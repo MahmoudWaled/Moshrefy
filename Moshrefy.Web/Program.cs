@@ -23,6 +23,8 @@ using Moshrefy.Application.Interfaces.IUnitOfWork;
 using Moshrefy.infrastructure.UnitOfWork;
 using System;
 using System.Text;
+using Moshrefy.Web.MappingProfiles;
+using AcademicYearProfile = Moshrefy.Application.MappingProfiles.AcademicYearProfile;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -91,7 +93,10 @@ builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // AutoMapper configuration
+// For Application Mapping Profiles
 builder.Services.AddAutoMapper(cfg => { }, typeof(AcademicYearProfile).Assembly);
+// For Web Mapping Profiles
+builder.Services.AddAutoMapper(cfg => { }, typeof(AuthProfile).Assembly);
 
 // Identity configuration
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
@@ -145,6 +150,13 @@ builder.Services.AddAuthorization(options =>
 
 builder.Services.AddScoped<IAuthorizationHandler, CenterAccessHandler>();
 
+// Add session services
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 var app = builder.Build();
 
@@ -172,6 +184,7 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseSession();
 
 app.MapStaticAssets();
 
@@ -182,3 +195,4 @@ app.MapControllerRoute(
 
 
 app.Run();
+
