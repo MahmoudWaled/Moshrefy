@@ -1,5 +1,4 @@
-﻿
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <!--
 This is a starter template page. Use this page to start your new project from
 scratch. This page gets rid of all links and provides the needed markup only.
@@ -28,7 +27,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
         <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
       </li>
       <li class="nav-item d-none d-sm-inline-block">
-        <a href="index3.html" class="nav-link">Home</a>
+        <a asp-controller="Home" asp-action="Index" class="nav-link">Home</a>
       </li>
       <li class="nav-item d-none d-sm-inline-block">
         <a href="#" class="nav-link">Contact</a>
@@ -59,101 +58,33 @@ scratch. This page gets rid of all links and provides the needed markup only.
         </div>
       </li>
 
-      <!-- Messages Dropdown Menu -->
-      <li class="nav-item dropdown">
-        <a class="nav-link" data-toggle="dropdown" href="#">
-          <i class="far fa-comments"></i>
-          <span class="badge badge-danger navbar-badge">3</span>
-        </a>
-        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-          <a href="#" class="dropdown-item">
-            <!-- Message Start -->
-            <div class="media">
-              <img src="dist/img/user1-128x128.jpg" alt="User Avatar" class="img-size-50 mr-3 img-circle">
-              <div class="media-body">
-                <h3 class="dropdown-item-title">
-                  Brad Diesel
-                  <span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span>
-                </h3>
-                <p class="text-sm">Call me whenever you can...</p>
-                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
-              </div>
-            </div>
-            <!-- Message End -->
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item">
-            <!-- Message Start -->
-            <div class="media">
-              <img src="dist/img/user8-128x128.jpg" alt="User Avatar" class="img-size-50 img-circle mr-3">
-              <div class="media-body">
-                <h3 class="dropdown-item-title">
-                  John Pierce
-                  <span class="float-right text-sm text-muted"><i class="fas fa-star"></i></span>
-                </h3>
-                <p class="text-sm">I got your message bro</p>
-                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
-              </div>
-            </div>
-            <!-- Message End -->
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item">
-            <!-- Message Start -->
-            <div class="media">
-              <img src="dist/img/user3-128x128.jpg" alt="User Avatar" class="img-size-50 img-circle mr-3">
-              <div class="media-body">
-                <h3 class="dropdown-item-title">
-                  Nora Silvester
-                  <span class="float-right text-sm text-warning"><i class="fas fa-star"></i></span>
-                </h3>
-                <p class="text-sm">The subject goes here</p>
-                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
-              </div>
-            </div>
-            <!-- Message End -->
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item dropdown-footer">See All Messages</a>
-        </div>
-      </li>
-      <!-- Notifications Dropdown Menu -->
-      <li class="nav-item dropdown">
-        <a class="nav-link" data-toggle="dropdown" href="#">
-          <i class="far fa-bell"></i>
-          <span class="badge badge-warning navbar-badge">15</span>
-        </a>
-        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-          <span class="dropdown-header">15 Notifications</span>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item">
-            <i class="fas fa-envelope mr-2"></i> 4 new messages
-            <span class="float-right text-muted text-sm">3 mins</span>
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item">
-            <i class="fas fa-users mr-2"></i> 8 friend requests
-            <span class="float-right text-muted text-sm">12 hours</span>
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item">
-            <i class="fas fa-file mr-2"></i> 3 new reports
-            <span class="float-right text-muted text-sm">2 days</span>
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
-        </div>
-      </li>
+      <!-- User Info -->
       <li class="nav-item">
-        <a class="nav-link" data-widget="fullscreen" href="#" role="button">
-          <i class="fas fa-expand-arrows-alt"></i>
+        <a class="nav-link" href="#">
+          <i class="fas fa-user mr-2"></i>
+          @{
+            var displayRole = "User";
+            if (User.IsInRole("SuperAdmin"))
+            {
+              displayRole = "Super Admin";
+            }
+            else if (User.IsInRole("Admin"))
+            {
+              displayRole = "Admin";
+            }
+            else if (User.IsInRole("Manager"))
+            {
+              displayRole = "Manager";
+            }
+            else if (User.IsInRole("Employee"))
+            {
+              displayRole = "Employee";
+            }
+          }
+          <span>@User.Identity?.Name (@displayRole)</span>
         </a>
       </li>
-      <li class="nav-item">
-        <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button">
-          <i class="fas fa-th-large"></i>
-        </a>
-      </li>
+     
     </ul>
   </nav>
   <!-- /.navbar -->
@@ -161,9 +92,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
   <!-- Main Sidebar Container -->
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
-    <a href="index3.html" class="brand-link">
-      <img src="dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-      <span class="brand-text font-weight-light">AdminLTE 3</span>
+    <a asp-controller="Home" asp-action="Index" class="brand-link">
+      <img src="~/dist/img/AdminLTELogo.png" alt="Moshrefy Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+      <span class="brand-text font-weight-light">Moshrefy</span>
     </a>
 
     <!-- Sidebar -->
@@ -171,45 +102,181 @@ scratch. This page gets rid of all links and provides the needed markup only.
       <!-- Sidebar Menu -->
       <nav class="mt-2">
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-          <!-- Add icons to the links using the .nav-icon class
-               with font-awesome or any other icon font library -->
-          <li class="nav-item menu-open">
-            <a href="#" class="nav-link active">
-              <i class="nav-icon fas fa-tachometer-alt"></i>
-              <p>
-                Starter Pages
-                <i class="right fas fa-angle-left"></i>
-              </p>
+        
+        <!-- Dashboard - All Roles -->
+        <li class="nav-item">
+          <a asp-controller="Home" asp-action="Index" class="nav-link">
+            <i class="nav-icon fas fa-tachometer-alt"></i>
+            <p>Dashboard</p>
+          </a>
+        </li>
+
+        <!-- SuperAdmin Only -->
+        @if (User.IsInRole("SuperAdmin"))
+        {
+          <li class="nav-item">
+            <a asp-controller="Center" asp-action="Index" class="nav-link">
+              <i class="nav-icon fas fa-building"></i>
+              <p>Centers</p>
             </a>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="#" class="nav-link active">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Active Page</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="#" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Inactive Page</p>
-                </a>
-              </li>
-            </ul>
           </li>
           <li class="nav-item">
-            <a href="#" class="nav-link">
-              <i class="nav-icon fas fa-th"></i>
-              <p>
-                Simple Link
-                <span class="right badge badge-danger">New</span>
-              </p>
+            <a asp-controller="User" asp-action="Index" class="nav-link">
+              <i class="nav-icon fas fa-users-cog"></i>
+              <p>User Management</p>
             </a>
           </li>
-        </ul>
-      </nav>
-      <!-- /.sidebar-menu -->
-    </div>
-    <!-- /.sidebar -->
+          <li class="nav-item">
+            <a asp-controller="Settings" asp-action="Index" class="nav-link">
+              <i class="nav-icon fas fa-cogs"></i>
+              <p>System Settings</p>
+            </a>
+          </li>
+        }
+
+        <!-- Admin & SuperAdmin -->
+        @if (User.IsInRole("SuperAdmin") || User.IsInRole("Admin"))
+        {
+          <li class="nav-header">ACADEMIC MANAGEMENT</li>
+          
+          <li class="nav-item">
+            <a asp-controller="AcademicYear" asp-action="Index" class="nav-link">
+              <i class="nav-icon fas fa-calendar-alt"></i>
+              <p>Academic Years</p>
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a asp-controller="Course" asp-action="Index" class="nav-link">
+              <i class="nav-icon fas fa-book"></i>
+              <p>Courses</p>
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a asp-controller="Classroom" asp-action="Index" class="nav-link">
+              <i class="nav-icon fas fa-door-open"></i>
+              <p>Classrooms</p>
+            </a>
+          </li>
+        }
+
+        <!-- Admin, Manager, SuperAdmin -->
+        @if (User.IsInRole("SuperAdmin") || User.IsInRole("Admin") || User.IsInRole("Manager"))
+        {
+          <li class="nav-header">PEOPLE</li>
+          
+          <li class="nav-item">
+            <a asp-controller="Student" asp-action="Index" class="nav-link">
+              <i class="nav-icon fas fa-user-graduate"></i>
+              <p>Students</p>
+            </a>
+          </li>
+
+          @if (User.IsInRole("SuperAdmin") || User.IsInRole("Admin"))
+          {
+            <li class="nav-item">
+              <a asp-controller="Teacher" asp-action="Index" class="nav-link">
+                <i class="nav-icon fas fa-chalkboard-teacher"></i>
+                <p>Teachers</p>
+              </a>
+            </li>
+          }
+
+          <li class="nav-item">
+            <a asp-controller="Enrollment" asp-action="Index" class="nav-link">
+              <i class="nav-icon fas fa-user-plus"></i>
+              <p>Enrollments</p>
+            </a>
+          </li>
+        }
+
+        <!-- All Roles - Sessions & Attendance -->
+        <li class="nav-header">OPERATIONS</li>
+        
+        <li class="nav-item">
+          <a asp-controller="Session" asp-action="Index" class="nav-link">
+            <i class="nav-icon fas fa-clock"></i>
+            <p>Sessions</p>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a asp-controller="Attendance" asp-action="Index" class="nav-link">
+            <i class="nav-icon fas fa-clipboard-check"></i>
+            <p>Attendance</p>
+          </a>
+        </li>
+
+        <!-- Admin & SuperAdmin - Exams -->
+        @if (User.IsInRole("SuperAdmin") || User.IsInRole("Admin"))
+        {
+          <li class="nav-item">
+            <a asp-controller="Exam" asp-action="Index" class="nav-link">
+              <i class="nav-icon fas fa-file-alt"></i>
+              <p>Exams & Results</p>
+            </a>
+          </li>
+        }
+
+        <!-- Financial - Admin, Manager, SuperAdmin -->
+        @if (User.IsInRole("SuperAdmin") || User.IsInRole("Admin") || User.IsInRole("Manager"))
+        {
+          <li class="nav-header">FINANCIAL</li>
+          
+          <li class="nav-item">
+            <a asp-controller="Payment" asp-action="Index" class="nav-link">
+              <i class="nav-icon fas fa-money-bill-wave"></i>
+              <p>Payments</p>
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a asp-controller="Invoice" asp-action="Index" class="nav-link">
+              <i class="nav-icon fas fa-file-invoice-dollar"></i>
+              <p>Invoices</p>
+            </a>
+          </li>
+
+          @if (User.IsInRole("SuperAdmin") || User.IsInRole("Admin"))
+          {
+            <li class="nav-item">
+              <a asp-controller="Item" asp-action="Index" class="nav-link">
+                <i class="nav-icon fas fa-box"></i>
+                <p>Items/Inventory</p>
+              </a>
+            </li>
+          }
+        }
+
+        <!-- Reports - Admin, Manager, SuperAdmin -->
+        @if (User.IsInRole("SuperAdmin") || User.IsInRole("Admin") || User.IsInRole("Manager"))
+        {
+          <li class="nav-header">REPORTS</li>
+          
+          <li class="nav-item">
+            <a asp-controller="Report" asp-action="Index" class="nav-link">
+              <i class="nav-icon fas fa-chart-bar"></i>
+              <p>Reports</p>
+            </a>
+          </li>
+        }
+
+        <!-- Logout - All Roles -->
+        <li class="nav-item">
+          <form asp-controller="Auth" asp-action="Logout" method="post">
+            <button type="submit" class="nav-link btn btn-link text-left w-100">
+              <i class="nav-icon fas fa-sign-out-alt"></i>
+              <p>Logout</p>
+            </button>
+          </form>
+        </li>
+
+      </ul>
+    </nav>
+    <!-- /.sidebar-menu -->
+  </div>
+  <!-- /.sidebar -->
   </aside>
 
   <!-- Content Wrapper. Contains page content -->

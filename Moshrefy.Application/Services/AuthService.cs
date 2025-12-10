@@ -17,9 +17,7 @@ namespace Moshrefy.Application.Services
     public class AuthService(
         UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager,
-        IJwtTokenService jwtTokenService,
         IUnitOfWork unitOfWork,
-        ITokenBlacklistService tokenBlacklistService,
         IHttpContextAccessor httpContextAccessor,
         IConfiguration configuration,
         IEmailService emailService,
@@ -27,54 +25,6 @@ namespace Moshrefy.Application.Services
     {
         private readonly ILogger<AuthService> _logger = logger;
 
-        public async Task<AuthResponseDTO> LoginAsync(LoginUserDTO loginUserDTO)
-        {
-            var user = await userManager.FindByNameAsync(loginUserDTO.UserName);
-            if (user == null)
-                throw new UnauthorizedAccessException("Invalid username or password.");
-
-            if (!user.IsActive || user.IsDeleted)
-                throw new UnauthorizedAccessException("User account is inactive or deleted.");
-
-            var result = await signInManager.CheckPasswordSignInAsync(user, loginUserDTO.Password, lockoutOnFailure: true);
-
-            if (!result.Succeeded)
-            {
-                if (result.IsLockedOut)
-                {
-                    throw new UnauthorizedAccessException("Account is locked out.");
-                }
-                throw new UnauthorizedAccessException("Invalid username or password.");
-            }
-
-            var roles = await userManager.GetRolesAsync(user);
-            var accessToken = jwtTokenService.GenerateAccessToken(user, roles);
-            var refreshToken = jwtTokenService.GenerateRefreshToken();
-
-            // Store refresh token
-            var refreshTokenEntity = new RefreshToken
-            {
-                UserId = user.Id,
-                Token = refreshToken,
-                ExpiresAt = DateTime.UtcNow.AddDays(7) // 7 days expiry
-            };
-
-            await unitOfWork.RefreshTokens.AddAsync(refreshTokenEntity);
-            await unitOfWork.SaveChangesAsync();
-
-            var tokenExpiryMinutes = int.Parse(configuration["Jwt:TokenExpiryMinutes"] ?? "60");
-
-            return new AuthResponseDTO
-            {
-                Success = true,
-                Token = accessToken,
-                RefreshToken = refreshToken,
-                ExpiresAt = DateTime.UtcNow.AddMinutes(tokenExpiryMinutes),
-                UserId = user.Id,
-                UserName = user.UserName!,
-                Roles = roles
-            };
-        }
 
         public async Task<AuthResponseDTO> ResetPasswordAsync(ResetPasswordDTO resetPasswordDTO)
         {
@@ -98,31 +48,15 @@ namespace Moshrefy.Application.Services
 
             _logger.LogInformation("Password reset successful for user {UserId}", resetPasswordDTO.UserId);
 
-            var roles = await userManager.GetRolesAsync(user);
-            var accessToken = jwtTokenService.GenerateAccessToken(user, roles);
-            var refreshToken = jwtTokenService.GenerateRefreshToken();
-
-            // Store refresh token
-            var refreshTokenEntity = new RefreshToken
-            {
-                UserId = user.Id,
-                Token = refreshToken,
-                ExpiresAt = DateTime.UtcNow.AddDays(7)
-            };
-
-            await unitOfWork.RefreshTokens.AddAsync(refreshTokenEntity);
-            await unitOfWork.SaveChangesAsync();
-            var tokenExpiryMinutes = int.Parse(configuration["Jwt:TokenExpiryMinutes"] ?? "60");
+            // After password reset, automatically sign in the user
+            await signInManager.SignInAsync(user, isPersistent: false);
 
             return new AuthResponseDTO
             {
                 Success = true,
-                Token = accessToken,
-                RefreshToken = refreshToken,
-                ExpiresAt = DateTime.UtcNow.AddMinutes(tokenExpiryMinutes),
                 UserId = user.Id,
                 UserName = user.UserName!,
-                Roles = roles
+                Roles = (await userManager.GetRolesAsync(user)).ToList()
             };
         }
 
@@ -139,8 +73,8 @@ namespace Moshrefy.Application.Services
             var encodedToken = HttpUtility.UrlEncode(token);
             
             // Build reset link - adjust the base URL according to your frontend
-            var baseUrl = configuration["AppSettings:FrontendUrl"] ?? "https://localhost:3000";
-            var resetLink = $"{baseUrl}/reset-password?userId={user.Id}&token={encodedToken}";
+            var baseUrl = configuration["AppSettings:FrontendUrl"] ?? "https://localhost:5001";
+            var resetLink = $"{baseUrl}/Auth/ResetPassword?userId={user.Id}&token={encodedToken}";
 
             try
             {
@@ -211,70 +145,53 @@ namespace Moshrefy.Application.Services
             var encodedToken = HttpUtility.UrlEncode(token);
             
             // Build confirmation link - adjust the base URL according to your frontend
-            var baseUrl = configuration["AppSettings:FrontendUrl"] ?? "https://localhost:3000";
-            var confirmationLink = $"{baseUrl}/confirm-email?userId={user.Id}&token={encodedToken}";
+            var baseUrl = configuration["AppSettings:FrontendUrl"] ?? "https://localhost:5001";
+            var confirmationLink = $"{baseUrl}/Auth/ConfirmEmail?userId={user.Id}&token={encodedToken}";
 
             await emailService.SendEmailConfirmationAsync(user.Email!, user.UserName!, confirmationLink);
 
             return true;
         }
 
-        public async Task<string> RefreshTokenAsync(string refreshToken)
-        {
-            var storedToken = await unitOfWork.RefreshTokens.GetByTokenAsync(refreshToken);
-
-            if (storedToken == null || storedToken.ExpiresAt < DateTime.UtcNow)
-                throw new UnauthorizedAccessException("Invalid or expired refresh token.");
-
-            var user = await userManager.FindByIdAsync(storedToken.UserId);
-            if (user == null || !user.IsActive || user.IsDeleted)
-                throw new UnauthorizedAccessException("User not found or inactive.");
-
-            var roles = await userManager.GetRolesAsync(user);
-            var newAccessToken = jwtTokenService.GenerateAccessToken(user, roles);
-
-            return newAccessToken;
-        }
-
         public async Task LogoutAsync()
         {
-            // Get the current access token from the request
-            var token = httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString()?.Replace("Bearer ", "");
-
-            if (!string.IsNullOrEmpty(token))
-            {
-                // Get token expiration time
-                var tokenHandler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
-                var jwtToken = tokenHandler.ReadJwtToken(token);
-                var expiration = jwtToken.ValidTo - DateTime.UtcNow;
-
-                // Add token to blacklist until it expires
-                await tokenBlacklistService.BlacklistTokenAsync(token, expiration);
-            }
-
-            // Get user ID and revoke all refresh tokens
-            var userId = httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!string.IsNullOrEmpty(userId))
-            {
-                await unitOfWork.RefreshTokens.DeleteByUserIdAsync(userId);
-                await unitOfWork.SaveChangesAsync();
-            }
-
             await signInManager.SignOutAsync();
         }
 
-        public async Task RevokeRefreshTokenAsync(string refreshToken, string userId)
+        public Task RevokeRefreshTokenAsync(string refreshToken, string userId)
         {
-            var storedToken = await unitOfWork.RefreshTokens.GetByTokenAsync(refreshToken);
+            throw new NotImplementedException("JWT refresh tokens are disabled. Cookie authentication is used.");
+        }
 
-            if (storedToken == null)
-                throw new NoDataFoundException("Refresh token not found.");
+        // Cookie-based authentication methods (for MVC)
+        public async Task CookieLoginAsync(string userName, string password)
+        {
+            var user = await userManager.FindByNameAsync(userName);
+            if (user == null)
+                throw new UnauthorizedAccessException("Invalid username or password.");
 
-            if (storedToken.UserId != userId)
-                throw new UnauthorizedAccessException("This token does not belong to the current user.");
+            if (!user.IsActive || user.IsDeleted)
+                throw new UnauthorizedAccessException("User account is inactive or deleted.");
 
-            await unitOfWork.RefreshTokens.DeleteByTokenAsync(refreshToken);
-            await unitOfWork.SaveChangesAsync();
+            var result = await signInManager.PasswordSignInAsync(
+                userName, 
+                password, 
+                isPersistent: false, 
+                lockoutOnFailure: true);
+
+            if (!result.Succeeded)
+            {
+                if (result.IsLockedOut)
+                {
+                    throw new UnauthorizedAccessException("Account is locked out.");
+                }
+                throw new UnauthorizedAccessException("Invalid username or password.");
+            }
+        }
+
+        public async Task CookieLogoutAsync()
+        {
+            await signInManager.SignOutAsync();
         }
     }
 }

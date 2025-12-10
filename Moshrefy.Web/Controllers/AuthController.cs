@@ -1,7 +1,6 @@
-using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Moshrefy.Application.DTOs.User;
 using Moshrefy.Application.Interfaces.IServices;
 using Moshrefy.Web.Models;
 
@@ -10,13 +9,13 @@ namespace Moshrefy.Web.Controllers
     public class AuthController : Controller
     {
         private readonly IAuthService _authService;
-        private readonly IMapper _mapper;
         private readonly ILogger<AuthController> _logger;
 
-        public AuthController(IAuthService authService, IMapper mapper, ILogger<AuthController> logger)
+        public AuthController(
+            IAuthService authService,
+            ILogger<AuthController> logger)
         {
             _authService = authService;
-            _mapper = mapper;
             _logger = logger;
         }
 
@@ -44,55 +43,23 @@ namespace Moshrefy.Web.Controllers
 
             try
             {
-                var loginUserDTO = _mapper.Map<LoginUserDTO>(loginVM);
+                // Use IAuthService to handle cookie-based login
+                await _authService.CookieLoginAsync(loginVM.UserName, loginVM.Password);
 
-                var response = await _authService.LoginAsync(loginUserDTO);
-
-                if (response.Success)
-                {
-                    // Store authentication token in cookie or session
-                    HttpContext.Response.Cookies.Append("AuthToken", response.Token, new CookieOptions
-                    {
-                        HttpOnly = true,
-                        Secure = true,
-                        SameSite = SameSiteMode.Strict,
-                        Expires = response.ExpiresAt
-                    });
-
-                    // Store refresh token
-                    if (!string.IsNullOrEmpty(response.RefreshToken))
-                    {
-                        HttpContext.Response.Cookies.Append("RefreshToken", response.RefreshToken, new CookieOptions
-                        {
-                            HttpOnly = true,
-                            Secure = true,
-                            SameSite = SameSiteMode.Strict,
-                            Expires = DateTimeOffset.UtcNow.AddDays(7)
-                        });
-                    }
-
-                    // Store user info in session
-                    HttpContext.Session.SetString("UserId", response.UserId);
-                    HttpContext.Session.SetString("UserName", response.UserName);
-
-                    _logger.LogInformation($"User {loginVM.UserName} logged in successfully", loginVM.UserName, DateTime.UtcNow);
-                    
-                    TempData["SuccessMessage"] = "Login successful!";
-                    return RedirectToAction("Index", "Home");
-                }
-
-                ModelState.AddModelError(string.Empty, "Login failed. Please try again.");
-                return View(loginVM);
+                _logger.LogInformation($"User {loginVM.UserName} logged in successfully at {DateTime.UtcNow}");
+                
+                TempData["SuccessMessage"] = "Login successful!";
+                return RedirectToAction("Index", "Home");
             }
             catch (UnauthorizedAccessException ex)
             {
-                _logger.LogWarning(ex, $"Unauthorized login attempt for user {loginVM.UserName}", loginVM.UserName);
+                _logger.LogWarning(ex, $"Unauthorized login attempt for user {loginVM.UserName}");
                 ModelState.AddModelError(string.Empty, ex.Message);
                 return View(loginVM);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error during login for user {loginVM.UserName}", loginVM.UserName);
+                _logger.LogError(ex, $"Error during login for user {loginVM.UserName}");
                 ModelState.AddModelError(string.Empty, "An error occurred during login. Please try again later.");
                 return View(loginVM);
             }
@@ -104,18 +71,11 @@ namespace Moshrefy.Web.Controllers
         {
             try
             {
-                var userName = HttpContext.Session.GetString("UserName");
+                var userName = User.Identity?.Name;
                 
-                await _authService.LogoutAsync();
+                await _authService.CookieLogoutAsync();
 
-                // Clear cookies
-                HttpContext.Response.Cookies.Delete("AuthToken");
-                HttpContext.Response.Cookies.Delete("RefreshToken");
-
-                // Clear session
-                HttpContext.Session.Clear();
-
-                _logger.LogInformation($"User {userName} logged out successfully at {DateTime.UtcNow}", userName, DateTime.UtcNow);
+                _logger.LogInformation($"User {userName} logged out successfully at {DateTime.UtcNow}");
                 
                 TempData["SuccessMessage"] = "You have been logged out successfully.";
                 return RedirectToAction("Login");
@@ -125,6 +85,12 @@ namespace Moshrefy.Web.Controllers
                 _logger.LogError(ex, "Error during logout");
                 return RedirectToAction("Login");
             }
+        }
+
+        [HttpGet]
+        public IActionResult AccessDenied()
+        {
+            return View();
         }
     }
 }

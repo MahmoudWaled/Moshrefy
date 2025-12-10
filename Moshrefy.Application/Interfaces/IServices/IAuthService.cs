@@ -5,15 +5,18 @@ namespace Moshrefy.Application.Interfaces.IServices
 {
     public interface IAuthService
     {
-        Task<AuthResponseDTO> LoginAsync(LoginUserDTO loginUserDTO);
+        
+        // Cookie-based authentication (for MVC)
+        Task CookieLoginAsync(string userName, string password);
+        Task CookieLogoutAsync();
+        
+
         Task<AuthResponseDTO> ResetPasswordAsync(ResetPasswordDTO resetPasswordDTO);
         Task RequestResetPasswordAsync(RequestResetPasswordDTO requestResetPasswordDTO);
         Task ChangePasswordAsync(ChangePasswordDTO changePasswordDTO, string userId);
         Task<bool> ConfirmEmailAsync(string userId, string token);
         Task<bool> ResendConfirmationEmailAsync(string email);
-        Task<string> RefreshTokenAsync(string refreshToken);
         Task LogoutAsync();
-        Task RevokeRefreshTokenAsync(string refreshToken, string userId);
     }
 }
 
