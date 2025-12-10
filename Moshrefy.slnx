@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Moshrefy.Application/Moshrefy.Application.csproj" />
+  <Project Path="Moshrefy.Domain/Moshrefy.Domain.csproj" />
+  <Project Path="Moshrefy.Infrastructure/Moshrefy.Infrastructure.csproj" />
+  <Project Path="Moshrefy.Web/Moshrefy.Web.csproj" />
+</Solution>

@@ -1,0 +1,32 @@
+using Microsoft.EntityFrameworkCore;
+using Moshrefy.Application.Interfaces.IRepositories;
+using Moshrefy.Domain.Entities;
+using Moshrefy.infrastructure.Data;
+using Moshrefy.infrastructure.Repositories.GenericRepository;
+
+namespace Moshrefy.infrastructure.Repositories
+{
+    public class TeacherRepository(AppDbContext appDbContext) : GenericRepository<Teacher, int>(appDbContext), ITeacherRepository
+    {
+        public async Task<IEnumerable<Teacher>> GetActiveTeachersAsync()
+        {
+            return await appDbContext.Set<Teacher>()
+                .Where(t => t.IsActive)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Teacher>> GetByNameAsync(string teacherName)
+        {
+            return await appDbContext.Set<Teacher>()
+                .Where(t => t.Name.Contains(teacherName))
+                .ToListAsync();
+        }
+
+        public async Task<Teacher> GetByPhoneNumberAsync(string phoneNumber)
+        {
+            return await appDbContext.Set<Teacher>()
+                .Where(t => t.Phone == phoneNumber)
+                .FirstOrDefaultAsync();
+        }
+    }
+}
