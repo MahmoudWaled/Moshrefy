@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Moshrefy.Domain.Enums;
 using System.ComponentModel.DataAnnotations;
 
@@ -20,5 +21,8 @@ namespace Moshrefy.Web.Models.Item
         [Required(ErrorMessage = "Item status is required")]
         [Display(Name = "Item Status")]
         public ItemStatus ItemStatus { get; set; }
+
+        // For dropdown list
+        public SelectList? Students { get; set; }
     }
 }

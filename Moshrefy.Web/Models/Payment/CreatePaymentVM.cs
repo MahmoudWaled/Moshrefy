@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Moshrefy.Domain.Enums;
 using System.ComponentModel.DataAnnotations;
 
@@ -40,5 +41,12 @@ namespace Moshrefy.Web.Models.Payment
         [Required(ErrorMessage = "Exam is required")]
         [Display(Name = "Exam")]
         public int ExamId { get; set; }
+
+        // For dropdown lists
+        public SelectList? Invoices { get; set; }
+        public SelectList? Students { get; set; }
+        public SelectList? Sessions { get; set; }
+        public SelectList? TeacherItems { get; set; }
+        public SelectList? Exams { get; set; }
     }
 }

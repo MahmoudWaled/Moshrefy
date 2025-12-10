@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Moshrefy.Domain.Enums;
 using System.ComponentModel.DataAnnotations;
 
@@ -42,5 +43,10 @@ namespace Moshrefy.Web.Models.Exam
         [Required(ErrorMessage = "Teacher course is required")]
         [Display(Name = "Teacher Course")]
         public int TeacherCourseId { get; set; }
+
+        // For dropdown lists
+        public SelectList? Courses { get; set; }
+        public SelectList? Classrooms { get; set; }
+        public SelectList? TeacherCourses { get; set; }
     }
 }

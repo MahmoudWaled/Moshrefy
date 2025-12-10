@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
 namespace Moshrefy.Web.Models.Enrollment
@@ -11,5 +12,9 @@ namespace Moshrefy.Web.Models.Enrollment
         [Required(ErrorMessage = "Course is required")]
         [Display(Name = "Course")]
         public int CourseId { get; set; }
+
+        // For dropdown lists
+        public SelectList? Students { get; set; }
+        public SelectList? Courses { get; set; }
     }
 }

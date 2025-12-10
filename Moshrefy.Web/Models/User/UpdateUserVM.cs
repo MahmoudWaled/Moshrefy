@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
 namespace Moshrefy.Web.Models.User
@@ -23,5 +24,8 @@ namespace Moshrefy.Web.Models.User
 
         [Display(Name = "Is Active")]
         public bool IsActive { get; set; } = true;
+
+        // For dropdown list
+        public SelectList? Centers { get; set; }
     }
 }

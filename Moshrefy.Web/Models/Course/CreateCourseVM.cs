@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
 namespace Moshrefy.Web.Models.Course
@@ -11,5 +12,8 @@ namespace Moshrefy.Web.Models.Course
         [Required(ErrorMessage = "Academic year is required")]
         [Display(Name = "Academic Year")]
         public int AcademicYearId { get; set; }
+
+        // For dropdown list
+        public SelectList? AcademicYears { get; set; }
     }
 }

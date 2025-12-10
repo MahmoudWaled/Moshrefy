@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
 namespace Moshrefy.Web.Models.Item
@@ -7,5 +8,8 @@ namespace Moshrefy.Web.Models.Item
         [Required(ErrorMessage = "Student is required")]
         [Display(Name = "Student")]
         public int StudentId { get; set; }
+
+        // For dropdown list
+        public SelectList? Students { get; set; }
     }
 }

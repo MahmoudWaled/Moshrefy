@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
 namespace Moshrefy.Web.Models.TeacherItem
@@ -11,5 +12,9 @@ namespace Moshrefy.Web.Models.TeacherItem
         [Required(ErrorMessage = "Item is required")]
         [Display(Name = "Item")]
         public int ItemId { get; set; }
+
+        // For dropdown lists
+        public SelectList? Teachers { get; set; }
+        public SelectList? Items { get; set; }
     }
 }

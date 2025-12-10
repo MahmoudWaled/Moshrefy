@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
 namespace Moshrefy.Web.Models.Enrollment
@@ -14,5 +15,9 @@ namespace Moshrefy.Web.Models.Enrollment
 
         [Display(Name = "Is Active")]
         public bool IsActive { get; set; }
+
+        // For dropdown lists
+        public SelectList? Students { get; set; }
+        public SelectList? Courses { get; set; }
     }
 }

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Moshrefy.Domain.Enums;
 using System.ComponentModel.DataAnnotations;
 
@@ -32,5 +33,8 @@ namespace Moshrefy.Web.Models.User
         [Required(ErrorMessage = "Role is required")]
         [Display(Name = "Role")]
         public RolesNames RoleName { get; set; }
+
+        // For dropdown list
+        public SelectList? Centers { get; set; }
     }
 }
