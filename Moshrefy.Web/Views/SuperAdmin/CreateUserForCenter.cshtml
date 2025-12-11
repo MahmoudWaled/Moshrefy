@@ -1,0 +1,190 @@
+@model Moshrefy.Web.Models.User.CreateUserVM
+
+@{
+    ViewData["Title"] = "Create User for Center";
+}
+
+<!-- Content Header -->
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>
+                    <i class="fas fa-user-plus"></i> Create User for Center
+                </h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a asp-action="Index">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a asp-action="Users">Users</a></li>
+                    <li class="breadcrumb-item active">Create User</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <div class="card card-success">
+                    <div class="card-header">
+                        <h3 class="card-title">User Information</h3>
+                    </div>
+
+                    <form asp-action="CreateUserForCenter" method="post">
+                        <div class="card-body">
+                            <!-- Alert messages -->
+                            @if (TempData["ErrorMessage"] != null)
+                            {
+                                <div class="alert alert-danger alert-dismissible fade show">
+                                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                                    <i class="fas fa-exclamation-circle"></i> @TempData["ErrorMessage"]
+                                </div>
+                            }
+
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                            <!-- Center Selection -->
+                            <div class="form-group">
+                                <label asp-for="CenterId" class="control-label">
+                                    <i class="fas fa-building"></i> Select Center *
+                                </label>
+                                <select asp-for="CenterId" 
+                                        class="form-control select2" 
+                                        asp-items="Model.Centers"
+                                        style="width: 100%;">
+                                    <option value="">-- Select a Center --</option>
+                                </select>
+                                <span asp-validation-for="CenterId" class="text-danger"></span>
+                                <small class="form-text text-muted">
+                                    Select the center this user will belong to
+                                </small>
+                            </div>
+
+                            <!-- Role Selection -->
+                            <div class="form-group">
+                                <label asp-for="RoleName" class="control-label">
+                                    <i class="fas fa-user-tag"></i> User Role *
+                                </label>
+                                <select asp-for="RoleName" class="form-control">
+                                    <option value="">-- Select a Role --</option>
+                                    <option value="Manager">Manager</option>
+                                    <option value="Employee">Employee</option>
+                                </select>
+                                <span asp-validation-for="RoleName" class="text-danger"></span>
+                                <small class="form-text text-muted">
+                                    Select the role for this user
+                                </small>
+                            </div>
+
+                            <!-- Full Name -->
+                            <div class="form-group">
+                                <label asp-for="Name" class="control-label">
+                                    <i class="fas fa-user"></i> Full Name *
+                                </label>
+                                <input asp-for="Name" class="form-control" placeholder="Enter full name" />
+                                <span asp-validation-for="Name" class="text-danger"></span>
+                            </div>
+
+                            <!-- Username -->
+                            <div class="form-group">
+                                <label asp-for="UserName" class="control-label">
+                                    <i class="fas fa-at"></i> Username *
+                                </label>
+                                <input asp-for="UserName" class="form-control" placeholder="Enter username" />
+                                <span asp-validation-for="UserName" class="text-danger"></span>
+                                <small class="form-text text-muted">
+                                    Used for login. Must be unique.
+                                </small>
+                            </div>
+
+                            <!-- Email -->
+                            <div class="form-group">
+                                <label asp-for="Email" class="control-label">
+                                    <i class="fas fa-envelope"></i> Email Address
+                                </label>
+                                <input asp-for="Email" class="form-control" placeholder="user@example.com" />
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
+
+                            <!-- Phone Number -->
+                            <div class="form-group">
+                                <label asp-for="PhoneNumber" class="control-label">
+                                    <i class="fas fa-phone"></i> Phone Number
+                                </label>
+                                <input asp-for="PhoneNumber" class="form-control" placeholder="+1234567890" />
+                                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                            </div>
+
+                            <!-- Password -->
+                            <div class="form-group">
+                                <label asp-for="Password" class="control-label">
+                                    <i class="fas fa-lock"></i> Password *
+                                </label>
+                                <input asp-for="Password" class="form-control" placeholder="Enter password" />
+                                <span asp-validation-for="Password" class="text-danger"></span>
+                                <small class="form-text text-muted">
+                                    Minimum 6 characters. The user can change this later.
+                                </small>
+                            </div>
+
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle"></i>
+                                <strong>Note:</strong> This will create a user account for the selected center with the specified role.
+                            </div>
+                        </div>
+
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save"></i> Create User
+                            </button>
+                            <a asp-action="Users" class="btn btn-default">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <!-- Select2 -->
+    <link rel="stylesheet" href="~/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="~/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
+    <script src="~/plugins/select2/js/select2.full.min.js"></script>
+
+    <script>
+        $(function () {
+            // Initialize Select2 with search
+            $('.select2').select2({
+                theme: 'bootstrap4',
+                placeholder: '-- Select a Center --',
+                allowClear: true,
+                ajax: {
+                    url: '@Url.Action("SearchCenters", "SuperAdmin")',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return {
+                            term: params.term // search term
+                        };
+                    },
+                    processResults: function (data) {
+                        return {
+                            results: data.results
+                        };
+                    },
+                    cache: true
+                },
+                minimumInputLength: 0
+            });
+        });
+    </script>
+}

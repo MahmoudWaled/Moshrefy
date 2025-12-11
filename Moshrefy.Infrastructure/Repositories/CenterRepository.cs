@@ -11,16 +11,27 @@ namespace Moshrefy.infrastructure.Repositories
     {
         private readonly AppDbContext appDbContext = appDbContext;
 
+        public async Task<IEnumerable<Center>> GetNonDeletedCentersAsync(PaginationParamter paginationParamter)
+        {
+            var pageNumber = paginationParamter.PageNumber ?? 1;
+            var pageSize = paginationParamter.PageSize ?? 25;
+
+            return await appDbContext.Set<Center>()
+                .Where(c => !c.IsDeleted)
+                .OrderByDescending(c => c.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
         public async Task<IEnumerable<Center>> GetActiveCentersAsync(PaginationParamter paginationParamter)
         {
             var pageNumber = paginationParamter.PageNumber ?? 1;
-            var pageSize = paginationParamter.PageSize ?? 40;
-
-            if (pageSize > 40)
-                pageSize = 40;
+            var pageSize = paginationParamter.PageSize ?? 25;
 
             return await appDbContext.Set<Center>()
                 .Where(c => c.IsActive && !c.IsDeleted)
+                .OrderByDescending(c => c.CreatedAt)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
@@ -29,13 +40,11 @@ namespace Moshrefy.infrastructure.Repositories
         public async Task<IEnumerable<Center>> GetInactiveCentersAsync(PaginationParamter paginationParamter)
         {
             var pageNumber = paginationParamter.PageNumber ?? 1;
-            var pageSize = paginationParamter.PageSize ?? 40;
-
-            if (pageSize > 40)
-                pageSize = 40;
+            var pageSize = paginationParamter.PageSize ?? 25;
 
             return await appDbContext.Set<Center>()
                 .Where(c => !c.IsActive && !c.IsDeleted)
+                .OrderByDescending(c => c.CreatedAt)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
@@ -44,13 +53,11 @@ namespace Moshrefy.infrastructure.Repositories
         public async Task<IEnumerable<Center>> GetDeletedCentersAsync(PaginationParamter paginationParamter)
         {
             var pageNumber = paginationParamter.PageNumber ?? 1;
-            var pageSize = paginationParamter.PageSize ?? 40;
-
-            if (pageSize > 40)
-                pageSize = 40;
+            var pageSize = paginationParamter.PageSize ?? 25;
 
             return await appDbContext.Set<Center>()
                 .Where(c => c.IsDeleted)
+                .OrderByDescending(c => c.ModifiedAt)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
@@ -61,6 +68,25 @@ namespace Moshrefy.infrastructure.Repositories
             return await appDbContext.Set<Center>()
                 .Where(c => c.Name.Contains(centerName))
                 .ToListAsync();
+        }
+
+        public async Task<int> GetTotalCountAsync()
+        {
+            return await appDbContext.Set<Center>().CountAsync();
+        }
+
+        public async Task<int> GetNonDeletedCountAsync()
+        {
+            return await appDbContext.Set<Center>()
+                .Where(c => !c.IsDeleted)
+                .CountAsync();
+        }
+
+        public async Task<int> GetDeletedCountAsync()
+        {
+            return await appDbContext.Set<Center>()
+                .Where(c => c.IsDeleted)
+                .CountAsync();
         }
     }
 }

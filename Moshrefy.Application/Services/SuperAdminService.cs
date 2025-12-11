@@ -51,6 +51,22 @@ namespace Moshrefy.Application.Services
             return _mapper.Map<List<CenterResponseDTO>>(centers);
         }
 
+        public async Task<int> GetTotalCentersCountAsync()
+        {
+            return await _unitOfWork.Centers.GetTotalCountAsync();
+        }
+
+        public async Task<List<CenterResponseDTO>> GetNonDeletedCentersAsync(PaginationParamter paginationParamter)
+        {
+            var centers = await _unitOfWork.Centers.GetNonDeletedCentersAsync(paginationParamter);
+            return _mapper.Map<List<CenterResponseDTO>>(centers);
+        }
+
+        public async Task<int> GetNonDeletedCentersCountAsync()
+        {
+            return await _unitOfWork.Centers.GetNonDeletedCountAsync();
+        }
+
         public async Task<List<CenterResponseDTO>> GetActiveCentersAsync(PaginationParamter paginationParamter)
         {
             var activeCenters = await _unitOfWork.Centers.GetActiveCentersAsync(paginationParamter);
@@ -67,6 +83,11 @@ namespace Moshrefy.Application.Services
         {
             var deletedCenters = await _unitOfWork.Centers.GetDeletedCentersAsync(paginationParamter);
             return _mapper.Map<List<CenterResponseDTO>>(deletedCenters);
+        }
+
+        public async Task<int> GetDeletedCentersCountAsync()
+        {
+            return await _unitOfWork.Centers.GetDeletedCountAsync();
         }
 
         public async Task<CenterResponseDTO> GetCenterByIdAsync(int centerId)
@@ -109,7 +130,7 @@ namespace Moshrefy.Application.Services
             await _unitOfWork.SaveChangesAsync();
         }
 
-        public async Task DeleteCenterAsync(int centerId)
+        public async Task SoftDeleteCenterAsync(int centerId)
         {
             if (centerId <= 0)
                 throw new BadRequestException("Invalid center id.");
@@ -133,6 +154,20 @@ namespace Moshrefy.Application.Services
             center.ModifiedAt = DateTimeOffset.UtcNow;
 
             _unitOfWork.Centers.UpdateAsync(center);
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task DeleteCenterAsync(int centerId)
+        {
+            if (centerId <= 0)
+                throw new BadRequestException("Invalid center id.");
+
+            var center = await _unitOfWork.Centers.GetByIdAsync(centerId);
+
+            if (center == null)
+                throw new NotFoundException<int>(nameof(Center), "id", centerId);
+
+            _unitOfWork.Centers.DeleteAsync(center);
             await _unitOfWork.SaveChangesAsync();
         }
 
@@ -221,6 +256,8 @@ namespace Moshrefy.Application.Services
             await _unitOfWork.SaveChangesAsync();
         }
 
+       
+
         #endregion Center Management
 
         #region User Management
@@ -271,6 +308,149 @@ namespace Moshrefy.Application.Services
 
             await _userManager.UpdateAsync(user);
 
+            await _userManager.AddToRoleAsync(user, createUserDTO.RoleName.ToString());
+
+            // Reload user with Center navigation property
+            var createdUser = await _userManager.Users
+                .Include(u => u.Center)
+                .FirstOrDefaultAsync(u => u.Id == user.Id);
+
+            return _mapper.Map<UserResponseDTO>(createdUser ?? user);
+        }
+
+        public async Task<UserResponseDTO> CreateCenterAdminAsync(int centerId, CreateUserDTO createUserDTO)
+        {
+            if (centerId <= 0)
+                throw new BadRequestException("Invalid center id.");
+
+            if (createUserDTO == null)
+                throw new BadRequestException("CreateUserDTO cannot be null.");
+
+            // Verify center exists
+            var center = await _unitOfWork.Centers.GetByIdAsync(centerId);
+            if (center == null)
+                throw new NotFoundException<int>(nameof(Center), "id", centerId);
+
+            if (center.IsDeleted)
+                throw new BadRequestException("Cannot create user for a deleted center.");
+
+            if (!center.IsActive)
+                throw new BadRequestException("Cannot create user for an inactive center.");
+
+            // Check username uniqueness
+            if (!string.IsNullOrEmpty(createUserDTO.UserName))
+            {
+                var existingUser = await _userManager.FindByNameAsync(createUserDTO.UserName);
+                if (existingUser != null)
+                    throw new ConflictException($"A user with username {createUserDTO.UserName} already exists.");
+            }
+
+            // Check email uniqueness
+            if (!string.IsNullOrEmpty(createUserDTO.Email))
+            {
+                var existingUser = await _userManager.FindByEmailAsync(createUserDTO.Email);
+                if (existingUser != null)
+                    throw new ConflictException($"A user with email {createUserDTO.Email} already exists.");
+            }
+
+            // Override CenterId to ensure it matches the parameter
+            createUserDTO.CenterId = centerId;
+            
+            // Create the user
+            var user = _mapper.Map<ApplicationUser>(createUserDTO);
+            user.IsActive = true;
+            user.IsDeleted = false;
+
+            var result = await _userManager.CreateAsync(user, createUserDTO.Password);
+            if (!result.Succeeded)
+            {
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                throw new BadRequestException($"Center admin creation failed: {errors}");
+            }
+
+            // Get current user info for audit
+            var currentUser = await _userManager.FindByIdAsync(_tenantContext.GetCurrentUserId());
+
+            // Set audit fields
+            user.CreatedById = currentUser?.Id;
+            user.CreatedByName = currentUser?.UserName;
+            user.CreatedAt = DateTime.UtcNow;
+
+            await _userManager.UpdateAsync(user);
+
+            // Assign Admin role (or the role specified in DTO)
+            var roleToAssign = createUserDTO.RoleName == RolesNames.Admin ? RolesNames.Admin : createUserDTO.RoleName;
+            await _userManager.AddToRoleAsync(user, roleToAssign.ToString());
+
+            // Reload user with Center navigation property
+            var createdUser = await _userManager.Users
+                .Include(u => u.Center)
+                .FirstOrDefaultAsync(u => u.Id == user.Id);
+
+            return _mapper.Map<UserResponseDTO>(createdUser ?? user);
+        }
+
+        public async Task<UserResponseDTO> CreateUserForCenterAsync(int centerId, CreateUserDTO createUserDTO)
+        {
+            if (centerId <= 0)
+                throw new BadRequestException("Invalid center id.");
+
+            if (createUserDTO == null)
+                throw new BadRequestException("CreateUserDTO cannot be null.");
+
+            // Verify center exists and is active
+            var center = await _unitOfWork.Centers.GetByIdAsync(centerId);
+            if (center == null)
+                throw new NotFoundException<int>(nameof(Center), "id", centerId);
+
+            if (center.IsDeleted)
+                throw new BadRequestException("Cannot create user for a deleted center.");
+
+            if (!center.IsActive)
+                throw new BadRequestException("Cannot create user for an inactive center.");
+
+            // Check username uniqueness
+            if (!string.IsNullOrEmpty(createUserDTO.UserName))
+            {
+                var existingUser = await _userManager.FindByNameAsync(createUserDTO.UserName);
+                if (existingUser != null)
+                    throw new ConflictException($"A user with username {createUserDTO.UserName} already exists.");
+            }
+
+            // Check email uniqueness
+            if (!string.IsNullOrEmpty(createUserDTO.Email))
+            {
+                var existingUser = await _userManager.FindByEmailAsync(createUserDTO.Email);
+                if (existingUser != null)
+                    throw new ConflictException($"A user with email {createUserDTO.Email} already exists.");
+            }
+
+            // Override CenterId to ensure it matches the parameter
+            createUserDTO.CenterId = centerId;
+
+            // Create the user
+            var user = _mapper.Map<ApplicationUser>(createUserDTO);
+            user.IsActive = true;
+            user.IsDeleted = false;
+
+            var result = await _userManager.CreateAsync(user, createUserDTO.Password);
+            if (!result.Succeeded)
+            {
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                throw new BadRequestException($"User creation failed: {errors}");
+            }
+
+            // Get current user info for audit
+            var currentUser = await _userManager.FindByIdAsync(_tenantContext.GetCurrentUserId());
+
+            // Set audit fields
+            user.CreatedById = currentUser?.Id;
+            user.CreatedByName = currentUser?.UserName;
+            user.CreatedAt = DateTime.UtcNow;
+
+            await _userManager.UpdateAsync(user);
+
+            // Assign the specified role
             await _userManager.AddToRoleAsync(user, createUserDTO.RoleName.ToString());
 
             // Reload user with Center navigation property
@@ -415,6 +595,68 @@ namespace Moshrefy.Application.Services
             }
         }
 
+        public async Task UpdateUserInAnyCenterAsync(string userId, UpdateUserDTO updateUserDTO)
+        {
+            if (string.IsNullOrEmpty(userId))
+                throw new BadRequestException("User id cannot be null.");
+
+            if (updateUserDTO == null)
+                throw new BadRequestException("UpdateUserDTO cannot be null.");
+
+            var user = await _userManager.Users
+                .Include(u => u.Center)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null)
+                throw new NotFoundException<string>(nameof(ApplicationUser), "id", userId);
+
+            // If CenterId is provided, verify the center exists and is valid
+            if (updateUserDTO.CenterId.HasValue)
+            {
+                var center = await _unitOfWork.Centers.GetByIdAsync(updateUserDTO.CenterId.Value);
+                if (center == null)
+                    throw new NotFoundException<int>(nameof(Center), "id", updateUserDTO.CenterId.Value);
+
+                if (center.IsDeleted)
+                    throw new BadRequestException("Cannot assign user to a deleted center.");
+
+                if (!center.IsActive)
+                    throw new BadRequestException("Cannot assign user to an inactive center.");
+            }
+
+            // Check username uniqueness
+            if (!string.IsNullOrEmpty(updateUserDTO.UserName) && updateUserDTO.UserName != user.UserName)
+            {
+                var existingUser = await _userManager.FindByNameAsync(updateUserDTO.UserName);
+                if (existingUser != null && existingUser.Id != userId)
+                    throw new ConflictException($"A user with username {updateUserDTO.UserName} already exists.");
+            }
+
+            // Check email uniqueness
+            if (!string.IsNullOrEmpty(updateUserDTO.Email) && updateUserDTO.Email != user.Email)
+            {
+                var existingUser = await _userManager.FindByEmailAsync(updateUserDTO.Email);
+                if (existingUser != null && existingUser.Id != userId)
+                    throw new ConflictException($"A user with email {updateUserDTO.Email} already exists.");
+            }
+
+            // Map updates
+            _mapper.Map(updateUserDTO, user);
+            
+            // Set audit fields
+            var currentUser = await _userManager.FindByIdAsync(_tenantContext.GetCurrentUserId());
+            user.ModifiedById = currentUser?.Id;
+            user.ModifiedByName = currentUser?.UserName;
+            user.ModifiedAt = DateTime.UtcNow;
+
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+            {
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                throw new BadRequestException($"User update failed: {errors}");
+            }
+        }
+
         public async Task SoftDeleteUserAsync(string userId)
         {
             if (string.IsNullOrEmpty(userId))
@@ -427,6 +669,7 @@ namespace Moshrefy.Application.Services
 
             if (user.IsDeleted)
                 throw new ConflictException("User is already deleted.");
+            
             var currentUser = await _userManager.FindByIdAsync(_tenantContext.GetCurrentUserId());
             user.IsDeleted = true;
             user.IsActive = false;
@@ -435,6 +678,65 @@ namespace Moshrefy.Application.Services
             user.ModifiedAt = DateTime.UtcNow;
 
             await _userManager.UpdateAsync(user);
+        }
+
+        public async Task SoftDeleteUserForCenterAsync(int centerId, string userId)
+        {
+            if (centerId <= 0)
+                throw new BadRequestException("Invalid center id.");
+
+            if (string.IsNullOrEmpty(userId))
+                throw new BadRequestException("User id cannot be null.");
+
+            // Verify center exists
+            var center = await _unitOfWork.Centers.GetByIdAsync(centerId);
+            if (center == null)
+                throw new NotFoundException<int>(nameof(Center), "id", centerId);
+
+            // Find user and verify they belong to this center
+            var user = await _userManager.Users
+                .Include(u => u.Center)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null)
+                throw new NotFoundException<string>(nameof(ApplicationUser), "id", userId);
+
+            if (user.CenterId != centerId)
+                throw new BadRequestException($"User does not belong to center with id {centerId}.");
+
+            if (user.IsDeleted)
+                throw new ConflictException("User is already deleted.");
+
+            // Soft delete the user
+            var currentUser = await _userManager.FindByIdAsync(_tenantContext.GetCurrentUserId());
+            user.IsDeleted = true;
+            user.IsActive = false;
+            user.ModifiedById = currentUser?.Id;
+            user.ModifiedByName = currentUser?.UserName;
+            user.ModifiedAt = DateTime.UtcNow;
+
+            await _userManager.UpdateAsync(user);
+        }
+
+        public async Task DeleteUserFromAnyCenterAsync(string userId)
+        {
+            if (string.IsNullOrEmpty(userId))
+                throw new BadRequestException("User id cannot be null.");
+
+            var user = await _userManager.Users
+                .Include(u => u.Center)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null)
+                throw new NotFoundException<string>(nameof(ApplicationUser), "id", userId);
+
+            // Hard delete - permanently remove the user
+            var result = await _userManager.DeleteAsync(user);
+            if (!result.Succeeded)
+            {
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                throw new FailedException($"User deletion failed: {errors}");
+            }
         }
 
         public async Task RestoreUserAsync(string userId)
@@ -588,18 +890,28 @@ namespace Moshrefy.Application.Services
         // Get overall system statistics (total centers, active/inactive centers, total users, active/inactive users)
         public async Task<SystemStatisticsDTO> GetSystemStatisticsAsync()
         {
-            var allCenters = await _unitOfWork.Centers.GetAllAsync(new PaginationParamter());
-            var totalCenters = allCenters.Count();
-            var activeCenters = allCenters.Count(c => c.IsActive && !c.IsDeleted);
+            // Use efficient COUNT() queries
+            var totalCenters = await _unitOfWork.Centers.GetTotalCountAsync();
+            var nonDeletedCenters = await _unitOfWork.Centers.GetNonDeletedCountAsync();
+            
+            // For active centers, we need a custom query since there's no direct count method
+            var activeCentersCount = await _unitOfWork.Centers
+                .GetActiveCentersAsync(new PaginationParamter { PageSize = 1 }); // Just to access the query
+            
+            // Load non-deleted centers and count active ones
+            // Since we need to check IsActive flag, this is more efficient than loading all
+            var nonDeletedCentersList = await _unitOfWork.Centers.GetNonDeletedCentersAsync(
+                new PaginationParamter { PageSize = 200 }); // Use max allowed
+            var activeCenters = nonDeletedCentersList.Count(c => c.IsActive);
 
             var totalUsers = await _userManager.Users.CountAsync();
             var activeUsers = await _userManager.Users.CountAsync(u => u.IsActive && !u.IsDeleted);
 
             return new SystemStatisticsDTO
             {
-                TotalCenters = totalCenters,
+                TotalCenters = nonDeletedCenters,  // Show only non-deleted centers in stats
                 ActiveCenters = activeCenters,
-                InactiveCenters = totalCenters - activeCenters,
+                InactiveCenters = nonDeletedCenters - activeCenters,
                 TotalUsers = totalUsers,
                 ActiveUsers = activeUsers,
                 InactiveUsers = totalUsers - activeUsers

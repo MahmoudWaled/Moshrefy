@@ -1,0 +1,85 @@
+@{
+    ViewData["Title"] = "User Management";
+}
+
+<!-- Content Header -->
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>
+                    <i class="fas fa-users-cog"></i> User Management
+                </h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a asp-action="Index">Dashboard</a></li>
+                    <li class="breadcrumb-item active">Users</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-list"></i> All Users
+                        </h3>
+                        <div class="card-tools">
+                            <div class="btn-group">
+                                <a asp-action="CreateCenterAdmin" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-user-shield"></i> Create Center Admin
+                                </a>
+                                <a asp-action="CreateUserForCenter" class="btn btn-success btn-sm">
+                                    <i class="fas fa-user-plus"></i> Create User
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <!-- Alert messages -->
+                        @if (TempData["SuccessMessage"] != null)
+                        {
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                <i class="fas fa-check-circle"></i>
+                                @TempData["SuccessMessage"]
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        }
+                        @if (TempData["ErrorMessage"] != null)
+                        {
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="fas fa-exclamation-circle"></i>
+                                @TempData["ErrorMessage"]
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        }
+
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>User Management Interface Coming Soon!</strong>
+                            <p class="mb-0">You can create center admins and users using the buttons above. The user listing table will be implemented in the next phase.</p>
+                        </div>
+
+                        <!-- TODO: Add DataTables implementation for user listing -->
+                        <div class="text-center py-5">
+                            <i class="fas fa-users fa-4x text-muted mb-3"></i>
+                            <h4 class="text-muted">User listing table will be implemented here</h4>
+                            <p class="text-muted">Similar to the Centers table with server-side processing</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

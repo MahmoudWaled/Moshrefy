@@ -10,7 +10,9 @@
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="~/plugins/fontawesome-free/css/all.min.css">
   <!-- Theme style -->
-    <link rel="stylesheet" href="~/dist/css/adminlte.min.css">
+  <link rel="stylesheet" href="~/dist/css/adminlte.min.css">
+  <!-- Custom styles -->
+  <link rel="stylesheet" href="~/css/site.css">
 </head>
 <body class="hold-transition sidebar-mini">
 <div class="wrapper">
@@ -117,7 +119,7 @@
             </a>
           </li>
           <li class="nav-item">
-            <a asp-controller="User" asp-action="Index" class="nav-link">
+            <a asp-controller="SuperAdmin" asp-action="Users" class="nav-link">
               <i class="nav-icon fas fa-users-cog"></i>
               <p>User Management</p>
             </a>

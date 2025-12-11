@@ -9,6 +9,7 @@ namespace Moshrefy.Application.DTOs.Center
         public string? Email { get; set; }
         public string Phone { get; set; } = default!;
         public bool IsActive { get; set; }
+        public bool IsDeleted { get; set; }
 
         // Audit fields
         public DateTimeOffset CreatedAt { get; set; }

@@ -16,6 +16,8 @@ namespace Moshrefy.Web.Models.Center
 
         public bool IsActive { get; set; }
 
+        public bool IsDeleted { get; set; }
+
         // Audit fields
         public DateTimeOffset CreatedAt { get; set; }
         public string CreatedByName { get; set; } = default!;

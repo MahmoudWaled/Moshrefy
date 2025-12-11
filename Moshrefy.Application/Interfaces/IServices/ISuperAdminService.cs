@@ -11,11 +11,16 @@ namespace Moshrefy.Application.Interfaces.IServices
         // -------- Center Management -------- 
         Task<CenterResponseDTO> CreateCenterAsync(CreateCenterDTO createCenterDTO);
         Task<List<CenterResponseDTO>> GetAllCentersAsync(PaginationParamter paginationParamter);
+        Task<int> GetTotalCentersCountAsync();
+        Task<List<CenterResponseDTO>> GetNonDeletedCentersAsync(PaginationParamter paginationParamter);
+        Task<int> GetNonDeletedCentersCountAsync();
         Task<List<CenterResponseDTO>> GetActiveCentersAsync(PaginationParamter paginationParamter);
         Task<List<CenterResponseDTO>> GetInactiveCentersAsync(PaginationParamter paginationParamter);
         Task<List<CenterResponseDTO>> GetDeletedCentersAsync(PaginationParamter paginationParamter);
+        Task<int> GetDeletedCentersCountAsync();
         Task<CenterResponseDTO> GetCenterByIdAsync(int centerId);
         Task UpdateCenterAsync(int centerId, UpdateCenterDTO updateCenterDTO);
+        Task SoftDeleteCenterAsync(int centerId);
         Task DeleteCenterAsync(int centerId);
         Task RestoreCenterAsync(int centerId);
         Task ActivateCenterAsync(int centerId);
@@ -23,6 +28,8 @@ namespace Moshrefy.Application.Interfaces.IServices
 
         // -------- User Management (All Centers) --------
         Task<UserResponseDTO> CreateAdminForCenterAsync(CreateUserDTO createUserDTO);
+        Task<UserResponseDTO> CreateCenterAdminAsync(int centerId, CreateUserDTO createUserDTO);
+        Task<UserResponseDTO> CreateUserForCenterAsync(int centerId, CreateUserDTO createUserDTO);
         Task<List<UserResponseDTO>> GetAllUsersAsync(PaginationParamter paginationParamter);
         Task<List<UserResponseDTO>> GetActiveUsersAsync(PaginationParamter paginationParamter);
         Task<List<UserResponseDTO>> GetInactiveUsersAsync(PaginationParamter paginationParamter);
@@ -33,8 +40,11 @@ namespace Moshrefy.Application.Interfaces.IServices
         Task<UserResponseDTO> GetUserByEmailAsync(string email);
         Task<UserResponseDTO> GetUserByUsernameAsync(string username);
         Task UpdateUserAsync(string userId, UpdateUserDTO updateUserDTO);
+        Task UpdateUserInAnyCenterAsync(string userId, UpdateUserDTO updateUserDTO);
         Task DeleteUserAsync(string userId); // Hard delete
         Task SoftDeleteUserAsync(string userId);
+        Task SoftDeleteUserForCenterAsync(int centerId, string userId);
+        Task DeleteUserFromAnyCenterAsync(string userId);
         Task RestoreUserAsync(string userId);
         Task ActivateUserAsync(string userId);
         Task DeactivateUserAsync(string userId);

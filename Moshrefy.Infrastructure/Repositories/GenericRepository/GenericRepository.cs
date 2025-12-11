@@ -11,11 +11,10 @@ namespace Moshrefy.infrastructure.Repositories.GenericRepository
         public async Task<IEnumerable<TEntity>> GetAllAsync(PaginationParamter paginationParamter)
         {
             var pageNumber = paginationParamter.PageNumber ?? 1;
-            var pageSize = paginationParamter.PageSize ?? 40;
+            var pageSize = paginationParamter.PageSize ?? 25;
 
-            if (pageSize > 40)
-                pageSize = 40;
-
+            // Allow any page size for server-side processing
+            // The caller (controller/service) should validate reasonable limits
             return await appDbContext.Set<TEntity>()
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
