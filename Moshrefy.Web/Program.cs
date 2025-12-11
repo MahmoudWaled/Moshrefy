@@ -1,14 +1,12 @@
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Moshrefy.Application.Authorization.Handlers;
 using Moshrefy.Application.Authorization.Requirements;
 using Moshrefy.Application.Interfaces.IRepositories;
 using Moshrefy.Application.Interfaces.IServices;
-using Moshrefy.Application.MappingProfiles;
 using Moshrefy.Application.Services;
 using Moshrefy.Application.Validators.AcademicYear;
 using Moshrefy.Domain.Enums;
@@ -21,8 +19,8 @@ using Moshrefy.Application.Interfaces.IUnitOfWork;
 using Moshrefy.infrastructure.UnitOfWork;
 using System;
 using System.Text;
-using Moshrefy.Web.MappingProfiles;
-using AcademicYearProfile = Moshrefy.Application.MappingProfiles.AcademicYearProfile;
+
+//using AcademicYearProfile = Moshrefy.Application.MappingProfiles.AcademicYearProfile;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -91,9 +89,9 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // AutoMapper configuration
 // For Application Mapping Profiles
-builder.Services.AddAutoMapper(cfg => { }, typeof(AcademicYearProfile).Assembly);
+builder.Services.AddAutoMapper(cfg => { }, typeof(Moshrefy.Application.MappingProfiles.AcademicYearProfile).Assembly);
 // For Web Mapping Profiles
-builder.Services.AddAutoMapper(cfg => { }, typeof(AuthProfile).Assembly);
+builder.Services.AddAutoMapper(cfg => { }, typeof(Moshrefy.Web.MappingProfiles.AuthProfile).Assembly);
 
 // Identity configuration
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()

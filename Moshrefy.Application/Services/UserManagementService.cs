@@ -91,10 +91,6 @@ namespace Moshrefy.Application.Services
             }
 
             var users = await query.ToListAsync();
-
-            if (users.Count == 0)
-                throw new NoDataFoundException("No users found.");
-
             return _mapper.Map<List<UserResponseDTO>>(users);
         }
 
@@ -115,10 +111,6 @@ namespace Moshrefy.Application.Services
             }
 
             var users = await query.ToListAsync();
-
-            if (users.Count == 0)
-                throw new NoDataFoundException("No active users found.");
-
             return _mapper.Map<List<UserResponseDTO>>(users);
         }
 
@@ -139,10 +131,6 @@ namespace Moshrefy.Application.Services
             }
 
             var users = await query.ToListAsync();
-
-            if (users.Count == 0)
-                throw new NoDataFoundException("No inactive users found.");
-
             return _mapper.Map<List<UserResponseDTO>>(users);
         }
 
@@ -162,9 +150,6 @@ namespace Moshrefy.Application.Services
 
             // Filter users by current center
             var filteredUsers = usersInRole.Where(u => u.CenterId == currentCenterId).ToList();
-
-            if (filteredUsers.Count == 0)
-                throw new NoDataFoundException($"No users found for the role {roleName}.");
 
             var paginatedUsers = filteredUsers.AsEnumerable();
             if (paginationParamter.PageSize != null && paginationParamter.PageNumber != null)

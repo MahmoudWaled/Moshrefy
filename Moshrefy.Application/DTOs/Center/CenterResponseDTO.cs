@@ -9,5 +9,11 @@ namespace Moshrefy.Application.DTOs.Center
         public string? Email { get; set; }
         public string Phone { get; set; } = default!;
         public bool IsActive { get; set; }
+
+        // Audit fields
+        public DateTimeOffset CreatedAt { get; set; }
+        public string CreatedByName { get; set; } = default!;
+        public DateTimeOffset? ModifiedAt { get; set; }
+        public string? ModifiedByName { get; set; }
     }
 }

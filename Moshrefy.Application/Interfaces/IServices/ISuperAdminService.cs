@@ -1,6 +1,7 @@
 ﻿using Moshrefy.Application.DTOs.Center;
 using Moshrefy.Application.DTOs.User;
 using Moshrefy.Domain.Paramter;
+using Moshrefy.Application.DTOs.Statistics;
 
 namespace Moshrefy.Application.Interfaces.IServices
 {
@@ -64,7 +65,7 @@ namespace Moshrefy.Application.Interfaces.IServices
         Task RestoreItemAsync(int itemId);
 
         // -------- Statistics --------
-        Task<object> GetSystemStatisticsAsync();
+        Task<SystemStatisticsDTO> GetSystemStatisticsAsync();
 
         // -------- TeacherCourse Management --------
         Task RestoreTeacherCourseAsync(int teacherCourseId);

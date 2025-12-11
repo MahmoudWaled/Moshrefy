@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Moshrefy.Application.DTOs.Center;
+using Moshrefy.Application.DTOs.Statistics;
 using Moshrefy.Application.DTOs.User;
 using Moshrefy.Application.Interfaces.IServices;
 using Moshrefy.Application.Interfaces.IUnitOfWork;
@@ -47,40 +48,24 @@ namespace Moshrefy.Application.Services
         public async Task<List<CenterResponseDTO>> GetAllCentersAsync(PaginationParamter paginationParamter)
         {
             var centers = await _unitOfWork.Centers.GetAllAsync(paginationParamter);
-
-            if (!centers.Any())
-                throw new NoDataFoundException("No centers found.");
-
             return _mapper.Map<List<CenterResponseDTO>>(centers);
         }
 
         public async Task<List<CenterResponseDTO>> GetActiveCentersAsync(PaginationParamter paginationParamter)
         {
             var activeCenters = await _unitOfWork.Centers.GetActiveCentersAsync(paginationParamter);
-
-            if (!activeCenters.Any())
-                throw new NoDataFoundException("No active centers found.");
-
             return _mapper.Map<List<CenterResponseDTO>>(activeCenters);
         }
 
         public async Task<List<CenterResponseDTO>> GetInactiveCentersAsync(PaginationParamter paginationParamter)
         {
             var inactiveCenters = await _unitOfWork.Centers.GetInactiveCentersAsync(paginationParamter);
-
-            if (!inactiveCenters.Any())
-                throw new NoDataFoundException("No inactive centers found.");
-
             return _mapper.Map<List<CenterResponseDTO>>(inactiveCenters);
         }
 
         public async Task<List<CenterResponseDTO>> GetDeletedCentersAsync(PaginationParamter paginationParamter)
         {
             var deletedCenters = await _unitOfWork.Centers.GetDeletedCentersAsync(paginationParamter);
-
-            if (!deletedCenters.Any())
-                throw new NoDataFoundException("No deleted centers found.");
-
             return _mapper.Map<List<CenterResponseDTO>>(deletedCenters);
         }
 
@@ -308,10 +293,6 @@ namespace Moshrefy.Application.Services
             }
 
             var users = await query.ToListAsync();
-
-            if (users.Count == 0)
-                throw new NoDataFoundException("No users found.");
-
             return _mapper.Map<List<UserResponseDTO>>(users);
         }
 
@@ -330,10 +311,6 @@ namespace Moshrefy.Application.Services
             }
 
             var users = await query.ToListAsync();
-
-            if (users.Count == 0)
-                throw new NoDataFoundException($"No users found for center id {centerId}.");
-
             return _mapper.Map<List<UserResponseDTO>>(users);
         }
 
@@ -346,9 +323,6 @@ namespace Moshrefy.Application.Services
                 throw new BadRequestException("Invalid role name.");
 
             var usersInRole = await _userManager.GetUsersInRoleAsync(parsedRole.ToString());
-
-            if (usersInRole.Count == 0)
-                throw new NoDataFoundException($"No users found for the role {roleName}.");
 
             var paginatedUsers = usersInRole.AsEnumerable();
             if (paginationParamter.PageSize != null && paginationParamter.PageNumber != null)
@@ -498,10 +472,6 @@ namespace Moshrefy.Application.Services
             }
 
             var users = await query.ToListAsync();
-
-            if (users.Count == 0)
-                throw new NoDataFoundException("No deleted users found.");
-
             return _mapper.Map<List<UserResponseDTO>>(users);
         }
 
@@ -517,10 +487,6 @@ namespace Moshrefy.Application.Services
             }
 
             var users = await query.ToListAsync();
-
-            if (users.Count == 0)
-                throw new NoDataFoundException("No inactive users found.");
-
             return _mapper.Map<List<UserResponseDTO>>(users);
         }
 
@@ -536,10 +502,6 @@ namespace Moshrefy.Application.Services
             }
 
             var users = await query.ToListAsync();
-
-            if (users.Count == 0)
-                throw new NoDataFoundException("No active users found.");
-
             return _mapper.Map<List<UserResponseDTO>>(users);
         }
 
@@ -624,7 +586,7 @@ namespace Moshrefy.Application.Services
         #region Statistics
 
         // Get overall system statistics (total centers, active/inactive centers, total users, active/inactive users)
-        public async Task<object> GetSystemStatisticsAsync()
+        public async Task<SystemStatisticsDTO> GetSystemStatisticsAsync()
         {
             var allCenters = await _unitOfWork.Centers.GetAllAsync(new PaginationParamter());
             var totalCenters = allCenters.Count();
@@ -633,7 +595,7 @@ namespace Moshrefy.Application.Services
             var totalUsers = await _userManager.Users.CountAsync();
             var activeUsers = await _userManager.Users.CountAsync(u => u.IsActive && !u.IsDeleted);
 
-            return new
+            return new SystemStatisticsDTO
             {
                 TotalCenters = totalCenters,
                 ActiveCenters = activeCenters,
