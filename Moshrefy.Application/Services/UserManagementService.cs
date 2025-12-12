@@ -304,32 +304,6 @@ namespace Moshrefy.Application.Services
             await _userManager.UpdateAsync(user);
         }
 
-        public async Task RestoreUserAsync(string userId)
-        {
-            if (string.IsNullOrEmpty(userId))
-                throw new BadRequestException("User id cannot be null.");
-
-            var currentCenterId = _tenantContext.GetCurrentCenterId();
-            if (currentCenterId == null)
-                throw new BadRequestException("Admin must be assigned to a center.");
-
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null || user.CenterId != currentCenterId)
-                throw new NotFoundException<string>(nameof(user), "id", userId);
-
-            if (!user.IsDeleted)
-                throw new ConflictException("User is not deleted.");
-
-            var currentUser = await _userManager.FindByIdAsync(_tenantContext.GetCurrentUserId());
-            user.IsDeleted = false;
-            user.IsActive = true;
-            user.ModifiedById = currentUser?.Id;
-            user.ModifiedByName = currentUser?.UserName;
-            user.ModifiedAt = DateTime.UtcNow;
-
-            await _userManager.UpdateAsync(user);
-        }
-
         public async Task UpdateUserRoleAsync(string userId, string newRole)
         {
             if (string.IsNullOrEmpty(userId))

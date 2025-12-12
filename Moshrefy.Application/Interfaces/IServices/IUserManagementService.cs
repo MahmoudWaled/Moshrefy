@@ -18,7 +18,6 @@ namespace Moshrefy.Application.Interfaces.IServices
         Task ActivateUserAsync(string userId);
         Task DeactivateUserAsync(string userId);
         Task SoftDeleteUserAsync(string userId);
-        Task RestoreUserAsync(string userId);
     }
 
 }

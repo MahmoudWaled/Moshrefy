@@ -311,28 +311,6 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // Restore User
-        [HttpPost]
-        public async Task<IActionResult> RestoreUser(string id)
-        {
-            if (string.IsNullOrEmpty(id))
-            {
-                return Json(new { success = false, message = "Invalid ID" });
-            }
-
-            try
-            {
-                await _userManagementService.RestoreUserAsync(id);
-                _logger.LogInformation($"User {id} restored");
-                return Json(new { success = true, message = "Restored successfully!" });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error restoring user {id}");
-                return Json(new { success = false, message = $"Error: {ex.Message}" });
-            }
-        }
-
         // Change User Role
         [HttpPost]
         public async Task<IActionResult> ChangeUserRole(string id, string newRole)
@@ -379,5 +357,6 @@ namespace Moshrefy.Web.Controllers
         }
     }
 }
+
 
 
