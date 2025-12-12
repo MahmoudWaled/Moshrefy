@@ -17,6 +17,7 @@ namespace Moshrefy.Application.Services
     public class SuperAdminService(
         IUnitOfWork _unitOfWork,
         UserManager<ApplicationUser> _userManager,
+        SignInManager<ApplicationUser> _signInManager,
         IMapper _mapper,
         ITenantContext _tenantContext) : ISuperAdminService
     {
@@ -876,11 +877,25 @@ namespace Moshrefy.Application.Services
             if (user == null)
                 throw new NotFoundException<string>(nameof(ApplicationUser), "id", userId);
 
+            // Get current roles before updating
             var currentRoles = await _userManager.GetRolesAsync(user);
+            
+            // Remove all current roles
             if (currentRoles.Any())
                 await _userManager.RemoveFromRolesAsync(user, currentRoles);
 
-            await _userManager.AddToRoleAsync(user, updateUserRoleDTO.Role.ToString());
+            // Add new role
+            var result = await _userManager.AddToRoleAsync(user, updateUserRoleDTO.Role.ToString());
+            
+            if (!result.Succeeded)
+            {
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                throw new BadRequestException($"Role update failed: {errors}");
+            }
+
+            // Refresh the sign-in if the user is currently signed in
+            // This updates the authentication cookie with the new role claims
+            await _signInManager.RefreshSignInAsync(user);
         }
 
         #endregion User Management
@@ -890,35 +905,116 @@ namespace Moshrefy.Application.Services
         // Get overall system statistics (total centers, active/inactive centers, total users, active/inactive users)
         public async Task<SystemStatisticsDTO> GetSystemStatisticsAsync()
         {
-            // Use efficient COUNT() queries
+            // Centers
             var totalCenters = await _unitOfWork.Centers.GetTotalCountAsync();
             var nonDeletedCenters = await _unitOfWork.Centers.GetNonDeletedCountAsync();
-            
-            // For active centers, we need a custom query since there's no direct count method
-            var activeCentersCount = await _unitOfWork.Centers
-                .GetActiveCentersAsync(new PaginationParamter { PageSize = 1 }); // Just to access the query
-            
-            // Load non-deleted centers and count active ones
-            // Since we need to check IsActive flag, this is more efficient than loading all
             var nonDeletedCentersList = await _unitOfWork.Centers.GetNonDeletedCentersAsync(
-                new PaginationParamter { PageSize = 200 }); // Use max allowed
+                new PaginationParamter { PageSize = 200 });
             var activeCenters = nonDeletedCentersList.Count(c => c.IsActive);
 
+            // Users
             var totalUsers = await _userManager.Users.CountAsync();
             var activeUsers = await _userManager.Users.CountAsync(u => u.IsActive && !u.IsDeleted);
 
+            // Teachers
+            var totalTeachers = await GetTotalTeachersCountAsync();
+            var deletedTeachers = await GetDeletedTeachersCountAsync();
+
+            // Students
+            var totalStudents = await GetTotalStudentsCountAsync();
+            var deletedStudents = await GetDeletedStudentsCountAsync();
+
+            // Courses
+            var totalCourses = await GetTotalCoursesCountAsync();
+            var deletedCourses = await GetDeletedCoursesCountAsync();
+
+            // Classrooms
+            var totalClassrooms = await GetTotalClassroomsCountAsync();
+            var deletedClassrooms = await GetDeletedClassroomsCountAsync();
+
             return new SystemStatisticsDTO
             {
-                TotalCenters = nonDeletedCenters,  // Show only non-deleted centers in stats
+                // Centers
+                TotalCenters = nonDeletedCenters,
                 ActiveCenters = activeCenters,
                 InactiveCenters = nonDeletedCenters - activeCenters,
+                
+                // Users
                 TotalUsers = totalUsers,
                 ActiveUsers = activeUsers,
-                InactiveUsers = totalUsers - activeUsers
+                InactiveUsers = totalUsers - activeUsers,
+                
+                // Teachers
+                TotalTeachers = totalTeachers,
+                DeletedTeachers = deletedTeachers,
+                
+                // Students
+                TotalStudents = totalStudents,
+                DeletedStudents = deletedStudents,
+                
+                // Courses
+                TotalCourses = totalCourses,
+                DeletedCourses = deletedCourses,
+                
+                // Classrooms
+                TotalClassrooms = totalClassrooms,
+                DeletedClassrooms = deletedClassrooms
             };
         }
 
         #endregion Statistics
+
+        #region System-Wide Monitoring
+
+        public async Task<int> GetTotalTeachersCountAsync()
+        {
+            var teachers = await _unitOfWork.Teachers.GetAllAsync(new PaginationParamter { PageSize = int.MaxValue, PageNumber = 1 });
+            return teachers.Count();
+        }
+
+        public async Task<int> GetTotalStudentsCountAsync()
+        {
+            var students = await _unitOfWork.Students.GetAllAsync(new PaginationParamter { PageSize = int.MaxValue, PageNumber = 1 });
+            return students.Count();
+        }
+
+        public async Task<int> GetTotalCoursesCountAsync()
+        {
+            var courses = await _unitOfWork.Courses.GetAllAsync(new PaginationParamter { PageSize = int.MaxValue, PageNumber = 1 });
+            return courses.Count();
+        }
+
+        public async Task<int> GetTotalClassroomsCountAsync()
+        {
+            var classrooms = await _unitOfWork.Classrooms.GetAllAsync(new PaginationParamter { PageSize = int.MaxValue, PageNumber = 1 });
+            return classrooms.Count();
+        }
+
+        public async Task<int> GetDeletedTeachersCountAsync()
+        {
+            var teachers = await _unitOfWork.Teachers.GetAllAsync(new PaginationParamter { PageSize = int.MaxValue, PageNumber = 1 });
+            return teachers.Count(t => t.IsDeleted);
+        }
+
+        public async Task<int> GetDeletedStudentsCountAsync()
+        {
+            var students = await _unitOfWork.Students.GetAllAsync(new PaginationParamter { PageSize = int.MaxValue, PageNumber = 1 });
+            return students.Count(s => s.IsDeleted);
+        }
+
+        public async Task<int> GetDeletedCoursesCountAsync()
+        {
+            var courses = await _unitOfWork.Courses.GetAllAsync(new PaginationParamter { PageSize = int.MaxValue, PageNumber = 1 });
+            return courses.Count(c => c.IsDeleted);
+        }
+
+        public async Task<int> GetDeletedClassroomsCountAsync()
+        {
+            var classrooms = await _unitOfWork.Classrooms.GetAllAsync(new PaginationParamter { PageSize = int.MaxValue, PageNumber = 1 });
+            return classrooms.Count(c => c.IsDeleted);
+        }
+
+        #endregion System-Wide Monitoring
 
         #region Teacher Management
 

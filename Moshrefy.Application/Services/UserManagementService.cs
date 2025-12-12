@@ -81,7 +81,8 @@ namespace Moshrefy.Application.Services
             if (currentCenterId == null)
                 throw new BadRequestException("Admin must be assigned to a center.");
 
-            var query = _userManager.Users.Where(u => u.CenterId == currentCenterId);
+            // Exclude soft-deleted users
+            var query = _userManager.Users.Where(u => u.CenterId == currentCenterId && !u.IsDeleted);
 
             if (paginationParamter.PageSize != null && paginationParamter.PageNumber != null)
             {
@@ -100,8 +101,9 @@ namespace Moshrefy.Application.Services
             if (currentCenterId == null)
                 throw new BadRequestException("Admin must be assigned to a center.");
 
+            // Exclude soft-deleted users
             var query = _userManager.Users
-                .Where(u => u.CenterId == currentCenterId && u.IsActive);
+                .Where(u => u.CenterId == currentCenterId && u.IsActive && !u.IsDeleted);
 
             if (paginationParamter.PageSize != null && paginationParamter.PageNumber != null)
             {
@@ -120,8 +122,9 @@ namespace Moshrefy.Application.Services
             if (currentCenterId == null)
                 throw new BadRequestException("Admin must be assigned to a center.");
 
+            // Exclude soft-deleted users
             var query = _userManager.Users
-                .Where(u => u.CenterId == currentCenterId && !u.IsActive);
+                .Where(u => u.CenterId == currentCenterId && !u.IsActive && !u.IsDeleted);
 
             if (paginationParamter.PageSize != null && paginationParamter.PageNumber != null)
             {
@@ -320,6 +323,61 @@ namespace Moshrefy.Application.Services
             var currentUser = await _userManager.FindByIdAsync(_tenantContext.GetCurrentUserId());
             user.IsDeleted = false;
             user.IsActive = true;
+            user.ModifiedById = currentUser?.Id;
+            user.ModifiedByName = currentUser?.UserName;
+            user.ModifiedAt = DateTime.UtcNow;
+
+            await _userManager.UpdateAsync(user);
+        }
+
+        public async Task UpdateUserRoleAsync(string userId, string newRole)
+        {
+            if (string.IsNullOrEmpty(userId))
+                throw new BadRequestException("User id cannot be null.");
+            
+            if (string.IsNullOrEmpty(newRole))
+                throw new BadRequestException("New role cannot be null.");
+
+            var currentCenterId = _tenantContext.GetCurrentCenterId();
+            if (currentCenterId == null)
+                throw new BadRequestException("Admin must be assigned to a center.");
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null || user.CenterId != currentCenterId)
+                throw new NotFoundException<string>(nameof(user), "id", userId);
+
+            // Validate role
+            if (!Enum.TryParse<RolesNames>(newRole, out var parsedRole))
+                throw new BadRequestException("Invalid role name.");
+
+            // Check role constraints - only allow Employee and Manager
+            if (parsedRole != RolesNames.Employee && parsedRole != RolesNames.Manager)
+                throw new ForbiddenException("You can only assign Employee or Manager roles.");
+
+            // Get current roles
+            var currentRoles = await _userManager.GetRolesAsync(user);
+
+            // Remove all current roles
+            if (currentRoles.Any())
+            {
+                var removeResult = await _userManager.RemoveFromRolesAsync(user, currentRoles);
+                if (!removeResult.Succeeded)
+                {
+                    var errors = string.Join(", ", removeResult.Errors.Select(e => e.Description));
+                    throw new FailedException($"Failed to remove current roles: {errors}");
+                }
+            }
+
+            // Add new role
+            var addResult = await _userManager.AddToRoleAsync(user, parsedRole.ToString());
+            if (!addResult.Succeeded)
+            {
+                var errors = string.Join(", ", addResult.Errors.Select(e => e.Description));
+                throw new FailedException($"Failed to add new role: {errors}");
+            }
+
+            // Update modification info
+            var currentUser = await _userManager.FindByIdAsync(_tenantContext.GetCurrentUserId());
             user.ModifiedById = currentUser?.Id;
             user.ModifiedByName = currentUser?.UserName;
             user.ModifiedAt = DateTime.UtcNow;

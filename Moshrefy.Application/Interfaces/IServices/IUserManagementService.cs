@@ -14,9 +14,11 @@ namespace Moshrefy.Application.Interfaces.IServices
         Task<List<UserResponseDTO>> GetUsersByRoleInMyCenterAsync(string roleName, PaginationParamter paginationParamter);
         Task<UserResponseDTO> GetUserByIdInMyCenterAsync(string userId);
         Task UpdateUserAsync(string userId, UpdateUserDTO updateUserDTO);
+        Task UpdateUserRoleAsync(string userId, string newRole);
         Task ActivateUserAsync(string userId);
         Task DeactivateUserAsync(string userId);
         Task SoftDeleteUserAsync(string userId);
         Task RestoreUserAsync(string userId);
     }
+
 }

@@ -212,6 +212,10 @@
                                     <i class="fas fa-edit"></i> Edit User
                                 </a>
 
+                                <a asp-action="UpdateUserRole" asp-route-id="@Model.Id" class="btn btn-warning mb-2">
+                                    <i class="fas fa-user-tag"></i> Update Role
+                                </a>
+
                                 @if (Model.IsActive)
                                 {
                                     <button type="button" class="btn btn-warning mb-2" onclick="deactivateUser('@Model.Id', '@Model.UserName')">

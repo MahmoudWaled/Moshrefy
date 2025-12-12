@@ -173,20 +173,30 @@ namespace Moshrefy.Application.Services
             if (!user.IsActive || user.IsDeleted)
                 throw new UnauthorizedAccessException("User account is inactive or deleted.");
 
-            var result = await signInManager.PasswordSignInAsync(
-                userName, 
-                password, 
-                isPersistent: false, 
-                lockoutOnFailure: true);
-
-            if (!result.Succeeded)
+            // Verify password first
+            var passwordCheck = await userManager.CheckPasswordAsync(user, password);
+            if (!passwordCheck)
             {
-                if (result.IsLockedOut)
-                {
-                    throw new UnauthorizedAccessException("Account is locked out.");
-                }
+                await userManager.AccessFailedAsync(user);
                 throw new UnauthorizedAccessException("Invalid username or password.");
             }
+
+            // Add custom claims including CenterId
+            var additionalClaims = new List<Claim>();
+            
+            if (user.CenterId.HasValue)
+            {
+                additionalClaims.Add(new Claim("CenterId", user.CenterId.Value.ToString()));
+            }
+
+            // Sign in with custom claims
+            await signInManager.SignInWithClaimsAsync(
+                user, 
+                isPersistent: false,
+                additionalClaims);
+
+            _logger.LogInformation("User {UserName} logged in successfully with CenterId: {CenterId}", 
+                userName, user.CenterId?.ToString() ?? "None");
         }
 
         public async Task CookieLogoutAsync()

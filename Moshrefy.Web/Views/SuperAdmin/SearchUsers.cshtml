@@ -1,0 +1,371 @@
+@{
+    ViewData["Title"] = "Search Users";
+}
+
+<!-- Content Header -->
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>
+                    <i class="fas fa-search"></i> Search Users
+                </h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a asp-action="Index">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a asp-action="Users">Users</a></li>
+                    <li class="breadcrumb-item active">Search</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-user-search"></i> Advanced User Search
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <!-- Search Forms -->
+                        <div class="row">
+                            <!-- Search by Email -->
+                            <div class="col-md-6">
+                                <div class="card card-outline card-info">
+                                    <div class="card-header">
+                                        <h3 class="card-title">
+                                            <i class="fas fa-envelope"></i> Search by Email
+                                        </h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <form id="searchByEmailForm">
+                                            <div class="form-group">
+                                                <label for="emailInput">
+                                                    <i class="fas fa-at"></i> Email Address
+                                                </label>
+                                                <div class="input-group">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text">
+                                                            <i class="fas fa-envelope"></i>
+                                                        </span>
+                                                    </div>
+                                                    <input type="email" 
+                                                           class="form-control" 
+                                                           id="emailInput" 
+                                                           name="email" 
+                                                           placeholder="Enter email address..."
+                                                           required>
+                                                </div>
+                                                <small class="form-text text-muted">
+                                                    <i class="fas fa-info-circle"></i> Enter the exact email address
+                                                </small>
+                                            </div>
+                                            <button type="submit" class="btn btn-info btn-block">
+                                                <i class="fas fa-search"></i> Search by Email
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Search by Username -->
+                            <div class="col-md-6">
+                                <div class="card card-outline card-primary">
+                                    <div class="card-header">
+                                        <h3 class="card-title">
+                                            <i class="fas fa-user"></i> Search by Username
+                                        </h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <form id="searchByUsernameForm">
+                                            <div class="form-group">
+                                                <label for="usernameInput">
+                                                    <i class="fas fa-user-tag"></i> Username
+                                                </label>
+                                                <div class="input-group">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text">
+                                                            <i class="fas fa-user"></i>
+                                                        </span>
+                                                    </div>
+                                                    <input type="text" 
+                                                           class="form-control" 
+                                                           id="usernameInput" 
+                                                           name="username" 
+                                                           placeholder="Enter username..."
+                                                           required>
+                                                </div>
+                                                <small class="form-text text-muted">
+                                                    <i class="fas fa-info-circle"></i> Enter the exact username
+                                                </small>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary btn-block">
+                                                <i class="fas fa-search"></i> Search by Username
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Search Results -->
+                        <div id="searchResults" style="display: none;">
+                            <hr class="my-4">
+                            <h4 class="mb-3">
+                                <i class="fas fa-search-plus"></i> Search Result
+                            </h4>
+                            
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <dl class="row">
+                                                <dt class="col-sm-3">
+                                                    <i class="fas fa-user text-primary"></i> Name
+                                                </dt>
+                                                <dd class="col-sm-9">
+                                                    <strong id="resultName"></strong>
+                                                </dd>
+
+                                                <dt class="col-sm-3">
+                                                    <i class="fas fa-at text-info"></i> Username
+                                                </dt>
+                                                <dd class="col-sm-9">
+                                                    <code id="resultUsername"></code>
+                                                </dd>
+
+                                                <dt class="col-sm-3">
+                                                    <i class="fas fa-envelope text-info"></i> Email
+                                                </dt>
+                                                <dd class="col-sm-9" id="resultEmail"></dd>
+
+                                                <dt class="col-sm-3">
+                                                    <i class="fas fa-phone text-success"></i> Phone
+                                                </dt>
+                                                <dd class="col-sm-9" id="resultPhone"></dd>
+
+                                                <dt class="col-sm-3">
+                                                    <i class="fas fa-building text-warning"></i> Center
+                                                </dt>
+                                                <dd class="col-sm-9" id="resultCenter"></dd>
+
+                                                <dt class="col-sm-3">
+                                                    <i class="fas fa-user-tag text-purple"></i> Role
+                                                </dt>
+                                                <dd class="col-sm-9" id="resultRole"></dd>
+
+                                                <dt class="col-sm-3">
+                                                    <i class="fas fa-toggle-on text-success"></i> Status
+                                                </dt>
+                                                <dd class="col-sm-9" id="resultStatus"></dd>
+
+                                                <dt class="col-sm-3">
+                                                    <i class="fas fa-info-circle text-info"></i> State
+                                                </dt>
+                                                <dd class="col-sm-9" id="resultState"></dd>
+                                            </dl>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <div class="card card-success">
+                                                <div class="card-header">
+                                                    <h3 class="card-title">
+                                                        <i class="fas fa-cogs"></i> Actions
+                                                    </h3>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="btn-group-vertical w-100" id="resultActions">
+                                                        <!-- Actions will be inserted here -->
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        .card-outline {
+            border-top: 3px solid;
+        }
+        .card-outline.card-info {
+            border-top-color: #17a2b8;
+        }
+        .card-outline.card-primary {
+            border-top-color: #007bff;
+        }
+    </style>
+
+    <script>
+        $(document).ready(function () {
+            // Search by Email
+            $('#searchByEmailForm').on('submit', function (e) {
+                e.preventDefault();
+                
+                const email = $('#emailInput').val().trim();
+                if (!email) {
+                    Swal.fire('Error', 'Please enter an email address', 'error');
+                    return;
+                }
+
+                // Show loading
+                Swal.fire({
+                    title: 'Searching...',
+                    html: 'Looking for user with email: <strong>' + email + '</strong>',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                $.post('@Url.Action("SearchUserByEmail", "SuperAdmin")', { email: email })
+                    .done(function (response) {
+                        Swal.close();
+                        if (response.success) {
+                            displayUserResult(response.user);
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'User Not Found',
+                                html: response.message,
+                                confirmButtonText: 'Try Again'
+                            });
+                        }
+                    })
+                    .fail(function () {
+                        Swal.fire('Error', 'Failed to search user. Please try again.', 'error');
+                    });
+            });
+
+            // Search by Username
+            $('#searchByUsernameForm').on('submit', function (e) {
+                e.preventDefault();
+                
+                const username = $('#usernameInput').val().trim();
+                if (!username) {
+                    Swal.fire('Error', 'Please enter a username', 'error');
+                    return;
+                }
+
+                // Show loading
+                Swal.fire({
+                    title: 'Searching...',
+                    html: 'Looking for user with username: <strong>' + username + '</strong>',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                $.post('@Url.Action("SearchUserByUsername", "SuperAdmin")', { username: username })
+                    .done(function (response) {
+                        Swal.close();
+                        if (response.success) {
+                            displayUserResult(response.user);
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'User Not Found',
+                                html: response.message,
+                                confirmButtonText: 'Try Again'
+                            });
+                        }
+                    })
+                    .fail(function () {
+                        Swal.fire('Error', 'Failed to search user. Please try again.', 'error');
+                    });
+            });
+
+            function displayUserResult(user) {
+                // Show results section
+                $('#searchResults').fadeIn();
+
+                // Populate basic info
+                $('#resultName').text(user.name);
+                $('#resultUsername').text(user.userName);
+                $('#resultEmail').html(user.email ? '<a href="mailto:' + user.email + '">' + user.email + '</a>' : '<span class="text-muted">Not provided</span>');
+                $('#resultPhone').html(user.phoneNumber ? '<a href="tel:' + user.phoneNumber + '">' + user.phoneNumber + '</a>' : '<span class="text-muted">Not provided</span>');
+                
+                // Center
+                if (user.centerName && user.centerId) {
+                    $('#resultCenter').html('<a href="@Url.Action("CenterDetails", "SuperAdmin")/' + user.centerId + '" class="badge badge-info badge-lg px-3 py-2"><i class="fas fa-building mr-1"></i> ' + user.centerName + '</a>');
+                } else {
+                    $('#resultCenter').html('<span class="text-muted">No center assigned</span>');
+                }
+
+                // Role
+                if (user.roleName) {
+                    let badgeClass = 'badge-secondary';
+                    let icon = 'fa-user';
+                    
+                    switch(user.roleName) {
+                        case 'SuperAdmin':
+                            badgeClass = 'badge-danger';
+                            icon = 'fa-user-shield';
+                            break;
+                        case 'Admin':
+                            badgeClass = 'badge-warning';
+                            icon = 'fa-user-tie';
+                            break;
+                        case 'Manager':
+                            badgeClass = 'badge-primary';
+                            icon = 'fa-user-cog';
+                            break;
+                        case 'Employee':
+                            badgeClass = 'badge-info';
+                            icon = 'fa-user';
+                            break;
+                    }
+                    
+                    $('#resultRole').html('<span class="badge ' + badgeClass + ' badge-lg px-3 py-2"><i class="fas ' + icon + ' mr-1"></i> ' + user.roleName + '</span>');
+                } else {
+                    $('#resultRole').html('<span class="text-muted">No role assigned</span>');
+                }
+
+                // Status
+                $('#resultStatus').html(user.isActive ? 
+                    '<span class="badge badge-success badge-lg px-3 py-2"><i class="fas fa-check-circle"></i> Active</span>' : 
+                    '<span class="badge badge-warning badge-lg px-3 py-2"><i class="fas fa-times-circle"></i> Inactive</span>');
+
+                // State
+                $('#resultState').html(user.isDeleted ? 
+                    '<span class="badge badge-danger badge-lg px-3 py-2"><i class="fas fa-trash-alt"></i> Deleted</span>' : 
+                    '<span class="badge badge-info badge-lg px-3 py-2"><i class="fas fa-check"></i> Normal</span>');
+
+                // Actions
+                let actions = '';
+                actions += '<a href="@Url.Action("UserDetails", "SuperAdmin")/' + user.id + '" class="btn btn-info btn-block mb-2"><i class="fas fa-eye"></i> View Details</a>';
+                
+                if (!user.isDeleted) {
+                    actions += '<a href="@Url.Action("EditUser", "SuperAdmin")/' + user.id + '" class="btn btn-primary btn-block mb-2"><i class="fas fa-edit"></i> Edit User</a>';
+                    actions += '<a href="@Url.Action("UpdateUserRole", "SuperAdmin")/' + user.id + '" class="btn btn-warning btn-block mb-2"><i class="fas fa-user-tag"></i> Update Role</a>';
+                }
+
+                $('#resultActions').html(actions);
+
+                // Scroll to results
+                $('html, body').animate({
+                    scrollTop: $('#searchResults').offset().top - 100
+                }, 500);
+            }
+        });
+    </script>
+}

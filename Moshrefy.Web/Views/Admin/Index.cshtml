@@ -1,0 +1,170 @@
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Content Header -->
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1><i class="fas fa-home"></i> My Center</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item active">Dashboard</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <!-- System Update Notice (if needed) -->
+        @{
+            var hasCenterIdClaim = User.Claims.Any(c => c.Type == "CenterId" && !string.IsNullOrEmpty(c.Value));
+        }
+        @if (!hasCenterIdClaim)
+        {
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert alert-warning alert-dismissible">
+                        <button type="button" class="close" data-dismiss="alert">&times;</button>
+                        <h5><i class="icon fas fa-exclamation-triangle"></i> System Updated!</h5>
+                        We've made some improvements. Please <strong>log out and log back in</strong> to enjoy better performance.
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Welcome Card -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h4><i class="fas fa-smile"></i> Welcome to Your Center Dashboard!</h4>
+                        <p class="text-muted">Manage your team members and track your center's activities from here.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="row">
+            <div class="col-lg-4 col-md-6">
+                <div class="small-box bg-white border">
+                    <div class="inner">
+                        <h4><i class="fas fa-users text-primary"></i></h4>
+                        <p>My Team</p>
+                    </div>
+                    <a asp-action="Users" class="small-box-footer">
+                        View All Team Members <i class="fas fa-arrow-circle-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6">
+                <div class="small-box bg-white border">
+                    <div class="inner">
+                        <h4><i class="fas fa-user-plus text-success"></i></h4>
+                        <p>Add New Member</p>
+                    </div>
+                    <a asp-action="CreateUser" class="small-box-footer">
+                        Add Team Member <i class="fas fa-arrow-circle-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6">
+                <div class="small-box bg-white border">
+                    <div class="inner">
+                        <h4><i class="fas fa-book text-info"></i></h4>
+                        <p>Courses & Classes</p>
+                    </div>
+                    <a href="#" class="small-box-footer">
+                        Manage Courses <i class="fas fa-arrow-circle-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Information Card -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-info-circle"></i> Quick Guide</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5><i class="fas fa-users text-primary"></i> Managing Your Team</h5>
+                                <ul>
+                                    <li>Add new team members to help run your center</li>
+                                    <li>Update member information anytime</li>
+                                    <li>Enable or disable member access as needed</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h5><i class="fas fa-shield-alt text-success"></i> Your Center, Your Control</h5>
+                                <ul>
+                                    <li>All changes only affect your center</li>
+                                    <li>Your data is private and secure</li>
+                                    <li>Easy-to-use interface designed for you</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .small-box {
+        border-radius: 0.25rem;
+        box-shadow: 0 0 1px rgba(0,0,0,.125), 0 1px 3px rgba(0,0,0,.2);
+        margin-bottom: 20px;
+        position: relative;
+        display: block;
+        min-height: 120px;
+    }
+
+    .small-box > .inner {
+        padding: 10px;
+    }
+
+    .small-box h4 {
+        font-size: 2rem;
+        margin: 0 0 10px;
+    }
+
+    .small-box p {
+        font-size: 1.1rem;
+        font-weight: 500;
+    }
+
+    .small-box > .small-box-footer {
+        position: relative;
+        text-align: center;
+        padding: 8px 0;
+        color: rgba(0,0,0,.8);
+        display: block;
+        background: rgba(0,0,0,.05);
+        text-decoration: none;
+        margin-top: 10px;
+    }
+
+    .small-box > .small-box-footer:hover {
+        color: #fff;
+        background: rgba(0,0,0,.1);
+    }
+
+    .card {
+        box-shadow: 0 0 1px rgba(0,0,0,.125), 0 1px 3px rgba(0,0,0,.2);
+        margin-bottom: 1rem;
+    }
+</style>

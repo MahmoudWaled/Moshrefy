@@ -31,10 +31,22 @@ namespace Moshrefy.infrastructure.TenantServices
         {
             var centerIdClaim = _httpContextAccessor.HttpContext?.User?.FindFirstValue("CenterId");
 
-            if (string.IsNullOrEmpty(centerIdClaim))
-                return null;
+            if (!string.IsNullOrEmpty(centerIdClaim))
+            {
+                return int.Parse(centerIdClaim);
+            }
 
-            return int.Parse(centerIdClaim);
+            // Fallback: If claim is missing, get CenterId from database (for legacy sessions)
+            try
+            {
+                var userId = GetCurrentUserId();
+                var user = _userManager.FindByIdAsync(userId).GetAwaiter().GetResult();
+                return user?.CenterId;
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         public bool IsSuperAdmin()

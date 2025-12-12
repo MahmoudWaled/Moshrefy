@@ -127,6 +127,7 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.LoginPath = "/Auth/Login";
     options.AccessDeniedPath = "/Auth/AccessDenied";
     options.LogoutPath = "/Auth/Logout";
+    options.ReturnUrlParameter = "returnUrl";
 });
 
 builder.Services.AddAuthorization(options =>

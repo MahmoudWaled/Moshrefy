@@ -1,0 +1,110 @@
+@{
+    ViewData["Title"] = "Access Denied";
+    Layout = "~/Views/Shared/_AuthLayout.cshtml";
+}
+
+<div class="error-page">
+    <div class="error-content" style="margin: 0 auto; max-width: 600px; padding: 20px;">
+        <div class="text-center mb-4">
+            <div class="error-number" style="font-size: 120px; font-weight: 700; color: #dc3545;">
+                <i class="fas fa-ban"></i>
+            </div>
+        </div>
+
+        <h3 class="text-center mb-3">
+            <i class="fas fa-exclamation-triangle text-warning"></i> Access Denied
+        </h3>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="alert alert-danger">
+                    <h5><i class="icon fas fa-ban"></i> Unauthorized Access</h5>
+                    <p class="mb-0">
+                        You don't have permission to access this resource. This area is restricted to authorized users only.
+                    </p>
+                </div>
+
+                <div class="alert alert-info">
+                    <h6><i class="fas fa-info-circle"></i> Possible Reasons:</h6>
+                    <ul class="mb-0">
+                        <li>Your user role doesn't have the required permissions</li>
+                        <li>Your role was recently changed - try logging out and back in</li>
+                        <li>You're trying to access a different center's resources</li>
+                        <li>The resource has been restricted by an administrator</li>
+                    </ul>
+                </div>
+
+                <div class="text-center mt-4">
+                    <a href="javascript:history.back()" class="btn btn-secondary mr-2">
+                        <i class="fas fa-arrow-left"></i> Go Back
+                    </a>
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-primary mr-2">
+                        <i class="fas fa-home"></i> Go to Dashboard
+                    </a>
+                    <form asp-controller="Auth" asp-action="Logout" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-outline-danger">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </form>
+                </div>
+
+                <hr class="my-4">
+
+                <div class="text-center text-muted">
+                    <small>
+                        <i class="fas fa-question-circle"></i>
+                        If you believe this is an error, please contact your system administrator.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .error-page {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    .error-number i {
+        animation: shake 0.5s;
+        animation-iteration-count: 1;
+    }
+
+    @@keyframes shake {
+        0% { transform: translate(1px, 1px) rotate(0deg); }
+        10% { transform: translate(-1px, -2px) rotate(-1deg); }
+        20% { transform: translate(-3px, 0px) rotate(1deg); }
+        30% { transform: translate(3px, 2px) rotate(0deg); }
+        40% { transform: translate(1px, -1px) rotate(1deg); }
+        50% { transform: translate(-1px, 2px) rotate(-1deg); }
+        60% { transform: translate(-3px, 1px) rotate(0deg); }
+        70% { transform: translate(3px, 1px) rotate(-1deg); }
+        80% { transform: translate(-1px, -1px) rotate(1deg); }
+        90% { transform: translate(1px, 2px) rotate(0deg); }
+        100% { transform: translate(1px, -2px) rotate(-1deg); }
+    }
+
+    .card {
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        border: none;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        font-weight: 500;
+    }
+
+    form.d-inline {
+        display: inline-block;
+    }
+
+    form.d-inline button {
+        margin: 0;
+    }
+</style>

@@ -88,9 +88,24 @@
   <!-- Main Sidebar Container -->
   <aside class="main-sidebar sidebar-dark-primary elevation-4 z-3 ">
     <!-- Brand Logo -->
-    <a asp-controller="Home" asp-action="Index" class="brand-link">
-      <span class="brand-text font-weight-light">Moshrefy</span>
-    </a>
+    @if (User.IsInRole("SuperAdmin"))
+    {
+      <a asp-controller="SuperAdmin" asp-action="Index" class="brand-link">
+        <span class="brand-text font-weight-light">Moshrefy</span>
+      </a>
+    }
+    else if (User.IsInRole("Admin"))
+    {
+      <a asp-controller="Admin" asp-action="Index" class="brand-link">
+        <span class="brand-text font-weight-light">Moshrefy</span>
+      </a>
+    }
+    else
+    {
+      <a href="#" class="brand-link">
+        <span class="brand-text font-weight-light">Moshrefy</span>
+      </a>
+    }
 
     <!-- Sidebar -->
     <div class="sidebar">
@@ -99,16 +114,30 @@
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
         
         <!-- Dashboard - All Roles -->
-        <li class="nav-item">
-          <a asp-controller="SuperAdmin" asp-action="Index" class="nav-link">
-            <i class="nav-icon fas fa-tachometer-alt"></i>
-            <p>Dashboard</p>
-          </a>
-        </li>
+        @if (User.IsInRole("SuperAdmin"))
+        {
+          <li class="nav-item">
+            <a asp-controller="SuperAdmin" asp-action="Index" class="nav-link">
+              <i class="nav-icon fas fa-tachometer-alt"></i>
+              <p>Dashboard</p>
+            </a>
+          </li>
+        }
+        else if (User.IsInRole("Admin"))
+        {
+          <li class="nav-item">
+            <a asp-controller="Admin" asp-action="Index" class="nav-link">
+              <i class="nav-icon fas fa-home"></i>
+              <p>My Center</p>
+            </a>
+          </li>
+        }
 
         <!-- SuperAdmin Only -->
         @if (User.IsInRole("SuperAdmin"))
         {
+          <li class="nav-header">SYSTEM MANAGEMENT</li>
+          
           <li class="nav-item">
             <a asp-controller="SuperAdmin" asp-action="Centers" class="nav-link">
               <i class="nav-icon fas fa-building"></i>
@@ -122,9 +151,28 @@
             </a>
           </li>
           <li class="nav-item">
-            <a asp-controller="Settings" asp-action="Index" class="nav-link">
-              <i class="nav-icon fas fa-cogs"></i>
-              <p>System Settings</p>
+            <a asp-controller="SuperAdmin" asp-action="DeletedItems" class="nav-link">
+              <i class="nav-icon fas fa-trash-restore"></i>
+              <p>Deleted Items</p>
+            </a>
+          </li>
+        }
+
+        <!-- Admin Only - Team Management -->
+        @if (User.IsInRole("Admin"))
+        {
+          <li class="nav-header">MY TEAM</li>
+          
+          <li class="nav-item">
+            <a asp-controller="Admin" asp-action="Users" class="nav-link">
+              <i class="nav-icon fas fa-users"></i>
+              <p>Team Members</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a asp-controller="Admin" asp-action="CreateUser" class="nav-link">
+              <i class="nav-icon fas fa-user-plus"></i>
+              <p>Add Team Member</p>
             </a>
           </li>
         }
@@ -135,13 +183,6 @@
           <li class="nav-header">ACADEMIC MANAGEMENT</li>
           
           <li class="nav-item">
-            <a asp-controller="AcademicYear" asp-action="Index" class="nav-link">
-              <i class="nav-icon fas fa-calendar-alt"></i>
-              <p>Academic Years</p>
-            </a>
-          </li>
-
-          <li class="nav-item">
             <a asp-controller="Course" asp-action="Index" class="nav-link">
               <i class="nav-icon fas fa-book"></i>
               <p>Courses</p>
@@ -149,39 +190,16 @@
           </li>
 
           <li class="nav-item">
-            <a asp-controller="Classroom" asp-action="Index" class="nav-link">
-              <i class="nav-icon fas fa-door-open"></i>
-              <p>Classrooms</p>
-            </a>
-          </li>
-        }
-
-        <!-- Admin, Manager, SuperAdmin -->
-        @if (User.IsInRole("SuperAdmin") || User.IsInRole("Admin") || User.IsInRole("Manager"))
-        {
-          <li class="nav-header">PEOPLE</li>
-          
-          <li class="nav-item">
             <a asp-controller="Student" asp-action="Index" class="nav-link">
               <i class="nav-icon fas fa-user-graduate"></i>
               <p>Students</p>
             </a>
           </li>
 
-          @if (User.IsInRole("SuperAdmin") || User.IsInRole("Admin"))
-          {
-            <li class="nav-item">
-              <a asp-controller="Teacher" asp-action="Index" class="nav-link">
-                <i class="nav-icon fas fa-chalkboard-teacher"></i>
-                <p>Teachers</p>
-              </a>
-            </li>
-          }
-
           <li class="nav-item">
-            <a asp-controller="Enrollment" asp-action="Index" class="nav-link">
-              <i class="nav-icon fas fa-user-plus"></i>
-              <p>Enrollments</p>
+            <a asp-controller="Teacher" asp-action="Index" class="nav-link">
+              <i class="nav-icon fas fa-chalkboard-teacher"></i>
+              <p>Teachers</p>
             </a>
           </li>
         }
@@ -190,31 +208,13 @@
         <li class="nav-header">OPERATIONS</li>
         
         <li class="nav-item">
-          <a asp-controller="Session" asp-action="Index" class="nav-link">
-            <i class="nav-icon fas fa-clock"></i>
-            <p>Sessions</p>
-          </a>
-        </li>
-
-        <li class="nav-item">
           <a asp-controller="Attendance" asp-action="Index" class="nav-link">
             <i class="nav-icon fas fa-clipboard-check"></i>
             <p>Attendance</p>
           </a>
         </li>
 
-        <!-- Admin & SuperAdmin - Exams -->
-        @if (User.IsInRole("SuperAdmin") || User.IsInRole("Admin"))
-        {
-          <li class="nav-item">
-            <a asp-controller="Exam" asp-action="Index" class="nav-link">
-              <i class="nav-icon fas fa-file-alt"></i>
-              <p>Exams & Results</p>
-            </a>
-          </li>
-        }
-
-        <!-- Financial - Admin, Manager, SuperAdmin -->
+        <!-- Financial - Admin & SuperAdmin -->
         @if (User.IsInRole("SuperAdmin") || User.IsInRole("Admin") || User.IsInRole("Manager"))
         {
           <li class="nav-header">FINANCIAL</li>
@@ -223,36 +223,6 @@
             <a asp-controller="Payment" asp-action="Index" class="nav-link">
               <i class="nav-icon fas fa-money-bill-wave"></i>
               <p>Payments</p>
-            </a>
-          </li>
-
-          <li class="nav-item">
-            <a asp-controller="Invoice" asp-action="Index" class="nav-link">
-              <i class="nav-icon fas fa-file-invoice-dollar"></i>
-              <p>Invoices</p>
-            </a>
-          </li>
-
-          @if (User.IsInRole("SuperAdmin") || User.IsInRole("Admin"))
-          {
-            <li class="nav-item">
-              <a asp-controller="Item" asp-action="Index" class="nav-link">
-                <i class="nav-icon fas fa-box"></i>
-                <p>Items/Inventory</p>
-              </a>
-            </li>
-          }
-        }
-
-        <!-- Reports - Admin, Manager, SuperAdmin -->
-        @if (User.IsInRole("SuperAdmin") || User.IsInRole("Admin") || User.IsInRole("Manager"))
-        {
-          <li class="nav-header">REPORTS</li>
-          
-          <li class="nav-item">
-            <a asp-controller="Report" asp-action="Index" class="nav-link">
-              <i class="nav-icon fas fa-chart-bar"></i>
-              <p>Reports</p>
             </a>
           </li>
         }

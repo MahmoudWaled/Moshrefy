@@ -50,6 +50,16 @@ namespace Moshrefy.Application.Interfaces.IServices
         Task DeactivateUserAsync(string userId);
         Task UpdateUserRoleAsync(string userId, UpdateUserRoleDTO updateUserRoleDTO);
 
+        // -------- System-Wide Monitoring (Read-Only) --------
+        Task<int> GetTotalTeachersCountAsync();
+        Task<int> GetTotalStudentsCountAsync();
+        Task<int> GetTotalCoursesCountAsync();
+        Task<int> GetTotalClassroomsCountAsync();
+        Task<int> GetDeletedTeachersCountAsync();
+        Task<int> GetDeletedStudentsCountAsync();
+        Task<int> GetDeletedCoursesCountAsync();
+        Task<int> GetDeletedClassroomsCountAsync();
+
         // -------- Teacher Management --------
         Task RestoreTeacherAsync(int teacherId);
 

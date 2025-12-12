@@ -34,6 +34,14 @@ namespace Moshrefy.Web.Controllers
             return View(statsVM);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> DeletedItems()
+        {
+            var statsDTO = await _superAdminService.GetSystemStatisticsAsync();
+            var statsVM = _mapper.Map<SystemStatisticsVM>(statsDTO);
+            return View(statsVM);
+        }
+
         #region Center Management
 
         [HttpGet]
@@ -570,7 +578,7 @@ namespace Moshrefy.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateUserForCenter(Models.User.CreateUserVM createUserVM, string returnUrl = null)
+        public async Task<IActionResult> CreateUserForCenter(Models.User.CreateUserVM createUserVM, string? returnUrl = null)
         {
             if (!ModelState.IsValid)
             {
@@ -934,6 +942,243 @@ namespace Moshrefy.Web.Controllers
                 "createdat" => users.OrderByDescending(u => u.CreatedAt).ToList(),
                 _ => users
             };
+        }
+
+        // Search Users - Advanced search page
+        [HttpGet]
+        public IActionResult SearchUsers()
+        {
+            return View();
+        }
+
+        // Search user by email (AJAX)
+        [HttpPost]
+        public async Task<IActionResult> SearchUserByEmail(string email)
+        {
+            if (string.IsNullOrEmpty(email))
+            {
+                return Json(new { success = false, message = "Email is required" });
+            }
+
+            try
+            {
+                var userDTO = await _superAdminService.GetUserByEmailAsync(email);
+                var userVM = _mapper.Map<Models.User.UserVM>(userDTO);
+                return Json(new { success = true, user = userVM });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error searching user by email: {email}");
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        // Search user by username (AJAX)
+        [HttpPost]
+        public async Task<IActionResult> SearchUserByUsername(string username)
+        {
+            if (string.IsNullOrEmpty(username))
+            {
+                return Json(new { success = false, message = "Username is required" });
+            }
+
+            try
+            {
+                var userDTO = await _superAdminService.GetUserByUsernameAsync(username);
+                var userVM = _mapper.Map<Models.User.UserVM>(userDTO);
+                return Json(new { success = true, user = userVM });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error searching user by username: {username}");
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        // Show inactive users page
+        [HttpGet]
+        public IActionResult InactiveUsers()
+        {
+            return View();
+        }
+
+        // AJAX endpoint for Inactive Users DataTables
+        [HttpPost]
+        public async Task<IActionResult> GetInactiveUsersData()
+        {
+            try
+            {
+                // Parse DataTables parameters
+                var draw = Request.Form["draw"].FirstOrDefault();
+                var start = Request.Form["start"].FirstOrDefault();
+                var length = Request.Form["length"].FirstOrDefault();
+                var searchValue = Request.Form["search[value]"].FirstOrDefault();
+                var sortColumnIndex = Request.Form["order[0][column]"].FirstOrDefault();
+                var sortColumnName = Request.Form[$"columns[{sortColumnIndex}][name]"].FirstOrDefault();
+                var sortDirection = Request.Form["order[0][dir]"].FirstOrDefault();
+
+                // Parse pagination
+                int pageSize = length != null ? Convert.ToInt32(length) : 25;
+                int skip = start != null ? Convert.ToInt32(start) : 0;
+                int pageNumber = (skip / pageSize) + 1;
+
+                var paginationParams = new PaginationParamter
+                {
+                    PageNumber = pageNumber,
+                    PageSize = pageSize
+                };
+
+                // Get inactive users
+                var usersDTO = await _superAdminService.GetInactiveUsersAsync(paginationParams);
+                int totalRecords = usersDTO.Count;
+                int filteredRecords = totalRecords;
+
+                var usersVM = _mapper.Map<List<Models.User.UserVM>>(usersDTO);
+
+                // Apply search filter if provided
+                if (!string.IsNullOrEmpty(searchValue))
+                {
+                    usersVM = usersVM.Where(u =>
+                        u.Name.Contains(searchValue, StringComparison.OrdinalIgnoreCase) ||
+                        u.UserName.Contains(searchValue, StringComparison.OrdinalIgnoreCase) ||
+                        (u.Email != null && u.Email.Contains(searchValue, StringComparison.OrdinalIgnoreCase)) ||
+                        (u.PhoneNumber != null && u.PhoneNumber.Contains(searchValue, StringComparison.OrdinalIgnoreCase)) ||
+                        (u.CenterName != null && u.CenterName.Contains(searchValue, StringComparison.OrdinalIgnoreCase)) ||
+                        (u.RoleName != null && u.RoleName.Contains(searchValue, StringComparison.OrdinalIgnoreCase)) ||
+                        u.Id.Contains(searchValue)
+                    ).ToList();
+
+                    filteredRecords = usersVM.Count;
+                }
+
+                // Apply sorting
+                if (!string.IsNullOrEmpty(sortColumnName) && !string.IsNullOrEmpty(sortDirection))
+                {
+                    usersVM = sortDirection.ToLower() == "asc"
+                        ? SortUsersAscending(usersVM, sortColumnName)
+                        : SortUsersDescending(usersVM, sortColumnName);
+                }
+
+                // Return JSON response for DataTables
+                var jsonData = new
+                {
+                    draw = draw,
+                    recordsTotal = totalRecords,
+                    recordsFiltered = filteredRecords,
+                    data = usersVM
+                };
+
+                return Ok(jsonData);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error loading inactive users data");
+                return StatusCode(500, new { error = "Error loading data. Please try again." });
+            }
+        }
+
+        // Update User Role - GET
+        [HttpGet]
+        public async Task<IActionResult> UpdateUserRole(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+            {
+                return NotFound();
+            }
+
+            try
+            {
+                var userDTO = await _superAdminService.GetUserByIdAsync(id);
+                var userVM = _mapper.Map<Models.User.UserVM>(userDTO);
+
+                // Create view model for role update
+                var updateUserRoleVM = new Models.User.UpdateUserRoleVM();
+                
+                // Set current role if available
+                if (!string.IsNullOrEmpty(userVM.RoleName) && Enum.TryParse<RolesNames>(userVM.RoleName, out var currentRole))
+                {
+                    updateUserRoleVM.Role = currentRole;
+                }
+
+                ViewBag.UserId = id;
+                ViewBag.UserName = userVM.UserName;
+                ViewBag.CurrentRole = userVM.RoleName;
+
+                return View(updateUserRoleVM);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error loading user for role update: {id}");
+                TempData["ErrorMessage"] = $"Error loading user: {ex.Message}";
+                return RedirectToAction(nameof(Users));
+            }
+        }
+
+        // Update User Role - POST
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateUserRole(string id, Models.User.UpdateUserRoleVM updateUserRoleVM)
+        {
+            if (string.IsNullOrEmpty(id))
+            {
+                return NotFound();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                try
+                {
+                    var userDTO = await _superAdminService.GetUserByIdAsync(id);
+                    var userVM = _mapper.Map<Models.User.UserVM>(userDTO);
+                    ViewBag.UserId = id;
+                    ViewBag.UserName = userVM.UserName;
+                    ViewBag.CurrentRole = userVM.RoleName;
+                }
+                catch { }
+                return View(updateUserRoleVM);
+            }
+
+            try
+            {
+                // Get user info before update
+                var userBeforeUpdate = await _superAdminService.GetUserByIdAsync(id);
+                
+                // Update the role
+                var updateUserRoleDTO = _mapper.Map<Application.DTOs.User.UpdateUserRoleDTO>(updateUserRoleVM);
+                await _superAdminService.UpdateUserRoleAsync(id, updateUserRoleDTO);
+                
+                // Check if the updated user is currently logged in
+                var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                
+                if (id == currentUserId)
+                {
+                    // User updated their own role - they need to be aware their session has been refreshed
+                    TempData["SuccessMessage"] = $"Your role has been updated from {userBeforeUpdate.RoleName} to {updateUserRoleDTO.Role}. The changes are now active. Please navigate to see your new permissions.";
+                }
+                else
+                {
+                    // Updated another user's role
+                    TempData["SuccessMessage"] = $"User role updated successfully from {userBeforeUpdate.RoleName} to {updateUserRoleDTO.Role}! The changes will take effect immediately for the user.";
+                }
+                
+                return RedirectToAction(nameof(UserDetails), new { id = id });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error updating user role: {id}");
+                TempData["ErrorMessage"] = $"Error updating role: {ex.Message}";
+                
+                try
+                {
+                    var userDTO = await _superAdminService.GetUserByIdAsync(id);
+                    var userVM = _mapper.Map<Models.User.UserVM>(userDTO);
+                    ViewBag.UserId = id;
+                    ViewBag.UserName = userVM.UserName;
+                    ViewBag.CurrentRole = userVM.RoleName;
+                }
+                catch { }
+                return View(updateUserRoleVM);
+            }
         }
 
         // Center Users - Show all users for a specific center
