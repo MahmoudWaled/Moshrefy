@@ -1,0 +1,482 @@
+@model Moshrefy.Web.Models.User.UserVM
+
+@{
+    ViewData["Title"] = "User Details";
+}
+
+<!-- Content Header -->
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>
+                    <i class="fas fa-user"></i> User Details
+                </h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a asp-action="Index">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a asp-action="Users">Users</a></li>
+                    <li class="breadcrumb-item active">Details</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <!-- Alert messages -->
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                <i class="fas fa-exclamation-circle"></i> @TempData["ErrorMessage"]
+            </div>
+        }
+
+        <div class="row">
+            <!-- User Information Card -->
+            <div class="col-md-8">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-info-circle"></i> User Information
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <dl class="row">
+                            <dt class="col-sm-4">
+                                <i class="fas fa-user text-primary"></i> Full Name
+                            </dt>
+                            <dd class="col-sm-8">
+                                <strong>@Model.Name</strong>
+                            </dd>
+
+                            <dt class="col-sm-4">
+                                <i class="fas fa-at text-info"></i> Username
+                            </dt>
+                            <dd class="col-sm-8">
+                                <code>@Model.UserName</code>
+                            </dd>
+
+                            <dt class="col-sm-4">
+                                <i class="fas fa-envelope text-info"></i> Email
+                            </dt>
+                            <dd class="col-sm-8">
+                                @if (!string.IsNullOrEmpty(Model.Email))
+                                {
+                                    <a href="mailto:@Model.Email">@Model.Email</a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Not provided</span>
+                                }
+                            </dd>
+
+                            <dt class="col-sm-4">
+                                <i class="fas fa-phone text-success"></i> Phone Number
+                            </dt>
+                            <dd class="col-sm-8">
+                                @if (!string.IsNullOrEmpty(Model.PhoneNumber))
+                                {
+                                    <a href="tel:@Model.PhoneNumber">@Model.PhoneNumber</a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Not provided</span>
+                                }
+                            </dd>
+
+                            <dt class="col-sm-4">
+                                <i class="fas fa-building text-warning"></i> Center
+                            </dt>
+                            <dd class="col-sm-8">
+                                @if (!string.IsNullOrEmpty(Model.CenterName) && Model.CenterId.HasValue)
+                                {
+                                    <a asp-action="CenterDetails" asp-route-centerId="@Model.CenterId" 
+                                       class="badge badge-info badge-lg px-3 py-2" 
+                                       style="text-decoration: none; cursor: pointer;"
+                                       title="View Center Details">
+                                        <i class="fas fa-building mr-1"></i> @Model.CenterName
+                                        <i class="fas fa-external-link-alt ml-1" style="font-size: 0.8em;"></i>
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">No center assigned</span>
+                                }
+                            </dd>
+
+                            <dt class="col-sm-4">
+                                <i class="fas fa-user-tag text-purple"></i> Role
+                            </dt>
+                            <dd class="col-sm-8">
+                                @if (!string.IsNullOrEmpty(Model.RoleName))
+                                {
+                                    var badgeClass = "badge-secondary";
+                                    var icon = "fa-user";
+                                    
+                                    switch(Model.RoleName)
+                                    {
+                                        case "SuperAdmin":
+                                            badgeClass = "badge-danger";
+                                            icon = "fa-user-shield";
+                                            break;
+                                        case "Admin":
+                                            badgeClass = "badge-primary";
+                                            icon = "fa-user-tie";
+                                            break;
+                                        case "Manager":
+                                            badgeClass = "badge-warning";
+                                            icon = "fa-user-cog";
+                                            break;
+                                        case "Employee":
+                                            badgeClass = "badge-info";
+                                            icon = "fa-user";
+                                            break;
+                                    }
+                                    
+                                    <span class="badge @badgeClass badge-lg px-3 py-2">
+                                        <i class="fas @icon mr-1"></i> @Model.RoleName
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">No role assigned</span>
+                                }
+                            </dd>
+
+                            <dt class="col-sm-4">
+                                <i class="fas fa-toggle-on text-success"></i> Status
+                            </dt>
+                            <dd class="col-sm-8">
+                                @if (Model.IsActive)
+                                {
+                                    <span class="badge badge-success badge-lg px-3 py-2">
+                                        <i class="fas fa-check-circle"></i> Active
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-warning badge-lg px-3 py-2">
+                                        <i class="fas fa-times-circle"></i> Inactive
+                                    </span>
+                                }
+                            </dd>
+
+                            <dt class="col-sm-4">
+                                <i class="fas fa-info-circle text-info"></i> State
+                            </dt>
+                            <dd class="col-sm-8">
+                                @if (Model.IsDeleted)
+                                {
+                                    <span class="badge badge-danger badge-lg px-3 py-2">
+                                        <i class="fas fa-trash-alt"></i> Deleted
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-info badge-lg px-3 py-2">
+                                        <i class="fas fa-check"></i> Normal
+                                    </span>
+                                }
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions & Metadata Card -->
+            <div class="col-md-4">
+                <!-- Actions Card -->
+                <div class="card card-success">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-cogs"></i> Actions
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="btn-group-vertical w-100">
+                            @if (!Model.IsDeleted)
+                            {
+                                <a asp-action="EditUser" asp-route-id="@Model.Id" class="btn btn-primary mb-2">
+                                    <i class="fas fa-edit"></i> Edit User
+                                </a>
+
+                                @if (Model.IsActive)
+                                {
+                                    <button type="button" class="btn btn-warning mb-2" onclick="deactivateUser('@Model.Id', '@Model.UserName')">
+                                        <i class="fas fa-ban"></i> Deactivate User
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button type="button" class="btn btn-success mb-2" onclick="activateUser('@Model.Id', '@Model.UserName')">
+                                        <i class="fas fa-check"></i> Activate User
+                                    </button>
+                                }
+
+                                <button type="button" class="btn btn-warning mb-2" onclick="softDeleteUser('@Model.Id', '@Model.UserName')">
+                                    <i class="fas fa-trash-alt"></i> Soft Delete
+                                </button>
+
+                                <button type="button" class="btn btn-danger" onclick="hardDeleteUser('@Model.Id', '@Model.UserName')">
+                                    <i class="fas fa-trash"></i> Hard Delete
+                                </button>
+                            }
+                            else
+                            {
+                                <button type="button" class="btn btn-success mb-2" onclick="restoreUser('@Model.Id', '@Model.UserName')">
+                                    <i class="fas fa-undo"></i> Restore User
+                                </button>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Metadata Card -->
+                <div class="card card-secondary">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-history"></i> Metadata
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-5 text-sm">
+                                <i class="fas fa-clock text-muted"></i> Created
+                            </dt>
+                            <dd class="col-sm-7 text-sm">
+                                <small class="text-muted">
+                                    @Model.CreatedAt.ToString("MMM dd, yyyy")
+                                    <br>@Model.CreatedAt.ToString("hh:mm tt")
+                                </small>
+                            </dd>
+
+                            @if (!string.IsNullOrEmpty(Model.CreatedByName))
+                            {
+                                <dt class="col-sm-5 text-sm">
+                                    <i class="fas fa-user text-muted"></i> Created By
+                                </dt>
+                                <dd class="col-sm-7 text-sm">
+                                    <small class="text-muted">@Model.CreatedByName</small>
+                                </dd>
+                            }
+
+                            <dt class="col-sm-5 text-sm">
+                                <i class="fas fa-fingerprint text-muted"></i> User ID
+                            </dt>
+                            <dd class="col-sm-7 text-sm">
+                                <small class="text-muted text-break">@Model.Id</small>
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Back Button -->
+        <div class="row">
+            <div class="col-12">
+                <a asp-action="Users" class="btn btn-default">
+                    <i class="fas fa-arrow-left"></i> Back to Users List
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        // Restore user
+        function restoreUser(userId, userName) {
+            Swal.fire({
+                title: 'Restore User?',
+                html: 'Restore<br><strong>' + userName + '</strong>?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="fas fa-undo"></i> Yes, Restore',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post('@Url.Action("RestoreUser", "SuperAdmin")', { id: userId })
+                        .done(function (response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    title: 'Restored!',
+                                    text: response.message,
+                                    icon: 'success',
+                                    timer: 2000
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire('Error!', response.message, 'error');
+                            }
+                        })
+                        .fail(function () {
+                            Swal.fire('Error!', 'Failed to restore user.', 'error');
+                        });
+                }
+            });
+        }
+
+        // Activate user
+        function activateUser(userId, userName) {
+            Swal.fire({
+                title: 'Activate User?',
+                html: 'Activate<br><strong>' + userName + '</strong>?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="fas fa-check"></i> Yes, Activate',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post('@Url.Action("ActivateUser", "SuperAdmin")', { id: userId })
+                        .done(function (response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    title: 'Activated!',
+                                    text: response.message,
+                                    icon: 'success',
+                                    timer: 2000
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire('Error!', response.message, 'error');
+                            }
+                        })
+                        .fail(function () {
+                            Swal.fire('Error!', 'Failed to activate user.', 'error');
+                        });
+                }
+            });
+        }
+
+        // Deactivate user
+        function deactivateUser(userId, userName) {
+            Swal.fire({
+                title: 'Deactivate User?',
+                html: 'Deactivate<br><strong>' + userName + '</strong>?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ffc107',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="fas fa-ban"></i> Yes, Deactivate',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post('@Url.Action("DeactivateUser", "SuperAdmin")', { id: userId })
+                        .done(function (response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    title: 'Deactivated!',
+                                    text: response.message,
+                                    icon: 'success',
+                                    timer: 2000
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire('Error!', response.message, 'error');
+                            }
+                        })
+                        .fail(function () {
+                            Swal.fire('Error!', 'Failed to deactivate user.', 'error');
+                        });
+                }
+            });
+        }
+
+        // Soft delete user
+        function softDeleteUser(userId, userName) {
+            Swal.fire({
+                title: 'Soft Delete User?',
+                html: 'Move<br><strong>' + userName + '</strong><br>to trash?<br><small class="text-muted">You can restore it later.</small>',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ffc107',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="fas fa-trash-alt"></i> Yes, Soft Delete',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post('@Url.Action("SoftDeleteUser", "SuperAdmin")', { id: userId })
+                        .done(function (response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    title: 'Deleted!',
+                                    text: response.message,
+                                    icon: 'success',
+                                    timer: 2000
+                                }).then(() => {
+                                    window.location.href = '@Url.Action("Users", "SuperAdmin")';
+                                });
+                            } else {
+                                Swal.fire('Error!', response.message, 'error');
+                            }
+                        })
+                        .fail(function () {
+                            Swal.fire('Error!', 'Failed to delete user.', 'error');
+                        });
+                }
+            });
+        }
+
+        // Hard delete user
+        function hardDeleteUser(userId, userName) {
+            Swal.fire({
+                title: 'Permanently Delete User?',
+                html: '<strong class="text-danger">?? WARNING</strong><br>' +
+                      'This will <strong>PERMANENTLY DELETE</strong><br>' +
+                      '<strong>' + userName + '</strong><br><br>' +
+                      '<span class="text-danger">This action CANNOT be undone!</span><br>' +
+                      '<small class="text-muted">All user data will be lost forever.</small>',
+                icon: 'error',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="fas fa-trash"></i> Yes, DELETE PERMANENTLY',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post('@Url.Action("HardDeleteUser", "SuperAdmin")', { id: userId })
+                        .done(function (response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    title: 'Permanently Deleted!',
+                                    text: response.message,
+                                    icon: 'success',
+                                    timer: 2000
+                                }).then(() => {
+                                    window.location.href = '@Url.Action("Users", "SuperAdmin")';
+                                });
+                            } else {
+                                Swal.fire('Error!', response.message, 'error');
+                            }
+                        })
+                        .fail(function () {
+                            Swal.fire('Error!', 'Failed to delete user permanently.', 'error');
+                        });
+                }
+            });
+        }
+    </script>
+}

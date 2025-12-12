@@ -222,8 +222,14 @@
                         </div>
                     </div>
                     <div class="card-footer text-center">
-                        <a asp-controller="User" asp-action="Index" class="btn btn-sm btn-info">
+                        <a  asp-action="Users" class="btn btn-sm btn-info">
                             <i class="fas fa-eye"></i> View All Users
+                        </a>
+                        <a asp-action="CreateUserForCenter" class="btn btn-sm btn-success">
+                            <i class="fas fa-plus"></i> Create New User
+                        </a>
+                        <a asp-action="CreateCenterAdmin" class="btn btn-sm btn-warning ">
+                            <i class="fas fa-plus"></i> Create New Admin
                         </a>
                     </div>
                 </div>

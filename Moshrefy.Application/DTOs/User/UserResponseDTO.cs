@@ -7,7 +7,9 @@ namespace Moshrefy.Application.DTOs.User
         public string UserName { get; set; } = default!;
         public string? Email { get; set; }
         public string? PhoneNumber { get; set; }
+        public int? CenterId { get; set; }
         public string? CenterName { get; set; }
+        public string? RoleName { get; set; }
         public DateTime CreatedAt { get; set; }
         public string? CreatedById { get; set; }
         public string? CreatedByName { get; set; }

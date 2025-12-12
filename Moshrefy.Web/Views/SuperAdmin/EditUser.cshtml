@@ -1,9 +1,8 @@
-@model Moshrefy.Web.Models.User.CreateUserVM
+@model Moshrefy.Web.Models.User.UpdateUserVM
 
 @{
-    ViewData["Title"] = "Create User for Center";
-    var preSelectedCenter = ViewBag.PreSelectedCenter as bool? ?? false;
-    var centerName = ViewBag.CenterName as string;
+    ViewData["Title"] = "Edit User";
+    var userId = ViewBag.UserId as string;
 }
 
 <!-- Content Header -->
@@ -12,14 +11,14 @@
         <div class="row mb-2">
             <div class="col-sm-6">
                 <h1>
-                    <i class="fas fa-user-plus"></i> Create User for Center
+                    <i class="fas fa-edit"></i> Edit User
                 </h1>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item"><a asp-action="Index">Dashboard</a></li>
                     <li class="breadcrumb-item"><a asp-action="Users">Users</a></li>
-                    <li class="breadcrumb-item active">Create User</li>
+                    <li class="breadcrumb-item active">Edit</li>
                 </ol>
             </div>
         </div>
@@ -31,12 +30,12 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-8 offset-md-2">
-                <div class="card card-success">
+                <div class="card card-primary">
                     <div class="card-header">
                         <h3 class="card-title">User Information</h3>
                     </div>
 
-                    <form asp-action="CreateUserForCenter" method="post">
+                    <form asp-action="EditUser" asp-route-id="@userId" method="post">
                         <div class="card-body">
                             <!-- Alert messages -->
                             @if (TempData["ErrorMessage"] != null)
@@ -47,60 +46,12 @@
                                 </div>
                             }
 
-                            @if (preSelectedCenter && !string.IsNullOrEmpty(centerName))
-                            {
-                                <div class="alert alert-info">
-                                    <i class="fas fa-building"></i>
-                                    <strong>Creating user for:</strong> @centerName
-                                </div>
-                            }
-
                             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-                            <!-- Center Selection -->
-                            <div class="form-group">
-                                <label asp-for="CenterId" class="control-label">
-                                    <i class="fas fa-building"></i> Select Center *
-                                </label>
-                                <select asp-for="CenterId" 
-                                        class="form-control select2" 
-                                        asp-items="Model.Centers"
-                                        style="width: 100%;">
-                                    <option value="">-- Select a Center --</option>
-                                </select>
-                                <span asp-validation-for="CenterId" class="text-danger"></span>
-                                <small class="form-text text-muted">
-                                    @if (preSelectedCenter)
-                                    {
-                                        <text>Center is pre-selected. You can change it if needed.</text>
-                                    }
-                                    else
-                                    {
-                                        <text>Select the center this user will belong to</text>
-                                    }
-                                </small>
-                            </div>
-
-                            <!-- Role Selection -->
-                            <div class="form-group">
-                                <label asp-for="RoleName" class="control-label">
-                                    <i class="fas fa-user-tag"></i> User Role *
-                                </label>
-                                <select asp-for="RoleName" class="form-control">
-                                    <option value="">-- Select a Role --</option>
-                                    <option value="Manager">Manager</option>
-                                    <option value="Employee">Employee</option>
-                                </select>
-                                <span asp-validation-for="RoleName" class="text-danger"></span>
-                                <small class="form-text text-muted">
-                                    Select the role for this user
-                                </small>
-                            </div>
 
                             <!-- Full Name -->
                             <div class="form-group">
                                 <label asp-for="Name" class="control-label">
-                                    <i class="fas fa-user"></i> Full Name *
+                                    <i class="fas fa-user"></i> Full Name
                                 </label>
                                 <input asp-for="Name" class="form-control" placeholder="Enter full name" />
                                 <span asp-validation-for="Name" class="text-danger"></span>
@@ -109,7 +60,7 @@
                             <!-- Username -->
                             <div class="form-group">
                                 <label asp-for="UserName" class="control-label">
-                                    <i class="fas fa-at"></i> Username *
+                                    <i class="fas fa-at"></i> Username
                                 </label>
                                 <input asp-for="UserName" class="form-control" placeholder="Enter username" />
                                 <span asp-validation-for="UserName" class="text-danger"></span>
@@ -136,36 +87,51 @@
                                 <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                             </div>
 
-                            <!-- Password -->
+                            <!-- Center Selection -->
                             <div class="form-group">
-                                <label asp-for="Password" class="control-label">
-                                    <i class="fas fa-lock"></i> Password *
+                                <label asp-for="CenterId" class="control-label">
+                                    <i class="fas fa-building"></i> Center
                                 </label>
-                                <input asp-for="Password" class="form-control" placeholder="Enter password" />
-                                <span asp-validation-for="Password" class="text-danger"></span>
+                                <select asp-for="CenterId" 
+                                        class="form-control select2" 
+                                        asp-items="Model.Centers"
+                                        style="width: 100%;">
+                                    <option value="">-- Select a Center (Optional) --</option>
+                                </select>
+                                <span asp-validation-for="CenterId" class="text-danger"></span>
                                 <small class="form-text text-muted">
-                                    Minimum 6 characters. The user can change this later.
+                                    Assign or change the center for this user
+                                </small>
+                            </div>
+
+                            <!-- Is Active -->
+                            <div class="form-group">
+                                <div class="custom-control custom-switch custom-switch-on-success">
+                                    <input type="checkbox" asp-for="IsActive" class="custom-control-input" id="isActiveSwitch">
+                                    <label class="custom-control-label" for="isActiveSwitch">
+                                        <i class="fas fa-toggle-on"></i> User is Active
+                                    </label>
+                                </div>
+                                <small class="form-text text-muted">
+                                    Inactive users cannot login to the system
                                 </small>
                             </div>
 
                             <div class="alert alert-info">
                                 <i class="fas fa-info-circle"></i>
-                                <strong>Note:</strong> This will create a user account for the selected center with the specified role.
+                                <strong>Note:</strong> Changes will be saved and the user will be updated immediately.
                             </div>
                         </div>
 
                         <div class="card-footer">
-                            <button type="submit" class="btn btn-success">
-                                <i class="fas fa-save"></i> Create User
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Save Changes
                             </button>
-                            @if (Model.CenterId.HasValue && Model.CenterId.Value > 0)
-                            {
-                                <a asp-action="CenterUsers" asp-route-centerId="@Model.CenterId" class="btn btn-secondary">
-                                    <i class="fas fa-arrow-left"></i> Back to Center Users
-                                </a>
-                            }
-                            <a asp-action="Users" class="btn btn-default">
+                            <a asp-action="UserDetails" asp-route-id="@userId" class="btn btn-secondary">
                                 <i class="fas fa-times"></i> Cancel
+                            </a>
+                            <a asp-action="Users" class="btn btn-default">
+                                <i class="fas fa-arrow-left"></i> Back to List
                             </a>
                         </div>
                     </form>
@@ -188,7 +154,7 @@
             // Initialize Select2 with search
             $('.select2').select2({
                 theme: 'bootstrap4',
-                placeholder: '-- Select a Center --',
+                placeholder: '-- Select a Center (Optional) --',
                 allowClear: true,
                 ajax: {
                     url: '@Url.Action("SearchCenters", "SuperAdmin")',
@@ -196,7 +162,7 @@
                     delay: 250,
                     data: function (params) {
                         return {
-                            term: params.term // search term
+                            term: params.term
                         };
                     },
                     processResults: function (data) {

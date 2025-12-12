@@ -1,5 +1,8 @@
-﻿@{
-    ViewData["Title"] = "User Management";
+@{
+    ViewData["Title"] = "Center Users";
+    var centerId = ViewBag.CenterId as int? ?? 0;
+    var centerName = ViewBag.CenterName as string ?? "Unknown Center";
+    var centerAddress = ViewBag.CenterAddress as string ?? "";
 }
 
 <!-- Content Header -->
@@ -8,12 +11,17 @@
         <div class="row mb-2">
             <div class="col-sm-6">
                 <h1>
-                    <i class="fas fa-users-cog"></i> User Management
+                    <i class="fas fa-users"></i> @centerName - Users
                 </h1>
+                <p class="text-muted">
+                    <i class="fas fa-map-marker-alt"></i> @centerAddress
+                </p>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item"><a asp-action="Index">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a asp-action="Centers">Centers</a></li>
+                    <li class="breadcrumb-item"><a asp-action="CenterDetails" asp-route-centerId="@centerId">@centerName</a></li>
                     <li class="breadcrumb-item active">Users</li>
                 </ol>
             </div>
@@ -26,20 +34,18 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-12">
-                <div class="card">
+                <div class="card card-info">
                     <div class="card-header">
                         <h3 class="card-title">
-                            <i class="fas fa-list"></i> All Users
+                            <i class="fas fa-list"></i> Users in @centerName
                         </h3>
                         <div class="card-tools">
-                            <div class="btn-group">
-                                <a asp-action="CreateCenterAdmin" class="btn btn-primary btn-sm">
-                                    <i class="fas fa-user-shield"></i> Create Center Admin
-                                </a>
-                                <a asp-action="CreateUserForCenter" class="btn btn-success btn-sm">
-                                    <i class="fas fa-user-plus"></i> Create User
-                                </a>
-                            </div>
+                            <a asp-action="CreateUserForCenter" asp-route-centerId="@centerId" class="btn btn-success btn-sm mr-2" title="Create New User for This Center">
+                                <i class="fas fa-user-plus"></i> Create User
+                            </a>
+                            <a asp-action="CenterDetails" asp-route-centerId="@centerId" class="btn btn-tool" title="Back to Center Details">
+                                <i class="fas fa-arrow-left"></i>
+                            </a>
                         </div>
                     </div>
                     <div class="card-body">
@@ -65,46 +71,8 @@
                             </div>
                         }
 
-                        <!-- Filter Controls -->
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                                    <label class="btn btn-outline-primary active" id="showAll">
-                                        <input type="radio" name="filterOptions" checked>
-                                        <i class="fas fa-list"></i> Show All
-                                    </label>
-                                    <label class="btn btn-outline-success" id="hideDeleted">
-                                        <input type="radio" name="filterOptions">
-                                        <i class="fas fa-filter"></i> Active Only
-                                    </label>
-                                    <label class="btn btn-outline-danger" id="showDeleted">
-                                        <input type="radio" name="filterOptions">
-                                        <i class="fas fa-trash"></i> Show Only Deleted
-                                    </label>
-                                </div>
-                                <span class="ml-3 text-muted">
-                                    <i class="fas fa-info-circle"></i>
-                                    <span id="filterInfo">Showing all users</span>
-                                </span>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group mb-0">
-                                    <label for="roleFilter" class="mr-2">
-                                        <i class="fas fa-user-tag"></i> Filter by Role:
-                                    </label>
-                                    <select id="roleFilter" class="form-control d-inline-block" style="width: auto;">
-                                        <option value="all">All Roles</option>
-                                        <option value="SuperAdmin">Super Admin</option>
-                                        <option value="Admin">Admin</option>
-                                        <option value="Manager">Manager</option>
-                                        <option value="Employee">Employee</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
                         <div class="table-responsive">
-                            <table id="usersTable" class="table table-bordered table-hover table-striped">
+                            <table id="centerUsersTable" class="table table-bordered table-hover table-striped">
                                 <thead class="thead-light">
                                     <tr>
                                         <th>#</th>
@@ -112,7 +80,6 @@
                                         <th data-name="UserName">Username</th>
                                         <th data-name="Email">Email</th>
                                         <th data-name="PhoneNumber">Phone</th>
-                                        <th data-name="CenterName">Center</th>
                                         <th data-name="RoleName">Role</th>
                                         <th data-name="IsActive">Status</th>
                                         <th data-name="IsDeleted">State</th>
@@ -126,6 +93,14 @@
                             </table>
                         </div>
                     </div>
+                    <div class="card-footer">
+                        <a asp-action="CenterDetails" asp-route-centerId="@centerId" class="btn btn-default">
+                            <i class="fas fa-arrow-left"></i> Back to Center Details
+                        </a>
+                        <a asp-action="Centers" class="btn btn-secondary">
+                            <i class="fas fa-list"></i> All Centers
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -137,13 +112,13 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap4.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap4.min.css">
 
-    <!-- Custom CSS for better table appearance -->
+    <!-- Custom CSS -->
     <style>
-        #usersTable {
+        #centerUsersTable {
             font-size: 0.9rem;
         }
 
-        #usersTable thead th {
+        #centerUsersTable thead th {
             font-weight: 600;
             font-size: 0.85rem;
             text-transform: uppercase;
@@ -152,52 +127,20 @@
             white-space: nowrap;
         }
 
-        #usersTable tbody td {
+        #centerUsersTable tbody td {
             padding: 10px 8px;
             vertical-align: middle !important;
         }
 
-        #usersTable tbody td small {
-            font-size: 0.85rem;
-        }
-
-        #usersTable .badge {
+        #centerUsersTable .badge {
             font-size: 0.75rem;
             font-weight: 500;
             padding: 4px 8px;
             white-space: nowrap;
         }
 
-        #usersTable .btn-group-sm .btn {
-            padding: 0.25rem 0.5rem;
-            font-size: 0.875rem;
-        }
-
-        #usersTable tbody tr:hover {
+        #centerUsersTable tbody tr:hover {
             background-color: #f8f9fa !important;
-        }
-
-        @@media (max-width: 768px) {
-            #usersTable {
-                font-size: 0.85rem;
-            }
-
-            #usersTable thead th {
-                font-size: 0.8rem;
-                padding: 8px 4px;
-            }
-
-            #usersTable tbody td {
-                padding: 8px 4px;
-            }
-        }
-
-        .btn-group {
-            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
-        }
-
-        .table-responsive {
-            border-radius: 0.25rem;
         }
     </style>
 
@@ -212,20 +155,18 @@
 
     <script>
         $(document).ready(function () {
-            var currentFilter = 'all';
-            var currentRole = 'all';
+            var centerId = @centerId;
             var isFirstLoad = true;
 
-            // Initialize DataTable with server-side processing
-            var table = $('#usersTable').DataTable({
+            // Initialize DataTable
+            var table = $('#centerUsersTable').DataTable({
                 processing: false,
                 serverSide: true,
                 ajax: {
-                    url: '@Url.Action("GetUsersData", "SuperAdmin")',
+                    url: '@Url.Action("GetCenterUsersData", "SuperAdmin")',
                     type: 'POST',
                     data: function (d) {
-                        d.filterDeleted = currentFilter;
-                        d.filterRole = currentRole;
+                        d.centerId = centerId;
                     },
                     error: function (xhr, error, code) {
                         console.error('DataTables error:', error, code);
@@ -238,9 +179,9 @@
                     },
                     beforeSend: function () {
                         if (isFirstLoad) {
-                            $('#usersTable tbody').html(
-                                '<tr><td colspan="11" class="text-center py-5">' +
-                                '<div class="spinner-border text-primary" role="status">' +
+                            $('#centerUsersTable tbody').html(
+                                '<tr><td colspan="10" class="text-center py-5">' +
+                                '<div class="spinner-border text-info" role="status">' +
                                 '<span class="sr-only">Loading...</span></div>' +
                                 '<br><span class="text-muted mt-2">Loading users...</span>' +
                                 '</td></tr>'
@@ -305,18 +246,6 @@
                         }
                     },
                     {
-                        data: 'centerName',
-                        name: 'CenterName',
-                        width: '150px',
-                        className: 'align-middle',
-                        render: function (data) {
-                            if (data && data !== '') {
-                                return '<i class="fas fa-building text-info mr-1"></i> <small>' + data + '</small>';
-                            }
-                            return '<span class="text-muted">N/A</span>';
-                        }
-                    },
-                    {
                         data: 'roleName',
                         name: 'RoleName',
                         width: '100px',
@@ -332,11 +261,11 @@
                                         icon = 'fa-user-shield';
                                         break;
                                     case 'Admin':
-                                        badgeClass = 'badge-warning';
+                                        badgeClass = 'badge-primary';
                                         icon = 'fa-user-tie';
                                         break;
                                     case 'Manager':
-                                        badgeClass = 'badge-primary';
+                                        badgeClass = 'badge-warning';
                                         icon = 'fa-user-cog';
                                         break;
                                     case 'Employee':
@@ -448,7 +377,7 @@
                 ],
                 pageLength: 25,
                 lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
-                order: [[8, 'desc']], // Sort by created date descending
+                order: [[7, 'desc']], // Sort by created date descending
                 autoWidth: false,
                 responsive: true,
                 language: {
@@ -461,64 +390,22 @@
                     zeroRecords: "No matching users found",
                     emptyTable: '<div class="p-4 text-center">' +
                         '<i class="fas fa-users fa-4x text-muted mb-3"></i>' +
-                        '<h4 class="text-muted">No Users Found</h4>' +
-                        '<p class="text-muted">Get started by creating your first user.</p>' +
-                        '<a href="@Url.Action("CreateUserForCenter", "SuperAdmin")" class="btn btn-success">' +
-                        '<i class="fas fa-plus"></i> Create Your First User</a></div>'
+                        '<h4 class="text-muted">No Users in This Center</h4>' +
+                        '<p class="text-muted">This center doesn\'t have any users yet.</p></div>'
                 },
-                columnDefs: [
-                    { responsivePriority: 1, targets: 0 },  // # - always visible
-                    { responsivePriority: 2, targets: 1 },  // Name - always visible
-                    { responsivePriority: 3, targets: 2 },  // Username - always visible
-                    { responsivePriority: 4, targets: 10 }, // Actions - always visible
-                    { responsivePriority: 5, targets: 6 },  // Role
-                    { responsivePriority: 6, targets: 7 },  // Status
-                    { responsivePriority: 7, targets: 8 },  // State
-                    { responsivePriority: 8, targets: 5 },  // Center
-                    { responsivePriority: 9, targets: 3 },  // Email
-                    { responsivePriority: 10, targets: 4 }, // Phone
-                    { responsivePriority: 11, targets: 9 }  // Created
-                ],
                 createdRow: function (row, data, dataIndex) {
                     if (data.isDeleted) {
                         $(row).addClass('table-danger');
                     }
                 }
             });
-
-            // Filter: Show All
-            $('#showAll').click(function () {
-                currentFilter = 'all';
-                $('#filterInfo').text('Showing all users');
-                table.ajax.reload(null, false);
-            });
-
-            // Filter: Active Only
-            $('#hideDeleted').click(function () {
-                currentFilter = 'active';
-                $('#filterInfo').text('Showing active users only');
-                table.ajax.reload(null, false);
-            });
-
-            // Filter: Show Only Deleted
-            $('#showDeleted').click(function () {
-                currentFilter = 'deleted';
-                $('#filterInfo').text('Showing only deleted users');
-                table.ajax.reload(null, false);
-            });
-
-            // Role Filter
-            $('#roleFilter').change(function () {
-                currentRole = $(this).val();
-                table.ajax.reload(null, false);
-            });
         });
 
-        // Restore user function
+        // User action functions
         function restoreUser(userId, userName) {
             Swal.fire({
                 title: 'Restore User?',
-                html: 'Are you sure you want to restore<br><strong>' + userName + '</strong>?',
+                html: 'Restore<br><strong>' + userName + '</strong>?',
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: '#28a745',
@@ -548,16 +435,15 @@
                         timer: 2000,
                         showConfirmButton: false
                     });
-                    $('#usersTable').DataTable().ajax.reload(null, false);
+                    $('#centerUsersTable').DataTable().ajax.reload(null, false);
                 }
             });
         }
 
-        // Activate user function
         function activateUser(userId, userName) {
             Swal.fire({
                 title: 'Activate User?',
-                html: 'Activate user<br><strong>' + userName + '</strong>?',
+                html: 'Activate<br><strong>' + userName + '</strong>?',
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: '#28a745',
@@ -587,16 +473,15 @@
                         timer: 2000,
                         showConfirmButton: false
                     });
-                    $('#usersTable').DataTable().ajax.reload(null, false);
+                    $('#centerUsersTable').DataTable().ajax.reload(null, false);
                 }
             });
         }
 
-        // Deactivate user function
         function deactivateUser(userId, userName) {
             Swal.fire({
                 title: 'Deactivate User?',
-                html: 'Deactivate user<br><strong>' + userName + '</strong>?',
+                html: 'Deactivate<br><strong>' + userName + '</strong>?',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#ffc107',
@@ -626,12 +511,11 @@
                         timer: 2000,
                         showConfirmButton: false
                     });
-                    $('#usersTable').DataTable().ajax.reload(null, false);
+                    $('#centerUsersTable').DataTable().ajax.reload(null, false);
                 }
             });
         }
 
-        // Soft delete user function
         function softDeleteUser(userId, userName) {
             Swal.fire({
                 title: 'Soft Delete User?',
@@ -665,16 +549,15 @@
                         timer: 2000,
                         showConfirmButton: false
                     });
-                    $('#usersTable').DataTable().ajax.reload(null, false);
+                    $('#centerUsersTable').DataTable().ajax.reload(null, false);
                 }
             });
         }
 
-        // Hard delete user function
         function hardDeleteUser(userId, userName) {
             Swal.fire({
                 title: 'Permanently Delete User?',
-                html: '<strong class="text-danger">⚠️ WARNING</strong><br>' +
+                html: '<strong class="text-danger">?? WARNING</strong><br>' +
                       'This will <strong>PERMANENTLY DELETE</strong><br>' +
                       '<strong>' + userName + '</strong><br><br>' +
                       '<span class="text-danger">This action CANNOT be undone!</span><br>' +
@@ -708,10 +591,9 @@
                         timer: 2000,
                         showConfirmButton: false
                     });
-                    $('#usersTable').DataTable().ajax.reload(null, false);
+                    $('#centerUsersTable').DataTable().ajax.reload(null, false);
                 }
             });
         }
     </script>
 }
-

@@ -239,6 +239,9 @@
                                 <a asp-action="Centers" class="btn btn-default">
                                     <i class="fas fa-arrow-left"></i> Back to List
                                 </a>
+                                <a asp-action="CenterUsers" asp-route-centerId="@Model.Id" class="btn btn-info">
+                                    <i class="fas fa-users"></i> View Center Users
+                                </a>
                                 <a asp-action="EditCenter" asp-route-id="@Model.Id" class="btn btn-warning">
                                     <i class="fas fa-edit"></i> Edit
                                 </a>
