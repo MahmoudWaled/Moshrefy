@@ -44,7 +44,7 @@ namespace Moshrefy.Application.Authorization.Handlers
         {
             var role = roles.FirstOrDefault();
 
-            // تحويل الـ string role إلى RolesNames enum للمقارنة
+            // Convert the role string to RolesNames enum for comparison
             if (!Enum.TryParse<RolesNames>(role, out var roleEnum))
                 return false;
 

@@ -1,0 +1,91 @@
+@model Moshrefy.Web.Models.Course.CreateCourseVM
+@{
+    ViewData["Title"] = "Add Course";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Content Header -->
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1><i class="fas fa-book-medical"></i> Add Course</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a asp-controller="Admin" asp-action="Index">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a asp-action="Index">Courses</a></li>
+                    <li class="breadcrumb-item active">Add</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Course Information</h3>
+                    </div>
+                    <form asp-action="Create" method="post">
+                        <div class="card-body">
+                            <!-- Success/Error Messages -->
+                            @if (TempData["SuccessMessage"] != null)
+                            {
+                                <div class="alert alert-success alert-dismissible">
+                                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                                    <i class="icon fas fa-check"></i> @TempData["SuccessMessage"]
+                                </div>
+                            }
+                            @if (TempData["ErrorMessage"] != null)
+                            {
+                                <div class="alert alert-danger alert-dismissible">
+                                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                                    <i class="icon fas fa-ban"></i> @TempData["ErrorMessage"]
+                                </div>
+                            }
+
+                            <div class="form-group">
+                                <label asp-for="Name">Course Name <span class="text-danger">*</span></label>
+                                <input asp-for="Name" class="form-control" placeholder="e.g., Mathematics, Physics, etc." />
+                                <span asp-validation-for="Name" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="AcademicYearId">Academic Year <span class="text-danger">*</span></label>
+                                <select asp-for="AcademicYearId" asp-items="Model.AcademicYears" class="form-control">
+                                    <option value="">-- Select Academic Year --</option>
+                                </select>
+                                <small class="form-text text-muted">Select the academic year this course belongs to</small>
+                                <span asp-validation-for="AcademicYearId" class="text-danger"></span>
+                            </div>
+
+                            <!-- Info Box -->
+                            <div class="callout callout-info">
+                                <h5><i class="fas fa-info-circle"></i> Note</h5>
+                                <p>Courses are organized by academic years. Students can enroll in active courses.</p>
+                            </div>
+                        </div>
+
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-action-create">
+                                <i class="fas fa-check"></i> Create Course
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

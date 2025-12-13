@@ -1,0 +1,208 @@
+@{
+    ViewData["Title"] = "Academic Years";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Content Header -->
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1><i class="fas fa-calendar-alt"></i> Academic Years</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a asp-controller="Admin" asp-action="Index">Dashboard</a></li>
+                    <li class="breadcrumb-item active">Academic Years</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Manage Academic Years</h3>
+                        <div class="card-tools">
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <a asp-action="Create" class="btn btn-action-create btn-sm">
+                                    <i class="fas fa-plus"></i> Add Academic Year
+                                </a>
+                            }
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <!-- Filter Options -->
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label>Show:</label>
+                                <select id="filterStatus" class="form-control">
+                                    <option value="all">All Academic Years</option>
+                                    <option value="active">Active Only</option>
+                                    <option value="inactive">Inactive Only</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- DataTable -->
+                        <table id="academicYearsTable" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Status</th>
+                                    <th>Created By</th>
+                                    <th>Created At</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="~/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="~/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+    
+    <!-- DataTables JS -->
+    <script src="~/plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="~/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="~/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+    
+    <!-- SweetAlert2 -->
+    <link rel="stylesheet" href="~/plugins/sweetalert2/sweetalert2.min.css">
+    <script src="~/plugins/sweetalert2/sweetalert2.min.js"></script>
+    
+    <script>
+        $(document).ready(function () {
+            console.log('Initializing Academic Years DataTable...');
+            
+            var table = $('#academicYearsTable').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: '@Url.Action("GetAcademicYearsData")',
+                    type: 'POST',
+                    data: function (d) {
+                        d.filterStatus = $('#filterStatus').val();
+                        console.log('Sending request with filter:', d.filterStatus);
+                    },
+                    error: function (xhr, error, thrown) {
+                        console.error('DataTable Error:', error, thrown);
+                        console.error('Response:', xhr.responseText);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error Loading Data',
+                            text: error + '. Check console for details.'
+                        });
+                    },
+                    dataSrc: function(json) {
+                        console.log('Received data:', json);
+                        return json.data;
+                    }
+                },
+                columns: [
+                    { data: 'name', name: 'name' },
+                    {
+                        data: 'isActive',
+                        name: 'isActive',
+                        render: function (data, type, row) {
+                            if (data) {
+                                return '<span class="badge badge-state-active">Active</span>';
+                            } else {
+                                return '<span class="badge badge-state-deactive">Inactive</span>';
+                            }
+                        }
+                    },
+                    { data: 'createdByName', name: 'createdByName', defaultContent: 'N/A' },
+                    {
+                        data: 'createdAt',
+                        name: 'createdAt',
+                        render: function (data, type, row) {
+                            if (data) {
+                                var date = new Date(data);
+                                return date.toLocaleDateString();
+                            }
+                            return 'N/A';
+                        }
+                    },
+                    {
+                        data: null,
+                        orderable: false,
+                        render: function (data, type, row) {
+                            var actions = '<div class="btn-group btn-group-sm">';
+                            actions += '<a href="/AcademicYear/Details/' + row.id + '" class="btn btn-action-view" title="View Details"><i class="fas fa-eye"></i></a>';
+                            
+                            @if (User.IsInRole("Admin"))
+                            {
+                                @:actions += '<a href="/AcademicYear/Edit/' + row.id + '" class="btn btn-action-edit" title="Edit"><i class="fas fa-edit"></i></a>';
+                                @:actions += '<button onclick="deleteAcademicYear(' + row.id + ')" class="btn btn-action-delete" title="Delete"><i class="fas fa-trash"></i></button>';
+                            }
+
+                            actions += '</div>';
+                            return actions;
+                        }
+                    }
+                ],
+                order: [[0, 'asc']],
+                language: {
+                    processing: '<i class="fas fa-spinner fa-spin fa-2x"></i> Loading...',
+                    emptyTable: 'No academic years found',
+                    zeroRecords: 'No matching records found'
+                }
+            });
+
+            // Reload table when filter changes
+            $('#filterStatus').change(function () {
+                console.log('Filter changed to:', $(this).val());
+                table.ajax.reload();
+            });
+        });
+
+        function deleteAcademicYear(id) {
+            Swal.fire({
+                title: 'Delete Academic Year?',
+                text: 'This will permanently delete this academic year and all associated data.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, delete',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post('@Url.Action("Delete")', { id: id })
+                        .done(function (response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Deleted!',
+                                    text: response.message,
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                });
+                                $('#academicYearsTable').DataTable().ajax.reload();
+                            } else {
+                                Swal.fire('Error', response.message, 'error');
+                            }
+                        })
+                        .fail(function () {
+                            Swal.fire('Error', 'An error occurred', 'error');
+                        });
+                }
+            });
+        }
+    </script>
+}

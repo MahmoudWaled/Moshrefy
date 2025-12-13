@@ -100,7 +100,7 @@ namespace Moshrefy.Application.Services
             var allAcademicYears = await _unitOfWork.AcademicYears.GetAllAsync(paginationParamter);
 
             var filteredAcademicYears = allAcademicYears
-                .Where(ay => ay.CenterId == currentCenterId)
+                .Where(ay => ay.CenterId == currentCenterId && !ay.IsDeleted)
                 .ToList();
 
             if (filteredAcademicYears.Count == 0)

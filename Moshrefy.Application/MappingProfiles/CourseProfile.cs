@@ -8,12 +8,12 @@ namespace Moshrefy.Application.MappingProfiles
     {
         public CourseProfile()
         {
-            CreateMap<CreateCourseDTO, Course>();
-
-            CreateMap<UpdateCourseDTO, Course>();
-
+            // Entity to DTO
             CreateMap<Course, CourseResponseDTO>()
                 .ForMember(dest => dest.AcademicYearName, opt => opt.MapFrom(src => src.AcademicYear != null ? src.AcademicYear.Name : null));
+
+            CreateMap<CreateCourseDTO, Course>();
+            CreateMap<UpdateCourseDTO, Course>();
         }
     }
 }

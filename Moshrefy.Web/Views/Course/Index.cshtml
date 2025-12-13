@@ -1,0 +1,274 @@
+@{
+    ViewData["Title"] = "Courses";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Content Header -->
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1><i class="fas fa-book"></i> Courses</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a asp-controller="Admin" asp-action="Index">Dashboard</a></li>
+                    <li class="breadcrumb-item active">Courses</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Manage Courses</h3>
+                        <div class="card-tools">
+                            @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                            {
+                                <a asp-action="Create" class="btn btn-action-create btn-sm">
+                                    <i class="fas fa-plus"></i> Add Course
+                                </a>
+                            }
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <!-- Filter Options -->
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label>Show:</label>
+                                <select id="filterStatus" class="form-control">
+                                    <option value="all">All Courses</option>
+                                    <option value="active">Active Only</option>
+                                    <option value="inactive">Inactive Only</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- DataTable -->
+                        <table id="coursesTable" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Course Name</th>
+                                    <th>Academic Year</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="~/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="~/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+    
+    <!-- DataTables JS -->
+    <script src="~/plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="~/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="~/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+    
+    <!-- SweetAlert2 -->
+    <link rel="stylesheet" href="~/plugins/sweetalert2/sweetalert2.min.css">
+    <script src="~/plugins/sweetalert2/sweetalert2.min.js"></script>
+    
+    <script>
+        $(document).ready(function () {
+            console.log('Initializing Courses DataTable...');
+            
+            var table = $('#coursesTable').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: '@Url.Action("GetCoursesData")',
+                    type: 'POST',
+                    data: function (d) {
+                        d.filterStatus = $('#filterStatus').val();
+                        console.log('Sending request with filter:', d.filterStatus);
+                    },
+                    error: function (xhr, error, thrown) {
+                        console.error('DataTable Error:', error, thrown);
+                        console.error('Response:', xhr.responseText);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error Loading Data',
+                            text: error + '. Check console for details.'
+                        });
+                    },
+                    dataSrc: function(json) {
+                        console.log('Received data:', json);
+                        return json.data;
+                    }
+                },
+                columns: [
+                    { data: 'name', name: 'name' },
+                    { data: 'academicYearName', name: 'academicYearName', defaultContent: 'N/A' },
+                    {
+                        data: 'isActive',
+                        name: 'isActive',
+                        render: function (data, type, row) {
+                            if (data) {
+                                return '<span class="badge badge-state-active">Active</span>';
+                            } else {
+                                return '<span class="badge badge-state-deactive">Inactive</span>';
+                            }
+                        }
+                    },
+                    {
+                        data: null,
+                        orderable: false,
+                        render: function (data, type, row) {
+                            var actions = '<div class="btn-group btn-group-sm">';
+                            actions += '<a href="/Course/Details/' + row.id + '" class="btn btn-action-view" title="View Details"><i class="fas fa-eye"></i></a>';
+                            
+                            @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                            {
+                                @:actions += '<a href="/Course/Edit/' + row.id + '" class="btn btn-action-edit" title="Edit"><i class="fas fa-edit"></i></a>';
+                                
+                                @:if (row.isActive) {
+                                    @:actions += '<button onclick="deactivateCourse(' + row.id + ')" class="btn btn-state-deactive" title="Deactivate"><i class="fas fa-ban"></i></button>';
+                                @:} else {
+                                    @:actions += '<button onclick="activateCourse(' + row.id + ')" class="btn btn-state-active" title="Activate"><i class="fas fa-check"></i></button>';
+                                @:}
+                            }
+
+                            @if (User.IsInRole("Admin"))
+                            {
+                                @:actions += '<button onclick="deleteCourse(' + row.id + ')" class="btn btn-action-delete" title="Delete"><i class="fas fa-trash"></i></button>';
+                            }
+
+                            actions += '</div>';
+                            return actions;
+                        }
+                    }
+                ],
+                order: [[0, 'asc']],
+                language: {
+                    processing: '<i class="fas fa-spinner fa-spin fa-2x"></i> Loading...',
+                    emptyTable: 'No courses found',
+                    zeroRecords: 'No matching records found'
+                }
+            });
+
+            // Reload table when filter changes
+            $('#filterStatus').change(function () {
+                console.log('Filter changed to:', $(this).val());
+                table.ajax.reload();
+            });
+        });
+
+        function activateCourse(id) {
+            Swal.fire({
+                title: 'Activate Course?',
+                text: 'This course will be available for enrollment.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, activate',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post('@Url.Action("Activate")', { id: id })
+                        .done(function (response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Activated!',
+                                    text: response.message,
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                });
+                                $('#coursesTable').DataTable().ajax.reload();
+                            } else {
+                                Swal.fire('Error', response.message, 'error');
+                            }
+                        })
+                        .fail(function () {
+                            Swal.fire('Error', 'An error occurred', 'error');
+                        });
+                }
+            });
+        }
+
+        function deactivateCourse(id) {
+            Swal.fire({
+                title: 'Deactivate Course?',
+                text: 'This course will not be available for new enrollments.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ffc107',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, deactivate',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post('@Url.Action("Deactivate")', { id: id })
+                        .done(function (response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Deactivated!',
+                                    text: response.message,
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                });
+                                $('#coursesTable').DataTable().ajax.reload();
+                            } else {
+                                Swal.fire('Error', response.message, 'error');
+                            }
+                        })
+                        .fail(function () {
+                            Swal.fire('Error', 'An error occurred', 'error');
+                        });
+                }
+            });
+        }
+
+        function deleteCourse(id) {
+            Swal.fire({
+                title: 'Delete Course?',
+                text: 'This will permanently delete this course and all associated data.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, delete',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post('@Url.Action("Delete")', { id: id })
+                        .done(function (response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Deleted!',
+                                    text: response.message,
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                });
+                                $('#coursesTable').DataTable().ajax.reload();
+                            } else {
+                                Swal.fire('Error', response.message, 'error');
+                            }
+                        })
+                        .fail(function () {
+                            Swal.fire('Error', 'An error occurred', 'error');
+                        });
+                }
+            });
+        }
+    </script>
+}

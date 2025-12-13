@@ -8,6 +8,7 @@ namespace Moshrefy.Application.MappingProfiles
     {
         public AcademicYearProfile()
         {
+            // Entity to DTO
             CreateMap<AcademicYear, AcademicYearResponseDTO>()
                 .ForMember(dest => dest.CreatedByName, opt => opt.MapFrom(src => src.CreatedBy.UserName))
                 .ForMember(dest => dest.ModifiedByName, opt => opt.MapFrom(src => src.ModifiedBy != null ? src.ModifiedBy.UserName : null));
