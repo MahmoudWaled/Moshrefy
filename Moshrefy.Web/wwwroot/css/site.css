@@ -1,4 +1,239 @@
 /* ===================================
+   MOSHREFY COLOR PALETTE SYSTEM
+   Consistent colors for roles, actions, and states
+   ================================== */
+
+:root {
+    /* ========== ROLE COLORS ========== */
+    --role-superadmin: #4A148C;      /* Deep Purple */
+    --role-superadmin-dark: #38106b;
+    --role-admin: #00897B;           /* Teal */
+    --role-admin-dark: #00695c;
+    --role-manager: #1565C0;         /* Blue */
+    --role-manager-dark: #0d47a1;
+    --role-employee: #78909C;        /* Blue Grey */
+    --role-employee-dark: #546e7a;
+
+    /* ========== ACTION COLORS (CRUD) ========== */
+    --action-create: #2E7D32;        /* Green */
+    --action-create-dark: #1b5e20;
+    --action-edit: #F57C00;          /* Orange */
+    --action-edit-dark: #e65100;
+    --action-delete: #D32F2F;        /* Red */
+    --action-delete-dark: #b71c1c;
+    --action-view: #039BE5;          /* Light Blue */
+    --action-view-dark: #0277bd;
+
+    /* ========== STATE COLORS ========== */
+    --state-active: #4CAF50;         /* Green */
+    --state-active-dark: #388e3c;
+    --state-deactive: #616161;       /* Grey */
+    --state-deactive-dark: #424242;
+    --state-restore: #26A69A;        /* Teal */
+    --state-restore-dark: #00897b;
+    --state-change-role: #3949AB;    /* Indigo */
+    --state-change-role-dark: #283593;
+}
+
+/* ========================================
+   ROLE BUTTONS
+   Used for: Role-specific actions (Create Admin, etc.)
+   ======================================== */
+
+.btn-role-superadmin {
+    background-color: var(--role-superadmin) !important;
+    border-color: var(--role-superadmin) !important;
+    color: white !important;
+}
+
+.btn-role-superadmin:hover {
+    background-color: var(--role-superadmin-dark) !important;
+    border-color: var(--role-superadmin-dark) !important;
+}
+
+.btn-role-admin {
+    background-color: var(--role-admin) !important;
+    border-color: var(--role-admin) !important;
+    color: white !important;
+}
+
+.btn-role-admin:hover {
+    background-color: var(--role-admin-dark) !important;
+    border-color: var(--role-admin-dark) !important;
+}
+
+.btn-role-manager {
+    background-color: var(--role-manager) !important;
+    border-color: var(--role-manager) !important;
+    color: white !important;
+}
+
+.btn-role-manager:hover {
+    background-color: var(--role-manager-dark) !important;
+    border-color: var(--role-manager-dark) !important;
+}
+
+.btn-role-employee {
+    background-color: var(--role-employee) !important;
+    border-color: var(--role-employee) !important;
+    color: white !important;
+}
+
+.btn-role-employee:hover {
+    background-color: var(--role-employee-dark) !important;
+    border-color: var(--role-employee-dark) !important;
+}
+
+/* ========================================
+   ACTION BUTTONS (CRUD)
+   Used for: Create, Edit, Delete, View actions
+   ======================================== */
+
+.btn-action-create {
+    background-color: var(--action-create) !important;
+    border-color: var(--action-create) !important;
+    color: white !important;
+}
+
+.btn-action-create:hover {
+    background-color: var(--action-create-dark) !important;
+    border-color: var(--action-create-dark) !important;
+}
+
+.btn-action-edit {
+    background-color: var(--action-edit) !important;
+    border-color: var(--action-edit) !important;
+    color: white !important;
+}
+
+.btn-action-edit:hover {
+    background-color: var(--action-edit-dark) !important;
+    border-color: var(--action-edit-dark) !important;
+}
+
+.btn-action-delete {
+    background-color: var(--action-delete) !important;
+    border-color: var(--action-delete) !important;
+    color: white !important;
+}
+
+.btn-action-delete:hover {
+    background-color: var(--action-delete-dark) !important;
+    border-color: var(--action-delete-dark) !important;
+}
+
+.btn-action-view {
+    background-color: var(--action-view) !important;
+    border-color: var(--action-view) !important;
+    color: white !important;
+}
+
+.btn-action-view:hover {
+    background-color: var(--action-view-dark) !important;
+    border-color: var(--action-view-dark) !important;
+}
+
+/* ========================================
+   STATE BUTTONS
+   Used for: Active, Deactive, Restore, Change Role
+   ======================================== */
+
+.btn-state-active {
+    background-color: var(--state-active) !important;
+    border-color: var(--state-active) !important;
+    color: white !important;
+}
+
+.btn-state-active:hover {
+    background-color: var(--state-active-dark) !important;
+    border-color: var(--state-active-dark) !important;
+}
+
+.btn-state-deactive {
+    background-color: var(--state-deactive) !important;
+    border-color: var(--state-deactive) !important;
+    color: white !important;
+}
+
+.btn-state-deactive:hover {
+    background-color: var(--state-deactive-dark) !important;
+    border-color: var(--state-deactive-dark) !important;
+}
+
+.btn-state-restore {
+    background-color: var(--state-restore) !important;
+    border-color: var(--state-restore) !important;
+    color: white !important;
+}
+
+.btn-state-restore:hover {
+    background-color: var(--state-restore-dark) !important;
+    border-color: var(--state-restore-dark) !important;
+}
+
+.btn-state-change-role {
+    background-color: var(--state-change-role) !important;
+    border-color: var(--state-change-role) !important;
+    color: white !important;
+}
+
+.btn-state-change-role:hover {
+    background-color: var(--state-change-role-dark) !important;
+    border-color: var(--state-change-role-dark) !important;
+}
+
+/* ========================================
+   ROLE BADGES
+   Used for: Displaying user roles in tables and cards
+   ======================================== */
+
+.badge-role-superadmin {
+    background-color: var(--role-superadmin) !important;
+    color: white !important;
+}
+
+.badge-role-admin {
+    background-color: var(--role-admin) !important;
+    color: white !important;
+}
+
+.badge-role-manager {
+    background-color: var(--role-manager) !important;
+    color: white !important;
+}
+
+.badge-role-employee {
+    background-color: var(--role-employee) !important;
+    color: white !important;
+}
+
+/* ========================================
+   STATE BADGES
+   Used for: Active/Inactive/Deleted status indicators
+   ======================================== */
+
+.badge-state-active {
+    background-color: var(--state-active) !important;
+    color: white !important;
+}
+
+.badge-state-deactive {
+    background-color: var(--state-deactive) !important;
+    color: white !important;
+}
+
+.badge-state-deleted {
+    background-color: var(--action-delete) !important;
+    color: white !important;
+}
+
+.badge-state-normal {
+    background-color: var(--action-view) !important;
+    color: white !important;
+}
+
+
+/* ===================================
    COMPLETE SIDEBAR FIX - Replace all existing sidebar CSS
    ================================== */
 

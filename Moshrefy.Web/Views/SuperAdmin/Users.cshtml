@@ -33,16 +33,16 @@
                         </h3>
                         <div class="card-tools">
                             <div class="btn-group">
-                                <a asp-action="SearchUsers" class="btn btn-info btn-sm" title="Advanced Search">
+                                <a asp-action="SearchUsers" class="btn btn-action-view btn-sm" title="Advanced Search">
                                     <i class="fas fa-search"></i> Search Users
                                 </a>
-                                <a asp-action="InactiveUsers" class="btn btn-warning btn-sm" title="View Inactive Users">
+                                <a asp-action="InactiveUsers" class="btn btn-state-deactive btn-sm" title="View Inactive Users">
                                     <i class="fas fa-user-times"></i> Inactive Users
                                 </a>
-                                <a asp-action="CreateCenterAdmin" class="btn btn-primary btn-sm">
+                                <a asp-action="CreateCenterAdmin" class="btn btn-role-admin btn-sm">
                                     <i class="fas fa-user-shield"></i> Create Center Admin
                                 </a>
-                                <a asp-action="CreateUserForCenter" class="btn btn-success btn-sm">
+                                <a asp-action="CreateUserForCenter" class="btn btn-action-create btn-sm">
                                     <i class="fas fa-user-plus"></i> Create User
                                 </a>
                             </div>
@@ -272,19 +272,19 @@
                                 
                                 switch(data) {
                                     case 'SuperAdmin':
-                                        badgeClass = 'badge-danger';
+                                        badgeClass = 'badge-role-superadmin';
                                         icon = 'fa-user-shield';
                                         break;
                                     case 'Admin':
-                                        badgeClass = 'badge-warning';
+                                        badgeClass = 'badge-role-admin';
                                         icon = 'fa-user-tie';
                                         break;
                                     case 'Manager':
-                                        badgeClass = 'badge-primary';
+                                        badgeClass = 'badge-role-manager';
                                         icon = 'fa-user-cog';
                                         break;
                                     case 'Employee':
-                                        badgeClass = 'badge-info';
+                                        badgeClass = 'badge-role-employee';
                                         icon = 'fa-user';
                                         break;
                                 }
@@ -302,9 +302,9 @@
                         className: 'text-center align-middle',
                         render: function (data) {
                             if (data) {
-                                return '<span class="badge badge-success px-2"><i class="fas fa-check-circle"></i> Active</span>';
+                                return '<span class="badge badge-state-active px-2"><i class="fas fa-check-circle"></i> Active</span>';
                             }
-                            return '<span class="badge badge-warning px-2"><i class="fas fa-times-circle"></i> Inactive</span>';
+                            return '<span class="badge badge-state-deactive px-2"><i class="fas fa-times-circle"></i> Inactive</span>';
                         }
                     },
                     {
@@ -314,9 +314,9 @@
                         className: 'text-center align-middle',
                         render: function (data) {
                             if (data) {
-                                return '<span class="badge badge-danger px-2"><i class="fas fa-trash-alt"></i> Deleted</span>';
+                                return '<span class="badge badge-state-deleted px-2"><i class="fas fa-trash-alt"></i> Deleted</span>';
                             }
-                            return '<span class="badge badge-info px-2"><i class="fas fa-check"></i> Normal</span>';
+                            return '<span class="badge badge-state-normal px-2"><i class="fas fa-check"></i> Normal</span>';
                         }
                     },
                     {
@@ -344,29 +344,29 @@
 
                             // View button (always visible)
                             buttons += '<a href="@Url.Action("UserDetails", "SuperAdmin")/' + row.id + '" ' +
-                                'class="btn btn-info" title="View Details">' +
+                                'class="btn btn-action-view" title="View Details">' +
                                 '<i class="fas fa-eye"></i></a>';
 
                             if (!row.isDeleted) {
                                 // Edit button
                                 buttons += '<a href="@Url.Action("EditUser", "SuperAdmin")/' + row.id + '" ' +
-                                    'class="btn btn-primary" title="Edit">' +
+                                    'class="btn btn-action-edit" title="Edit">' +
                                     '<i class="fas fa-edit"></i></a>';
 
                                 // Active/Deactivate button
                                 if (row.isActive) {
-                                    buttons += '<button class="btn btn-warning" title="Deactivate" ' +
+                                    buttons += '<button class="btn btn-state-deactive" title="Deactivate" ' +
                                         'onclick="deactivateUser(\'' + row.id + '\', \'' + row.userName.replace(/'/g, "\\'") + '\')">' +
                                         '<i class="fas fa-ban"></i></button>';
                                 } else {
-                                    buttons += '<button class="btn btn-success" title="Activate" ' +
+                                    buttons += '<button class="btn btn-state-active" title="Activate" ' +
                                         'onclick="activateUser(\'' + row.id + '\', \'' + row.userName.replace(/'/g, "\\'") + '\')">' +
                                         '<i class="fas fa-check"></i></button>';
                                 }
 
                                 // Delete dropdown button
                                 buttons += '<div class="btn-group btn-group-sm" role="group">' +
-                                    '<button type="button" class="btn btn-danger dropdown-toggle" ' +
+                                    '<button type="button" class="btn btn-action-delete dropdown-toggle" ' +
                                     'data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Delete Options">' +
                                     '<i class="fas fa-trash"></i></button>' +
                                     '<div class="dropdown-menu dropdown-menu-right">' +
@@ -380,7 +380,7 @@
                                     '</div></div>';
                             } else {
                                 // Restore button
-                                buttons += '<button class="btn btn-success" title="Restore" ' +
+                                buttons += '<button class="btn btn-state-restore" title="Restore" ' +
                                     'onclick="restoreUser(\'' + row.id + '\', \'' + row.userName.replace(/'/g, "\\'") + '\')">' +
                                     '<i class="fas fa-undo"></i></button>';
                             }

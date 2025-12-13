@@ -222,19 +222,19 @@
                                 
                                 switch(data) {
                                     case 'SuperAdmin':
-                                        badgeClass = 'badge-danger';
+                                        badgeClass = 'badge-role-superadmin';
                                         icon = 'fa-user-shield';
                                         break;
                                     case 'Admin':
-                                        badgeClass = 'badge-warning';
+                                        badgeClass = 'badge-role-admin';
                                         icon = 'fa-user-tie';
                                         break;
                                     case 'Manager':
-                                        badgeClass = 'badge-primary';
+                                        badgeClass = 'badge-role-manager';
                                         icon = 'fa-user-cog';
                                         break;
                                     case 'Employee':
-                                        badgeClass = 'badge-info';
+                                        badgeClass = 'badge-role-employee';
                                         icon = 'fa-user';
                                         break;
                                 }
@@ -270,11 +270,11 @@
 
                             // View button
                             buttons += '<a href="@Url.Action("UserDetails", "SuperAdmin")/' + row.id + '" ' +
-                                'class="btn btn-info" title="View Details">' +
+                                'class="btn btn-action-view" title="View Details">' +
                                 '<i class="fas fa-eye"></i></a>';
 
                             // Activate button (since all users in this view are inactive)
-                            buttons += '<button class="btn btn-success" title="Activate" ' +
+                            buttons += '<button class="btn btn-state-active" title="Activate" ' +
                                 'onclick="activateUser(\'' + row.id + '\', \'' + row.userName.replace(/'/g, "\\'") + '\')">' +
                                 '<i class="fas fa-check"></i></button>';
 

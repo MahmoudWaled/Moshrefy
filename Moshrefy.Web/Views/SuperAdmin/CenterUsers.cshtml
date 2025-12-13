@@ -40,7 +40,7 @@
                             <i class="fas fa-list"></i> Users in @centerName
                         </h3>
                         <div class="card-tools">
-                            <a asp-action="CreateUserForCenter" asp-route-centerId="@centerId" class="btn btn-success btn-sm mr-2" title="Create New User for This Center">
+                            <a asp-action="CreateUserForCenter" asp-route-centerId="@centerId" class="btn btn-action-create btn-sm mr-2" title="Create New User for This Center">
                                 <i class="fas fa-user-plus"></i> Create User
                             </a>
                             <a asp-action="CenterDetails" asp-route-centerId="@centerId" class="btn btn-tool" title="Back to Center Details">
@@ -257,19 +257,19 @@
                                 
                                 switch(data) {
                                     case 'SuperAdmin':
-                                        badgeClass = 'badge-danger';
+                                        badgeClass = 'badge-role-superadmin';
                                         icon = 'fa-user-shield';
                                         break;
                                     case 'Admin':
-                                        badgeClass = 'badge-primary';
+                                        badgeClass = 'badge-role-admin';
                                         icon = 'fa-user-tie';
                                         break;
                                     case 'Manager':
-                                        badgeClass = 'badge-warning';
+                                        badgeClass = 'badge-role-manager';
                                         icon = 'fa-user-cog';
                                         break;
                                     case 'Employee':
-                                        badgeClass = 'badge-info';
+                                        badgeClass = 'badge-role-employee';
                                         icon = 'fa-user';
                                         break;
                                 }
@@ -287,9 +287,9 @@
                         className: 'text-center align-middle',
                         render: function (data) {
                             if (data) {
-                                return '<span class="badge badge-success px-2"><i class="fas fa-check-circle"></i> Active</span>';
+                                return '<span class="badge badge-state-active px-2"><i class="fas fa-check-circle"></i> Active</span>';
                             }
-                            return '<span class="badge badge-warning px-2"><i class="fas fa-times-circle"></i> Inactive</span>';
+                            return '<span class="badge badge-state-deactive px-2"><i class="fas fa-times-circle"></i> Inactive</span>';
                         }
                     },
                     {
@@ -299,9 +299,9 @@
                         className: 'text-center align-middle',
                         render: function (data) {
                             if (data) {
-                                return '<span class="badge badge-danger px-2"><i class="fas fa-trash-alt"></i> Deleted</span>';
+                                return '<span class="badge badge-state-deleted px-2"><i class="fas fa-trash-alt"></i> Deleted</span>';
                             }
-                            return '<span class="badge badge-info px-2"><i class="fas fa-check"></i> Normal</span>';
+                            return '<span class="badge badge-state-normal px-2"><i class="fas fa-check"></i> Normal</span>';
                         }
                     },
                     {
@@ -329,29 +329,29 @@
 
                             // View button (always visible)
                             buttons += '<a href="@Url.Action("UserDetails", "SuperAdmin")/' + row.id + '" ' +
-                                'class="btn btn-info" title="View Details">' +
+                                'class="btn btn-action-view" title="View Details">' +
                                 '<i class="fas fa-eye"></i></a>';
 
                             if (!row.isDeleted) {
                                 // Edit button
                                 buttons += '<a href="@Url.Action("EditUser", "SuperAdmin")/' + row.id + '" ' +
-                                    'class="btn btn-primary" title="Edit">' +
+                                    'class="btn btn-action-edit" title="Edit">' +
                                     '<i class="fas fa-edit"></i></a>';
 
                                 // Active/Deactivate button
                                 if (row.isActive) {
-                                    buttons += '<button class="btn btn-warning" title="Deactivate" ' +
+                                    buttons += '<button class="btn btn-state-deactive" title="Deactivate" ' +
                                         'onclick="deactivateUser(\'' + row.id + '\', \'' + row.userName.replace(/'/g, "\\'") + '\')">' +
                                         '<i class="fas fa-ban"></i></button>';
                                 } else {
-                                    buttons += '<button class="btn btn-success" title="Activate" ' +
+                                    buttons += '<button class="btn btn-state-active" title="Activate" ' +
                                         'onclick="activateUser(\'' + row.id + '\', \'' + row.userName.replace(/'/g, "\\'") + '\')">' +
                                         '<i class="fas fa-check"></i></button>';
                                 }
 
                                 // Delete dropdown button
                                 buttons += '<div class="btn-group btn-group-sm" role="group">' +
-                                    '<button type="button" class="btn btn-danger dropdown-toggle" ' +
+                                    '<button type="button" class="btn btn-action-delete dropdown-toggle" ' +
                                     'data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Delete Options">' +
                                     '<i class="fas fa-trash"></i></button>' +
                                     '<div class="dropdown-menu dropdown-menu-right">' +
@@ -365,7 +365,7 @@
                                     '</div></div>';
                             } else {
                                 // Restore button
-                                buttons += '<button class="btn btn-success" title="Restore" ' +
+                                buttons += '<button class="btn btn-state-restore" title="Restore" ' +
                                     'onclick="restoreUser(\'' + row.id + '\', \'' + row.userName.replace(/'/g, "\\'") + '\')">' +
                                     '<i class="fas fa-undo"></i></button>';
                             }

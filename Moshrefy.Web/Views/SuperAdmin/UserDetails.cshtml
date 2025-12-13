@@ -128,19 +128,19 @@
                                     switch(Model.RoleName)
                                     {
                                         case "SuperAdmin":
-                                            badgeClass = "badge-danger";
+                                            badgeClass = "badge-role-superadmin";
                                             icon = "fa-user-shield";
                                             break;
                                         case "Admin":
-                                            badgeClass = "badge-primary";
+                                            badgeClass = "badge-role-admin";
                                             icon = "fa-user-tie";
                                             break;
                                         case "Manager":
-                                            badgeClass = "badge-warning";
+                                            badgeClass = "badge-role-manager";
                                             icon = "fa-user-cog";
                                             break;
                                         case "Employee":
-                                            badgeClass = "badge-info";
+                                            badgeClass = "badge-role-employee";
                                             icon = "fa-user";
                                             break;
                                     }
@@ -161,13 +161,13 @@
                             <dd class="col-sm-8">
                                 @if (Model.IsActive)
                                 {
-                                    <span class="badge badge-success badge-lg px-3 py-2">
+                                    <span class="badge badge-state-active badge-lg px-3 py-2">
                                         <i class="fas fa-check-circle"></i> Active
                                     </span>
                                 }
                                 else
                                 {
-                                    <span class="badge badge-warning badge-lg px-3 py-2">
+                                    <span class="badge badge-state-deactive badge-lg px-3 py-2">
                                         <i class="fas fa-times-circle"></i> Inactive
                                     </span>
                                 }
@@ -179,13 +179,13 @@
                             <dd class="col-sm-8">
                                 @if (Model.IsDeleted)
                                 {
-                                    <span class="badge badge-danger badge-lg px-3 py-2">
+                                    <span class="badge badge-state-deleted badge-lg px-3 py-2">
                                         <i class="fas fa-trash-alt"></i> Deleted
                                     </span>
                                 }
                                 else
                                 {
-                                    <span class="badge badge-info badge-lg px-3 py-2">
+                                    <span class="badge badge-state-normal badge-lg px-3 py-2">
                                         <i class="fas fa-check"></i> Normal
                                     </span>
                                 }
@@ -208,38 +208,38 @@
                         <div class="btn-group-vertical w-100">
                             @if (!Model.IsDeleted)
                             {
-                                <a asp-action="EditUser" asp-route-id="@Model.Id" class="btn btn-primary mb-2">
+                                <a asp-action="EditUser" asp-route-id="@Model.Id" class="btn btn-action-edit mb-2">
                                     <i class="fas fa-edit"></i> Edit User
                                 </a>
 
-                                <a asp-action="UpdateUserRole" asp-route-id="@Model.Id" class="btn btn-warning mb-2">
+                                <a asp-action="UpdateUserRole" asp-route-id="@Model.Id" class="btn btn-state-change-role mb-2">
                                     <i class="fas fa-user-tag"></i> Update Role
                                 </a>
 
                                 @if (Model.IsActive)
                                 {
-                                    <button type="button" class="btn btn-warning mb-2" onclick="deactivateUser('@Model.Id', '@Model.UserName')">
+                                    <button type="button" class="btn btn-state-deactive mb-2" onclick="deactivateUser('@Model.Id', '@Model.UserName')">
                                         <i class="fas fa-ban"></i> Deactivate User
                                     </button>
                                 }
                                 else
                                 {
-                                    <button type="button" class="btn btn-success mb-2" onclick="activateUser('@Model.Id', '@Model.UserName')">
+                                    <button type="button" class="btn btn-state-active mb-2" onclick="activateUser('@Model.Id', '@Model.UserName')">
                                         <i class="fas fa-check"></i> Activate User
                                     </button>
                                 }
 
-                                <button type="button" class="btn btn-warning mb-2" onclick="softDeleteUser('@Model.Id', '@Model.UserName')">
+                                <button type="button" class="btn btn-action-delete mb-2" onclick="softDeleteUser('@Model.Id', '@Model.UserName')">
                                     <i class="fas fa-trash-alt"></i> Soft Delete
                                 </button>
 
-                                <button type="button" class="btn btn-danger" onclick="hardDeleteUser('@Model.Id', '@Model.UserName')">
+                                <button type="button" class="btn btn-action-delete" onclick="hardDeleteUser('@Model.Id', '@Model.UserName')">
                                     <i class="fas fa-trash"></i> Hard Delete
                                 </button>
                             }
                             else
                             {
-                                <button type="button" class="btn btn-success mb-2" onclick="restoreUser('@Model.Id', '@Model.UserName')">
+                                <button type="button" class="btn btn-state-restore mb-2" onclick="restoreUser('@Model.Id', '@Model.UserName')">
                                     <i class="fas fa-undo"></i> Restore User
                                 </button>
                             }

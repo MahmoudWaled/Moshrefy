@@ -75,19 +75,19 @@
                                         switch((string)ViewBag.CurrentRole)
                                         {
                                             case "SuperAdmin":
-                                                badgeClass = "badge-danger";
+                                                badgeClass = "badge-role-superadmin";
                                                 icon = "fa-user-shield";
                                                 break;
                                             case "Admin":
-                                                badgeClass = "badge-warning";
+                                                badgeClass = "badge-role-admin";
                                                 icon = "fa-user-tie";
                                                 break;
                                             case "Manager":
-                                                badgeClass = "badge-primary";
+                                                badgeClass = "badge-role-manager";
                                                 icon = "fa-user-cog";
                                                 break;
                                             case "Employee":
-                                                badgeClass = "badge-info";
+                                                badgeClass = "badge-role-employee";
                                                 icon = "fa-user";
                                                 break;
                                         }
@@ -161,7 +161,7 @@
                                                class="custom-control-input"
                                                @(Model.Role == Moshrefy.Domain.Enums.RolesNames.SuperAdmin ? "checked" : "")>
                                         <label class="custom-control-label" for="roleSuperAdmin">
-                                            <span class="badge badge-danger badge-lg mr-2">
+                                            <span class="badge badge-role-superadmin badge-lg mr-2">
                                                 <i class="fas fa-user-shield"></i> Super Admin
                                             </span>
                                             <small class="text-muted d-block ml-4">Full system access and control over all centers</small>
@@ -177,7 +177,7 @@
                                                class="custom-control-input"
                                                @(Model.Role == Moshrefy.Domain.Enums.RolesNames.Admin ? "checked" : "")>
                                         <label class="custom-control-label" for="roleAdmin">
-                                            <span class="badge badge-warning badge-lg mr-2">
+                                            <span class="badge badge-role-admin badge-lg mr-2">
                                                 <i class="fas fa-user-tie"></i> Admin
                                             </span>
                                             <small class="text-muted d-block ml-4">Full access to manage their assigned center</small>
@@ -193,7 +193,7 @@
                                                class="custom-control-input"
                                                @(Model.Role == Moshrefy.Domain.Enums.RolesNames.Manager ? "checked" : "")>
                                         <label class="custom-control-label" for="roleManager">
-                                            <span class="badge badge-primary badge-lg mr-2">
+                                            <span class="badge badge-role-manager badge-lg mr-2">
                                                 <i class="fas fa-user-cog"></i> Manager
                                             </span>
                                             <small class="text-muted d-block ml-4">Can manage operations and view reports</small>
@@ -209,7 +209,7 @@
                                                class="custom-control-input"
                                                @(Model.Role == Moshrefy.Domain.Enums.RolesNames.Employee ? "checked" : "")>
                                         <label class="custom-control-label" for="roleEmployee">
-                                            <span class="badge badge-info badge-lg mr-2">
+                                            <span class="badge badge-role-employee badge-lg mr-2">
                                                 <i class="fas fa-user"></i> Employee
                                             </span>
                                             <small class="text-muted d-block ml-4">Basic access for daily operations</small>
@@ -241,7 +241,7 @@
                                     </a>
                                 </div>
                                 <div class="col-md-6">
-                                    <button type="submit" class="btn btn-success btn-block" id="submitBtn">
+                                    <button type="submit" class="btn btn-state-change-role btn-block" id="submitBtn">
                                         <i class="fas fa-save"></i> Update Role
                                     </button>
                                 </div>
@@ -283,7 +283,7 @@
                 Swal.fire({
                     title: 'Confirm Role Update',
                     html: 'Update <strong>' + userName + '</strong>\'s role to:<br><br>' +
-                          '<span class="badge badge-primary badge-lg">' + selectedRole + '</span>',
+                          '<span class="badge badge-state-change-role badge-lg">' + selectedRole + '</span>',
                     icon: 'question',
                     showCancelButton: true,
                     confirmButtonColor: '#28a745',
