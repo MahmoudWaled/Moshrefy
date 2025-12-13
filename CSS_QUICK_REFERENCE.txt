@@ -1,0 +1,98 @@
+/* ============================================
+   MOSHREFY CSS QUICK REFERENCE
+   Location: wwwroot/css/site.css
+   ============================================
+
+   This file contains all custom styles for the Moshrefy application.
+   Each section is clearly documented with:
+   - Used in: Where the styles are applied
+   - Comments: What each class does
+
+   SECTIONS:
+   1. Sidebar (lines 1-93)
+   2. Error Pages (lines 95-165)
+   3. Dashboard Widgets (lines 167-237)
+   4. Cards (lines 239-248)
+   5. DataTables (lines 250-360)
+   6. User Role Forms (lines 362-420)
+   7. Search & Filters (lines 422-445)
+   8. Form Elements (lines 447-470)
+   9. Progress Bars (lines 472-485)
+   10. Links (lines 487-505)
+   11. Utilities (lines 507-535)
+
+   ============================================ */
+
+/* COMMONLY USED CLASSES */
+
+/* Error Pages */
+.error-page              /* Full-height centered error container */
+.error-content-wrapper   /* Max-width 600px wrapper for error content */
+.error-number            /* Large red error number/icon (120px) */
+
+/* Dashboard Widgets */
+.small-box               /* Dashboard statistics card */
+.small-box.admin-widget  /* Admin dashboard variant */
+.small-box-footer        /* Widget footer link */
+
+/* DataTables */
+#usersTable              /* Users management table */
+#inactiveUsersTable      /* Inactive users table (yellow background) */
+#centersTable            /* Centers management table */
+
+/* User Forms */
+.role-selection          /* Role selection radio group container */
+.profile-avatar          /* User avatar (100x100px) */
+.profile-user-img        /* Profile image placeholder with blue background */
+.badge-lg                /* Large badge for role display */
+
+/* Form Elements */
+.select-full-width       /* Full-width select (for Select2) */
+.textarea-resizable      /* Vertically resizable textarea */
+.form-inline-display     /* Display form inline */
+.alert-hidden            /* Hidden alert (display: none) */
+
+/* Search & Filters */
+.card-outline            /* Card with colored top border */
+.card-outline.card-info  /* Info color (teal) */
+.card-outline.card-primary /* Primary color (blue) */
+.role-filter-select      /* Role filter dropdown (auto width) */
+
+/* Utilities */
+.w-100px                 /* Width: 100px */
+.h-100px                 /* Height: 100px */
+.max-w-600               /* Max-width: 600px */
+.p-20                    /* Padding: 20px */
+.m-auto                  /* Margin: 0 auto */
+
+/* Progress Bars */
+.progress-bar-full       /* 100% width progress bar */
+.progress-bar-empty      /* 0% width progress bar */
+
+/* Links */
+.external-link           /* External link styling */
+.center-details-link     /* Center details link */
+
+
+/* ============================================
+   ADDING NEW STYLES
+   ============================================
+
+   When adding new styles, follow this format:
+
+   1. Add to the appropriate section in site.css
+   2. Include documentation:
+
+   /* ============================================
+      SECTION NAME
+      Used in: Description
+      ============================================ */
+
+   /* Comment explaining what this does */
+   .your-class-name {
+       property: value;
+   }
+
+   3. Update this quick reference if needed
+
+   ============================================ */

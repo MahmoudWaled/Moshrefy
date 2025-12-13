@@ -55,8 +55,7 @@
                     <div class="card-body box-profile">
                         <div class="text-center mb-3">
                             <div class="profile-user-img-wrapper">
-                                <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center" 
-                                     style="width: 100px; height: 100px;">
+                                <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center profile-avatar">
                                     <i class="fas fa-user fa-3x text-white"></i>
                                 </div>
                             </div>
@@ -221,7 +220,7 @@
                             </div>
 
                             <!-- Preview -->
-                            <div class="alert alert-info mt-4" id="rolePreview" style="display: none;">
+                            <div class="alert alert-info mt-4 alert-hidden" id="rolePreview">
                                 <h5><i class="fas fa-info-circle"></i> Role Change Preview</h5>
                                 <p class="mb-1">
                                     <strong>Current Role:</strong> 
@@ -261,32 +260,7 @@
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <style>
-        .role-selection .custom-control-label {
-            cursor: pointer;
-            padding: 10px;
-            border-radius: 5px;
-            transition: background-color 0.2s;
-        }
 
-        .role-selection .custom-control-label:hover {
-            background-color: #f8f9fa;
-        }
-
-        .role-selection .custom-radio input:checked ~ .custom-control-label {
-            background-color: #e7f3ff;
-            font-weight: 500;
-        }
-
-        .badge-lg {
-            font-size: 0.9rem;
-            padding: 6px 12px;
-        }
-
-        .profile-user-img-wrapper {
-            margin-bottom: 20px;
-        }
-    </style>
 
     <script>
         $(document).ready(function () {

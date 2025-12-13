@@ -1,104 +1,11 @@
-/* ===================================
-   COMPLETE SIDEBAR FIX - Replace all existing sidebar CSS
-   ================================== */
-
-/* Base sidebar */
-.main-sidebar {
-    position: fixed !important;
-    top: 0;
-    left: 0;
-    height: 100vh !important;
-    z-index: 1040;
-    transition: width 0.3s ease-in-out !important;
-    overflow: visible !important;
-}
-
-    .main-sidebar .brand-link {
-        transition: width 0.3s ease-in-out !important;
-        width: 250px;
-    }
-
-    .main-sidebar .sidebar {
-        height: calc(100vh - 57px) !important;
-        overflow-y: auto !important;
-        overflow-x: hidden !important;
-        transition: width 0.3s ease-in-out !important;
-    }
-
-/* COLLAPSED STATE */
-body.sidebar-mini.sidebar-collapse .main-sidebar {
-    width: 4.6rem !important;
-}
-
-    body.sidebar-mini.sidebar-collapse .main-sidebar .brand-link {
-        width: 4.6rem !important;
-    }
-
-    body.sidebar-mini.sidebar-collapse .main-sidebar .sidebar {
-        width: 4.6rem !important;
-    }
-
-    /* Hide text when collapsed */
-    body.sidebar-mini.sidebar-collapse .main-sidebar .nav-link > p,
-    body.sidebar-mini.sidebar-collapse .main-sidebar .brand-text {
-        opacity: 0 !important;
-        visibility: hidden !important;
-        width: 0 !important;
-    }
-
-    /* IMPORTANT: Keep nav-header height but hide text */
-    body.sidebar-mini.sidebar-collapse .main-sidebar .nav-header {
-        visibility: hidden !important;
-        height: 30px !important;
-        min-height: 30px !important;
-        display: block !important;
-    }
-
-    /* HOVER EXPANSION */
-    body.sidebar-mini.sidebar-collapse .main-sidebar:hover {
-        width: 250px !important;
-    }
-
-        body.sidebar-mini.sidebar-collapse .main-sidebar:hover .brand-link {
-            width: 250px !important;
-        }
-
-        body.sidebar-mini.sidebar-collapse .main-sidebar:hover .sidebar {
-            width: 250px !important;
-        }
-
-        /* Show text on hover */
-        body.sidebar-mini.sidebar-collapse .main-sidebar:hover .nav-link > p,
-        body.sidebar-mini.sidebar-collapse .main-sidebar:hover .brand-text {
-            opacity: 1 !important;
-            visibility: visible !important;
-            width: auto !important;
-        }
-
-        body.sidebar-mini.sidebar-collapse .main-sidebar:hover .nav-header {
-            visibility: visible !important;
-        }
-
-/* Hover states */
-.main-sidebar .nav-sidebar .nav-link:hover {
-    background: rgba(255, 255, 255, 0.1) !important;
-}
-
-/* Header z-index */
-.main-header {
-    position: fixed !important;
-    top: 0;
-    left: 0;
-    right: 0;
-}
-
-
 /* ============================================
-   ERROR PAGES & ACCESS DENIED
-   Used in: Error pages and access denied screens
+   Moshrefy Views Stylesheet
+   Extracted from inline styles in views
    ============================================ */
 
-/* Full-height centered error page container */
+/* ============================================
+   Error Pages & Access Denied
+   ============================================ */
 .error-page {
     min-height: 100vh;
     display: flex;
@@ -107,21 +14,18 @@ body.sidebar-mini.sidebar-collapse .main-sidebar {
     padding: 20px;
 }
 
-/* Error content wrapper with max-width constraint */
 .error-content-wrapper {
     margin: 0 auto;
     max-width: 600px;
     padding: 20px;
 }
 
-/* Large error number/icon display */
 .error-number {
     font-size: 120px;
     font-weight: 700;
     color: #dc3545;
 }
 
-/* Shake animation for error icon */
 .error-number i {
     animation: shake 0.5s;
     animation-iteration-count: 1;
@@ -141,19 +45,16 @@ body.sidebar-mini.sidebar-collapse .main-sidebar {
     100% { transform: translate(1px, -2px) rotate(-1deg); }
 }
 
-/* Error page specific card styling */
 .error-page .card {
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     border: none;
 }
 
-/* Error page button styling */
 .error-page .btn {
     padding: 10px 20px;
     font-weight: 500;
 }
 
-/* Inline form display for error page actions */
 .error-page form.d-inline {
     display: inline-block;
 }
@@ -162,13 +63,9 @@ body.sidebar-mini.sidebar-collapse .main-sidebar {
     margin: 0;
 }
 
-
 /* ============================================
-   DASHBOARD WIDGETS (SMALL BOXES)
-   Used in: Dashboard statistics cards and info boxes
+   Small Boxes (Dashboard Widgets)
    ============================================ */
-
-/* Base small-box widget styling */
 .small-box {
     border-radius: 0.25rem;
     box-shadow: 0 0 1px rgba(0,0,0,.125), 0 1px 3px rgba(0,0,0,.2);
@@ -182,7 +79,6 @@ body.sidebar-mini.sidebar-collapse .main-sidebar {
     padding: 10px;
 }
 
-/* Large number display in widgets */
 .small-box h3 {
     font-size: 2.2rem;
     font-weight: bold;
@@ -199,13 +95,11 @@ body.sidebar-mini.sidebar-collapse .main-sidebar {
     font-size: 1rem;
 }
 
-/* Admin dashboard variant */
 .small-box.admin-widget p {
     font-size: 1.1rem;
     font-weight: 500;
 }
 
-/* Widget footer link */
 .small-box > .small-box-footer {
     position: relative;
     text-align: center;
@@ -227,7 +121,10 @@ body.sidebar-mini.sidebar-collapse .main-sidebar {
     background: rgba(0,0,0,.1);
 }
 
-/* Background icon for widgets */
+.small-box.admin-widget > .small-box-footer:hover {
+    background: rgba(0,0,0,.1);
+}
+
 .small-box .icon {
     transition: all .3s linear;
     position: absolute;
@@ -238,31 +135,23 @@ body.sidebar-mini.sidebar-collapse .main-sidebar {
     color: rgba(0,0,0,.15);
 }
 
-
 /* ============================================
-   CARDS
-   Used in: All card components across the application
+   Cards
    ============================================ */
-
 .card {
     box-shadow: 0 0 1px rgba(0,0,0,.125), 0 1px 3px rgba(0,0,0,.2);
     margin-bottom: 1rem;
 }
 
-
 /* ============================================
-   DATATABLES STYLING
-   Used in: All DataTables instances (users, centers, etc.)
+   DataTables Styling
    ============================================ */
-
-/* Base table styling */
 #usersTable,
 #inactiveUsersTable,
 #centersTable {
     font-size: 0.9rem;
 }
 
-/* Table header styling */
 #usersTable thead th,
 #inactiveUsersTable thead th,
 #centersTable thead th {
@@ -274,7 +163,6 @@ body.sidebar-mini.sidebar-collapse .main-sidebar {
     white-space: nowrap;
 }
 
-/* Table body cell styling */
 #usersTable tbody td,
 #inactiveUsersTable tbody td,
 #centersTable tbody td {
@@ -282,13 +170,11 @@ body.sidebar-mini.sidebar-collapse .main-sidebar {
     vertical-align: middle !important;
 }
 
-/* Small text in table cells */
 #usersTable tbody td small,
 #centersTable tbody td small {
     font-size: 0.85rem;
 }
 
-/* Badge styling in tables */
 #usersTable .badge,
 #inactiveUsersTable .badge,
 #centersTable .badge {
@@ -298,21 +184,18 @@ body.sidebar-mini.sidebar-collapse .main-sidebar {
     white-space: nowrap;
 }
 
-/* Button group styling in tables */
 #usersTable .btn-group-sm .btn,
 #centersTable .btn-group-sm .btn {
     padding: 0.25rem 0.5rem;
     font-size: 0.875rem;
 }
 
-/* Row hover effect */
 #usersTable tbody tr:hover,
 #inactiveUsersTable tbody tr:hover,
 #centersTable tbody tr:hover {
     background-color: #f8f9fa !important;
 }
 
-/* Inactive users table specific styling */
 #inactiveUsersTable tbody tr {
     background-color: #fff3cd !important;
 }
@@ -321,7 +204,6 @@ body.sidebar-mini.sidebar-collapse .main-sidebar {
     background-color: #ffe69c !important;
 }
 
-/* Centers table DataTables wrapper controls */
 #centersTable_wrapper .dataTables_length,
 #centersTable_wrapper .dataTables_filter,
 #centersTable_wrapper .dataTables_info,
@@ -329,7 +211,6 @@ body.sidebar-mini.sidebar-collapse .main-sidebar {
     font-size: 0.9rem;
 }
 
-/* Responsive table styling for mobile */
 @media (max-width: 768px) {
     #usersTable,
     #inactiveUsersTable,
@@ -351,23 +232,17 @@ body.sidebar-mini.sidebar-collapse .main-sidebar {
     }
 }
 
-/* Button group shadow */
 .btn-group {
     box-shadow: 0 1px 3px rgba(0,0,0,0.12);
 }
 
-/* Table responsive container */
 .table-responsive {
     border-radius: 0.25rem;
 }
 
-
 /* ============================================
-   USER ROLE SELECTION & FORMS
-   Used in: Role selection forms and user management
+   Role Selection & User Forms
    ============================================ */
-
-/* Role selection radio buttons */
 .role-selection .custom-control-label {
     cursor: pointer;
     padding: 10px;
@@ -384,18 +259,15 @@ body.sidebar-mini.sidebar-collapse .main-sidebar {
     font-weight: 500;
 }
 
-/* Large badge for role display */
 .badge-lg {
     font-size: 0.9rem;
     padding: 6px 12px;
 }
 
-/* User profile image wrapper */
 .profile-user-img-wrapper {
     margin-bottom: 20px;
 }
 
-/* User profile image placeholder */
 .profile-user-img {
     width: 100px;
     height: 100px;
@@ -408,19 +280,14 @@ body.sidebar-mini.sidebar-collapse .main-sidebar {
     margin: 0 auto 1rem;
 }
 
-/* User avatar fixed dimensions */
 .profile-avatar {
     width: 100px;
     height: 100px;
 }
 
-
 /* ============================================
-   SEARCH & FILTER COMPONENTS
-   Used in: Search forms and filter cards
+   Search & Filter Components
    ============================================ */
-
-/* Card with colored top border */
 .card-outline {
     border-top: 3px solid;
 }
@@ -433,43 +300,32 @@ body.sidebar-mini.sidebar-collapse .main-sidebar {
     border-top-color: #007bff;
 }
 
-/* Role filter dropdown */
 .role-filter-select {
     width: auto;
 }
 
-
 /* ============================================
-   FORM ELEMENTS
-   Used in: Forms across the application
+   Form Elements
    ============================================ */
-
-/* Full-width select elements (for Select2) */
 .select-full-width {
     width: 100%;
 }
 
-/* Vertically resizable textareas */
 .textarea-resizable {
     resize: vertical;
 }
 
-/* Inline form display */
 .form-inline-display {
     display: inline-block;
 }
 
-/* Hidden alert (toggled via JavaScript) */
 .alert-hidden {
     display: none;
 }
 
-
 /* ============================================
-   PROGRESS BARS
-   Used in: Dashboard statistics and progress displays
+   Progress Bars
    ============================================ */
-
 .progress-bar-full {
     width: 100%;
 }
@@ -478,12 +334,9 @@ body.sidebar-mini.sidebar-collapse .main-sidebar {
     width: 0%;
 }
 
-
 /* ============================================
-   LINKS & EXTERNAL REFERENCES
-   Used in: Links to external resources or center details
+   Links & External References
    ============================================ */
-
 .external-link {
     text-decoration: none;
     cursor: pointer;
@@ -493,6 +346,9 @@ body.sidebar-mini.sidebar-collapse .main-sidebar {
     font-size: 0.8em;
 }
 
+/* ============================================
+   Center Details & Admin Pages
+   ============================================ */
 .center-details-link {
     text-decoration: none;
     cursor: pointer;
@@ -502,13 +358,9 @@ body.sidebar-mini.sidebar-collapse .main-sidebar {
     font-size: 0.8em;
 }
 
-
 /* ============================================
-   UTILITY CLASSES
-   Used in: Quick styling utilities
+   Utility Classes
    ============================================ */
-
-/* Fixed dimensions */
 .w-100px {
     width: 100px;
 }
@@ -517,12 +369,10 @@ body.sidebar-mini.sidebar-collapse .main-sidebar {
     height: 100px;
 }
 
-/* Max width constraint */
 .max-w-600 {
     max-width: 600px;
 }
 
-/* Spacing utilities */
 .p-20 {
     padding: 20px;
 }
@@ -530,4 +380,3 @@ body.sidebar-mini.sidebar-collapse .main-sidebar {
 .m-auto {
     margin: 0 auto;
 }
-
