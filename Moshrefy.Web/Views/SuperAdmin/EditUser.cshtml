@@ -1,179 +1,103 @@
 @model Moshrefy.Web.Models.User.UpdateUserVM
-
 @{
     ViewData["Title"] = "Edit User";
+    Layout = "~/Views/Shared/_Layout.cshtml";
     var userId = ViewBag.UserId as string;
 }
 
-<!-- Content Header -->
-<section class="content-header">
-    <div class="container-fluid">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1>
-                    <i class="fas fa-edit"></i> Edit User
-                </h1>
-            </div>
-            <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a asp-action="Index">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a asp-action="Users">Users</a></li>
-                    <li class="breadcrumb-item active">Edit</li>
-                </ol>
-            </div>
-        </div>
+<!-- Page header -->
+<div class="page-header d-print-none">
+  <div class="container-xl">
+    <div class="row g-2 align-items-center">
+      <div class="col">
+        <div class="page-pretitle">Users</div>
+        <h2 class="page-title"><i class="ti ti-edit"></i> Edit User</h2>
+      </div>
     </div>
-</section>
+  </div>
+</div>
 
-<!-- Main content -->
-<section class="content">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-8 offset-md-2">
-                <div class="card card-primary">
-                    <div class="card-header">
-                        <h3 class="card-title">User Information</h3>
-                    </div>
+<!-- Page body -->
+<div class="page-body">
+  <div class="container-xl">
+    <div class="row">
+      <div class="col-md-8 offset-md-2">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">User Information</h3>
+          </div>
+          <form asp-action="EditUser" asp-route-id="@userId" method="post">
+            <div class="card-body">
+              <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-                    <form asp-action="EditUser" asp-route-id="@userId" method="post">
-                        <div class="card-body">
-                            <!-- Alert messages -->
-                            @if (TempData["ErrorMessage"] != null)
-                            {
-                                <div class="alert alert-danger alert-dismissible fade show">
-                                    <button type="button" class="close" data-dismiss="alert">&times;</button>
-                                    <i class="fas fa-exclamation-circle"></i> @TempData["ErrorMessage"]
-                                </div>
-                            }
+              <div class="mb-3">
+                <label class="form-label" asp-for="Name"><i class="ti ti-user me-1"></i>Full Name</label>
+                <input asp-for="Name" class="form-control" placeholder="Enter full name" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+              </div>
 
-                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+              <div class="mb-3">
+                <label class="form-label" asp-for="UserName"><i class="ti ti-at me-1"></i>Username</label>
+                <input asp-for="UserName" class="form-control" placeholder="Enter username" />
+                <span asp-validation-for="UserName" class="text-danger"></span>
+                <small class="form-hint">Used for login. Must be unique.</small>
+              </div>
 
-                            <!-- Full Name -->
-                            <div class="form-group">
-                                <label asp-for="Name" class="control-label">
-                                    <i class="fas fa-user"></i> Full Name
-                                </label>
-                                <input asp-for="Name" class="form-control" placeholder="Enter full name" />
-                                <span asp-validation-for="Name" class="text-danger"></span>
-                            </div>
+              <div class="mb-3">
+                <label class="form-label" asp-for="Email"><i class="ti ti-mail me-1"></i>Email Address</label>
+                <input asp-for="Email" class="form-control" placeholder="user@example.com" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+              </div>
 
-                            <!-- Username -->
-                            <div class="form-group">
-                                <label asp-for="UserName" class="control-label">
-                                    <i class="fas fa-at"></i> Username
-                                </label>
-                                <input asp-for="UserName" class="form-control" placeholder="Enter username" />
-                                <span asp-validation-for="UserName" class="text-danger"></span>
-                                <small class="form-text text-muted">
-                                    Used for login. Must be unique.
-                                </small>
-                            </div>
+              <div class="mb-3">
+                <label class="form-label" asp-for="PhoneNumber"><i class="ti ti-phone me-1"></i>Phone Number</label>
+                <input asp-for="PhoneNumber" class="form-control" placeholder="+1234567890" />
+                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+              </div>
 
-                            <!-- Email -->
-                            <div class="form-group">
-                                <label asp-for="Email" class="control-label">
-                                    <i class="fas fa-envelope"></i> Email Address
-                                </label>
-                                <input asp-for="Email" class="form-control" placeholder="user@example.com" />
-                                <span asp-validation-for="Email" class="text-danger"></span>
-                            </div>
+              <div class="mb-3">
+                <label class="form-label" asp-for="CenterId"><i class="ti ti-building me-1"></i>Center</label>
+                <select asp-for="CenterId" asp-items="Model.Centers" class="form-select">
+                  <option value="">-- Select a Center (Optional) --</option>
+                </select>
+                <span asp-validation-for="CenterId" class="text-danger"></span>
+                <small class="form-hint">Assign or change the center for this user</small>
+              </div>
 
-                            <!-- Phone Number -->
-                            <div class="form-group">
-                                <label asp-for="PhoneNumber" class="control-label">
-                                    <i class="fas fa-phone"></i> Phone Number
-                                </label>
-                                <input asp-for="PhoneNumber" class="form-control" placeholder="+1234567890" />
-                                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-                            </div>
+              <div class="mb-3">
+                <label class="form-check form-switch">
+                  <input type="checkbox" asp-for="IsActive" class="form-check-input">
+                  <span class="form-check-label"><i class="ti ti-toggle-right me-1"></i>User is Active</span>
+                </label>
+                <small class="form-hint">Inactive users cannot login to the system</small>
+              </div>
 
-                            <!-- Center Selection -->
-                            <div class="form-group">
-                                <label asp-for="CenterId" class="control-label">
-                                    <i class="fas fa-building"></i> Center
-                                </label>
-                                <select asp-for="CenterId" 
-                                        class="form-control select2" 
-                                        asp-items="Model.Centers"
-                                        class="form-control select2 select-full-width">
-                                    <option value="">-- Select a Center (Optional) --</option>
-                                </select>
-                                <span asp-validation-for="CenterId" class="text-danger"></span>
-                                <small class="form-text text-muted">
-                                    Assign or change the center for this user
-                                </small>
-                            </div>
-
-                            <!-- Is Active -->
-                            <div class="form-group">
-                                <div class="custom-control custom-switch custom-switch-on-success">
-                                    <input type="checkbox" asp-for="IsActive" class="custom-control-input" id="isActiveSwitch">
-                                    <label class="custom-control-label" for="isActiveSwitch">
-                                        <i class="fas fa-toggle-on"></i> User is Active
-                                    </label>
-                                </div>
-                                <small class="form-text text-muted">
-                                    Inactive users cannot login to the system
-                                </small>
-                            </div>
-
-                            <div class="alert alert-info">
-                                <i class="fas fa-info-circle"></i>
-                                <strong>Note:</strong> Changes will be saved and the user will be updated immediately.
-                            </div>
-                        </div>
-
-                        <div class="card-footer">
-                            <button type="submit" class="btn btn-action-edit">
-                                <i class="fas fa-save"></i> Save Changes
-                            </button>
-                            <a asp-action="UserDetails" asp-route-id="@userId" class="btn btn-secondary">
-                                <i class="fas fa-times"></i> Cancel
-                            </a>
-                            <a asp-action="Users" class="btn btn-default">
-                                <i class="fas fa-arrow-left"></i> Back to List
-                            </a>
-                        </div>
-                    </form>
+              <div class="alert alert-info">
+                <div class="d-flex">
+                  <div><i class="ti ti-info-circle icon me-2"></i></div>
+                  <div><strong>Note:</strong> Changes will be saved and the user will be updated immediately.</div>
                 </div>
+              </div>
             </div>
+
+            <div class="card-footer text-end">
+              <a asp-action="Users" class="btn btn-secondary me-2">
+                <i class="ti ti-arrow-left"></i> Back to List
+              </a>
+              <a asp-action="UserDetails" asp-route-id="@userId" class="btn btn-outline-secondary me-2">
+                <i class="ti ti-x"></i> Cancel
+              </a>
+              <button type="submit" class="btn btn-action-edit">
+                <i class="ti ti-device-floppy"></i> Save Changes
+              </button>
+            </div>
+          </form>
         </div>
+      </div>
     </div>
-</section>
+  </div>
+</div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    
-    <!-- Select2 -->
-    <link rel="stylesheet" href="~/plugins/select2/css/select2.min.css">
-    <link rel="stylesheet" href="~/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
-    <script src="~/plugins/select2/js/select2.full.min.js"></script>
-
-    <script>
-        $(function () {
-            // Initialize Select2 with search
-            $('.select2').select2({
-                theme: 'bootstrap4',
-                placeholder: '-- Select a Center (Optional) --',
-                allowClear: true,
-                ajax: {
-                    url: '@Url.Action("SearchCenters", "SuperAdmin")',
-                    dataType: 'json',
-                    delay: 250,
-                    data: function (params) {
-                        return {
-                            term: params.term
-                        };
-                    },
-                    processResults: function (data) {
-                        return {
-                            results: data.results
-                        };
-                    },
-                    cache: true
-                },
-                minimumInputLength: 0
-            });
-        });
-    </script>
 }

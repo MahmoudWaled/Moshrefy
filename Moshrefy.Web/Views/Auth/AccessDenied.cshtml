@@ -7,44 +7,52 @@
     <div class="error-content-wrapper">
         <div class="text-center mb-4">
             <div class="error-number">
-                <i class="fas fa-ban"></i>
+                <i class="ti ti-ban"></i>
             </div>
         </div>
 
         <h3 class="text-center mb-3">
-            <i class="fas fa-exclamation-triangle text-warning"></i> Access Denied
+            <i class="ti ti-alert-triangle text-warning"></i> Access Denied
         </h3>
 
         <div class="card">
             <div class="card-body">
                 <div class="alert alert-danger">
-                    <h5><i class="icon fas fa-ban"></i> Unauthorized Access</h5>
-                    <p class="mb-0">
-                        You don't have permission to access this resource. This area is restricted to authorized users only.
-                    </p>
+                    <div class="d-flex">
+                        <div><i class="ti ti-ban icon me-2"></i></div>
+                        <div>
+                            <h5>Unauthorized Access</h5>
+                            <p class="mb-0">You don't have permission to access this resource. This area is restricted to authorized users only.</p>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="alert alert-info">
-                    <h6><i class="fas fa-info-circle"></i> Possible Reasons:</h6>
-                    <ul class="mb-0">
-                        <li>Your user role doesn't have the required permissions</li>
-                        <li>Your role was recently changed - try logging out and back in</li>
-                        <li>You're trying to access a different center's resources</li>
-                        <li>The resource has been restricted by an administrator</li>
-                    </ul>
+                    <div class="d-flex">
+                        <div><i class="ti ti-info-circle icon me-2"></i></div>
+                        <div>
+                            <h6>Possible Reasons:</h6>
+                            <ul class="mb-0">
+                                <li>Your user role doesn't have the required permissions</li>
+                                <li>Your role was recently changed - try logging out and back in</li>
+                                <li>You're trying to access a different center's resources</li>
+                                <li>The resource has been restricted by an administrator</li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="text-center mt-4">
-                    <a href="javascript:history.back()" class="btn btn-secondary mr-2">
-                        <i class="fas fa-arrow-left"></i> Go Back
+                    <a href="javascript:history.back()" class="btn btn-secondary me-2">
+                        <i class="ti ti-arrow-left"></i> Go Back
                     </a>
-                    <a asp-controller="Home" asp-action="Index" class="btn btn-primary mr-2">
-                        <i class="fas fa-home"></i> Go to Dashboard
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-action-view me-2">
+                        <i class="ti ti-home"></i> Go to Dashboard
                     </a>
                     <form asp-controller="Auth" asp-action="Logout" method="post" class="d-inline">
                         @Html.AntiForgeryToken()
                         <button type="submit" class="btn btn-outline-danger">
-                            <i class="fas fa-sign-out-alt"></i> Logout
+                            <i class="ti ti-logout"></i> Logout
                         </button>
                     </form>
                 </div>
@@ -53,7 +61,7 @@
 
                 <div class="text-center text-muted">
                     <small>
-                        <i class="fas fa-question-circle"></i>
+                        <i class="ti ti-help"></i>
                         If you believe this is an error, please contact your system administrator.
                     </small>
                 </div>

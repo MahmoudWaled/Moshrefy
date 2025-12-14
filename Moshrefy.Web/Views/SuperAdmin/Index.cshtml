@@ -160,7 +160,7 @@
                   <div class="text-muted">View and manage all system users</div>
                 </div>
                 <div class="col-auto align-self-center">
-                  <a href="@Url.Action("Index", "SuperAdmin", new { area = "SuperAdmin" })" class="btn btn-sm btn-action-view">
+                  <a asp-action="Index" asp-controller="SuperAdmin" asp-area="SuperAdmin" class="btn btn-sm btn-action-view">
                     <i class="ti ti-eye icon"></i>
                     View
                   </a>
@@ -180,7 +180,7 @@
                   <div class="text-muted">View and manage all centers</div>
                 </div>
                 <div class="col-auto align-self-center">
-                  <a href="@Url.Action("Index", "Center", new { area = "SuperAdmin" })" class="btn btn-sm btn-action-view">
+                  <a asp-action="Index" asp-controller="SuperAdmin" asp-area="SuperAdmin" class="btn btn-sm btn-action-view">
                     <i class="ti ti-eye icon"></i>
                     View
                   </a>
@@ -189,7 +189,7 @@
 
               <div class="row py-2">
                 <div class="col-auto">
-                  <span class="avatar bg-danger text-white">
+                  <span class="avatar bg-action-delete text-white">
                     <i class="ti ti-trash"></i>
                   </span>
                 </div>
@@ -200,7 +200,7 @@
                   <div class="text-muted">Review and restore deleted items</div>
                 </div>
                 <div class="col-auto align-self-center">
-                  <a href="@Url.Action("DeletedItems", "SuperAdmin", new { area = "SuperAdmin" })" class="btn btn-sm btn-action-view">
+                  <a asp-action="DeletedItems" asp-controller="SuperAdmin" asp-area="SuperAdmin" class="btn btn-sm btn-action-view">
                     <i class="ti ti-eye icon"></i>
                     View
                   </a>
@@ -209,7 +209,7 @@
 
               <div class="row py-2">
                 <div class="col-auto">
-                  <span class="avatar bg-info text-white">
+                  <span class="avatar bg-action-view text-white">
                     <i class="ti ti-package"></i>
                   </span>
                 </div>
@@ -220,7 +220,7 @@
                   <div class="text-muted">View and manage inventory items</div>
                 </div>
                 <div class="col-auto align-self-center">
-                  <a href="@Url.Action("Index", "Item", new { area = "SuperAdmin" })" class="btn btn-sm btn-action-view">
+                  <a asp-action="Index" asp-controller="Item" asp-area="SuperAdmin" class="btn btn-sm btn-action-view">
                     <i class="ti ti-eye icon"></i>
                     View
                   </a>

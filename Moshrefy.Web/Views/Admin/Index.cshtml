@@ -3,122 +3,124 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<!-- Content Header -->
-<section class="content-header">
-    <div class="container-fluid">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1><i class="fas fa-home"></i> My Center</h1>
-            </div>
-            <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item active">Dashboard</li>
-                </ol>
-            </div>
-        </div>
+<!-- Page header -->
+<div class="page-header d-print-none">
+  <div class="container-xl">
+    <div class="row g-2 align-items-center">
+      <div class="col">
+        <div class="page-pretitle">Admin</div>
+        <h2 class="page-title"><i class="ti ti-home"></i> My Center</h2>
+      </div>
     </div>
-</section>
+  </div>
+</div>
 
-<!-- Main content -->
-<section class="content">
-    <div class="container-fluid">
-        <!-- System Update Notice (if needed) -->
-        @{
-            var hasCenterIdClaim = User.Claims.Any(c => c.Type == "CenterId" && !string.IsNullOrEmpty(c.Value));
-        }
-        @if (!hasCenterIdClaim)
-        {
+<!-- Page body -->
+<div class="page-body">
+  <div class="container-xl">
+    @{
+      var hasCenterIdClaim = User.Claims.Any(c => c.Type == "CenterId" && !string.IsNullOrEmpty(c.Value));
+    }
+    @if (!hasCenterIdClaim)
+    {
+      <div class="row">
+        <div class="col-12">
+          <div class="alert alert-warning">
+            <div class="d-flex">
+              <div><i class="ti ti-alert-triangle icon me-2"></i></div>
+              <div><strong>System Updated!</strong><br>We've made some improvements. Please <strong>log out and log back in</strong> to enjoy better performance.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Welcome Card -->
+    <div class="row row-deck row-cards">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-body">
+            <h4><i class="ti ti-mood-happy me-2"></i>Welcome to Your Center Dashboard!</h4>
+            <p class="text-muted">Manage your team members and track your center's activities from here.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row row-deck row-cards mt-3">
+      <div class="col-lg-4 col-md-6">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div class="subheader"><i class="ti ti-users text-primary" style="font-size: 2rem;"></i></div>
+            </div>
+            <div class="h3 mb-3">My Team</div>
+            <a asp-action="Users" class="btn btn-action-view">
+              View All Team Members <i class="ti ti-arrow-right ms-1"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div class="subheader"><i class="ti ti-user-plus text-success" style="font-size: 2rem;"></i></div>
+            </div>
+            <div class="h3 mb-3">Add New Member</div>
+            <a asp-action="CreateUser" class="btn btn-action-create">
+              Add Team Member <i class="ti ti-arrow-right ms-1"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div class="subheader"><i class="ti ti-book text-info" style="font-size: 2rem;"></i></div>
+            </div>
+            <div class="h3 mb-3">Courses & Classes</div>
+            <a asp-controller="Course" asp-action="Index" class="btn btn-action-view">
+              Manage Courses <i class="ti ti-arrow-right ms-1"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Information Card -->
+    <div class="row row-deck row-cards mt-3">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title"><i class="ti ti-info-circle me-2"></i>Quick Guide</h3>
+          </div>
+          <div class="card-body">
             <div class="row">
-                <div class="col-12">
-                    <div class="alert alert-warning alert-dismissible">
-                        <button type="button" class="close" data-dismiss="alert">&times;</button>
-                        <h5><i class="icon fas fa-exclamation-triangle"></i> System Updated!</h5>
-                        We've made some improvements. Please <strong>log out and log back in</strong> to enjoy better performance.
-                    </div>
-                </div>
+              <div class="col-md-6">
+                <h5><i class="ti ti-users text-primary me-2"></i>Managing Your Team</h5>
+                <ul>
+                  <li>Add new team members to help run your center</li>
+                  <li>Update member information anytime</li>
+                  <li>Enable or disable member access as needed</li>
+                </ul>
+              </div>
+              <div class="col-md-6">
+                <h5><i class="ti ti-shield-check text-success me-2"></i>Your Center, Your Control</h5>
+                <ul>
+                  <li>All changes only affect your center</li>
+                  <li>Your data is private and secure</li>
+                  <li>Easy-to-use interface designed for you</li>
+                </ul>
+              </div>
             </div>
-        }
-
-        <!-- Welcome Card -->
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-body">
-                        <h4><i class="fas fa-smile"></i> Welcome to Your Center Dashboard!</h4>
-                        <p class="text-muted">Manage your team members and track your center's activities from here.</p>
-                    </div>
-                </div>
-            </div>
+          </div>
         </div>
-
-        <!-- Quick Actions -->
-        <div class="row">
-            <div class="col-lg-4 col-md-6">
-                <div class="small-box bg-white border">
-                    <div class="inner">
-                        <h4><i class="fas fa-users text-primary"></i></h4>
-                        <p>My Team</p>
-                    </div>
-                    <a asp-action="Users" class="btn btn-action-view btn-sm">
-                        View All Team Members <i class="fas fa-arrow-circle-right"></i>
-                    </a>
-                </div>
-            </div>
-
-            <div class="col-lg-4 col-md-6">
-                <div class="small-box bg-white border">
-                    <div class="inner">
-                        <h4><i class="fas fa-user-plus text-success"></i></h4>
-                        <p>Add New Member</p>
-                    </div>
-                    <a asp-action="CreateUser" class="btn btn-action-create btn-sm">
-                        Add Team Member <i class="fas fa-arrow-circle-right"></i>
-                    </a>
-                </div>
-            </div>
-
-            <div class="col-lg-4 col-md-6">
-                <div class="small-box bg-white border">
-                    <div class="inner">
-                        <h4><i class="fas fa-book text-info"></i></h4>
-                        <p>Courses & Classes</p>
-                    </div>
-                    <a href="#" class="small-box-footer">
-                        Manage Courses <i class="fas fa-arrow-circle-right"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Information Card -->
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-info-circle"></i> Quick Guide</h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h5><i class="fas fa-users text-primary"></i> Managing Your Team</h5>
-                                <ul>
-                                    <li>Add new team members to help run your center</li>
-                                    <li>Update member information anytime</li>
-                                    <li>Enable or disable member access as needed</li>
-                                </ul>
-                            </div>
-                            <div class="col-md-6">
-                                <h5><i class="fas fa-shield-alt text-success"></i> Your Center, Your Control</h5>
-                                <ul>
-                                    <li>All changes only affect your center</li>
-                                    <li>Your data is private and secure</li>
-                                    <li>Easy-to-use interface designed for you</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
-</section>
+  </div>
+</div>

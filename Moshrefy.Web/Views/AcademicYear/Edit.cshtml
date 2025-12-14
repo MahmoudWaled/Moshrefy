@@ -6,80 +6,58 @@
     var academicYearName = ViewBag.AcademicYearName;
 }
 
-<!-- Content Header -->
-<section class="content-header">
-    <div class="container-fluid">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1><i class="fas fa-edit"></i> Edit Academic Year</h1>
-            </div>
-            <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a asp-controller="Admin" asp-action="Index">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a asp-action="Index">Academic Years</a></li>
-                    <li class="breadcrumb-item active">Edit</li>
-                </ol>
-            </div>
-        </div>
+<!-- Page header -->
+<div class="page-header d-print-none">
+  <div class="container-xl">
+    <div class="row g-2 align-items-center">
+      <div class="col">
+        <div class="page-pretitle">Academic Years</div>
+        <h2 class="page-title"><i class="ti ti-edit"></i> Edit Academic Year</h2>
+      </div>
     </div>
-</section>
+  </div>
+</div>
 
-<!-- Main content -->
-<section class="content">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-8 offset-md-2">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Edit: @academicYearName</h3>
-                    </div>
-                    <form asp-action="Edit" asp-route-id="@academicYearId" method="post">
-                        <div class="card-body">
-                            <!-- Success/Error Messages -->
-                            @if (TempData["SuccessMessage"] != null)
-                            {
-                                <div class="alert alert-success alert-dismissible">
-                                    <button type="button" class="close" data-dismiss="alert">&times;</button>
-                                    <i class="icon fas fa-check"></i> @TempData["SuccessMessage"]
-                                </div>
-                            }
-                            @if (TempData["ErrorMessage"] != null)
-                            {
-                                <div class="alert alert-danger alert-dismissible">
-                                    <button type="button" class="close" data-dismiss="alert">&times;</button>
-                                    <i class="icon fas fa-ban"></i> @TempData["ErrorMessage"]
-                                </div>
-                            }
+<!-- Page body -->
+<div class="page-body">
+  <div class="container-xl">
+    <div class="row">
+      <div class="col-md-8 offset-md-2">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Edit: @academicYearName</h3>
+          </div>
+          <form asp-action="Edit" asp-route-id="@academicYearId" method="post">
+            <div class="card-body">
+              <div class="mb-3">
+                <label class="form-label" asp-for="Name">Academic Year Name <span class="text-danger">*</span></label>
+                <input asp-for="Name" class="form-control" placeholder="e.g., 2024-2025" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+              </div>
 
-                            <div class="form-group">
-                                <label asp-for="Name">Academic Year Name <span class="text-danger">*</span></label>
-                                <input asp-for="Name" class="form-control" placeholder="e.g., 2024-2025" />
-                                <span asp-validation-for="Name" class="text-danger"></span>
-                            </div>
-
-                            <div class="form-group">
-                                <div class="custom-control custom-switch">
-                                    <input type="checkbox" asp-for="IsActive" class="custom-control-input" id="isActiveSwitch">
-                                    <label class="custom-control-label" for="isActiveSwitch">Active</label>
-                                </div>
-                                <small class="form-text text-muted">Inactive academic years won't be available for new enrollments</small>
-                            </div>
-                        </div>
-
-                        <div class="card-footer">
-                            <button type="submit" class="btn btn-action-edit">
-                                <i class="fas fa-save"></i> Save Changes
-                            </button>
-                            <a asp-action="Details" asp-route-id="@academicYearId" class="btn btn-outline-secondary">
-                                <i class="fas fa-times"></i> Cancel
-                            </a>
-                        </div>
-                    </form>
-                </div>
+              <div class="mb-3">
+                <label class="form-check form-switch">
+                  <input type="checkbox" asp-for="IsActive" class="form-check-input">
+                  <span class="form-check-label">Active</span>
+                </label>
+                <small class="form-hint">Inactive academic years won't be available for new enrollments</small>
+              </div>
             </div>
+
+            <div class="card-footer text-end">
+              <a asp-action="Details" asp-route-id="@academicYearId" class="btn btn-outline-secondary me-2">
+                <i class="ti ti-x"></i> Cancel
+              </a>
+              <button type="submit" class="btn btn-action-edit">
+                <i class="ti ti-device-floppy"></i> Save Changes
+              </button>
+            </div>
+          </form>
         </div>
+      </div>
     </div>
-</section>
+  </div>
+</div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

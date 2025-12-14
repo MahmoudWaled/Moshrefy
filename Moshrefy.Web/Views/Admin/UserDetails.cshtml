@@ -4,421 +4,240 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<!-- Content Header -->
-<section class="content-header">
-    <div class="container-fluid">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1><i class="fas fa-user"></i> Team Member Details</h1>
-            </div>
-            <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a asp-action="Index">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a asp-action="Users">My Team</a></li>
-                    <li class="breadcrumb-item active">Details</li>
-                </ol>
-            </div>
-        </div>
+<!-- Page header -->
+<div class="page-header d-print-none">
+  <div class="container-xl">
+    <div class="row g-2 align-items-center">
+      <div class="col">
+        <div class="page-pretitle">Admin</div>
+        <h2 class="page-title"><i class="ti ti-user"></i> Team Member Details</h2>
+      </div>
+      <div class="col-auto ms-auto">
+        <a asp-action="Users" class="btn btn-secondary">
+          <i class="ti ti-arrow-left"></i> Back to Team
+        </a>
+      </div>
     </div>
-</section>
+  </div>
+</div>
 
-<!-- Main content -->
-<section class="content">
-    <div class="container-fluid">
-        <!-- Success/Error Messages -->
-        @if (TempData["SuccessMessage"] != null)
-        {
-            <div class="alert alert-success alert-dismissible">
-                <button type="button" class="close" data-dismiss="alert">&times;</button>
-                <i class="icon fas fa-check"></i> @TempData["SuccessMessage"]
+<!-- Page body -->
+<div class="page-body">
+  <div class="container-xl">
+    <div class="row">
+      <!-- Member Info Card -->
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-body text-center">
+            <div class="avatar avatar-xl mb-3" style="background-color: var(--tblr-primary); color: white; font-size: 2rem;">
+              @Model.Name.Substring(0, 1).ToUpper()
             </div>
-        }
-        @if (TempData["ErrorMessage"] != null)
-        {
-            <div class="alert alert-danger alert-dismissible">
-                <button type="button" class="close" data-dismiss="alert">&times;</button>
-                <i class="icon fas fa-ban"></i> @TempData["ErrorMessage"]
+            <h3 class="card-title mb-1">@Model.Name</h3>
+            <p class="text-muted">@@@Model.UserName</p>
+
+            <div class="mb-3">
+              @if (Model.IsActive)
+              {
+                <span class="badge bg-state-active">Active Member</span>
+              }
+              else
+              {
+                <span class="badge bg-secondary">Inactive</span>
+              }
+              <br />
+              @if (!string.IsNullOrEmpty(Model.RoleName))
+              {
+                <span class="badge mt-2 @(Model.RoleName == "Employee" ? "bg-role-employee" : Model.RoleName == "Manager" ? "bg-role-manager" : "bg-secondary")">
+                  <i class="ti @(Model.RoleName == "Employee" ? "ti-user" : "ti-user-cog")"></i>
+                  @Model.RoleName
+                </span>
+              }
             </div>
-        }
 
-        <div class="row">
-            <!-- Member Info Card -->
-            <div class="col-md-4">
-                <div class="card card-primary card-outline">
-                    <div class="card-body box-profile">
-                        <div class="text-center">
-                            <div class="profile-user-img img-fluid img-circle" style="width: 100px; height: 100px; background: #007bff; color: white; display: flex; align-items: center; justify-content: center; font-size: 3rem; margin: 0 auto 1rem;">
-                                @Model.Name.Substring(0, 1).ToUpper()
-                            </div>
-                        </div>
-
-                        <h3 class="profile-username text-center">@Model.Name</h3>
-                        <p class="text-muted text-center">@@@Model.UserName</p>
-
-                        <div class="text-center mb-3">
-                            @if (Model.IsActive)
-                            {
-                                <span class="badge badge-state-active badge-lg">Active Member</span>
-                            }
-                            else
-                            {
-                                <span class="badge badge-secondary badge-lg">Inactive</span>
-                            }
-                            <br />
-                            @if (!string.IsNullOrEmpty(Model.RoleName))
-                            {
-                                <span class="badge badge-lg mt-2 
-                                    @(Model.RoleName == "Employee" ? "badge-role-employee" : 
-                                      Model.RoleName == "Manager" ? "badge-role-manager" : "badge-secondary")">
-                                    @(Model.RoleName == "Employee" ? "Employee" : 
-                                      Model.RoleName == "Manager" ? "Manager" : Model.RoleName)
-                                </span>
-                            }
-                        </div>
-
-                        <ul class="list-group list-group-unbordered mb-3">
-                            @if (!string.IsNullOrEmpty(Model.Email))
-                            {
-                                <li class="list-group-item">
-                                    <b><i class="fas fa-envelope mr-1"></i> Email</b>
-                                    <span class="float-right">@Model.Email</span>
-                                </li>
-                            }
-                            @if (!string.IsNullOrEmpty(Model.PhoneNumber))
-                            {
-                                <li class="list-group-item">
-                                    <b><i class="fas fa-phone mr-1"></i> Phone</b>
-                                    <span class="float-right">@Model.PhoneNumber</span>
-                                </li>
-                            }
-                        </ul>
-
-                        <div class="btn-group btn-block">
-                            <a asp-action="EditUser" asp-route-id="@Model.Id" class="btn btn-action-edit">
-                                <i class="fas fa-edit"></i> Edit Info
-                            </a>
-                        </div>
-                    </div>
+            <div class="list-group list-group-flush text-start">
+              @if (!string.IsNullOrEmpty(Model.Email))
+              {
+                <div class="list-group-item">
+                  <i class="ti ti-mail me-2 text-muted"></i><strong>Email:</strong> @Model.Email
                 </div>
-            </div>
-
-            <!-- Actions Card -->
-            <div class="col-md-8">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Member Actions</h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <div class="info-box">
-                                    <span class="info-box-icon bg-purple"><i class="fas fa-user-tag"></i></span>
-                                    <div class="info-box-content">
-                                        <span class="info-box-text">Member Type</span>
-                                        <button class="btn btn-state-change-role btn-sm mt-2" onclick="showChangeRoleModal()">
-                                            <i class="fas fa-exchange-alt"></i> Change Type
-                                        </button>
-                                        <small class="d-block text-muted mt-1">
-                                            Current: <strong>@(Model.RoleName == "Employee" ? "Employee" : Model.RoleName == "Manager" ? "Manager" : Model.RoleName)</strong>
-                                        </small>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <div class="info-box">
-                                    <span class="info-box-icon bg-info"><i class="fas fa-key"></i></span>
-                                    <div class="info-box-content">
-                                        <span class="info-box-text">Access Control</span>
-                                        @if (Model.IsActive)
-                                        {
-                                            <button class="btn btn-state-deactive btn-sm mt-2" onclick="deactivateMember()">
-                                                <i class="fas fa-ban"></i> Disable Access
-                                            </button>
-                                            <small class="d-block text-muted mt-1">Currently has access to the system</small>
-                                        }
-                                        else
-                                        {
-                                            <button class="btn btn-state-active btn-sm mt-2" onclick="activateMember()">
-                                                <i class="fas fa-check"></i> Enable Access
-                                            </button>
-                                            <small class="d-block text-muted mt-1">Access is currently disabled</small>
-                                        }
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-12 mb-3">
-                                <div class="info-box">
-                                    <span class="info-box-icon bg-danger"><i class="fas fa-user-times"></i></span>
-                                    <div class="info-box-content">
-                                        <span class="info-box-text">Remove Member</span>
-                                        <button class="btn btn-action-delete btn-sm mt-2" onclick="removeMember()">
-                                            <i class="fas fa-trash"></i> Remove from Team
-                                        </button>
-                                        <small class="d-block text-muted mt-1">This can be undone later</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Member Activity -->
-                        <div class="card bg-light">
-                            <div class="card-header">
-                                <h5 class="card-title"><i class="fas fa-clock"></i> Member Since</h5>
-                            </div>
-                            <div class="card-body">
-                                <p><strong>Joined:</strong> @Model.CreatedAt.ToString("MMMM dd, yyyy")</p>
-                                @if (!string.IsNullOrEmpty(Model.CreatedByName))
-                                {
-                                    <p><strong>Added by:</strong> @Model.CreatedByName</p>
-                                }
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card-footer">
-                        <a asp-action="Users" class="btn btn-outline-secondary">
-                            <i class="fas fa-arrow-left"></i> Back to Team List
-                        </a>
-                    </div>
+              }
+              @if (!string.IsNullOrEmpty(Model.PhoneNumber))
+              {
+                <div class="list-group-item">
+                  <i class="ti ti-phone me-2 text-muted"></i><strong>Phone:</strong> @Model.PhoneNumber
                 </div>
+              }
             </div>
+
+            <div class="mt-3">
+              <a asp-action="EditUser" asp-route-id="@Model.Id" class="btn btn-action-edit w-100">
+                <i class="ti ti-edit"></i> Edit Info
+              </a>
+            </div>
+          </div>
         </div>
+      </div>
+
+      <!-- Actions Card -->
+      <div class="col-md-8">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Member Actions</h3>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <div class="card bg-light">
+                  <div class="card-body">
+                    <div class="d-flex align-items-center mb-2">
+                      <span class="avatar bg-purple text-white me-3"><i class="ti ti-tag"></i></span>
+                      <div>
+                        <strong>Member Type</strong>
+                        <div class="text-muted small">Current: <strong>@Model.RoleName</strong></div>
+                      </div>
+                    </div>
+                    <button class="btn btn-sm btn-purple" onclick="showChangeRoleModal()">
+                      <i class="ti ti-arrows-exchange"></i> Change Type
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <div class="card bg-light">
+                  <div class="card-body">
+                    <div class="d-flex align-items-center mb-2">
+                      <span class="avatar bg-action-view text-white me-3"><i class="ti ti-key"></i></span>
+                      <div>
+                        <strong>Access Control</strong>
+                        <div class="text-muted small">@(Model.IsActive ? "Currently has access" : "Access disabled")</div>
+                      </div>
+                    </div>
+                    @if (Model.IsActive)
+                    {
+                      <button class="btn btn-sm btn-state-deactive" onclick="deactivateMember()">
+                        <i class="ti ti-ban"></i> Disable Access
+                      </button>
+                    }
+                    else
+                    {
+                      <button class="btn btn-sm btn-state-active" onclick="activateMember()">
+                        <i class="ti ti-check"></i> Enable Access
+                      </button>
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-12 mb-3">
+                <div class="card bg-light">
+                  <div class="card-body">
+                    <div class="d-flex align-items-center mb-2">
+                      <span class="avatar bg-action-delete text-white me-3"><i class="ti ti-user-off"></i></span>
+                      <div>
+                        <strong>Remove Member</strong>
+                        <div class="text-muted small">This can be undone later</div>
+                      </div>
+                    </div>
+                    <button class="btn btn-sm btn-action-delete" onclick="removeMember()">
+                      <i class="ti ti-trash"></i> Remove from Team
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Member Activity -->
+            <div class="card">
+              <div class="card-header">
+                <h4 class="card-title"><i class="ti ti-clock me-2"></i>Member Since</h4>
+              </div>
+              <div class="card-body">
+                <p><strong>Joined:</strong> @Model.CreatedAt.ToString("MMMM dd, yyyy")</p>
+                @if (!string.IsNullOrEmpty(Model.CreatedByName))
+                {
+                  <p><strong>Added by:</strong> @Model.CreatedByName</p>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-</section>
+  </div>
+</div>
 
 <!-- Change Role Modal -->
-<div class="modal fade" id="changeRoleModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Change Member Type</h5>
-                <button type="button" class="close" data-dismiss="modal">
-                    <span>&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <p>Select the new type for <strong>@Model.Name</strong>:</p>
-                <div class="form-group">
-                    <label>Member Type</label>
-                    <select id="newRoleSelect" class="form-control">
-                        <option value="">-- Select Type --</option>
-                        <option value="Employee">Employee</option>
-                        <option value="Manager">Manager</option>
-                    </select>
-                </div>
-                <div class="alert alert-info" id="roleDescriptionModal" style="display: none;">
-                    <i class="icon fas fa-info-circle"></i>
-                    <span id="roleDescriptionTextModal"></span>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" onclick="changeRole()">Change Type</button>
-            </div>
+<div class="modal fade" id="changeRoleModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Change Member Type</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p>Select the new type for <strong>@Model.Name</strong>:</p>
+        <div class="mb-3">
+          <label class="form-label">Member Type</label>
+          <select id="newRoleSelect" class="form-select">
+            <option value="">-- Select Type --</option>
+            <option value="Employee">Employee</option>
+            <option value="Manager">Manager</option>
+          </select>
         </div>
+        <div class="alert alert-info" id="roleDescriptionModal" style="display: none;">
+          <i class="ti ti-info-circle me-2"></i><span id="roleDescriptionTextModal"></span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-action-edit" onclick="changeRole()">Change Type</button>
+      </div>
     </div>
+  </div>
 </div>
 
 @section Scripts {
-    <!-- SweetAlert2 -->
-    <link rel="stylesheet" href="~/plugins/sweetalert2/sweetalert2.min.css">
-    <script src="~/plugins/sweetalert2/sweetalert2.min.js"></script>
-    
     <script>
         const roleDescriptions = {
-            'Employee': 'Regular team member who can handle day-to-day tasks like recording attendance, managing student information, and basic operations.',
-            'Manager': 'Senior team member with additional permissions to manage finances, generate reports, and oversee operations.'
+            'Employee': 'Regular team member who can handle day-to-day tasks.',
+            'Manager': 'Senior team member with additional permissions.'
         };
 
-        function showChangeRoleModal() {
-            $('#changeRoleModal').modal('show');
-        }
+        var changeRoleModalEl = document.getElementById('changeRoleModal');
+        var changeRoleModal = changeRoleModalEl ? new bootstrap.Modal(changeRoleModalEl) : null;
+
+        function showChangeRoleModal() { if (changeRoleModal) changeRoleModal.show(); }
 
         $('#newRoleSelect').change(function() {
-            var selectedRole = $(this).val();
-            
-            if (selectedRole && roleDescriptions[selectedRole]) {
-                $('#roleDescriptionTextModal').text(roleDescriptions[selectedRole]);
-                $('#roleDescriptionModal').slideDown();
-            } else {
-                $('#roleDescriptionModal').slideUp();
-            }
+            var r = $(this).val();
+            if (r && roleDescriptions[r]) { $('#roleDescriptionTextModal').text(roleDescriptions[r]); $('#roleDescriptionModal').slideDown(); }
+            else { $('#roleDescriptionModal').slideUp(); }
         });
 
         function changeRole() {
             var newRole = $('#newRoleSelect').val();
-            
-            if (!newRole) {
-                Swal.fire('Error', 'Please select a member type', 'error');
-                return;
-            }
-
-            Swal.fire({
-                title: 'Change Member Type?',
-                text: 'Change this member\'s type to ' + newRole + '?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#6f42c1',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Yes, change type',
-                cancelButtonText: 'Cancel'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.post('@Url.Action("ChangeUserRole")', { 
-                        id: '@Model.Id',
-                        newRole: newRole
-                    })
-                    .done(function (response) {
-                        if (response.success) {
-                            $('#changeRoleModal').modal('hide');
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Success!',
-                                text: response.message,
-                                timer: 2000,
-                                showConfirmButton: false
-                            }).then(() => {
-                                location.reload();
-                            });
-                        } else {
-                            Swal.fire('Error', response.message, 'error');
-                        }
-                    })
-                    .fail(function () {
-                        Swal.fire('Error', 'An error occurred while changing the member type', 'error');
-                    });
-                }
-            });
+            if (!newRole) { Swal.fire('Error', 'Please select a member type', 'error'); return; }
+            Swal.fire({ title: 'Change Type?', text: 'Change to ' + newRole + '?', icon: 'question', showCancelButton: true, confirmButtonColor: '#6f42c1', confirmButtonText: 'Yes, change' })
+            .then((r) => { if (r.isConfirmed) { $.post('@Url.Action("ChangeUserRole")', { id: '@Model.Id', newRole: newRole }).done((res) => { if (res.success) { if (changeRoleModal) changeRoleModal.hide(); Swal.fire({ icon: 'success', title: 'Success!', timer: 2000, showConfirmButton: false }).then(() => location.reload()); } else { Swal.fire('Error', res.message, 'error'); } }); } });
         }
 
         function activateMember() {
-            Swal.fire({
-                title: 'Enable Access?',
-                text: 'Enable access for this team member?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#28a745',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Yes, enable',
-                cancelButtonText: 'Cancel'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.post('@Url.Action("ActivateUser")', { id: '@Model.Id' })
-                        .done(function (response) {
-                            if (response.success) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Success!',
-                                    text: response.message,
-                                    timer: 2000,
-                                    showConfirmButton: false
-                                }).then(() => {
-                                    location.reload();
-                                });
-                            } else {
-                                Swal.fire('Error', response.message, 'error');
-                            }
-                        })
-                        .fail(function () {
-                            Swal.fire('Error', 'An error occurred', 'error');
-                        });
-                }
-            });
+            Swal.fire({ title: 'Enable Access?', icon: 'question', showCancelButton: true, confirmButtonColor: '#28a745', confirmButtonText: '<i class="ti ti-check"></i> Yes, enable' })
+            .then((r) => { if (r.isConfirmed) { $.post('@Url.Action("ActivateUser")', { id: '@Model.Id' }).done((res) => { if (res.success) { Swal.fire({ icon: 'success', title: 'Enabled!', timer: 2000, showConfirmButton: false }).then(() => location.reload()); } }); } });
         }
 
         function deactivateMember() {
-            Swal.fire({
-                title: 'Disable Access?',
-                text: 'This member will not be able to log in until you enable access again.',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#ffc107',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Yes, disable',
-                cancelButtonText: 'Cancel'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.post('@Url.Action("DeactivateUser")', { id: '@Model.Id' })
-                        .done(function (response) {
-                            if (response.success) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Success!',
-                                    text: response.message,
-                                    timer: 2000,
-                                    showConfirmButton: false
-                                }).then(() => {
-                                    location.reload();
-                                });
-                            } else {
-                                Swal.fire('Error', response.message, 'error');
-                            }
-                        })
-                        .fail(function () {
-                            Swal.fire('Error', 'An error occurred', 'error');
-                        });
-                }
-            });
+            Swal.fire({ title: 'Disable Access?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ffc107', confirmButtonText: '<i class="ti ti-ban"></i> Yes, disable' })
+            .then((r) => { if (r.isConfirmed) { $.post('@Url.Action("DeactivateUser")', { id: '@Model.Id' }).done((res) => { if (res.success) { Swal.fire({ icon: 'success', title: 'Disabled!', timer: 2000, showConfirmButton: false }).then(() => location.reload()); } }); } });
         }
 
         function removeMember() {
-            Swal.fire({
-                title: 'Remove Team Member?',
-                text: 'You can restore them later if needed.',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#dc3545',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Yes, remove',
-                cancelButtonText: 'Cancel'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.post('@Url.Action("SoftDeleteUser")', { id: '@Model.Id' })
-                        .done(function (response) {
-                            if (response.success) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Removed!',
-                                    text: response.message,
-                                    timer: 2000,
-                                    showConfirmButton: false
-                                }).then(() => {
-                                    window.location.href = '@Url.Action("Users")';
-                                });
-                            } else {
-                                Swal.fire('Error', response.message, 'error');
-                            }
-                        })
-                        .fail(function () {
-                            Swal.fire('Error', 'An error occurred', 'error');
-                        });
-                }
-            });
+            Swal.fire({ title: 'Remove Member?', text: 'You can restore them later.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#dc3545', confirmButtonText: '<i class="ti ti-trash"></i> Yes, remove' })
+            .then((r) => { if (r.isConfirmed) { $.post('@Url.Action("SoftDeleteUser")', { id: '@Model.Id' }).done((res) => { if (res.success) { Swal.fire({ icon: 'success', title: 'Removed!', timer: 2000, showConfirmButton: false }).then(() => window.location.href = '@Url.Action("Users")'); } }); } });
         }
     </script>
-
-    <style>
-        .bg-purple {
-            background-color: #6f42c1 !important;
-            color: white;
-        }
-        
-        .btn-purple {
-            background-color: #6f42c1;
-            border-color: #6f42c1;
-            color: white;
-        }
-        
-        .btn-purple:hover {
-            background-color: #5a32a3;
-            border-color: #5a32a3;
-            color: white;
-        }
-    </style>
+    <style>.bg-purple,.btn-purple{background-color:#6f42c1!important;color:white;}.btn-purple:hover{background-color:#5a32a3!important;}</style>
 }
-
-

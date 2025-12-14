@@ -4,286 +4,181 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<!-- Content Header -->
-<section class="content-header">
-    <div class="container-fluid">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1>
-                    <i class="fas fa-trash-restore"></i> Deleted Items Recovery
-                </h1>
-            </div>
-            <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a asp-action="Index">Dashboard</a></li>
-                    <li class="breadcrumb-item active">Deleted Items</li>
-                </ol>
-            </div>
-        </div>
+<!-- Page header -->
+<div class="page-header d-print-none">
+  <div class="container-xl">
+    <div class="row g-2 align-items-center">
+      <div class="col">
+        <div class="page-pretitle">System</div>
+        <h2 class="page-title"><i class="ti ti-trash"></i> Deleted Items Recovery</h2>
+      </div>
+      <div class="col-auto ms-auto">
+        <a asp-action="Index" class="btn btn-secondary"><i class="ti ti-arrow-left"></i> Back to Dashboard</a>
+      </div>
     </div>
-</section>
+  </div>
+</div>
 
-<!-- Main content -->
-<section class="content">
-    <div class="container-fluid">
-        <!-- Summary Cards -->
-        <div class="row">
-            <div class="col-lg-3 col-6">
-                <div class="small-box bg-white">
-                    <div class="inner">
-                        <h3>@Model.DeletedTeachers</h3>
-                        <p>Deleted Teachers</p>
-                    </div>
-                    <div class="icon">
-                        <i class="fas fa-chalkboard-teacher text-muted"></i>
-                    </div>
-                    @if (Model.DeletedTeachers > 0)
-                    {
-                        <a href="#teachers-section" class="small-box-footer">
-                            View & Restore <i class="fas fa-arrow-circle-down"></i>
-                        </a>
-                    }
-                    else
-                    {
-                        <span class="small-box-footer text-muted">No deleted items</span>
-                    }
-                </div>
+<!-- Page body -->
+<div class="page-body">
+  <div class="container-xl">
+    <!-- Summary Cards -->
+    <div class="row row-deck row-cards mb-3">
+      <div class="col-sm-6 col-lg-3">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div class="subheader">Deleted Teachers</div>
             </div>
-
-            <div class="col-lg-3 col-6">
-                <div class="small-box bg-white">
-                    <div class="inner">
-                        <h3>@Model.DeletedStudents</h3>
-                        <p>Deleted Students</p>
-                    </div>
-                    <div class="icon">
-                        <i class="fas fa-user-graduate text-muted"></i>
-                    </div>
-                    @if (Model.DeletedStudents > 0)
-                    {
-                        <a href="#students-section" class="small-box-footer">
-                            View & Restore <i class="fas fa-arrow-circle-down"></i>
-                        </a>
-                    }
-                    else
-                    {
-                        <span class="small-box-footer text-muted">No deleted items</span>
-                    }
-                </div>
+            <div class="h1 mb-3">@Model.DeletedTeachers</div>
+            <div class="d-flex mb-2">
+              <span class="avatar bg-secondary-lt"><i class="ti ti-chalkboard"></i></span>
             </div>
-
-            <div class="col-lg-3 col-6">
-                <div class="small-box bg-white">
-                    <div class="inner">
-                        <h3>@Model.DeletedCourses</h3>
-                        <p>Deleted Courses</p>
-                    </div>
-                    <div class="icon">
-                        <i class="fas fa-book text-muted"></i>
-                    </div>
-                    @if (Model.DeletedCourses > 0)
-                    {
-                        <a href="#courses-section" class="small-box-footer">
-                            View & Restore <i class="fas fa-arrow-circle-down"></i>
-                        </a>
-                    }
-                    else
-                    {
-                        <span class="small-box-footer text-muted">No deleted items</span>
-                    }
-                </div>
-            </div>
-
-            <div class="col-lg-3 col-6">
-                <div class="small-box bg-white">
-                    <div class="inner">
-                        <h3>@Model.DeletedClassrooms</h3>
-                        <p>Deleted Classrooms</p>
-                    </div>
-                    <div class="icon">
-                        <i class="fas fa-door-open text-muted"></i>
-                    </div>
-                    @if (Model.DeletedClassrooms > 0)
-                    {
-                        <a href="#classrooms-section" class="small-box-footer">
-                            View & Restore <i class="fas fa-arrow-circle-down"></i>
-                        </a>
-                    }
-                    else
-                    {
-                        <span class="small-box-footer text-muted">No deleted items</span>
-                    }
-                </div>
-            </div>
+          </div>
         </div>
-
-        <!-- Info Alert -->
-        <div class="row">
-            <div class="col-12">
-                <div class="alert alert-info alert-dismissible">
-                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">�</button>
-                    <h5><i class="icon fas fa-info"></i> Recovery Information</h5>
-                    These items have been soft-deleted and can be restored. Use the restore buttons below to recover specific items.
-                    Data that has been permanently deleted cannot be recovered.
-                </div>
+      </div>
+      <div class="col-sm-6 col-lg-3">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div class="subheader">Deleted Students</div>
             </div>
-        </div>
-
-        <!-- Deleted Teachers Section -->
-        <div class="row" id="teachers-section">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-chalkboard-teacher mr-2"></i>
-                            Deleted Teachers (@Model.DeletedTeachers)
-                        </h3>
-                        <div class="card-tools">
-                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                <i class="fas fa-minus"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        @if (Model.DeletedTeachers > 0)
-                        {
-                            <p class="text-muted">Coming soon: List of deleted teachers with restore functionality</p>
-                            <div class="text-center py-4">
-                                <i class="fas fa-spinner fa-spin fa-3x text-muted"></i>
-                                <p class="mt-3">Feature under development</p>
-                            </div>
-                        }
-                        else
-                        {
-                            <div class="text-center py-5">
-                                <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
-                                <p class="text-muted">No deleted teachers found</p>
-                            </div>
-                        }
-                    </div>
-                </div>
+            <div class="h1 mb-3">@Model.DeletedStudents</div>
+            <div class="d-flex mb-2">
+              <span class="avatar bg-secondary-lt"><i class="ti ti-school"></i></span>
             </div>
+          </div>
         </div>
-
-        <!-- Deleted Students Section -->
-        <div class="row" id="students-section">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-user-graduate mr-2"></i>
-                            Deleted Students (@Model.DeletedStudents)
-                        </h3>
-                        <div class="card-tools">
-                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                <i class="fas fa-minus"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        @if (Model.DeletedStudents > 0)
-                        {
-                            <p class="text-muted">Coming soon: List of deleted students with restore functionality</p>
-                            <div class="text-center py-4">
-                                <i class="fas fa-spinner fa-spin fa-3x text-muted"></i>
-                                <p class="mt-3">Feature under development</p>
-                            </div>
-                        }
-                        else
-                        {
-                            <div class="text-center py-5">
-                                <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
-                                <p class="text-muted">No deleted students found</p>
-                            </div>
-                        }
-                    </div>
-                </div>
+      </div>
+      <div class="col-sm-6 col-lg-3">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div class="subheader">Deleted Courses</div>
             </div>
-        </div>
-
-        <!-- Deleted Courses Section -->
-        <div class="row" id="courses-section">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-book mr-2"></i>
-                            Deleted Courses (@Model.DeletedCourses)
-                        </h3>
-                        <div class="card-tools">
-                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                <i class="fas fa-minus"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        @if (Model.DeletedCourses > 0)
-                        {
-                            <p class="text-muted">Coming soon: List of deleted courses with restore functionality</p>
-                            <div class="text-center py-4">
-                                <i class="fas fa-spinner fa-spin fa-3x text-muted"></i>
-                                <p class="mt-3">Feature under development</p>
-                            </div>
-                        }
-                        else
-                        {
-                            <div class="text-center py-5">
-                                <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
-                                <p class="text-muted">No deleted courses found</p>
-                            </div>
-                        }
-                    </div>
-                </div>
+            <div class="h1 mb-3">@Model.DeletedCourses</div>
+            <div class="d-flex mb-2">
+              <span class="avatar bg-secondary-lt"><i class="ti ti-book"></i></span>
             </div>
+          </div>
         </div>
-
-        <!-- Deleted Classrooms Section -->
-        <div class="row" id="classrooms-section">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-door-open mr-2"></i>
-                            Deleted Classrooms (@Model.DeletedClassrooms)
-                        </h3>
-                        <div class="card-tools">
-                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                <i class="fas fa-minus"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        @if (Model.DeletedClassrooms > 0)
-                        {
-                            <p class="text-muted">Coming soon: List of deleted classrooms with restore functionality</p>
-                            <div class="text-center py-4">
-                                <i class="fas fa-spinner fa-spin fa-3x text-muted"></i>
-                                <p class="mt-3">Feature under development</p>
-                            </div>
-                        }
-                        else
-                        {
-                            <div class="text-center py-5">
-                                <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
-                                <p class="text-muted">No deleted classrooms found</p>
-                            </div>
-                        }
-                    </div>
-                </div>
+      </div>
+      <div class="col-sm-6 col-lg-3">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div class="subheader">Deleted Classrooms</div>
             </div>
-        </div>
-
-        <!-- Actions -->
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-body text-center">
-                        <a asp-action="Index" class="btn btn-outline-secondary">
-                            <i class="fas fa-arrow-left"></i> Back to Dashboard
-                        </a>
-                    </div>
-                </div>
+            <div class="h1 mb-3">@Model.DeletedClassrooms</div>
+            <div class="d-flex mb-2">
+              <span class="avatar bg-secondary-lt"><i class="ti ti-door"></i></span>
             </div>
+          </div>
         </div>
+      </div>
     </div>
-</section>
+
+    <!-- Info Alert -->
+    <div class="alert alert-info" role="alert">
+      <div class="d-flex">
+        <div><i class="ti ti-info-circle icon me-2"></i></div>
+        <div>
+          <h4 class="alert-title">Recovery Information</h4>
+          <div class="text-muted">These items have been soft-deleted and can be restored. Data that has been permanently deleted cannot be recovered.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Deleted Teachers Section -->
+    <div class="card mb-3" id="teachers-section">
+      <div class="card-header">
+        <h3 class="card-title"><i class="ti ti-chalkboard me-2"></i>Deleted Teachers (@Model.DeletedTeachers)</h3>
+      </div>
+      <div class="card-body">
+        @if (Model.DeletedTeachers > 0)
+        {
+          <div class="text-center py-4">
+            <span class="avatar avatar-xl bg-azure-lt mb-3"><i class="ti ti-loader ti-spin"></i></span>
+            <p class="text-muted">Feature under development</p>
+          </div>
+        }
+        else
+        {
+          <div class="text-center py-5">
+            <span class="avatar avatar-xl bg-success-lt mb-3"><i class="ti ti-check"></i></span>
+            <p class="text-muted">No deleted teachers found</p>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Deleted Students Section -->
+    <div class="card mb-3" id="students-section">
+      <div class="card-header">
+        <h3 class="card-title"><i class="ti ti-school me-2"></i>Deleted Students (@Model.DeletedStudents)</h3>
+      </div>
+      <div class="card-body">
+        @if (Model.DeletedStudents > 0)
+        {
+          <div class="text-center py-4">
+            <span class="avatar avatar-xl bg-azure-lt mb-3"><i class="ti ti-loader ti-spin"></i></span>
+            <p class="text-muted">Feature under development</p>
+          </div>
+        }
+        else
+        {
+          <div class="text-center py-5">
+            <span class="avatar avatar-xl bg-success-lt mb-3"><i class="ti ti-check"></i></span>
+            <p class="text-muted">No deleted students found</p>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Deleted Courses Section -->
+    <div class="card mb-3" id="courses-section">
+      <div class="card-header">
+        <h3 class="card-title"><i class="ti ti-book me-2"></i>Deleted Courses (@Model.DeletedCourses)</h3>
+      </div>
+      <div class="card-body">
+        @if (Model.DeletedCourses > 0)
+        {
+          <div class="text-center py-4">
+            <span class="avatar avatar-xl bg-azure-lt mb-3"><i class="ti ti-loader ti-spin"></i></span>
+            <p class="text-muted">Feature under development</p>
+          </div>
+        }
+        else
+        {
+          <div class="text-center py-5">
+            <span class="avatar avatar-xl bg-success-lt mb-3"><i class="ti ti-check"></i></span>
+            <p class="text-muted">No deleted courses found</p>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Deleted Classrooms Section -->
+    <div class="card mb-3" id="classrooms-section">
+      <div class="card-header">
+        <h3 class="card-title"><i class="ti ti-door me-2"></i>Deleted Classrooms (@Model.DeletedClassrooms)</h3>
+      </div>
+      <div class="card-body">
+        @if (Model.DeletedClassrooms > 0)
+        {
+          <div class="text-center py-4">
+            <span class="avatar avatar-xl bg-azure-lt mb-3"><i class="ti ti-loader ti-spin"></i></span>
+            <p class="text-muted">Feature under development</p>
+          </div>
+        }
+        else
+        {
+          <div class="text-center py-5">
+            <span class="avatar avatar-xl bg-success-lt mb-3"><i class="ti ti-check"></i></span>
+            <p class="text-muted">No deleted classrooms found</p>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

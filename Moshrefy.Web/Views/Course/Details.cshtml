@@ -4,251 +4,133 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<!-- Content Header -->
-<section class="content-header">
-    <div class="container-fluid">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1><i class="fas fa-book"></i> Course Details</h1>
-            </div>
-            <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a asp-controller="Admin" asp-action="Index">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a asp-action="Index">Courses</a></li>
-                    <li class="breadcrumb-item active">Details</li>
-                </ol>
-            </div>
-        </div>
+<!-- Page header -->
+<div class="page-header d-print-none">
+  <div class="container-xl">
+    <div class="row g-2 align-items-center">
+      <div class="col">
+        <div class="page-pretitle">Courses</div>
+        <h2 class="page-title"><i class="ti ti-book"></i> Course Details</h2>
+      </div>
+      <div class="col-auto ms-auto">
+        <a asp-action="Index" class="btn btn-secondary">
+          <i class="ti ti-arrow-left"></i> Back to List
+        </a>
+      </div>
     </div>
-</section>
+  </div>
+</div>
 
-<!-- Main content -->
-<section class="content">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-8 offset-md-2">
-                <!-- Success/Error Messages -->
-                @if (TempData["SuccessMessage"] != null)
-                {
-                    <div class="alert alert-success alert-dismissible">
-                        <button type="button" class="close" data-dismiss="alert">&times;</button>
-                        <i class="icon fas fa-check"></i> @TempData["SuccessMessage"]
-                    </div>
-                }
-                @if (TempData["ErrorMessage"] != null)
-                {
-                    <div class="alert alert-danger alert-dismissible">
-                        <button type="button" class="close" data-dismiss="alert">&times;</button>
-                        <i class="icon fas fa-ban"></i> @TempData["ErrorMessage"]
-                    </div>
-                }
-
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">@Model.Name</h3>
-                        <div class="card-tools">
-                            @if (Model.IsActive)
-                            {
-                                <span class="badge badge-state-active">Active</span>
-                            }
-                            else
-                            {
-                                <span class="badge badge-state-deactive">Inactive</span>
-                            }
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <h5><i class="fas fa-info-circle"></i> Course Information</h5>
-                                <table class="table table-sm">
-                                    <tr>
-                                        <th style="width: 40%">ID:</th>
-                                        <td>@Model.Id</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Course Name:</th>
-                                        <td>@Model.Name</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Academic Year:</th>
-                                        <td>
-                                            @if (!string.IsNullOrEmpty(Model.AcademicYearName))
-                                            {
-                                                <a asp-controller="AcademicYear" asp-action="Details" asp-route-id="@Model.AcademicYearId">
-                                                    @Model.AcademicYearName
-                                                </a>
-                                            }
-                                            else
-                                            {
-                                                <span class="text-muted">N/A</span>
-                                            }
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th>Status:</th>
-                                        <td>
-                                            @if (Model.IsActive)
-                                            {
-                                                <span class="badge badge-state-active">Active</span>
-                                            }
-                                            else
-                                            {
-                                                <span class="badge badge-state-deactive">Inactive</span>
-                                            }
-                                        </td>
-                                    </tr>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-footer">
-                        @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
-                        {
-                            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-action-edit">
-                                <i class="fas fa-edit"></i> Edit
-                            </a>
-
-                            if (Model.IsActive)
-                            {
-                                <button onclick="deactivateCourse(@Model.Id)" class="btn btn-state-deactive">
-                                    <i class="fas fa-ban"></i> Deactivate
-                                </button>
-                            }
-                            else
-                            {
-                                <button onclick="activateCourse(@Model.Id)" class="btn btn-state-active">
-                                    <i class="fas fa-check"></i> Activate
-                                </button>
-                            }
-                        }
-
-                        @if (User.IsInRole("Admin"))
-                        {
-                            <button onclick="deleteCourse(@Model.Id)" class="btn btn-action-delete">
-                                <i class="fas fa-trash"></i> Delete
-                            </button>
-                        }
-
-                        <a asp-action="Index" class="btn btn-outline-secondary">
-                            <i class="fas fa-arrow-left"></i> Back to List
-                        </a>
-                    </div>
+<!-- Page body -->
+<div class="page-body">
+  <div class="container-xl">
+    <div class="row">
+      <div class="col-md-8 offset-md-2">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">@Model.Name</h3>
+            <div class="card-actions">
+              @if (Model.IsActive)
+              {
+                <span class="badge bg-state-active"><i class="ti ti-check"></i> Active</span>
+              }
+              else
+              {
+                <span class="badge bg-state-inactive"><i class="ti ti-x"></i> Inactive</span>
+              }
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="datagrid">
+              <div class="datagrid-item">
+                <div class="datagrid-title">ID</div>
+                <div class="datagrid-content">@Model.Id</div>
+              </div>
+              <div class="datagrid-item">
+                <div class="datagrid-title">Course Name</div>
+                <div class="datagrid-content">@Model.Name</div>
+              </div>
+              <div class="datagrid-item">
+                <div class="datagrid-title">Academic Year</div>
+                <div class="datagrid-content">
+                  @if (!string.IsNullOrEmpty(Model.AcademicYearName))
+                  {
+                    <a asp-controller="AcademicYear" asp-action="Details" asp-route-id="@Model.AcademicYearId">
+                      @Model.AcademicYearName
+                    </a>
+                  }
+                  else
+                  {
+                    <span class="text-muted">N/A</span>
+                  }
                 </div>
+              </div>
+              <div class="datagrid-item">
+                <div class="datagrid-title">Status</div>
+                <div class="datagrid-content">
+                  @if (Model.IsActive)
+                  {
+                    <span class="badge bg-state-active"><i class="ti ti-check"></i> Active</span>
+                  }
+                  else
+                  {
+                    <span class="badge bg-state-inactive"><i class="ti ti-x"></i> Inactive</span>
+                  }
+                </div>
+              </div>
             </div>
+          </div>
+          <div class="card-footer">
+            <div class="btn-list">
+              @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+              {
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-action-edit">
+                  <i class="ti ti-edit"></i> Edit
+                </a>
+
+                if (Model.IsActive)
+                {
+                  <button onclick="deactivateCourse(@Model.Id)" class="btn btn-state-deactive">
+                    <i class="ti ti-ban"></i> Deactivate
+                  </button>
+                }
+                else
+                {
+                  <button onclick="activateCourse(@Model.Id)" class="btn btn-state-active">
+                    <i class="ti ti-check"></i> Activate
+                  </button>
+                }
+              }
+
+              @if (User.IsInRole("Admin"))
+              {
+                <button onclick="deleteCourse(@Model.Id)" class="btn btn-action-delete">
+                  <i class="ti ti-trash"></i> Delete
+                </button>
+              }
+            </div>
+          </div>
         </div>
+      </div>
     </div>
-</section>
+  </div>
+</div>
 
 @section Scripts {
-    <!-- SweetAlert2 -->
-    <link rel="stylesheet" href="~/plugins/sweetalert2/sweetalert2.min.css">
-    <script src="~/plugins/sweetalert2/sweetalert2.min.js"></script>
-
     <script>
         function activateCourse(id) {
-            Swal.fire({
-                title: 'Activate Course?',
-                text: 'This course will be available for enrollment.',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#28a745',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Yes, activate',
-                cancelButtonText: 'Cancel'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.post('@Url.Action("Activate")', { id: id })
-                        .done(function (response) {
-                            if (response.success) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Activated!',
-                                    text: response.message,
-                                    timer: 2000,
-                                    showConfirmButton: false
-                                }).then(() => {
-                                    location.reload();
-                                });
-                            } else {
-                                Swal.fire('Error', response.message, 'error');
-                            }
-                        })
-                        .fail(function () {
-                            Swal.fire('Error', 'An error occurred', 'error');
-                        });
-                }
-            });
+            Swal.fire({ title: 'Activate Course?', text: 'This course will be available for enrollment.', icon: 'question', showCancelButton: true, confirmButtonColor: '#28a745', confirmButtonText: '<i class="ti ti-check"></i> Yes, activate' })
+            .then((r) => { if (r.isConfirmed) { $.post('@Url.Action("Activate")', { id: id }).done((res) => { if (res.success) { Swal.fire({ icon: 'success', title: 'Activated!', timer: 2000, showConfirmButton: false }).then(() => location.reload()); } else { Swal.fire('Error', res.message, 'error'); } }); } });
         }
 
         function deactivateCourse(id) {
-            Swal.fire({
-                title: 'Deactivate Course?',
-                text: 'This course will not be available for new enrollments.',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#ffc107',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Yes, deactivate',
-                cancelButtonText: 'Cancel'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.post('@Url.Action("Deactivate")', { id: id })
-                        .done(function (response) {
-                            if (response.success) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Deactivated!',
-                                    text: response.message,
-                                    timer: 2000,
-                                    showConfirmButton: false
-                                }).then(() => {
-                                    location.reload();
-                                });
-                            } else {
-                                Swal.fire('Error', response.message, 'error');
-                            }
-                        })
-                        .fail(function () {
-                            Swal.fire('Error', 'An error occurred', 'error');
-                        });
-                }
-            });
+            Swal.fire({ title: 'Deactivate Course?', text: 'This course will not be available.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ffc107', confirmButtonText: '<i class="ti ti-ban"></i> Yes, deactivate' })
+            .then((r) => { if (r.isConfirmed) { $.post('@Url.Action("Deactivate")', { id: id }).done((res) => { if (res.success) { Swal.fire({ icon: 'success', title: 'Deactivated!', timer: 2000, showConfirmButton: false }).then(() => location.reload()); } else { Swal.fire('Error', res.message, 'error'); } }); } });
         }
 
         function deleteCourse(id) {
-            Swal.fire({
-                title: 'Delete Course?',
-                text: 'This will permanently delete this course and all associated data.',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#dc3545',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Yes, delete',
-                cancelButtonText: 'Cancel'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.post('@Url.Action("Delete")', { id: id })
-                        .done(function (response) {
-                            if (response.success) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Deleted!',
-                                    text: response.message,
-                                    timer: 2000,
-                                    showConfirmButton: false
-                                }).then(() => {
-                                    window.location.href = '@Url.Action("Index")';
-                                });
-                            } else {
-                                Swal.fire('Error', response.message, 'error');
-                            }
-                        })
-                        .fail(function () {
-                            Swal.fire('Error', 'An error occurred', 'error');
-                        });
-                }
-            });
+            Swal.fire({ title: 'Delete Course?', text: 'This will permanently delete this course.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#dc3545', confirmButtonText: '<i class="ti ti-trash"></i> Yes, delete' })
+            .then((r) => { if (r.isConfirmed) { $.post('@Url.Action("Delete")', { id: id }).done((res) => { if (res.success) { Swal.fire({ icon: 'success', title: 'Deleted!', timer: 2000, showConfirmButton: false }).then(() => window.location.href = '@Url.Action("Index")'); } else { Swal.fire('Error', res.message, 'error'); } }); } });
         }
     </script>
 }

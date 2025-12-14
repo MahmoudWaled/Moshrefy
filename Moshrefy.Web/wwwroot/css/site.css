@@ -7,24 +7,38 @@
    ======================================== */
 :root {
   /* Role Colors */
-  --color-role-superadmin: #8b0000;    /* Dark Red */
-  --color-role-admin: #ff4500;         /* Orange Red */
-  --color-role-manager: #ffa500;       /* Orange */
-  --color-role-employee: #32cd32;      /* Lime Green */
-  --color-role-teacher: #4169e1;       /* Royal Blue */
-  --color-role-student: #9370db;       /* Medium Purple */
+  --color-role-superadmin: #8b0000;
+  --color-role-superadmin-hover: #6b0000;
+  --color-role-admin: #00897B;
+  --color-role-admin-hover: #00796b;
+  --color-role-manager: #1565C0;
+  --color-role-manager-hover: #0d47a1;
+  --color-role-employee: #78909C;
+  --color-role-employee-hover: #607d8b;
+  --color-role-teacher: #a7c520;
+  --color-role-teacher-hover: #8ba61a;
+  --color-role-student: #70a0db;
+  --color-role-student-hover: #5a8bc6;
 
   /* Action Colors */
-  --color-action-create: #28a745;      /* Green */
-  --color-action-view: #17a2b8;        /* Cyan */
-  --color-action-edit: #ffc107;        /* Yellow */
-  --color-action-delete: #dc3545;      /* Red */
+  --color-action-create: #2E7D32;
+  --color-action-create-hover: #256b29;
+  --color-action-view: #17a2b8;
+  --color-action-view-hover: #138496;
+  --color-action-edit: #ffc107;
+  --color-action-edit-hover: #e0a800;
+  --color-action-delete: #D32F2F;
+  --color-action-delete-hover: #b52828;
 
   /* State Colors */
-  --color-state-active: #28a745;       /* Green */
-  --color-state-inactive: #6c757d;     /* Gray */
-  --color-state-pending: #ffc107;      /* Yellow */
-  --color-state-completed: #17a2b8;    /* Cyan */
+  --color-state-active: #4CAF50;
+  --color-state-active-hover: #3d8b40;
+  --color-state-inactive: #616161;
+  --color-state-inactive-hover: #515151;
+  --color-state-pending: #26A69A;
+  --color-state-pending-hover: #1e8a80;
+  --color-state-completed: #3949AB;
+  --color-state-completed-hover: #303f9f;
 }
 
 /* ========================================
@@ -72,8 +86,8 @@
 
 .btn-action-create:hover,
 .btn.btn-action-create:hover {
-  background-color: #218838 !important;
-  border-color: #1e7e34 !important;
+  background-color: var(--color-action-create-hover) !important;
+  border-color: var(--color-action-create-hover) !important;
 }
 
 .btn-action-view,
@@ -85,8 +99,8 @@
 
 .btn-action-view:hover,
 .btn.btn-action-view:hover {
-  background-color: #138496 !important;
-  border-color: #117a8b !important;
+  background-color: var(--color-action-view-hover) !important;
+  border-color: var(--color-action-view-hover) !important;
 }
 
 .btn-action-edit,
@@ -98,8 +112,8 @@
 
 .btn-action-edit:hover,
 .btn.btn-action-edit:hover {
-  background-color: #e0a800 !important;
-  border-color: #d39e00 !important;
+  background-color: var(--color-action-edit-hover) !important;
+  border-color: var(--color-action-edit-hover) !important;
 }
 
 .btn-action-delete,
@@ -111,8 +125,8 @@
 
 .btn-action-delete:hover,
 .btn.btn-action-delete:hover {
-  background-color: #c82333 !important;
-  border-color: #bd2130 !important;
+  background-color: var(--color-action-delete-hover) !important;
+  border-color: var(--color-action-delete-hover) !important;
 }
 
 /* ========================================
@@ -130,7 +144,7 @@
 
 .badge.bg-state-pending {
   background-color: var(--color-state-pending) !important;
-  color: #212529 !important;
+  color: white !important;
 }
 
 .badge.bg-state-completed {
@@ -403,4 +417,106 @@ table.dataTable tbody tr .badge {
 .badge[class*="bg-action-"] {
   font-weight: 500;
   letter-spacing: 0.02em;
+}
+
+/* ========================================
+   11. STATE CHANGE BUTTONS
+   ======================================== */
+
+/* Activate Button - Green */
+.btn-state-active,
+.btn.btn-state-active {
+  background-color: var(--color-state-active) !important;
+  border-color: var(--color-state-active) !important;
+  color: white !important;
+}
+
+.btn-state-active:hover,
+.btn.btn-state-active:hover {
+  background-color: var(--color-state-active-hover) !important;
+  border-color: var(--color-state-active-hover) !important;
+}
+
+/* Deactivate Button - Gray */
+.btn-state-deactive,
+.btn.btn-state-deactive {
+  background-color: var(--color-state-inactive) !important;
+  border-color: var(--color-state-inactive) !important;
+  color: white !important;
+}
+
+.btn-state-deactive:hover,
+.btn.btn-state-deactive:hover {
+  background-color: var(--color-state-inactive-hover) !important;
+  border-color: var(--color-state-inactive-hover) !important;
+}
+
+/* Restore Button - Cyan */
+.btn-state-restore,
+.btn.btn-state-restore {
+  background-color: var(--color-state-completed) !important;
+  border-color: var(--color-state-completed) !important;
+  color: white !important;
+}
+
+.btn-state-restore:hover,
+.btn.btn-state-restore:hover {
+  background-color: var(--color-state-completed-hover) !important;
+  border-color: var(--color-state-completed-hover) !important;
+}
+
+/* ========================================
+   12. ROLE BUTTONS
+   ======================================== */
+
+.btn-role-superadmin,
+.btn.btn-role-superadmin {
+  background-color: var(--color-role-superadmin) !important;
+  border-color: var(--color-role-superadmin) !important;
+  color: white !important;
+}
+
+.btn-role-superadmin:hover,
+.btn.btn-role-superadmin:hover {
+  background-color: var(--color-role-superadmin-hover) !important;
+  border-color: var(--color-role-superadmin-hover) !important;
+}
+
+.btn-role-admin,
+.btn.btn-role-admin {
+  background-color: var(--color-role-admin) !important;
+  border-color: var(--color-role-admin) !important;
+  color: white !important;
+}
+
+.btn-role-admin:hover,
+.btn.btn-role-admin:hover {
+  background-color: var(--color-role-admin-hover) !important;
+  border-color: var(--color-role-admin-hover) !important;
+}
+
+.btn-role-manager,
+.btn.btn-role-manager {
+  background-color: var(--color-role-manager) !important;
+  border-color: var(--color-role-manager) !important;
+  color: white !important;
+}
+
+.btn-role-manager:hover,
+.btn.btn-role-manager:hover {
+  background-color: var(--color-role-manager-hover) !important;
+  border-color: var(--color-role-manager-hover) !important;
+}
+
+.btn-role-employee,
+.btn.btn-role-employee {
+  background-color: var(--color-role-employee) !important;
+  border-color: var(--color-role-employee) !important;
+  color: white !important;
+}
+
+.btn-role-employee:hover,
+.btn.btn-role-employee:hover {
+  background-color: var(--color-role-employee-hover) !important;
+  border-color: var(--color-role-employee-hover) !important;
 }
