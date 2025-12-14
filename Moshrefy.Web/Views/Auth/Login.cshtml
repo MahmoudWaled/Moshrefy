@@ -1,78 +1,68 @@
 ﻿@model Moshrefy.Web.Models.LoginVM
+
 @{
     ViewData["Title"] = "Login";
-    Layout = "~/Views/Shared/_AuthLayout.cshtml";
+    Layout = "_AuthLayout";
 }
 
-<div class="login-box">
-    <div class="login-logo">
-        <p><b>Moshrefy</b></p>
-    </div>
-    <!-- /.login-logo -->
-    <div class="card">
-        <div class="card-body login-card-body">
-            <p class="login-box-msg">Sign in to start your session</p>
-
-            @if (TempData["SuccessMessage"] != null)
-            {
-                <div class="alert alert-success alert-dismissible">
-                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                    @TempData["SuccessMessage"]
-                </div>
-            }
-
-            <form asp-action="Login" asp-controller="Auth" method="post">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-                <div class="input-group mb-3">
-                    <input asp-for="UserName" type="text" class="form-control" placeholder="Username">
-                    <div class="input-group-append">
-                        <div class="input-group-text">
-                            <span class="fas fa-user"></span>
-                        </div>
-                    </div>
-                </div>
-                <span asp-validation-for="UserName" class="text-danger"></span>
-
-                <div class="input-group mb-3">
-                    <input asp-for="Password" type="password" class="form-control" placeholder="Password">
-                    <div class="input-group-append">
-                        <div class="input-group-text">
-                            <span class="fas fa-lock"></span>
-                        </div>
-                    </div>
-                </div>
-                <span asp-validation-for="Password" class="text-danger"></span>
-
-                <div class="row">
-                    <div class="col-8">
-                        <div class="icheck-primary">
-                            <input type="checkbox" id="remember">
-                            <label for="remember">
-                                Remember Me
-                            </label>
-                        </div>
-                    </div>
-                    <!-- /.col -->
-                    <div class="col-4">
-                        <button type="submit" class="btn btn-primary btn-block">Sign In</button>
-                    </div>
-                    <!-- /.col -->
-                </div>
-            </form>
-
-            <p class="mb-1">
-                <a asp-action="ForgotPassword" asp-controller="Auth">I forgot my password</a>
-            </p>
-            <p class="mb-0">
-                <a asp-action="Register" asp-controller="Auth" class="text-center">Register a new membership</a>
-            </p>
-        </div>
-        <!-- /.login-card-body -->
-    </div>
+<div class="text-center mb-4">
+  <a href="." class="navbar-brand navbar-brand-autodark">
+    <h1 class="mb-0">Moshrefy</h1>
+  </a>
 </div>
-<!-- /.login-box -->
+
+<div class="card card-md">
+  <div class="card-body">
+    <h2 class="h2 text-center mb-4">Login to your account</h2>
+    
+    @if (ViewData["ErrorMessage"] != null)
+    {
+      <div class="alert alert-danger alert-dismissible" role="alert">
+        <div class="d-flex">
+          <div>
+            <i class="ti ti-alert-circle icon alert-icon"></i>
+          </div>
+          <div>
+            <h4 class="alert-title">Login Failed</h4>
+            <div class="text-muted">@ViewData["ErrorMessage"]</div>
+          </div>
+        </div>
+        <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
+      </div>
+    }
+    
+    <form asp-action="Login" asp-controller="Auth" method="post">
+      <div class="mb-3">
+        <label class="form-label" asp-for="UserName">Username</label>
+        <input type="text" class="form-control" asp-for="UserName" placeholder="Enter username" autocomplete="username" required>
+        <span asp-validation-for="UserName" class="text-danger"></span>
+      </div>
+      
+      <div class="mb-3">
+        <label class="form-label" asp-for="Password">
+          Password
+          @* <span class="form-label-description">
+            <a href="./forgot-password.html">I forgot password</a>
+          </span> *@
+        </label>
+        <input type="password" class="form-control" asp-for="Password" placeholder="Enter password" autocomplete="current-password" required>
+        <span asp-validation-for="Password" class="text-danger"></span>
+      </div>
+      
+      <div class="form-footer">
+        <button type="submit" class="btn btn-primary w-100">
+          <i class="ti ti-login icon"></i>
+          Sign in
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="text-center text-muted mt-3">
+  <small>&copy; 2024-2025 Moshrefy. All rights reserved.</small>
+</div>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+  <partial name="_ValidationScriptsPartial" />
 }

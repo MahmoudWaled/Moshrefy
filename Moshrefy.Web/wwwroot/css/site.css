@@ -1,768 +1,406 @@
-/* ===================================
-   MOSHREFY COLOR PALETTE SYSTEM
-   Consistent colors for roles, actions, and states
-   ================================== */
+/* ========================================
+   MOSHREFY CUSTOM COLOR PALETTE
+   ======================================== */
 
+/* ========================================
+   1. CSS VARIABLES - Color Definitions
+   ======================================== */
 :root {
-    /* ========== ROLE COLORS ========== */
-    --role-superadmin: #4A148C;      /* Deep Purple */
-    --role-superadmin-dark: #38106b;
-    --role-admin: #00897B;           /* Teal */
-    --role-admin-dark: #00695c;
-    --role-manager: #1565C0;         /* Blue */
-    --role-manager-dark: #0d47a1;
-    --role-employee: #78909C;        /* Blue Grey */
-    --role-employee-dark: #546e7a;
+  /* Role Colors */
+  --color-role-superadmin: #8b0000;    /* Dark Red */
+  --color-role-admin: #ff4500;         /* Orange Red */
+  --color-role-manager: #ffa500;       /* Orange */
+  --color-role-employee: #32cd32;      /* Lime Green */
+  --color-role-teacher: #4169e1;       /* Royal Blue */
+  --color-role-student: #9370db;       /* Medium Purple */
 
-    /* ========== ACTION COLORS (CRUD) ========== */
-    --action-create: #2E7D32;        /* Green */
-    --action-create-dark: #1b5e20;
-    --action-edit: #F57C00;          /* Orange */
-    --action-edit-dark: #e65100;
-    --action-delete: #D32F2F;        /* Red */
-    --action-delete-dark: #b71c1c;
-    --action-view: #039BE5;          /* Light Blue */
-    --action-view-dark: #0277bd;
+  /* Action Colors */
+  --color-action-create: #28a745;      /* Green */
+  --color-action-view: #17a2b8;        /* Cyan */
+  --color-action-edit: #ffc107;        /* Yellow */
+  --color-action-delete: #dc3545;      /* Red */
 
-    /* ========== STATE COLORS ========== */
-    --state-active: #4CAF50;         /* Green */
-    --state-active-dark: #388e3c;
-    --state-deactive: #616161;       /* Grey */
-    --state-deactive-dark: #424242;
-    --state-restore: #26A69A;        /* Teal */
-    --state-restore-dark: #00897b;
-    --state-change-role: #3949AB;    /* Indigo */
-    --state-change-role-dark: #283593;
+  /* State Colors */
+  --color-state-active: #28a745;       /* Green */
+  --color-state-inactive: #6c757d;     /* Gray */
+  --color-state-pending: #ffc107;      /* Yellow */
+  --color-state-completed: #17a2b8;    /* Cyan */
 }
 
 /* ========================================
-   ROLE BUTTONS
-   Used for: Role-specific actions (Create Admin, etc.)
+   2. ROLE BADGES
    ======================================== */
-
-.btn-role-superadmin {
-    background-color: var(--role-superadmin) !important;
-    border-color: var(--role-superadmin) !important;
-    color: white !important;
+.badge.bg-role-superadmin {
+  background-color: var(--color-role-superadmin) !important;
+  color: white !important;
 }
 
-.btn-role-superadmin:hover {
-    background-color: var(--role-superadmin-dark) !important;
-    border-color: var(--role-superadmin-dark) !important;
+.badge.bg-role-admin {
+  background-color: var(--color-role-admin) !important;
+  color: white !important;
 }
 
-.btn-role-admin {
-    background-color: var(--role-admin) !important;
-    border-color: var(--role-admin) !important;
-    color: white !important;
+.badge.bg-role-manager {
+  background-color: var(--color-role-manager) !important;
+  color: white !important;
 }
 
-.btn-role-admin:hover {
-    background-color: var(--role-admin-dark) !important;
-    border-color: var(--role-admin-dark) !important;
+.badge.bg-role-employee {
+  background-color: var(--color-role-employee) !important;
+  color: white !important;
 }
 
-.btn-role-manager {
-    background-color: var(--role-manager) !important;
-    border-color: var(--role-manager) !important;
-    color: white !important;
+.badge.bg-role-teacher {
+  background-color: var(--color-role-teacher) !important;
+  color: white !important;
 }
 
-.btn-role-manager:hover {
-    background-color: var(--role-manager-dark) !important;
-    border-color: var(--role-manager-dark) !important;
-}
-
-.btn-role-employee {
-    background-color: var(--role-employee) !important;
-    border-color: var(--role-employee) !important;
-    color: white !important;
-}
-
-.btn-role-employee:hover {
-    background-color: var(--role-employee-dark) !important;
-    border-color: var(--role-employee-dark) !important;
+.badge.bg-role-student {
+  background-color: var(--color-role-student) !important;
+  color: white !important;
 }
 
 /* ========================================
-   ACTION BUTTONS (CRUD)
-   Used for: Create, Edit, Delete, View actions
+   3. ACTION BUTTONS
    ======================================== */
-
-.btn-action-create {
-    background-color: var(--action-create) !important;
-    border-color: var(--action-create) !important;
-    color: white !important;
+.btn-action-create,
+.btn.btn-action-create {
+  background-color: var(--color-action-create) !important;
+  border-color: var(--color-action-create) !important;
+  color: white !important;
 }
 
-.btn-action-create:hover {
-    background-color: var(--action-create-dark) !important;
-    border-color: var(--action-create-dark) !important;
+.btn-action-create:hover,
+.btn.btn-action-create:hover {
+  background-color: #218838 !important;
+  border-color: #1e7e34 !important;
 }
 
-.btn-action-edit {
-    background-color: var(--action-edit) !important;
-    border-color: var(--action-edit) !important;
-    color: white !important;
+.btn-action-view,
+.btn.btn-action-view {
+  background-color: var(--color-action-view) !important;
+  border-color: var(--color-action-view) !important;
+  color: white !important;
 }
 
-.btn-action-edit:hover {
-    background-color: var(--action-edit-dark) !important;
-    border-color: var(--action-edit-dark) !important;
+.btn-action-view:hover,
+.btn.btn-action-view:hover {
+  background-color: #138496 !important;
+  border-color: #117a8b !important;
 }
 
-.btn-action-delete {
-    background-color: var(--action-delete) !important;
-    border-color: var(--action-delete) !important;
-    color: white !important;
+.btn-action-edit,
+.btn.btn-action-edit {
+  background-color: var(--color-action-edit) !important;
+  border-color: var(--color-action-edit) !important;
+  color: #212529 !important;
 }
 
-.btn-action-delete:hover {
-    background-color: var(--action-delete-dark) !important;
-    border-color: var(--action-delete-dark) !important;
+.btn-action-edit:hover,
+.btn.btn-action-edit:hover {
+  background-color: #e0a800 !important;
+  border-color: #d39e00 !important;
 }
 
-.btn-action-view {
-    background-color: var(--action-view) !important;
-    border-color: var(--action-view) !important;
-    color: white !important;
+.btn-action-delete,
+.btn.btn-action-delete {
+  background-color: var(--color-action-delete) !important;
+  border-color: var(--color-action-delete) !important;
+  color: white !important;
 }
 
-.btn-action-view:hover {
-    background-color: var(--action-view-dark) !important;
-    border-color: var(--action-view-dark) !important;
+.btn-action-delete:hover,
+.btn.btn-action-delete:hover {
+  background-color: #c82333 !important;
+  border-color: #bd2130 !important;
 }
 
 /* ========================================
-   STATE BUTTONS
-   Used for: Active, Deactive, Restore, Change Role
+   4. STATE BADGES
    ======================================== */
-
-.btn-state-active {
-    background-color: var(--state-active) !important;
-    border-color: var(--state-active) !important;
-    color: white !important;
+.badge.bg-state-active {
+  background-color: var(--color-state-active) !important;
+  color: white !important;
 }
 
-.btn-state-active:hover {
-    background-color: var(--state-active-dark) !important;
-    border-color: var(--state-active-dark) !important;
+.badge.bg-state-inactive {
+  background-color: var(--color-state-inactive) !important;
+  color: white !important;
 }
 
-.btn-state-deactive {
-    background-color: var(--state-deactive) !important;
-    border-color: var(--state-deactive) !important;
-    color: white !important;
+.badge.bg-state-pending {
+  background-color: var(--color-state-pending) !important;
+  color: #212529 !important;
 }
 
-.btn-state-deactive:hover {
-    background-color: var(--state-deactive-dark) !important;
-    border-color: var(--state-deactive-dark) !important;
-}
-
-.btn-state-restore {
-    background-color: var(--state-restore) !important;
-    border-color: var(--state-restore) !important;
-    color: white !important;
-}
-
-.btn-state-restore:hover {
-    background-color: var(--state-restore-dark) !important;
-    border-color: var(--state-restore-dark) !important;
-}
-
-.btn-state-change-role {
-    background-color: var(--state-change-role) !important;
-    border-color: var(--state-change-role) !important;
-    color: white !important;
-}
-
-.btn-state-change-role:hover {
-    background-color: var(--state-change-role-dark) !important;
-    border-color: var(--state-change-role-dark) !important;
+.badge.bg-state-completed {
+  background-color: var(--color-state-completed) !important;
+  color: white !important;
 }
 
 /* ========================================
-   ROLE BADGES
-   Used for: Displaying user roles in tables and cards
+   5. PROGRESS BARS (for role distribution)
    ======================================== */
-
-.badge-role-superadmin {
-    background-color: var(--role-superadmin) !important;
-    color: white !important;
+.progress-bar.bg-role-superadmin {
+  background-color: var(--color-role-superadmin) !important;
 }
 
-.badge-role-admin {
-    background-color: var(--role-admin) !important;
-    color: white !important;
+.progress-bar.bg-role-admin {
+  background-color: var(--color-role-admin) !important;
 }
 
-.badge-role-manager {
-    background-color: var(--role-manager) !important;
-    color: white !important;
+.progress-bar.bg-role-manager {
+  background-color: var(--color-role-manager) !important;
 }
 
-.badge-role-employee {
-    background-color: var(--role-employee) !important;
-    color: white !important;
+.progress-bar.bg-role-employee {
+  background-color: var(--color-role-employee) !important;
+}
+
+.progress-bar.bg-role-teacher {
+  background-color: var(--color-role-teacher) !important;
+}
+
+.progress-bar.bg-role-student {
+  background-color: var(--color-role-student) !important;
 }
 
 /* ========================================
-   STATE BADGES
-   Used for: Active/Inactive/Deleted status indicators
+   6. TABLER COMPATIBILITY STYLES
    ======================================== */
 
-.badge-state-active {
-    background-color: var(--state-active) !important;
-    color: white !important;
+/* Ensure custom button colors work with Tabler's button structure */
+.btn-group .btn-action-create,
+.btn-group .btn-action-view,
+.btn-group .btn-action-edit,
+.btn-group .btn-action-delete {
+  border-radius: 0;
 }
 
-.badge-state-deactive {
-    background-color: var(--state-deactive) !important;
-    color: white !important;
+.btn-group .btn-action-create:first-child {
+  border-top-left-radius: 0.25rem;
+  border-bottom-left-radius: 0.25rem;
 }
 
-.badge-state-deleted {
-    background-color: var(--action-delete) !important;
-    color: white !important;
+.btn-group .btn-action-delete:last-child {
+  border-top-right-radius: 0.25rem;
+  border-bottom-right-radius: 0.25rem;
 }
 
-.badge-state-normal {
-    background-color: var(--action-view) !important;
-    color: white !important;
+/* Avatar backgrounds for role colors */
+.avatar.bg-role-superadmin {
+  background-color: var(--color-role-superadmin) !important;
 }
 
-
-/* ===================================
-   COMPLETE SIDEBAR FIX - Replace all existing sidebar CSS
-   ================================== */
-
-/* Base sidebar */
-.main-sidebar {
-    position: fixed !important;
-    top: 0;
-    left: 0;
-    height: 100vh !important;
-    z-index: 1040;
-    transition: width 0.3s ease-in-out !important;
-    overflow: visible !important;
+.avatar.bg-role-admin {
+  background-color: var(--color-role-admin) !important;
 }
 
-    .main-sidebar .brand-link {
-        transition: width 0.3s ease-in-out !important;
-        width: 250px;
-    }
-
-    .main-sidebar .sidebar {
-        height: calc(100vh - 57px) !important;
-        overflow-y: auto !important;
-        overflow-x: hidden !important;
-        transition: width 0.3s ease-in-out !important;
-    }
-
-/* COLLAPSED STATE */
-body.sidebar-mini.sidebar-collapse .main-sidebar {
-    width: 4.6rem !important;
+.avatar.bg-role-manager {
+  background-color: var(--color-role-manager) !important;
 }
 
-    body.sidebar-mini.sidebar-collapse .main-sidebar .brand-link {
-        width: 4.6rem !important;
-    }
-
-    body.sidebar-mini.sidebar-collapse .main-sidebar .sidebar {
-        width: 4.6rem !important;
-    }
-
-    /* Hide text when collapsed */
-    body.sidebar-mini.sidebar-collapse .main-sidebar .nav-link > p,
-    body.sidebar-mini.sidebar-collapse .main-sidebar .brand-text {
-        opacity: 0 !important;
-        visibility: hidden !important;
-        width: 0 !important;
-    }
-
-    /* IMPORTANT: Keep nav-header height but hide text */
-    body.sidebar-mini.sidebar-collapse .main-sidebar .nav-header {
-        visibility: hidden !important;
-        height: 30px !important;
-        min-height: 30px !important;
-        display: block !important;
-    }
-
-    /* HOVER EXPANSION */
-    body.sidebar-mini.sidebar-collapse .main-sidebar:hover {
-        width: 250px !important;
-    }
-
-        body.sidebar-mini.sidebar-collapse .main-sidebar:hover .brand-link {
-            width: 250px !important;
-        }
-
-        body.sidebar-mini.sidebar-collapse .main-sidebar:hover .sidebar {
-            width: 250px !important;
-        }
-
-        /* Show text on hover */
-        body.sidebar-mini.sidebar-collapse .main-sidebar:hover .nav-link > p,
-        body.sidebar-mini.sidebar-collapse .main-sidebar:hover .brand-text {
-            opacity: 1 !important;
-            visibility: visible !important;
-            width: auto !important;
-        }
-
-        body.sidebar-mini.sidebar-collapse .main-sidebar:hover .nav-header {
-            visibility: visible !important;
-        }
-
-/* Hover states */
-.main-sidebar .nav-sidebar .nav-link:hover {
-    background: rgba(255, 255, 255, 0.1) !important;
+.avatar.bg-role-employee {
+  background-color: var(--color-role-employee) !important;
 }
 
-/* Header z-index */
-.main-header {
-    position: fixed !important;
-    top: 0;
-    left: 0;
-    right: 0;
+.avatar.bg-role-teacher {
+  background-color: var(--color-role-teacher) !important;
 }
 
-
-/* ============================================
-   ERROR PAGES & ACCESS DENIED
-   Used in: Error pages and access denied screens
-   ============================================ */
-
-/* Full-height centered error page container */
-.error-page {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
+.avatar.bg-role-student {
+  background-color: var(--color-role-student) !important;
 }
 
-/* Error content wrapper with max-width constraint */
-.error-content-wrapper {
-    margin: 0 auto;
-    max-width: 600px;
-    padding: 20px;
+/* Card header colors for different sections */
+.card-header.bg-role-superadmin {
+  background-color: var(--color-role-superadmin) !important;
+  color: white !important;
 }
 
-/* Large error number/icon display */
-.error-number {
-    font-size: 120px;
-    font-weight: 700;
-    color: #dc3545;
+.card-header.bg-role-admin {
+  background-color: var(--color-role-admin) !important;
+  color: white !important;
 }
 
-/* Shake animation for error icon */
-.error-number i {
-    animation: shake 0.5s;
-    animation-iteration-count: 1;
+.card-header.bg-role-manager {
+  background-color: var(--color-role-manager) !important;
+  color: white !important;
 }
 
-@keyframes shake {
-    0% { transform: translate(1px, 1px) rotate(0deg); }
-    10% { transform: translate(-1px, -2px) rotate(-1deg); }
-    20% { transform: translate(-3px, 0px) rotate(1deg); }
-    30% { transform: translate(3px, 2px) rotate(0deg); }
-    40% { transform: translate(1px, -1px) rotate(1deg); }
-    50% { transform: translate(-1px, 2px) rotate(-1deg); }
-    60% { transform: translate(-3px, 1px) rotate(0deg); }
-    70% { transform: translate(3px, 1px) rotate(-1deg); }
-    80% { transform: translate(-1px, -1px) rotate(1deg); }
-    90% { transform: translate(1px, 2px) rotate(0deg); }
-    100% { transform: translate(1px, -2px) rotate(-1deg); }
+.card-header.bg-role-employee {
+  background-color: var(--color-role-employee) !important;
+  color: white !important;
 }
 
-/* Error page specific card styling */
-.error-page .card {
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    border: none;
+.card-header.bg-role-teacher {
+  background-color: var(--color-role-teacher) !important;
+  color: white !important;
 }
 
-/* Error page button styling */
-.error-page .btn {
-    padding: 10px 20px;
-    font-weight: 500;
+.card-header.bg-role-student {
+  background-color: var(--color-role-student) !important;
+  color: white !important;
 }
 
-/* Inline form display for error page actions */
-.error-page form.d-inline {
-    display: inline-block;
+/* Text colors for roles */
+.text-role-superadmin {
+  color: var(--color-role-superadmin) !important;
 }
 
-.error-page form.d-inline button {
-    margin: 0;
+.text-role-admin {
+  color: var(--color-role-admin) !important;
 }
 
-
-/* ============================================
-   DASHBOARD WIDGETS (SMALL BOXES)
-   Used in: Dashboard statistics cards and info boxes
-   ============================================ */
-
-/* Base small-box widget styling */
-.small-box {
-    border-radius: 0.25rem;
-    box-shadow: 0 0 1px rgba(0,0,0,.125), 0 1px 3px rgba(0,0,0,.2);
-    margin-bottom: 20px;
-    position: relative;
-    display: block;
-    min-height: 120px;
+.text-role-manager {
+  color: var(--color-role-manager) !important;
 }
 
-.small-box > .inner {
-    padding: 10px;
+.text-role-employee {
+  color: var(--color-role-employee) !important;
 }
 
-/* Large number display in widgets */
-.small-box h3 {
-    font-size: 2.2rem;
-    font-weight: bold;
-    margin: 0 0 10px;
-    padding: 0;
+.text-role-teacher {
+  color: var(--color-role-teacher) !important;
 }
 
-.small-box h4 {
-    font-size: 2rem;
-    margin: 0 0 10px;
+.text-role-student {
+  color: var(--color-role-student) !important;
 }
 
-.small-box p {
-    font-size: 1rem;
+/* Border colors for roles */
+.border-role-superadmin {
+  border-color: var(--color-role-superadmin) !important;
 }
 
-/* Admin dashboard variant */
-.small-box.admin-widget p {
-    font-size: 1.1rem;
-    font-weight: 500;
+.border-role-admin {
+  border-color: var(--color-role-admin) !important;
 }
 
-/* Widget footer link */
-.small-box > .small-box-footer {
-    position: relative;
-    text-align: center;
-    padding: 3px 0;
-    color: rgba(0,0,0,.8);
-    display: block;
-    z-index: 10;
-    background: rgba(0,0,0,.05);
-    text-decoration: none;
-    margin-top: 10px;
+.border-role-manager {
+  border-color: var(--color-role-manager) !important;
 }
 
-.small-box.admin-widget > .small-box-footer {
-    padding: 8px 0;
+.border-role-employee {
+  border-color: var(--color-role-employee) !important;
 }
 
-.small-box > .small-box-footer:hover {
-    color: #fff;
-    background: rgba(0,0,0,.1);
+.border-role-teacher {
+  border-color: var(--color-role-teacher) !important;
 }
 
-/* Background icon for widgets */
-.small-box .icon {
-    transition: all .3s linear;
-    position: absolute;
-    top: -10px;
-    right: 10px;
-    z-index: 0;
-    font-size: 70px;
-    color: rgba(0,0,0,.15);
+.border-role-student {
+  border-color: var(--color-role-student) !important;
 }
 
+/* ========================================
+   7. DATATABLES INTEGRATION
+   ======================================== */
 
-/* ============================================
-   CARDS
-   Used in: All card components across the application
-   ============================================ */
-
-.card {
-    box-shadow: 0 0 1px rgba(0,0,0,.125), 0 1px 3px rgba(0,0,0,.2);
-    margin-bottom: 1rem;
+/* Ensure action buttons work in DataTables */
+table.dataTable tbody tr .btn-action-create,
+table.dataTable tbody tr .btn-action-view,
+table.dataTable tbody tr .btn-action-edit,
+table.dataTable tbody tr .btn-action-delete {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
 }
 
-
-/* ============================================
-   DATATABLES STYLING
-   Used in: All DataTables instances (users, centers, etc.)
-   ============================================ */
-
-/* Base table styling */
-#usersTable,
-#inactiveUsersTable,
-#centersTable {
-    font-size: 0.9rem;
+/* Role badges in DataTables */
+table.dataTable tbody tr .badge {
+  font-size: 0.75rem;
+  padding: 0.25em 0.6em;
 }
 
-/* Table header styling */
-#usersTable thead th,
-#inactiveUsersTable thead th,
-#centersTable thead th {
-    font-weight: 600;
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    padding: 12px 8px;
-    white-space: nowrap;
+/* ========================================
+   8. UTILITY CLASSES
+   ======================================== */
+
+/* Background utilities for actions */
+.bg-action-create {
+  background-color: var(--color-action-create) !important;
+  color: white !important;
 }
 
-/* Table body cell styling */
-#usersTable tbody td,
-#inactiveUsersTable tbody td,
-#centersTable tbody td {
-    padding: 10px 8px;
-    vertical-align: middle !important;
+.bg-action-view {
+  background-color: var(--color-action-view) !important;
+  color: white !important;
 }
 
-/* Small text in table cells */
-#usersTable tbody td small,
-#centersTable tbody td small {
-    font-size: 0.85rem;
+.bg-action-edit {
+  background-color: var(--color-action-edit) !important;
+  color: #212529 !important;
 }
 
-/* Badge styling in tables */
-#usersTable .badge,
-#inactiveUsersTable .badge,
-#centersTable .badge {
-    font-size: 0.75rem;
-    font-weight: 500;
-    padding: 4px 8px;
-    white-space: nowrap;
+.bg-action-delete {
+  background-color: var(--color-action-delete) !important;
+  color: white !important;
 }
 
-/* Button group styling in tables */
-#usersTable .btn-group-sm .btn,
-#centersTable .btn-group-sm .btn {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.875rem;
+/* Text utilities for actions */
+.text-action-create {
+  color: var(--color-action-create) !important;
 }
 
-/* Row hover effect */
-#usersTable tbody tr:hover,
-#inactiveUsersTable tbody tr:hover,
-#centersTable tbody tr:hover {
-    background-color: #f8f9fa !important;
+.text-action-view {
+  color: var(--color-action-view) !important;
 }
 
-/* Inactive users table specific styling */
-#inactiveUsersTable tbody tr {
-    background-color: #fff3cd !important;
+.text-action-edit {
+  color: var(--color-action-edit) !important;
 }
 
-#inactiveUsersTable tbody tr:hover {
-    background-color: #ffe69c !important;
+.text-action-delete {
+  color: var(--color-action-delete) !important;
 }
 
-/* Centers table DataTables wrapper controls */
-#centersTable_wrapper .dataTables_length,
-#centersTable_wrapper .dataTables_filter,
-#centersTable_wrapper .dataTables_info,
-#centersTable_wrapper .dataTables_paginate {
-    font-size: 0.9rem;
-}
+/* ========================================
+   9. RESPONSIVE ADJUSTMENTS
+   ======================================== */
 
-/* Responsive table styling for mobile */
 @media (max-width: 768px) {
-    #usersTable,
-    #inactiveUsersTable,
-    #centersTable {
-        font-size: 0.85rem;
-    }
-
-    #usersTable thead th,
-    #inactiveUsersTable thead th,
-    #centersTable thead th {
-        font-size: 0.8rem;
-        padding: 8px 4px;
-    }
-
-    #usersTable tbody td,
-    #inactiveUsersTable tbody td,
-    #centersTable tbody td {
-        padding: 8px 4px;
-    }
+  .btn-action-create,
+  .btn-action-view,
+  .btn-action-edit,
+  .btn-action-delete {
+    font-size: 0.875rem;
+    padding: 0.375rem 0.75rem;
+  }
+  
+  .badge {
+    font-size: 0.75rem;
+  }
 }
 
-/* Button group shadow */
-.btn-group {
-    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+/* ========================================
+   10. ADDITIONAL TABLER OVERRIDES
+   ======================================== */
+
+/* Ensure our colors take precedence over Tabler defaults */
+.btn-primary.btn-action-create {
+  background-color: var(--color-action-create) !important;
+  border-color: var(--color-action-create) !important;
 }
 
-/* Table responsive container */
-.table-responsive {
-    border-radius: 0.25rem;
+.btn-info.btn-action-view {
+  background-color: var(--color-action-view) !important;
+  border-color: var(--color-action-view) !important;
 }
 
-
-/* ============================================
-   USER ROLE SELECTION & FORMS
-   Used in: Role selection forms and user management
-   ============================================ */
-
-/* Role selection radio buttons */
-.role-selection .custom-control-label {
-    cursor: pointer;
-    padding: 10px;
-    border-radius: 5px;
-    transition: background-color 0.2s;
+.btn-warning.btn-action-edit {
+  background-color: var(--color-action-edit) !important;
+  border-color: var(--color-action-edit) !important;
 }
 
-.role-selection .custom-control-label:hover {
-    background-color: #f8f9fa;
+.btn-danger.btn-action-delete {
+  background-color: var(--color-action-delete) !important;
+  border-color: var(--color-action-delete) !important;
 }
 
-.role-selection .custom-radio input:checked ~ .custom-control-label {
-    background-color: #e7f3ff;
-    font-weight: 500;
+/* Fix for Tabler's default badge styles */
+.badge[class*="bg-role-"],
+.badge[class*="bg-state-"],
+.badge[class*="bg-action-"] {
+  font-weight: 500;
+  letter-spacing: 0.02em;
 }
-
-/* Large badge for role display */
-.badge-lg {
-    font-size: 0.9rem;
-    padding: 6px 12px;
-}
-
-/* User profile image wrapper */
-.profile-user-img-wrapper {
-    margin-bottom: 20px;
-}
-
-/* User profile image placeholder */
-.profile-user-img {
-    width: 100px;
-    height: 100px;
-    background: #007bff;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 3rem;
-    margin: 0 auto 1rem;
-}
-
-/* User avatar fixed dimensions */
-.profile-avatar {
-    width: 100px;
-    height: 100px;
-}
-
-
-/* ============================================
-   SEARCH & FILTER COMPONENTS
-   Used in: Search forms and filter cards
-   ============================================ */
-
-/* Card with colored top border */
-.card-outline {
-    border-top: 3px solid;
-}
-
-.card-outline.card-info {
-    border-top-color: #17a2b8;
-}
-
-.card-outline.card-primary {
-    border-top-color: #007bff;
-}
-
-/* Role filter dropdown */
-.role-filter-select {
-    width: auto;
-}
-
-
-/* ============================================
-   FORM ELEMENTS
-   Used in: Forms across the application
-   ============================================ */
-
-/* Full-width select elements (for Select2) */
-.select-full-width {
-    width: 100%;
-}
-
-/* Vertically resizable textareas */
-.textarea-resizable {
-    resize: vertical;
-}
-
-/* Inline form display */
-.form-inline-display {
-    display: inline-block;
-}
-
-/* Hidden alert (toggled via JavaScript) */
-.alert-hidden {
-    display: none;
-}
-
-
-/* ============================================
-   PROGRESS BARS
-   Used in: Dashboard statistics and progress displays
-   ============================================ */
-
-.progress-bar-full {
-    width: 100%;
-}
-
-.progress-bar-empty {
-    width: 0%;
-}
-
-
-/* ============================================
-   LINKS & EXTERNAL REFERENCES
-   Used in: Links to external resources or center details
-   ============================================ */
-
-.external-link {
-    text-decoration: none;
-    cursor: pointer;
-}
-
-.external-link-icon {
-    font-size: 0.8em;
-}
-
-.center-details-link {
-    text-decoration: none;
-    cursor: pointer;
-}
-
-.center-details-icon {
-    font-size: 0.8em;
-}
-
-
-/* ============================================
-   UTILITY CLASSES
-   Used in: Quick styling utilities
-   ============================================ */
-
-/* Fixed dimensions */
-.w-100px {
-    width: 100px;
-}
-
-.h-100px {
-    height: 100px;
-}
-
-/* Max width constraint */
-.max-w-600 {
-    max-width: 600px;
-}
-
-/* Spacing utilities */
-.p-20 {
-    padding: 20px;
-}
-
-.m-auto {
-    margin: 0 auto;
-}
-

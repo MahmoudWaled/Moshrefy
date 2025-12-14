@@ -1,28 +1,27 @@
-﻿<!DOCTYPE html>
+﻿<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Moshrefy | @ViewData["Title"] </title>
-
-    <!-- Google Font: Source Sans Pro -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="~/../../plugins/fontawesome-free/css/all.min.css">
-    <!-- icheck bootstrap -->
-    <link rel="stylesheet" href="~/../../plugins/icheck-bootstrap/icheck-bootstrap.min.css">
-    <!-- Theme style -->
-    <link rel="stylesheet" href="~/../../dist/css/adminlte.min.css">
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+  <title>Moshrefy | @ViewData["Title"]</title>
+  
+  <!-- Tabler CSS -->
+  <link href="~/tabler/css/tabler.min.css" rel="stylesheet"/>
+  <!-- Tabler Icons -->
+    <link href="~/tabler/css/tabler-icons.min.css" rel="stylesheet"/>
+  <!-- Custom styles with color palette -->
+  <link href="~/css/site.css" rel="stylesheet"/>
 </head>
-<body class="hold-transition login-page">
-    @RenderBody()
-    <!-- jQuery -->
-    <script src="~/../../plugins/jquery/jquery.min.js"></script>
-    <!-- Bootstrap 4 -->
-    <script src="~/../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <!-- AdminLTE App -->
-    <script src="~/../../dist/js/adminlte.min.js"></script>
-    
-    @RenderSection("Scripts", required: false)
+<body class="d-flex flex-column">
+  <div class="page page-center">
+    <div class="container container-tight py-4">
+      @RenderBody()
+    </div>
+  </div>
+  
+  <!-- Tabler Core (includes Bootstrap) -->
+  <script src="~/tabler/js/tabler.min.js"></script>
+  @RenderSection("Scripts", required: false)
 </body>
 </html>
