@@ -40,7 +40,7 @@ namespace Moshrefy.Application.Services
             if (id <= 0)
                 throw new BadRequestException("Invalid course id.");
 
-            var course = await _unitOfWork.Courses.GetByIdAsync(id);
+            var course = await _unitOfWork.Courses.GetByIdWithAcademicYearAsync(id);
             if (course == null)
                 throw new NotFoundException<int>(nameof(Course), "id", id);
 

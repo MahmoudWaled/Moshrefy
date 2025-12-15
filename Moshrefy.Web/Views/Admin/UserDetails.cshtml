@@ -96,7 +96,7 @@
                         <div class="text-muted small">Current: <strong>@Model.RoleName</strong></div>
                       </div>
                     </div>
-                    <button class="btn btn-sm btn-purple" onclick="showChangeRoleModal()">
+                    <button class="btn btn-sm btn-purple" type="button" data-bs-toggle="modal" data-bs-target="#changeRoleModal">
                       <i class="ti ti-arrows-exchange"></i> Change Type
                     </button>
                   </div>
@@ -206,22 +206,70 @@
             'Manager': 'Senior team member with additional permissions.'
         };
 
-        var changeRoleModalEl = document.getElementById('changeRoleModal');
-        var changeRoleModal = changeRoleModalEl ? new bootstrap.Modal(changeRoleModalEl) : null;
+        // Initialize modal when document is ready
+        var changeRoleModal;
+        $(document).ready(function() {
+            var changeRoleModalEl = document.getElementById('changeRoleModal');
+            if (changeRoleModalEl) {
+                changeRoleModal = new bootstrap.Modal(changeRoleModalEl);
+            }
+        });
 
-        function showChangeRoleModal() { if (changeRoleModal) changeRoleModal.show(); }
+        function showChangeRoleModal() { 
+            if (changeRoleModal) {
+                changeRoleModal.show(); 
+            } else {
+                Swal.fire('Error', 'Could not open modal. Please refresh the page.', 'error');
+            }
+        }
 
         $('#newRoleSelect').change(function() {
             var r = $(this).val();
-            if (r && roleDescriptions[r]) { $('#roleDescriptionTextModal').text(roleDescriptions[r]); $('#roleDescriptionModal').slideDown(); }
-            else { $('#roleDescriptionModal').slideUp(); }
+            if (r && roleDescriptions[r]) { 
+                $('#roleDescriptionTextModal').text(roleDescriptions[r]); 
+                $('#roleDescriptionModal').slideDown(); 
+            }
+            else { 
+                $('#roleDescriptionModal').slideUp(); 
+            }
         });
 
         function changeRole() {
             var newRole = $('#newRoleSelect').val();
-            if (!newRole) { Swal.fire('Error', 'Please select a member type', 'error'); return; }
-            Swal.fire({ title: 'Change Type?', text: 'Change to ' + newRole + '?', icon: 'question', showCancelButton: true, confirmButtonColor: '#6f42c1', confirmButtonText: 'Yes, change' })
-            .then((r) => { if (r.isConfirmed) { $.post('@Url.Action("ChangeUserRole")', { id: '@Model.Id', newRole: newRole }).done((res) => { if (res.success) { if (changeRoleModal) changeRoleModal.hide(); Swal.fire({ icon: 'success', title: 'Success!', timer: 2000, showConfirmButton: false }).then(() => location.reload()); } else { Swal.fire('Error', res.message, 'error'); } }); } });
+            if (!newRole) { 
+                Swal.fire('Error', 'Please select a member type', 'error'); 
+                return; 
+            }
+            Swal.fire({ 
+                title: 'Change Type?', 
+                text: 'Change to ' + newRole + '?', 
+                icon: 'question', 
+                showCancelButton: true, 
+                confirmButtonColor: '#6f42c1', 
+                confirmButtonText: 'Yes, change' 
+            })
+            .then((r) => { 
+                if (r.isConfirmed) { 
+                    $.post('@Url.Action("ChangeUserRole")', { id: '@Model.Id', newRole: newRole })
+                    .done((res) => { 
+                        if (res.success) { 
+                            if (changeRoleModal) changeRoleModal.hide(); 
+                            Swal.fire({ 
+                                icon: 'success', 
+                                title: 'Success!', 
+                                text: res.message,
+                                timer: 2000, 
+                                showConfirmButton: false 
+                            }).then(() => location.reload()); 
+                        } else { 
+                            Swal.fire('Error', res.message, 'error'); 
+                        } 
+                    })
+                    .fail(function() {
+                        Swal.fire('Error', 'An error occurred while changing type.', 'error');
+                    }); 
+                } 
+            });
         }
 
         function activateMember() {
@@ -235,8 +283,43 @@
         }
 
         function removeMember() {
-            Swal.fire({ title: 'Remove Member?', text: 'You can restore them later.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#dc3545', confirmButtonText: '<i class="ti ti-trash"></i> Yes, remove' })
-            .then((r) => { if (r.isConfirmed) { $.post('@Url.Action("SoftDeleteUser")', { id: '@Model.Id' }).done((res) => { if (res.success) { Swal.fire({ icon: 'success', title: 'Removed!', timer: 2000, showConfirmButton: false }).then(() => window.location.href = '@Url.Action("Users")'); } }); } });
+            Swal.fire({
+                title: 'Remove Team Member?',
+                html: 'This action cannot be undone.<br><br>Type <strong>Delete</strong> to confirm:',
+                icon: 'warning',
+                input: 'text',
+                inputPlaceholder: 'Type Delete here',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="ti ti-trash"></i> Remove',
+                cancelButtonText: 'Cancel',
+                inputValidator: (value) => {
+                    if (value !== 'Delete') {
+                        return 'Please type "Delete" to confirm';
+                    }
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post('@Url.Action("SoftDeleteUser")', { id: '@Model.Id' })
+                        .done(function(response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Removed!',
+                                    text: response.message,
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                }).then(() => window.location.href = '@Url.Action("Users")');
+                            } else {
+                                Swal.fire('Error', response.message, 'error');
+                            }
+                        })
+                        .fail(function() {
+                            Swal.fire('Error', 'An error occurred', 'error');
+                        });
+                }
+            });
         }
     </script>
     <style>.bg-purple,.btn-purple{background-color:#6f42c1!important;color:white;}.btn-purple:hover{background-color:#5a32a3!important;}</style>

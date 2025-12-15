@@ -45,7 +45,6 @@
                     <th>#</th>
                     <th data-name="Name">Name</th>
                     <th data-name="UserName">Username</th>
-                    <th data-name="Email">Email</th>
                     <th data-name="PhoneNumber">Phone</th>
                     <th data-name="CenterName">Center</th>
                     <th data-name="RoleName">Role</th>
@@ -78,7 +77,6 @@
                     { data: null, orderable: false, searchable: false, className: 'text-center', render: function (d, t, r, m) { return '<span class="text-muted">' + (m.row + m.settings._iDisplayStart + 1) + '</span>'; } },
                     { data: 'name', name: 'Name', render: function (d) { return '<i class="ti ti-user text-warning me-1"></i> <strong>' + d + '</strong>'; } },
                     { data: 'userName', name: 'UserName', render: function (d) { return '<code>' + d + '</code>'; } },
-                    { data: 'email', name: 'Email', render: function (d) { return d ? '<a href="mailto:' + d + '">' + d + '</a>' : '<span class="text-muted">N/A</span>'; } },
                     { data: 'phoneNumber', name: 'PhoneNumber', render: function (d) { return d ? '<i class="ti ti-phone text-success me-1"></i>' + d : '<span class="text-muted">N/A</span>'; } },
                     { data: 'centerName', name: 'CenterName', render: function (d) { return d ? '<i class="ti ti-building text-info me-1"></i><small>' + d + '</small>' : '<span class="text-muted">N/A</span>'; } },
                     {

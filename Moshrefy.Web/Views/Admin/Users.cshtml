@@ -31,7 +31,18 @@
         <div class="card">
           <div class="card-header">
             <h3 class="card-title">Team Members</h3>
-            <div class="ms-auto">
+            <div class="ms-auto d-flex gap-3 align-items-center">
+              <!-- Role Type Filter Buttons -->
+              <div class="btn-group" role="group" aria-label="Role filter">
+                <button type="button" class="btn btn-outline-secondary btn-sm active" data-filter-role="all">All</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-filter-role="Employee">
+                  <i class="ti ti-user"></i> Employees
+                </button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-filter-role="Manager">
+                  <i class="ti ti-user-cog"></i> Managers
+                </button>
+              </div>
+              <!-- Status Filter -->
               <select id="filterStatus" class="form-select form-select-sm" style="width: auto;">
                 <option value="all">All Members</option>
                 <option value="active">Active Members</option>
@@ -66,6 +77,8 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
+            var currentRoleFilter = 'all';
+            
             var table = $('#usersTable').DataTable({
                 processing: true,
                 serverSide: true,
@@ -74,6 +87,7 @@
                     type: 'POST',
                     data: function (d) {
                         d.filterStatus = $('#filterStatus').val();
+                        d.filterRole = currentRoleFilter;
                     },
                     error: function (xhr, error, thrown) {
                         console.error('DataTable Error:', error, thrown);
@@ -147,7 +161,15 @@
                 }
             });
 
-            // Reload table when filter changes
+            // Role filter button click handler
+            $('[data-filter-role]').click(function() {
+                $('[data-filter-role]').removeClass('active');
+                $(this).addClass('active');
+                currentRoleFilter = $(this).data('filter-role');
+                table.ajax.reload();
+            });
+
+            // Reload table when status filter changes
             $('#filterStatus').change(function () {
                 table.ajax.reload();
             });
@@ -224,13 +246,20 @@
         function deleteUser(id) {
             Swal.fire({
                 title: 'Remove Team Member?',
-                text: 'This member will be deleted.',
+                html: 'This action cannot be undone.<br><br>Type <strong>Delete</strong> to confirm:',
                 icon: 'warning',
+                input: 'text',
+                inputPlaceholder: 'Type Delete here',
                 showCancelButton: true,
                 confirmButtonColor: '#dc3545',
                 cancelButtonColor: '#6c757d',
-                confirmButtonText: '<i class="ti ti-trash"></i> Yes, remove',
-                cancelButtonText: 'Cancel'
+                confirmButtonText: '<i class="ti ti-trash"></i> Remove',
+                cancelButtonText: 'Cancel',
+                inputValidator: (value) => {
+                    if (value !== 'Delete') {
+                        return 'Please type "Delete" to confirm';
+                    }
+                }
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.post('@Url.Action("SoftDeleteUser")', { id: id })
@@ -256,3 +285,4 @@
         }
     </script>
 }
+

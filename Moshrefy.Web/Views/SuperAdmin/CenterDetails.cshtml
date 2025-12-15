@@ -10,161 +10,204 @@
     <div class="row g-2 align-items-center">
       <div class="col">
         <div class="page-pretitle">Centers</div>
-        <h2 class="page-title"><i class="ti ti-building"></i> Center Details</h2>
+        <h2 class="page-title"><i class="ti ti-building"></i> @Model.Name</h2>
       </div>
       <div class="col-auto ms-auto">
-        <a asp-action="Centers" class="btn btn-secondary">
-          <i class="ti ti-arrow-left"></i> Back to List
+        <a asp-action="Centers" class="btn btn-outline-secondary">
+          <i class="ti ti-arrow-left"></i> Back to Centers
         </a>
       </div>
     </div>
   </div>
 </div>
 
+@Html.AntiForgeryToken()
+
 <!-- Page body -->
 <div class="page-body">
   <div class="container-xl">
-    <!-- Center Information Card -->
-    <div class="card">
-      <div class="card-header">
-        <h3 class="card-title"><i class="ti ti-building me-2"></i>@Model.Name</h3>
-        <div class="card-actions">
-          @if (Model.IsActive)
-          {
-            <span class="badge bg-state-active"><i class="ti ti-check"></i> Active</span>
-          }
-          else
-          {
-            <span class="badge bg-state-inactive"><i class="ti ti-x"></i> Inactive</span>
-          }
-        </div>
-      </div>
-      <div class="card-body">
-        <div class="row">
-          <div class="col-md-6">
-            <div class="datagrid">
-              <div class="datagrid-item">
-                <div class="datagrid-title"><i class="ti ti-id me-1"></i>ID</div>
-                <div class="datagrid-content">@Model.Id</div>
-              </div>
-              <div class="datagrid-item">
-                <div class="datagrid-title"><i class="ti ti-building me-1"></i>Name</div>
-                <div class="datagrid-content">@Model.Name</div>
-              </div>
-              <div class="datagrid-item">
-                <div class="datagrid-title"><i class="ti ti-phone me-1"></i>Phone</div>
-                <div class="datagrid-content">@Model.Phone</div>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="datagrid">
-              <div class="datagrid-item">
-                <div class="datagrid-title"><i class="ti ti-mail me-1"></i>Email</div>
-                <div class="datagrid-content">
-                  @if (!string.IsNullOrEmpty(Model.Email))
-                  {
-                    <a href="mailto:@Model.Email">@Model.Email</a>
-                  }
-                  else
-                  {
-                    <span class="text-muted">N/A</span>
-                  }
+    <div class="row">
+      <!-- Main Content -->
+      <div class="col-lg-8">
+        <!-- Status Banner -->
+        <div class="card mb-3 @(Model.IsActive ? "border-success" : "border-secondary")">
+          <div class="card-body py-3">
+            <div class="d-flex align-items-center">
+              @if (Model.IsActive)
+              {
+                <span class="avatar bg-state-active text-white me-3">
+                  <i class="ti ti-check"></i>
+                </span>
+                <div>
+                  <h3 class="mb-0 text-success">Active Center</h3>
+                  <small class="text-muted">This center is operational</small>
                 </div>
-              </div>
-              <div class="datagrid-item">
-                <div class="datagrid-title"><i class="ti ti-map-pin me-1"></i>Address</div>
-                <div class="datagrid-content">@Model.Address</div>
-              </div>
-              <div class="datagrid-item">
-                <div class="datagrid-title"><i class="ti ti-toggle-right me-1"></i>Status</div>
-                <div class="datagrid-content">
-                  @if (Model.IsActive){<span class="badge bg-state-active"><i class="ti ti-check"></i> Active</span>}
-                  else{<span class="badge bg-state-inactive"><i class="ti ti-x"></i> Inactive</span>}
+              }
+              else
+              {
+                <span class="avatar bg-state-inactive text-white me-3">
+                  <i class="ti ti-x"></i>
+                </span>
+                <div>
+                  <h3 class="mb-0 text-muted">Inactive Center</h3>
+                  <small class="text-muted">This center is not operational</small>
                 </div>
-              </div>
+              }
             </div>
           </div>
         </div>
-        @if (!string.IsNullOrEmpty(Model.Description))
-        {
-          <div class="mt-3">
-            <h4><i class="ti ti-file-text me-1"></i>Description</h4>
-            <p class="text-muted">@Model.Description</p>
-          </div>
-        }
-      </div>
-    </div>
 
-    <!-- Audit Information Card -->
-    <div class="card mt-3">
-      <div class="card-header">
-        <h3 class="card-title"><i class="ti ti-history me-2"></i>Audit Information</h3>
-      </div>
-      <div class="card-body">
-        <div class="row">
-          <div class="col-md-6">
-            <div class="card bg-azure-lt">
-              <div class="card-body">
-                <div class="d-flex align-items-center">
-                  <span class="avatar bg-azure text-white me-3"><i class="ti ti-user-plus"></i></span>
-                  <div>
-                    <strong>Created By</strong>
-                    <div>@Model.CreatedByName</div>
-                    <small class="text-muted"><i class="ti ti-clock me-1"></i>@Model.CreatedAt.ToLocalTime().ToString("MMM dd, yyyy 'at' hh:mm tt")</small>
-                  </div>
-                </div>
-              </div>
+        <!-- Center Information Card -->
+        <div class="card mb-3">
+          <div class="card-header">
+            <div class="d-flex align-items-center">
+              <span class="avatar bg-primary text-white me-3">
+                <i class="ti ti-building"></i>
+              </span>
+              <h3 class="card-title mb-0">Center Information</h3>
             </div>
           </div>
-          <div class="col-md-6">
-            @if (Model.ModifiedAt.HasValue && !string.IsNullOrEmpty(Model.ModifiedByName))
-            {
-              <div class="card bg-yellow-lt">
-                <div class="card-body">
-                  <div class="d-flex align-items-center">
-                    <span class="avatar bg-yellow text-white me-3"><i class="ti ti-user-edit"></i></span>
-                    <div>
-                      <strong>Last Modified By</strong>
-                      <div>@Model.ModifiedByName</div>
-                      <small class="text-muted"><i class="ti ti-clock me-1"></i>@Model.ModifiedAt.Value.ToLocalTime().ToString("MMM dd, yyyy 'at' hh:mm tt")</small>
-                    </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label text-muted small mb-1">
+                    <i class="ti ti-building me-1"></i> Center Name
+                  </label>
+                  <div class="h4 mb-0">@Model.Name</div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label text-muted small mb-1">
+                    <i class="ti ti-phone me-1"></i> Phone
+                  </label>
+                  <div class="h5 mb-0">@Model.Phone</div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label text-muted small mb-1">
+                    <i class="ti ti-mail me-1"></i> Email
+                  </label>
+                  <div>
+                    @if (!string.IsNullOrEmpty(Model.Email))
+                    {
+                      <a href="mailto:@Model.Email">@Model.Email</a>
+                    }
+                    else
+                    {
+                      <span class="text-muted">Not provided</span>
+                    }
                   </div>
                 </div>
               </div>
-            }
-            else
-            {
-              <div class="card bg-secondary-lt">
-                <div class="card-body">
-                  <div class="d-flex align-items-center">
-                    <span class="avatar bg-secondary text-white me-3"><i class="ti ti-user-edit"></i></span>
-                    <div>
-                      <strong>Last Modified</strong>
-                      <div>Never Modified</div>
-                      <small class="text-muted"><i class="ti ti-info-circle me-1"></i>No modifications yet</small>
-                    </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label text-muted small mb-1">
+                    <i class="ti ti-map-pin me-1"></i> Address
+                  </label>
+                  <div>@Model.Address</div>
+                </div>
+              </div>
+              @if (!string.IsNullOrEmpty(Model.Description))
+              {
+                <div class="col-12">
+                  <label class="form-label text-muted small mb-1">
+                    <i class="ti ti-file-text me-1"></i> Description
+                  </label>
+                  <p class="text-muted mb-0">@Model.Description</p>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Audit Trail Card -->
+        <div class="card">
+          <div class="card-header">
+            <div class="d-flex align-items-center">
+              <span class="avatar bg-secondary text-white me-3">
+                <i class="ti ti-history"></i>
+              </span>
+              <h3 class="card-title mb-0">Audit Trail</h3>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="d-flex align-items-start">
+                  <div class="avatar avatar-sm bg-green-lt text-green me-3">
+                    <i class="ti ti-plus"></i>
+                  </div>
+                  <div>
+                    <div class="text-muted small">Created By</div>
+                    <div class="fw-medium">@(Model.CreatedByName ?? "N/A")</div>
+                    <div class="text-muted small">@Model.CreatedAt.ToLocalTime().ToString("MMM dd, yyyy 'at' hh:mm tt")</div>
                   </div>
                 </div>
               </div>
-            }
+              @if (Model.ModifiedAt.HasValue && !string.IsNullOrEmpty(Model.ModifiedByName))
+              {
+                <div class="col-md-6">
+                  <div class="d-flex align-items-start">
+                    <div class="avatar avatar-sm bg-yellow-lt text-yellow me-3">
+                      <i class="ti ti-edit"></i>
+                    </div>
+                    <div>
+                      <div class="text-muted small">Last Modified By</div>
+                      <div class="fw-medium">@Model.ModifiedByName</div>
+                      <div class="text-muted small">@Model.ModifiedAt.Value.ToLocalTime().ToString("MMM dd, yyyy 'at' hh:mm tt")</div>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
           </div>
         </div>
       </div>
-      <div class="card-footer">
-        <div class="btn-list">
-          <a asp-action="CenterUsers" asp-route-centerId="@Model.Id" class="btn btn-action-view">
-            <i class="ti ti-users"></i> View Center Users
-          </a>
-          <a asp-action="EditCenter" asp-route-id="@Model.Id" class="btn btn-action-edit">
-            <i class="ti ti-edit"></i> Edit
-          </a>
-          <button onclick="softDeleteCenter()" class="btn btn-action-delete">
-            <i class="ti ti-trash"></i> Move to Trash
-          </button>
-          <button onclick="hardDeleteCenter()" class="btn btn-action-delete">
-            <i class="ti ti-trash-x"></i> Permanent Delete
-          </button>
+
+      <!-- Sidebar -->
+      <div class="col-lg-4">
+        <!-- Actions Card -->
+        <div class="card mb-3">
+          <div class="card-header">
+            <h3 class="card-title"><i class="ti ti-settings me-2"></i>Actions</h3>
+          </div>
+          <div class="card-body">
+            <div class="d-grid gap-2">
+              <a asp-action="CenterUsers" asp-route-centerId="@Model.Id" class="btn btn-action-view">
+                <i class="ti ti-users me-2"></i> View Center Users
+              </a>
+              <a asp-action="EditCenter" asp-route-id="@Model.Id" class="btn btn-action-edit">
+                <i class="ti ti-edit me-2"></i> Edit Center
+              </a>
+              <hr class="my-2">
+              <button onclick="softDeleteCenter()" class="btn btn-outline-warning">
+                <i class="ti ti-trash me-2"></i> Move to Trash
+              </button>
+              <button onclick="hardDeleteCenter()" class="btn btn-outline-danger">
+                <i class="ti ti-trash-x me-2"></i> Permanent Delete
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Warning Card -->
+        <div class="card bg-red-lt">
+          <div class="card-body">
+            <div class="d-flex">
+              <div>
+                <i class="ti ti-alert-triangle icon text-red me-2" style="font-size: 1.5rem;"></i>
+              </div>
+              <div>
+                <h4 class="text-red mb-1">Delete Warning</h4>
+                <p class="text-muted mb-0 small">
+                  Deleting this center will affect all associated users and data. This action requires confirmation.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -173,14 +216,82 @@
 
 @section Scripts {
     <script>
+        var token = $('input[name="__RequestVerificationToken"]').val();
+        
         function softDeleteCenter() {
-            Swal.fire({ title: 'Move to Trash?', html: '<strong>@Model.Name</strong> will be moved to trash.<br>You can restore it later.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#f39c12', confirmButtonText: '<i class="ti ti-trash"></i> Move to Trash' })
-            .then((r) => { if (r.isConfirmed) { $.post('@Url.Action("SoftDeleteCenter")', { id: @Model.Id }).done((res) => { if (res.success) { Swal.fire({ icon: 'success', title: 'Moved to Trash!', timer: 2000, showConfirmButton: false }).then(() => window.location.href = '@Url.Action("Centers")'); } else { Swal.fire('Error', res.message, 'error'); } }); } });
+            Swal.fire({ 
+                title: 'Move to Trash?', 
+                html: 'Move <strong>@Model.Name</strong> to trash.<br><br>Type <strong>Delete</strong> to confirm:', 
+                icon: 'warning', 
+                input: 'text',
+                inputPlaceholder: 'Type Delete here',
+                showCancelButton: true, 
+                confirmButtonColor: '#ffc107', 
+                confirmButtonText: '<i class="ti ti-trash"></i> Move to Trash',
+                inputValidator: (value) => {
+                    if (value !== 'Delete') {
+                        return 'Please type "Delete" to confirm';
+                    }
+                }
+            })
+            .then((r) => { 
+                if (r.isConfirmed) { 
+                    $.ajax({
+                        url: '@Url.Action("SoftDeleteCenter")',
+                        type: 'POST',
+                        data: { id: @Model.Id, __RequestVerificationToken: token },
+                        success: function(res) {
+                            if (res.success) { 
+                                Swal.fire({ icon: 'success', title: 'Moved to Trash!', text: res.message, timer: 2000, showConfirmButton: false })
+                                .then(() => window.location.href = '@Url.Action("Centers")'); 
+                            } else { 
+                                Swal.fire('Error', res.message || 'An error occurred', 'error'); 
+                            }
+                        },
+                        error: function() {
+                            Swal.fire('Error', 'Failed to move center to trash.', 'error');
+                        }
+                    }); 
+                } 
+            });
         }
 
         function hardDeleteCenter() {
-            Swal.fire({ title: 'PERMANENT DELETE', html: '<div class="alert alert-danger mb-2"><strong>DANGER!</strong> This cannot be undone!</div>Type <code>DELETE</code> to confirm:', input: 'text', inputPlaceholder: 'Type DELETE', icon: 'warning', showCancelButton: true, confirmButtonColor: '#dc3545', confirmButtonText: '<i class="ti ti-trash-x"></i> PERMANENTLY DELETE', preConfirm: (v) => { if (v !== 'DELETE') { Swal.showValidationMessage('You must type DELETE to confirm'); } } })
-            .then((r) => { if (r.isConfirmed) { $.post('@Url.Action("HardDeleteCenter")', { id: @Model.Id }).done((res) => { if (res.success) { Swal.fire({ icon: 'success', title: 'Deleted!', timer: 2000, showConfirmButton: false }).then(() => window.location.href = '@Url.Action("Centers")'); } else { Swal.fire('Error', res.message, 'error'); } }); } });
+            Swal.fire({ 
+                title: 'PERMANENT DELETE', 
+                html: '<div class="alert alert-danger mb-2"><strong>WARNING!</strong> This cannot be undone!</div>Delete <strong>@Model.Name</strong> forever?<br><br>Type <strong>Delete</strong> to confirm:', 
+                icon: 'error', 
+                input: 'text',
+                inputPlaceholder: 'Type Delete here',
+                showCancelButton: true, 
+                confirmButtonColor: '#dc3545', 
+                confirmButtonText: '<i class="ti ti-trash-x"></i> DELETE FOREVER',
+                inputValidator: (value) => {
+                    if (value !== 'Delete') {
+                        return 'Please type "Delete" to confirm';
+                    }
+                }
+            })
+            .then((r) => { 
+                if (r.isConfirmed) { 
+                    $.ajax({
+                        url: '@Url.Action("HardDeleteCenter")',
+                        type: 'POST',
+                        data: { id: @Model.Id, __RequestVerificationToken: token },
+                        success: function(res) {
+                            if (res.success) { 
+                                Swal.fire({ icon: 'success', title: 'Deleted!', text: res.message, timer: 2000, showConfirmButton: false })
+                                .then(() => window.location.href = '@Url.Action("Centers")'); 
+                            } else { 
+                                Swal.fire('Error', res.message || 'An error occurred', 'error'); 
+                            }
+                        },
+                        error: function() {
+                            Swal.fire('Error', 'Failed to delete center.', 'error');
+                        }
+                    }); 
+                } 
+            });
         }
     </script>
 }

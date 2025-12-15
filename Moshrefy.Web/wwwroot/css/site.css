@@ -39,6 +39,14 @@
   --color-state-pending-hover: #1e8a80;
   --color-state-completed: #3949AB;
   --color-state-completed-hover: #303f9f;
+  --color-state-normal: #0dcaf0;
+  --color-state-normal-hover: #0bb5d8;
+  --color-state-deleted: #dc3545;
+  --color-state-deleted-hover: #bb2d3b;
+  --color-state-deactive: #fd7e14;
+  --color-state-deactive-hover: #dc6c0d;
+  --color-state-restore: #20c997;
+  --color-state-restore-hover: #1aa87e;
 }
 
 /* ========================================
@@ -150,6 +158,67 @@
 .badge.bg-state-completed {
   background-color: var(--color-state-completed) !important;
   color: white !important;
+}
+
+.badge.bg-state-normal {
+  background-color: var(--color-state-normal) !important;
+  color: #212529 !important;
+}
+
+/* ========================================
+   4b. STATE ACTION BUTTONS
+   ======================================== */
+.btn-state-active,
+.btn.btn-state-active {
+  background-color: var(--color-state-active) !important;
+  border-color: var(--color-state-active) !important;
+  color: white !important;
+}
+
+.btn-state-active:hover,
+.btn.btn-state-active:hover {
+  background-color: var(--color-state-active-hover) !important;
+  border-color: var(--color-state-active-hover) !important;
+}
+
+.btn-state-deactive,
+.btn.btn-state-deactive {
+  background-color: var(--color-state-deactive) !important;
+  border-color: var(--color-state-deactive) !important;
+  color: white !important;
+}
+
+.btn-state-deactive:hover,
+.btn.btn-state-deactive:hover {
+  background-color: var(--color-state-deactive-hover) !important;
+  border-color: var(--color-state-deactive-hover) !important;
+}
+
+.btn-state-restore,
+.btn.btn-state-restore {
+  background-color: var(--color-state-restore) !important;
+  border-color: var(--color-state-restore) !important;
+  color: white !important;
+}
+
+.btn-state-restore:hover,
+.btn.btn-state-restore:hover {
+  background-color: var(--color-state-restore-hover) !important;
+  border-color: var(--color-state-restore-hover) !important;
+}
+
+/* Role-based buttons for actions */
+.btn-role-admin,
+.btn.btn-role-admin {
+  background-color: var(--color-role-admin) !important;
+  border-color: var(--color-role-admin) !important;
+  color: white !important;
+}
+
+.btn-role-admin:hover,
+.btn.btn-role-admin:hover {
+  background-color: var(--color-role-admin-hover) !important;
+  border-color: var(--color-role-admin-hover) !important;
 }
 
 /* ========================================

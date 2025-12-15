@@ -12,6 +12,11 @@
         <div class="page-pretitle">Centers</div>
         <h2 class="page-title"><i class="ti ti-edit"></i> Edit Center</h2>
       </div>
+      <div class="col-auto ms-auto">
+        <a asp-action="Centers" class="btn btn-outline-secondary">
+          <i class="ti ti-arrow-left"></i> Back to Centers
+        </a>
+      </div>
     </div>
   </div>
 </div>
@@ -19,84 +24,125 @@
 <!-- Page body -->
 <div class="page-body">
   <div class="container-xl">
-    <div class="card">
-      <div class="card-header">
-        <h3 class="card-title"><i class="ti ti-building me-2"></i>Update Center Information</h3>
-      </div>
-      <form asp-action="EditCenter" asp-route-id="@ViewContext.RouteData.Values["id"]" method="post" id="editCenterForm">
-        <div class="card-body">
-          <div class="row">
-            <div class="col-md-6">
-              <div class="mb-3">
-                <label class="form-label" asp-for="Name"><i class="ti ti-building text-primary me-1"></i>@Html.DisplayNameFor(m => m.Name)</label>
-                <div class="input-group">
-                  <span class="input-group-text"><i class="ti ti-building"></i></span>
-                  <input asp-for="Name" class="form-control" placeholder="Enter center name" />
+    <form asp-action="EditCenter" asp-route-id="@ViewBag.CenterId" method="post" id="editCenterForm">
+      <div class="row">
+        <!-- Main Form Column -->
+        <div class="col-lg-8">
+          <!-- Basic Information Card -->
+          <div class="card mb-3">
+            <div class="card-header">
+              <div class="d-flex align-items-center">
+                <span class="avatar bg-primary text-white me-3">
+                  <i class="ti ti-building"></i>
+                </span>
+                <div>
+                  <h3 class="card-title mb-0">Basic Information</h3>
+                  <small class="text-muted">Update center details</small>
                 </div>
-                <span asp-validation-for="Name" class="text-danger"></span>
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label" asp-for="Phone"><i class="ti ti-phone text-success me-1"></i>@Html.DisplayNameFor(m => m.Phone)</label>
-                <div class="input-group">
-                  <span class="input-group-text"><i class="ti ti-phone"></i></span>
-                  <input asp-for="Phone" class="form-control" placeholder="Enter phone number" />
-                </div>
-                <span asp-validation-for="Phone" class="text-danger"></span>
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label" asp-for="Address"><i class="ti ti-map-pin text-danger me-1"></i>@Html.DisplayNameFor(m => m.Address)</label>
-                <div class="input-group">
-                  <span class="input-group-text"><i class="ti ti-map-pin"></i></span>
-                  <input asp-for="Address" class="form-control" placeholder="Enter address" />
-                </div>
-                <span asp-validation-for="Address" class="text-danger"></span>
               </div>
             </div>
-
-            <div class="col-md-6">
-              <div class="mb-3">
-                <label class="form-label" asp-for="Email"><i class="ti ti-mail text-info me-1"></i>@Html.DisplayNameFor(m => m.Email)</label>
-                <div class="input-group">
-                  <span class="input-group-text"><i class="ti ti-mail"></i></span>
-                  <input asp-for="Email" class="form-control" placeholder="Enter email address" />
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-12 mb-3">
+                  <label class="form-label required" asp-for="Name">Center Name</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="ti ti-building"></i></span>
+                    <input asp-for="Name" class="form-control" placeholder="Enter center name" />
+                  </div>
+                  <span asp-validation-for="Name" class="text-danger small"></span>
                 </div>
-                <span asp-validation-for="Email" class="text-danger"></span>
-                <small class="form-hint">Optional</small>
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label" asp-for="Description"><i class="ti ti-file-text text-secondary me-1"></i>@Html.DisplayNameFor(m => m.Description)</label>
-                <div class="input-group">
-                  <span class="input-group-text"><i class="ti ti-file-text"></i></span>
-                  <textarea asp-for="Description" class="form-control" rows="4" placeholder="Enter description (optional)"></textarea>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label required" asp-for="Phone">Phone Number</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="ti ti-phone"></i></span>
+                    <input asp-for="Phone" class="form-control" placeholder="Enter phone number" />
+                  </div>
+                  <span asp-validation-for="Phone" class="text-danger small"></span>
                 </div>
-                <span asp-validation-for="Description" class="text-danger"></span>
-                <small class="form-hint">Optional</small>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label" asp-for="Email">Email Address</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="ti ti-mail"></i></span>
+                    <input asp-for="Email" type="email" class="form-control" placeholder="email@example.com" />
+                  </div>
+                  <span asp-validation-for="Email" class="text-danger small"></span>
+                </div>
               </div>
+            </div>
+          </div>
 
+          <!-- Location & Description Card -->
+          <div class="card mb-3">
+            <div class="card-header">
+              <div class="d-flex align-items-center">
+                <span class="avatar bg-info text-white me-3">
+                  <i class="ti ti-map-pin"></i>
+                </span>
+                <div>
+                  <h3 class="card-title mb-0">Location & Description</h3>
+                  <small class="text-muted">Additional details</small>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
               <div class="mb-3">
-                <label class="form-check form-switch">
-                  <input type="checkbox" asp-for="IsActive" class="form-check-input">
-                  <span class="form-check-label"><i class="ti ti-toggle-right me-1"></i>@Html.DisplayNameFor(m => m.IsActive)</span>
-                </label>
-                <small class="form-hint">Toggle to activate or deactivate this center</small>
+                <label class="form-label required" asp-for="Address">Address</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="ti ti-map-pin"></i></span>
+                  <input asp-for="Address" class="form-control" placeholder="Enter full address" />
+                </div>
+                <span asp-validation-for="Address" class="text-danger small"></span>
+              </div>
+              <div class="mb-3">
+                <label class="form-label" asp-for="Description">Description</label>
+                <textarea asp-for="Description" class="form-control" rows="4" placeholder="Enter center description (optional)"></textarea>
+                <span asp-validation-for="Description" class="text-danger small"></span>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="card-footer text-end">
-          <a asp-action="CenterDetails" asp-route-centerId="@ViewContext.RouteData.Values["id"]" class="btn btn-secondary me-2">
-            <i class="ti ti-arrow-left"></i> Back to Details
-          </a>
-          <button type="button" id="updateCenterBtn" class="btn btn-action-edit" onclick="validateAndUpdate()">
-            <i class="ti ti-device-floppy"></i> Update Center
-          </button>
+        <!-- Sidebar Column -->
+        <div class="col-lg-4">
+          <!-- Status Card -->
+          <div class="card mb-3">
+            <div class="card-header">
+              <div class="d-flex align-items-center">
+                <span class="avatar bg-success text-white me-3">
+                  <i class="ti ti-toggle-right"></i>
+                </span>
+                <h3 class="card-title mb-0">Status</h3>
+              </div>
+            </div>
+            <div class="card-body">
+              <label class="form-selectgroup-item flex-fill d-block">
+                <div class="form-check form-switch">
+                  <input type="checkbox" asp-for="IsActive" class="form-check-input">
+                  <span class="form-check-label">
+                    <strong>Center Active</strong>
+                    <div class="text-muted small">Active centers are visible and operational</div>
+                  </span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="card">
+            <div class="card-body">
+              <div class="d-grid gap-2">
+                <a asp-action="CenterDetails" asp-route-centerId="@ViewBag.CenterId" class="btn btn-outline-secondary">
+                  <i class="ti ti-arrow-left"></i> Back to Details
+                </a>
+                <button type="button" id="updateCenterBtn" class="btn btn-action-edit" onclick="validateAndUpdate()">
+                  <i class="ti ti-device-floppy"></i> Save Changes
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
-      </form>
-    </div>
+      </div>
+    </form>
   </div>
 </div>
 
@@ -108,9 +154,28 @@
             form.validate();
             if (form.valid()) {
                 var name = $('#Name').val();
-                Swal.fire({ title: 'Update Center?', html: 'Save changes to <strong>' + name + '</strong>?', icon: 'question', showCancelButton: true, confirmButtonColor: '#f39c12', confirmButtonText: '<i class="ti ti-device-floppy"></i> Yes, Update' })
-                .then((r) => { if (r.isConfirmed) { $('#updateCenterBtn').prop('disabled', true).html('<i class="ti ti-loader"></i> Updating...'); form.submit(); } });
+                Swal.fire({ 
+                    title: 'Update Center?', 
+                    html: 'Save changes to <strong>' + name + '</strong>?', 
+                    icon: 'question', 
+                    showCancelButton: true, 
+                    confirmButtonColor: '#f39c12', 
+                    confirmButtonText: '<i class="ti ti-device-floppy"></i> Yes, Update' 
+                })
+                .then((r) => { 
+                    if (r.isConfirmed) { 
+                        $('#updateCenterBtn').prop('disabled', true).html('<i class="ti ti-loader"></i> Saving...'); 
+                        form.submit(); 
+                    } 
+                });
             }
         }
     </script>
 }
+
+<style>
+  .required::after {
+    content: " *";
+    color: #dc3545;
+  }
+</style>

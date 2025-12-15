@@ -10,10 +10,10 @@
     <div class="row g-2 align-items-center">
       <div class="col">
         <div class="page-pretitle">Users</div>
-        <h2 class="page-title"><i class="ti ti-user"></i> User Details</h2>
+        <h2 class="page-title"><i class="ti ti-user"></i> @Model.Name</h2>
       </div>
       <div class="col-auto ms-auto">
-        <a asp-action="Users" class="btn btn-secondary">
+        <a asp-action="Users" class="btn btn-outline-secondary">
           <i class="ti ti-arrow-left"></i> Back to Users
         </a>
       </div>
@@ -25,78 +25,159 @@
 <div class="page-body">
   <div class="container-xl">
     <div class="row">
-      <!-- User Information Card -->
-      <div class="col-md-8">
-        <div class="card">
+      <!-- Main Content -->
+      <div class="col-lg-8">
+        <!-- Status Banner -->
+        <div class="card mb-3 @(Model.IsActive ? "border-success" : "border-secondary")">
+          <div class="card-body py-3">
+            <div class="d-flex align-items-center">
+              @if (Model.IsActive)
+              {
+                <span class="avatar bg-state-active text-white me-3">
+                  <i class="ti ti-check"></i>
+                </span>
+                <div>
+                  <h3 class="mb-0 text-success">Active User</h3>
+                  <small class="text-muted">This user can access the system</small>
+                </div>
+              }
+              else
+              {
+                <span class="avatar bg-state-inactive text-white me-3">
+                  <i class="ti ti-x"></i>
+                </span>
+                <div>
+                  <h3 class="mb-0 text-muted">Inactive User</h3>
+                  <small class="text-muted">This user cannot access the system</small>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- User Information Card -->
+        <div class="card mb-3">
           <div class="card-header">
-            <h3 class="card-title"><i class="ti ti-info-circle me-2"></i>User Information</h3>
+            <div class="d-flex align-items-center">
+              <span class="avatar bg-primary text-white me-3">
+                <i class="ti ti-user"></i>
+              </span>
+              <h3 class="card-title mb-0">User Information</h3>
+            </div>
           </div>
           <div class="card-body">
-            <div class="datagrid">
-              <div class="datagrid-item">
-                <div class="datagrid-title"><i class="ti ti-user text-primary me-1"></i>Full Name</div>
-                <div class="datagrid-content"><strong>@Model.Name</strong></div>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label text-muted small mb-1"><i class="ti ti-user me-1"></i> Full Name</label>
+                <div class="h5 mb-0">@Model.Name</div>
               </div>
-              <div class="datagrid-item">
-                <div class="datagrid-title"><i class="ti ti-at text-info me-1"></i>Username</div>
-                <div class="datagrid-content"><code>@Model.UserName</code></div>
+              <div class="col-md-6">
+                <label class="form-label text-muted small mb-1"><i class="ti ti-at me-1"></i> Username</label>
+                <div><code>@Model.UserName</code></div>
               </div>
-              <div class="datagrid-item">
-                <div class="datagrid-title"><i class="ti ti-mail text-info me-1"></i>Email</div>
-                <div class="datagrid-content">
-                  @if (!string.IsNullOrEmpty(Model.Email)){<a href="mailto:@Model.Email">@Model.Email</a>}
+              <div class="col-md-6">
+                <label class="form-label text-muted small mb-1"><i class="ti ti-mail me-1"></i> Email</label>
+                <div>
+                  @if (!string.IsNullOrEmpty(Model.Email))
+                  {<a href="mailto:@Model.Email">@Model.Email</a>}
                   else{<span class="text-muted">Not provided</span>}
                 </div>
               </div>
-              <div class="datagrid-item">
-                <div class="datagrid-title"><i class="ti ti-phone text-success me-1"></i>Phone</div>
-                <div class="datagrid-content">
-                  @if (!string.IsNullOrEmpty(Model.PhoneNumber)){<a href="tel:@Model.PhoneNumber">@Model.PhoneNumber</a>}
+              <div class="col-md-6">
+                <label class="form-label text-muted small mb-1"><i class="ti ti-phone me-1"></i> Phone</label>
+                <div>
+                  @if (!string.IsNullOrEmpty(Model.PhoneNumber))
+                  {<a href="tel:@Model.PhoneNumber">@Model.PhoneNumber</a>}
                   else{<span class="text-muted">Not provided</span>}
                 </div>
               </div>
-              <div class="datagrid-item">
-                <div class="datagrid-title"><i class="ti ti-building text-warning me-1"></i>Center</div>
-                <div class="datagrid-content">
-                  @if (!string.IsNullOrEmpty(Model.CenterName) && Model.CenterId.HasValue)
-                  {<a asp-action="CenterDetails" asp-route-centerId="@Model.CenterId" class="badge bg-info"><i class="ti ti-building me-1"></i>@Model.CenterName</a>}
-                  else{<span class="text-muted">No center assigned</span>}
-                </div>
-              </div>
-              <div class="datagrid-item">
-                <div class="datagrid-title"><i class="ti ti-tag text-purple me-1"></i>Role</div>
-                <div class="datagrid-content">
+            </div>
+          </div>
+        </div>
+
+        <!-- Role & Center Card -->
+        <div class="card mb-3">
+          <div class="card-header">
+            <div class="d-flex align-items-center">
+              <span class="avatar bg-purple text-white me-3">
+                <i class="ti ti-shield"></i>
+              </span>
+              <h3 class="card-title mb-0">Role & Center</h3>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label text-muted small mb-1"><i class="ti ti-tag me-1"></i> Role</label>
+                <div>
                   @if (!string.IsNullOrEmpty(Model.RoleName))
                   {
                     var bgClass = Model.RoleName switch { "SuperAdmin" => "bg-role-superadmin", "Admin" => "bg-role-admin", "Manager" => "bg-role-manager", _ => "bg-role-employee" };
                     var icon = Model.RoleName switch { "SuperAdmin" => "ti-shield", "Admin" => "ti-tie", "Manager" => "ti-settings", _ => "ti-user" };
-                    <span class="badge @bgClass"><i class="ti @icon me-1"></i>@Model.RoleName</span>
+                    <span class="badge @bgClass py-2 px-3"><i class="ti @icon me-1"></i>@Model.RoleName</span>
                   }
-                  else{<span class="text-muted">No role</span>}
+                  else{<span class="text-muted">No role assigned</span>}
                 </div>
               </div>
-              <div class="datagrid-item">
-                <div class="datagrid-title"><i class="ti ti-toggle-right text-success me-1"></i>Status</div>
-                <div class="datagrid-content">
-                  @if (Model.IsActive){<span class="badge bg-state-active"><i class="ti ti-check"></i> Active</span>}
-                  else{<span class="badge bg-state-inactive"><i class="ti ti-x"></i> Inactive</span>}
+              <div class="col-md-6">
+                <label class="form-label text-muted small mb-1"><i class="ti ti-building me-1"></i> Center</label>
+                <div>
+                  @if (!string.IsNullOrEmpty(Model.CenterName) && Model.CenterId.HasValue)
+                  {
+                    <a asp-action="CenterDetails" asp-route-centerId="@Model.CenterId" class="badge bg-info py-2 px-3">
+                      <i class="ti ti-building me-1"></i>@Model.CenterName
+                    </a>
+                  }
+                  else{<span class="text-muted">No center assigned</span>}
                 </div>
               </div>
-              <div class="datagrid-item">
-                <div class="datagrid-title"><i class="ti ti-info-circle text-info me-1"></i>State</div>
-                <div class="datagrid-content">
-                  @if (Model.IsDeleted){<span class="badge bg-action-delete"><i class="ti ti-trash"></i> Deleted</span>}
-                  else{<span class="badge bg-state-active"><i class="ti ti-check"></i> Normal</span>}
+              <div class="col-md-6">
+                <label class="form-label text-muted small mb-1"><i class="ti ti-info-circle me-1"></i> State</label>
+                <div>
+                  @if (Model.IsDeleted)
+                  {<span class="badge bg-action-delete py-2 px-3"><i class="ti ti-trash me-1"></i>Deleted</span>}
+                  else{<span class="badge bg-state-active py-2 px-3"><i class="ti ti-check me-1"></i>Normal</span>}
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Audit Card -->
+        <div class="card">
+          <div class="card-header">
+            <div class="d-flex align-items-center">
+              <span class="avatar bg-secondary text-white me-3">
+                <i class="ti ti-history"></i>
+              </span>
+              <h3 class="card-title mb-0">Audit Information</h3>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="d-flex align-items-start">
+                  <div class="avatar avatar-sm bg-green-lt text-green me-3"><i class="ti ti-plus"></i></div>
+                  <div>
+                    <div class="text-muted small">Created</div>
+                    <div class="fw-medium">@Model.CreatedAt.ToString("MMM dd, yyyy hh:mm tt")</div>
+                    @if (!string.IsNullOrEmpty(Model.CreatedByName)){<div class="text-muted small">by @Model.CreatedByName</div>}
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="text-muted small">User ID</div>
+                <code class="small">@Model.Id</code>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Actions & Metadata Card -->
-      <div class="col-md-4">
-        <div class="card">
+      <!-- Sidebar -->
+      <div class="col-lg-4">
+        <!-- Actions Card -->
+        <div class="card mb-3">
           <div class="card-header">
             <h3 class="card-title"><i class="ti ti-settings me-2"></i>Actions</h3>
           </div>
@@ -104,41 +185,38 @@
             <div class="d-grid gap-2">
               @if (!Model.IsDeleted)
               {
-                <a asp-action="EditUser" asp-route-id="@Model.Id" class="btn btn-action-edit"><i class="ti ti-edit"></i> Edit User</a>
-                <a asp-action="UpdateUserRole" asp-route-id="@Model.Id" class="btn btn-purple"><i class="ti ti-tag"></i> Update Role</a>
+                <a asp-action="EditUser" asp-route-id="@Model.Id" class="btn btn-action-edit">
+                  <i class="ti ti-edit me-2"></i> Edit User
+                </a>
+                <a asp-action="UpdateUserRole" asp-route-id="@Model.Id" class="btn btn-purple">
+                  <i class="ti ti-tag me-2"></i> Update Role
+                </a>
                 @if (Model.IsActive)
-                {<button class="btn btn-state-deactive" onclick="deactivate()"><i class="ti ti-ban"></i> Deactivate</button>}
+                {
+                  <button class="btn btn-state-deactive" onclick="deactivate()">
+                    <i class="ti ti-ban me-2"></i> Deactivate
+                  </button>
+                }
                 else
-                {<button class="btn btn-state-active" onclick="activate()"><i class="ti ti-check"></i> Activate</button>}
-                <button class="btn btn-action-delete" onclick="softDelete()"><i class="ti ti-trash"></i> Soft Delete</button>
-                <button class="btn btn-action-delete" onclick="hardDelete()"><i class="ti ti-trash-x"></i> Hard Delete</button>
+                {
+                  <button class="btn btn-state-active" onclick="activate()">
+                    <i class="ti ti-check me-2"></i> Activate
+                  </button>
+                }
+                <hr class="my-2">
+                <button class="btn btn-outline-warning" onclick="softDelete()">
+                  <i class="ti ti-trash me-2"></i> Move to Trash
+                </button>
+                <button class="btn btn-outline-danger" onclick="hardDelete()">
+                  <i class="ti ti-trash-x me-2"></i> Permanent Delete
+                </button>
               }
               else
-              {<button class="btn btn-state-restore" onclick="restore()"><i class="ti ti-refresh"></i> Restore User</button>}
-            </div>
-          </div>
-        </div>
-        <div class="card mt-3">
-          <div class="card-header">
-            <h3 class="card-title"><i class="ti ti-history me-2"></i>Metadata</h3>
-          </div>
-          <div class="card-body">
-            <div class="datagrid">
-              <div class="datagrid-item">
-                <div class="datagrid-title"><i class="ti ti-clock me-1"></i>Created</div>
-                <div class="datagrid-content">@Model.CreatedAt.ToString("MMM dd, yyyy hh:mm tt")</div>
-              </div>
-              @if (!string.IsNullOrEmpty(Model.CreatedByName))
               {
-                <div class="datagrid-item">
-                  <div class="datagrid-title"><i class="ti ti-user me-1"></i>Created By</div>
-                  <div class="datagrid-content">@Model.CreatedByName</div>
-                </div>
+                <button class="btn btn-state-restore" onclick="restore()">
+                  <i class="ti ti-refresh me-2"></i> Restore User
+                </button>
               }
-              <div class="datagrid-item">
-                <div class="datagrid-title"><i class="ti ti-id me-1"></i>User ID</div>
-                <div class="datagrid-content text-break"><small>@Model.Id</small></div>
-              </div>
             </div>
           </div>
         </div>
@@ -149,11 +227,26 @@
 
 @section Scripts {
     <script>
-        function restore() { Swal.fire({ title: 'Restore?', html: '<strong>@Model.UserName</strong>', icon: 'question', showCancelButton: true, confirmButtonColor: '#28a745', confirmButtonText: '<i class="ti ti-refresh"></i> Restore' }).then((r)=>{if(r.isConfirmed){$.post('@Url.Action("RestoreUser"))', {id:'@Model.Id'}).done((res)=>{if(res.success){Swal.fire({icon:'success',title:'Restored!',timer:2000,showConfirmButton:false}).then(()=>location.reload());}else{Swal.fire('Error',res.message,'error');}});}}); }
-        function activate() { Swal.fire({ title: 'Activate?', html: '<strong>@Model.UserName</strong>', icon: 'question', showCancelButton: true, confirmButtonColor: '#28a745', confirmButtonText: '<i class="ti ti-check"></i> Activate' }).then((r)=>{if(r.isConfirmed){$.post('@Url.Action("ActivateUser")', {id:'@Model.Id'}).done((res)=>{if(res.success){Swal.fire({icon:'success',title:'Activated!',timer:2000,showConfirmButton:false}).then(()=>location.reload());}else{Swal.fire('Error',res.message,'error');}});}}); }
-        function deactivate() { Swal.fire({ title: 'Deactivate?', html: '<strong>@Model.UserName</strong>', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ffc107', confirmButtonText: '<i class="ti ti-ban"></i> Deactivate' }).then((r)=>{if(r.isConfirmed){$.post('@Url.Action("DeactivateUser")', {id:'@Model.Id'}).done((res)=>{if(res.success){Swal.fire({icon:'success',title:'Deactivated!',timer:2000,showConfirmButton:false}).then(()=>location.reload());}else{Swal.fire('Error',res.message,'error');}});}}); }
-        function softDelete() { Swal.fire({ title: 'Soft Delete?', html: '<strong>@Model.UserName</strong><br>Move to trash?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ffc107', confirmButtonText: '<i class="ti ti-trash"></i> Soft Delete' }).then((r)=>{if(r.isConfirmed){$.post('@Url.Action("SoftDeleteUser")', {id:'@Model.Id'}).done((res)=>{if(res.success){Swal.fire({icon:'success',title:'Deleted!',timer:2000,showConfirmButton:false}).then(()=>window.location.href='@Url.Action("Users")');}else{Swal.fire('Error',res.message,'error');}});}}); }
-        function hardDelete() { Swal.fire({ title: 'PERMANENT DELETE', html: '<strong class="text-danger">WARNING</strong><br>Delete <strong>@Model.UserName</strong> forever?', icon: 'error', showCancelButton: true, confirmButtonColor: '#dc3545', confirmButtonText: '<i class="ti ti-trash-x"></i> DELETE' }).then((r)=>{if(r.isConfirmed){$.post('@Url.Action("HardDeleteUser")', {id:'@Model.Id'}).done((res)=>{if(res.success){Swal.fire({icon:'success',title:'Deleted!',timer:2000,showConfirmButton:false}).then(()=>window.location.href='@Url.Action("Users")');}else{Swal.fire('Error',res.message,'error');}});}}); }
+        function restore() { 
+            Swal.fire({ title: 'Restore User?', html: 'Restore <strong>@Model.UserName</strong>?', icon: 'question', showCancelButton: true, confirmButtonColor: '#28a745', confirmButtonText: '<i class="ti ti-refresh"></i> Restore' })
+            .then((r)=>{if(r.isConfirmed){$.post('@Url.Action("RestoreUser")', {id:'@Model.Id'}).done((res)=>{if(res.success){Swal.fire({icon:'success',title:'Restored!',text:res.message,timer:2000,showConfirmButton:false}).then(()=>location.reload());}else{Swal.fire('Error',res.message,'error');}});}});
+        }
+        function activate() { 
+            Swal.fire({ title: 'Activate User?', html: 'Activate <strong>@Model.UserName</strong>?', icon: 'question', showCancelButton: true, confirmButtonColor: '#28a745', confirmButtonText: '<i class="ti ti-check"></i> Activate' })
+            .then((r)=>{if(r.isConfirmed){$.post('@Url.Action("ActivateUser")', {id:'@Model.Id'}).done((res)=>{if(res.success){Swal.fire({icon:'success',title:'Activated!',text:res.message,timer:2000,showConfirmButton:false}).then(()=>location.reload());}else{Swal.fire('Error',res.message,'error');}});}});
+        }
+        function deactivate() { 
+            Swal.fire({ title: 'Deactivate User?', html: 'Deactivate <strong>@Model.UserName</strong>?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ffc107', confirmButtonText: '<i class="ti ti-ban"></i> Deactivate' })
+            .then((r)=>{if(r.isConfirmed){$.post('@Url.Action("DeactivateUser")', {id:'@Model.Id'}).done((res)=>{if(res.success){Swal.fire({icon:'success',title:'Deactivated!',text:res.message,timer:2000,showConfirmButton:false}).then(()=>location.reload());}else{Swal.fire('Error',res.message,'error');}});}});
+        }
+        function softDelete() { 
+            Swal.fire({ title: 'Delete User?', html: 'Move <strong>@Model.UserName</strong> to trash.<br><br>Type <strong>Delete</strong> to confirm:', icon: 'warning', input: 'text', inputPlaceholder: 'Type Delete here', showCancelButton: true, confirmButtonColor: '#ffc107', confirmButtonText: '<i class="ti ti-trash"></i> Move to Trash', inputValidator: (value) => {if (value !== 'Delete') {return 'Please type "Delete" to confirm';}} })
+            .then((r)=>{if(r.isConfirmed){$.post('@Url.Action("SoftDeleteUser")', {id:'@Model.Id'}).done((res)=>{if(res.success){Swal.fire({icon:'success',title:'Deleted!',text:res.message,timer:2000,showConfirmButton:false}).then(()=>window.location.href='@Url.Action("Users")');}else{Swal.fire('Error',res.message,'error');}});}});
+        }
+        function hardDelete() { 
+            Swal.fire({ title: 'PERMANENT DELETE', html: '<div class="alert alert-danger mb-2"><strong>WARNING!</strong> This cannot be undone!</div>Delete <strong>@Model.UserName</strong> forever?<br><br>Type <strong>Delete</strong> to confirm:', icon: 'error', input: 'text', inputPlaceholder: 'Type Delete here', showCancelButton: true, confirmButtonColor: '#dc3545', confirmButtonText: '<i class="ti ti-trash-x"></i> DELETE FOREVER', inputValidator: (value) => {if (value !== 'Delete') {return 'Please type "Delete" to confirm';}} })
+            .then((r)=>{if(r.isConfirmed){$.post('@Url.Action("HardDeleteUser")', {id:'@Model.Id'}).done((res)=>{if(res.success){Swal.fire({icon:'success',title:'Deleted!',text:res.message,timer:2000,showConfirmButton:false}).then(()=>window.location.href='@Url.Action("Users")');}else{Swal.fire('Error',res.message,'error');}});}});
+        }
     </script>
     <style>.bg-purple,.btn-purple{background-color:#6f42c1!important;color:white;}.btn-purple:hover{background-color:#5a32a3!important;}</style>
 }

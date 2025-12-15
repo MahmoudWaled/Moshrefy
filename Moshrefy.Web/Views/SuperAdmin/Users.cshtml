@@ -78,7 +78,6 @@
                     <th>#</th>
                     <th data-name="Name">Name</th>
                     <th data-name="UserName">Username</th>
-                    <th data-name="Email">Email</th>
                     <th data-name="PhoneNumber">Phone</th>
                     <th data-name="CenterName">Center</th>
                     <th data-name="RoleName">Role</th>
@@ -155,18 +154,6 @@
                         className: 'align-middle',
                         render: function (data) {
                             return '<code>' + data + '</code>';
-                        }
-                    },
-                    {
-                        data: 'email',
-                        name: 'Email',
-                        width: '180px',
-                        className: 'align-middle',
-                        render: function (data) {
-                            if (data && data !== '') {
-                                return '<a href="mailto:' + data + '" class="text-info">' + data + '</a>';
-                            }
-                            return '<span class="text-muted">N/A</span>';
                         }
                     },
                     {
@@ -249,7 +236,7 @@
                             if (data) {
                                 return '<span class="badge bg-action-delete"><i class="ti ti-trash"></i> Deleted</span>';
                             }
-                            return '<span class="badge bg-state-active"><i class="ti ti-check"></i> Normal</span>';
+                            return '<span class="badge bg-state-normal"><i class="ti ti-circle-check"></i> Normal</span>';
                         }
                     },
                     {
@@ -328,10 +315,8 @@
                     zeroRecords: "No matching users found",
                     emptyTable: '<div class="p-4 text-center">' +
                         '<i class="ti ti-users" style="font-size: 4rem;"></i>' +
-                        '<h4 class="text-muted mt-3">No Users Found</h4>' +
-                        '<p class="text-muted">Get started by creating your first user.</p>' +
-                        '<a href="@Url.Action("CreateUserForCenter", "SuperAdmin")" class="btn btn-action-create">' +
-                        '<i class="ti ti-plus"></i> Create Your First User</a></div>'
+                        '<h4 class="text-muted mt-3">No Deleted Users Found.</h4>' +
+                        '</div>'
                 },
                 createdRow: function (row, data, dataIndex) {
                     if (data.isDeleted) {
