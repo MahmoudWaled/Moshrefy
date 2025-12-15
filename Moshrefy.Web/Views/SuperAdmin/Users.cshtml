@@ -240,33 +240,33 @@
 
                             // View button (always visible)
                             buttons += '<a href="@Url.Action("UserDetails", "SuperAdmin")/' + row.id + '" ' +
-                                'class="btn btn-action-view" title="View Details">' +
+                                'class="btn btn-action-icon action-view" title="View Details">' +
                                 '<i class="ti ti-eye"></i></a>';
 
                             if (!row.isDeleted) {
                                 // Edit button
                                 buttons += '<a href="@Url.Action("EditUser", "SuperAdmin")/' + row.id + '" ' +
-                                    'class="btn btn-action-edit" title="Edit">' +
+                                    'class="btn btn-action-icon action-edit" title="Edit">' +
                                     '<i class="ti ti-edit"></i></a>';
 
                                 // Active/Deactivate button
                                 if (row.isActive) {
-                                    buttons += '<button class="btn btn-state-deactive" title="Deactivate" ' +
+                                    buttons += '<button class="btn btn-action-icon action-deactivate" title="Deactivate" ' +
                                         'onclick="deactivateUser(\'' + row.id + '\', \'' + row.userName.replace(/'/g, "\\'") + '\')">' +
                                         '<i class="ti ti-ban"></i></button>';
                                 } else {
-                                    buttons += '<button class="btn btn-state-active" title="Activate" ' +
+                                    buttons += '<button class="btn btn-action-icon action-activate" title="Activate" ' +
                                         'onclick="activateUser(\'' + row.id + '\', \'' + row.userName.replace(/'/g, "\\'") + '\')">' +
                                         '<i class="ti ti-check"></i></button>';
                                 }
 
                                 // Delete button
-                                buttons += '<button class="btn btn-action-delete" title="Delete" ' +
+                                buttons += '<button class="btn btn-action-icon action-delete" title="Delete" ' +
                                     'onclick="softDeleteUser(\'' + row.id + '\', \'' + row.userName.replace(/'/g, "\\'") + '\')">' +
                                     '<i class="ti ti-trash"></i></button>';
                             } else {
                                 // Restore button
-                                buttons += '<button class="btn btn-state-restore" title="Restore" ' +
+                                buttons += '<button class="btn btn-action-icon action-restore" title="Restore" ' +
                                     'onclick="restoreUser(\'' + row.id + '\', \'' + row.userName.replace(/'/g, "\\'") + '\')">' +
                                     '<i class="ti ti-refresh"></i></button>';
                             }
@@ -275,6 +275,7 @@
                             return buttons;
                         }
                     }
+
                 ],
                 pageLength: 25,
                 lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],

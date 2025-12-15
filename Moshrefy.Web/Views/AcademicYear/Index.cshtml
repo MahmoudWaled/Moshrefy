@@ -109,15 +109,16 @@
                         data: null, orderable: false,
                         render: function (d, t, row) {
                             var a = '<div class="btn-group btn-group-sm">';
-                            a += '<a href="/AcademicYear/Details/' + row.id + '" class="btn btn-action-view" title="View"><i class="ti ti-eye"></i></a>';
+                            a += '<a href="/AcademicYear/Details/' + row.id + '" class="btn btn-action-icon action-view" title="View"><i class="ti ti-eye"></i></a>';
                             @if (User.IsInRole("Admin"))
                             {
-                                @:a += '<a href="/AcademicYear/Edit/' + row.id + '" class="btn btn-action-edit" title="Edit"><i class="ti ti-edit"></i></a>';
-                                @:a += '<button onclick="deleteAcademicYear(' + row.id + ')" class="btn btn-action-delete" title="Delete"><i class="ti ti-trash"></i></button>';
+                                @:a += '<a href="/AcademicYear/Edit/' + row.id + '" class="btn btn-action-icon action-edit" title="Edit"><i class="ti ti-edit"></i></a>';
+                                @:a += '<button onclick="deleteAcademicYear(' + row.id + ')" class="btn btn-action-icon action-delete" title="Delete"><i class="ti ti-trash"></i></button>';
                             }
                             return a + '</div>';
                         }
                     }
+
                 ],
                 order: [[5, 'desc']],
                 language: {

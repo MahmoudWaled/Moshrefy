@@ -168,26 +168,26 @@
               
               if (row.isDeleted) {
                 // Restore button for deleted centers
-                actions += '<a href="javascript:void(0)" onclick="restoreCenter(' + row.id + ')" class="btn btn-sm btn-action-activate" title="Restore">' +
+                actions += '<a href="javascript:void(0)" onclick="restoreCenter(' + row.id + ')" class="btn btn-sm btn-action-icon action-restore" title="Restore">' +
                           '<i class="ti ti-restore icon"></i>' +
                           '</a>';
                 // Permanent delete button
-                actions += '<a href="javascript:void(0)" onclick="permanentDeleteCenter(' + row.id + ')" class="btn btn-sm btn-action-delete" title="Permanent Delete">' +
+                actions += '<a href="javascript:void(0)" onclick="permanentDeleteCenter(' + row.id + ')" class="btn btn-sm btn-action-icon action-delete" title="Permanent Delete">' +
                           '<i class="ti ti-trash-x icon"></i>' +
                           '</a>';
               } else {
                 // View button
-                actions += '<a href="@Url.Action("CenterDetails", "SuperAdmin")?centerId=' + row.id + '" class="btn btn-sm btn-action-view" title="View">' +
+                actions += '<a href="@Url.Action("CenterDetails", "SuperAdmin")?centerId=' + row.id + '" class="btn btn-sm btn-action-icon action-view" title="View">' +
                           '<i class="ti ti-eye icon"></i>' +
                           '</a>';
                 
                 // Edit button
-                actions += '<a href="@Url.Action("EditCenter", "SuperAdmin")?id=' + row.id + '" class="btn btn-sm btn-action-edit" title="Edit">' +
+                actions += '<a href="@Url.Action("EditCenter", "SuperAdmin")?id=' + row.id + '" class="btn btn-sm btn-action-icon action-edit" title="Edit">' +
                           '<i class="ti ti-edit icon"></i>' +
                           '</a>';
                 
                 // Delete button
-                actions += '<a href="javascript:void(0)" onclick="deleteCenter(' + row.id + ')" class="btn btn-sm btn-action-delete" title="Delete">' +
+                actions += '<a href="javascript:void(0)" onclick="deleteCenter(' + row.id + ')" class="btn btn-sm btn-action-icon action-delete" title="Delete">' +
                           '<i class="ti ti-trash icon"></i>' +
                           '</a>';
               }
@@ -196,6 +196,7 @@
               return actions;
             }
           }
+
         ],
         "order": [[5, "desc"]],
         "pageLength": 10,

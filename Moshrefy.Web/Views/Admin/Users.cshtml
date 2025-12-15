@@ -156,23 +156,24 @@
                         orderable: false,
                         render: function (data, type, row) {
                             var actions = '<div class="btn-group btn-group-sm">';
-                            actions += '<a href="/Admin/UserDetails/' + row.id + '" class="btn btn-action-view" title="View Details"><i class="ti ti-eye"></i></a>';
-                            actions += '<a href="/Admin/EditUser/' + row.id + '" class="btn btn-action-edit" title="Edit"><i class="ti ti-edit"></i></a>';
+                            actions += '<a href="/Admin/UserDetails/' + row.id + '" class="btn btn-action-icon action-view" title="View Details"><i class="ti ti-eye"></i></a>';
+                            actions += '<a href="/Admin/EditUser/' + row.id + '" class="btn btn-action-icon action-edit" title="Edit"><i class="ti ti-edit"></i></a>';
 
                             if (row.isActive) {
-                                actions += '<button onclick="deactivateUser(\'' + row.id + '\')" class="btn btn-state-deactive" title="Disable Access"><i class="ti ti-ban"></i></button>';
+                                actions += '<button onclick="deactivateUser(\'' + row.id + '\')" class="btn btn-action-icon action-deactivate" title="Disable Access"><i class="ti ti-ban"></i></button>';
                             } else {
-                                actions += '<button onclick="activateUser(\'' + row.id + '\')" class="btn btn-state-active" title="Enable Access"><i class="ti ti-check"></i></button>';
+                                actions += '<button onclick="activateUser(\'' + row.id + '\')" class="btn btn-action-icon action-activate" title="Enable Access"><i class="ti ti-check"></i></button>';
                             }
 
                             if (!row.isDeleted) {
-                                actions += '<button onclick="deleteUser(\'' + row.id + '\')" class="btn btn-action-delete" title="Remove"><i class="ti ti-trash"></i></button>';
+                                actions += '<button onclick="deleteUser(\'' + row.id + '\')" class="btn btn-action-icon action-delete" title="Remove"><i class="ti ti-trash"></i></button>';
                             }
 
                             actions += '</div>';
                             return actions;
                         }
                     }
+
                 ],
                 order: [[8, 'desc']],
                 language: {

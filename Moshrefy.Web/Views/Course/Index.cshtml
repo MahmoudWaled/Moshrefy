@@ -109,20 +109,21 @@
                         data: null, orderable: false,
                         render: function (d, t, row) {
                             var a = '<div class="btn-group btn-group-sm">';
-                            a += '<a href="/Course/Details/' + row.id + '" class="btn btn-action-view" title="View"><i class="ti ti-eye"></i></a>';
+                            a += '<a href="/Course/Details/' + row.id + '" class="btn btn-action-icon action-view" title="View"><i class="ti ti-eye"></i></a>';
                             @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
                             {
-                                @:a += '<a href="/Course/Edit/' + row.id + '" class="btn btn-action-edit" title="Edit"><i class="ti ti-edit"></i></a>';
-                                @:if (row.isActive) { a += '<button onclick="deactivateCourse(' + row.id + ')" class="btn btn-state-deactive" title="Deactivate"><i class="ti ti-ban"></i></button>'; }
-                                @:else { a += '<button onclick="activateCourse(' + row.id + ')" class="btn btn-state-active" title="Activate"><i class="ti ti-check"></i></button>'; }
+                                @:a += '<a href="/Course/Edit/' + row.id + '" class="btn btn-action-icon action-edit" title="Edit"><i class="ti ti-edit"></i></a>';
+                                @:if (row.isActive) { a += '<button onclick="deactivateCourse(' + row.id + ')" class="btn btn-action-icon action-deactivate" title="Deactivate"><i class="ti ti-ban"></i></button>'; }
+                                @:else { a += '<button onclick="activateCourse(' + row.id + ')" class="btn btn-action-icon action-activate" title="Activate"><i class="ti ti-check"></i></button>'; }
                             }
                             @if (User.IsInRole("Admin"))
                             {
-                                @:a += '<button onclick="deleteCourse(' + row.id + ')" class="btn btn-action-delete" title="Delete"><i class="ti ti-trash"></i></button>';
+                                @:a += '<button onclick="deleteCourse(' + row.id + ')" class="btn btn-action-icon action-delete" title="Delete"><i class="ti ti-trash"></i></button>';
                             }
                             return a + '</div>';
                         }
                     }
+
                 ],
                 order: [[5, 'desc']],
                 language: {

@@ -126,21 +126,22 @@
                         data: null, orderable: false, className: 'text-center',
                         render: function (d, t, row) {
                             var b = '<div class="btn-group btn-group-sm">';
-                            b += '<a href="@Url.Action("UserDetails", "SuperAdmin")/' + row.id + '" class="btn btn-action-view" title="View"><i class="ti ti-eye"></i></a>';
+                            b += '<a href="@Url.Action("UserDetails", "SuperAdmin")/' + row.id + '" class="btn btn-action-icon action-view" title="View"><i class="ti ti-eye"></i></a>';
                             if (!row.isDeleted) {
-                                b += '<a href="@Url.Action("EditUser", "SuperAdmin")/' + row.id + '" class="btn btn-action-edit" title="Edit"><i class="ti ti-edit"></i></a>';
+                                b += '<a href="@Url.Action("EditUser", "SuperAdmin")/' + row.id + '" class="btn btn-action-icon action-edit" title="Edit"><i class="ti ti-edit"></i></a>';
                                 if (row.isActive) {
-                                    b += '<button class="btn btn-state-deactive" title="Deactivate" onclick="deactivateUser(\'' + row.id + '\', \'' + row.userName.replace(/'/g, "\\'") + '\')"><i class="ti ti-ban"></i></button>';
+                                    b += '<button class="btn btn-action-icon action-deactivate" title="Deactivate" onclick="deactivateUser(\'' + row.id + '\', \'' + row.userName.replace(/'/g, "\\'") + '\')"><i class="ti ti-ban"></i></button>';
                                 } else {
-                                    b += '<button class="btn btn-state-active" title="Activate" onclick="activateUser(\'' + row.id + '\', \'' + row.userName.replace(/'/g, "\\'") + '\')"><i class="ti ti-check"></i></button>';
+                                    b += '<button class="btn btn-action-icon action-activate" title="Activate" onclick="activateUser(\'' + row.id + '\', \'' + row.userName.replace(/'/g, "\\'") + '\')"><i class="ti ti-check"></i></button>';
                                 }
-                                b += '<button class="btn btn-action-delete" title="Delete" onclick="softDeleteUser(\'' + row.id + '\', \'' + row.userName.replace(/'/g, "\\'") + '\')"><i class="ti ti-trash"></i></button>';
+                                b += '<button class="btn btn-action-icon action-delete" title="Delete" onclick="softDeleteUser(\'' + row.id + '\', \'' + row.userName.replace(/'/g, "\\'") + '\')"><i class="ti ti-trash"></i></button>';
                             } else {
-                                b += '<button class="btn btn-state-restore" title="Restore" onclick="restoreUser(\'' + row.id + '\', \'' + row.userName.replace(/'/g, "\\'") + '\')"><i class="ti ti-refresh"></i></button>';
+                                b += '<button class="btn btn-action-icon action-restore" title="Restore" onclick="restoreUser(\'' + row.id + '\', \'' + row.userName.replace(/'/g, "\\'") + '\')"><i class="ti ti-refresh"></i></button>';
                             }
                             return b + '</div>';
                         }
                     }
+
                 ],
                 pageLength: 25, order: [[7, 'desc']],
                 language: {
