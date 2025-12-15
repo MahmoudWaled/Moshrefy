@@ -14,9 +14,9 @@
         <h2 class="page-title"><i class="ti ti-user-edit"></i> Edit User</h2>
       </div>
       <div class="col-auto ms-auto">
-        <a asp-action="Users" class="btn btn-outline-secondary">
-          <i class="ti ti-arrow-left"></i> Back to Users
-        </a>
+        <button type="button" onclick="goBack()" class="btn btn-outline-secondary">
+          <i class="ti ti-arrow-left"></i> Back
+        </button>
       </div>
     </div>
   </div>
@@ -159,9 +159,9 @@
           <div class="card">
             <div class="card-body">
               <div class="d-grid gap-2">
-                <a asp-action="UserDetails" asp-route-id="@userId" class="btn btn-outline-secondary">
-                  <i class="ti ti-arrow-left"></i> Back to Details
-                </a>
+                <button type="button" onclick="goBack()" class="btn btn-outline-secondary">
+                  <i class="ti ti-x"></i> Cancel
+                </button>
                 <button type="submit" class="btn btn-action-edit">
                   <i class="ti ti-device-floppy"></i> Save Changes
                 </button>
@@ -176,6 +176,15 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        function goBack() {
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = '@Url.Action("Users", "SuperAdmin")';
+            }
+        }
+    </script>
 }
 
 <style>

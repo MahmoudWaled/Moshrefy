@@ -13,9 +13,9 @@
         <h2 class="page-title"><i class="ti ti-user-plus"></i> Add New Team Member</h2>
       </div>
       <div class="col-auto ms-auto">
-        <a asp-action="Users" class="btn btn-outline-secondary">
-          <i class="ti ti-arrow-left"></i> Back to Team
-        </a>
+        <button type="button" onclick="goBack()" class="btn btn-outline-secondary">
+          <i class="ti ti-arrow-left"></i> Back
+        </button>
       </div>
     </div>
   </div>
@@ -187,9 +187,9 @@
           <div class="card mt-3">
             <div class="card-body">
               <div class="d-flex gap-2">
-                <a asp-action="Users" class="btn btn-outline-secondary flex-fill">
+                <button type="button" onclick="goBack()" class="btn btn-outline-secondary flex-fill">
                   <i class="ti ti-x"></i> Cancel
-                </a>
+                </button>
                 <button type="submit" class="btn btn-action-create flex-fill">
                   <i class="ti ti-check"></i> Add Member
                 </button>
@@ -204,6 +204,15 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        function goBack() {
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = '@Url.Action("Users", "Admin")';
+            }
+        }
+    </script>
 }
 
 <style>

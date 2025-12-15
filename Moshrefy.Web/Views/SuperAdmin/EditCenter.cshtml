@@ -13,9 +13,9 @@
         <h2 class="page-title"><i class="ti ti-edit"></i> Edit Center</h2>
       </div>
       <div class="col-auto ms-auto">
-        <a asp-action="Centers" class="btn btn-outline-secondary">
-          <i class="ti ti-arrow-left"></i> Back to Centers
-        </a>
+        <button type="button" onclick="goBack()" class="btn btn-outline-secondary">
+          <i class="ti ti-arrow-left"></i> Back
+        </button>
       </div>
     </div>
   </div>
@@ -131,9 +131,9 @@
           <div class="card">
             <div class="card-body">
               <div class="d-grid gap-2">
-                <a asp-action="CenterDetails" asp-route-centerId="@ViewBag.CenterId" class="btn btn-outline-secondary">
-                  <i class="ti ti-arrow-left"></i> Back to Details
-                </a>
+                <button type="button" onclick="goBack()" class="btn btn-outline-secondary">
+                  <i class="ti ti-x"></i> Cancel
+                </button>
                 <button type="button" id="updateCenterBtn" class="btn btn-action-edit" onclick="validateAndUpdate()">
                   <i class="ti ti-device-floppy"></i> Save Changes
                 </button>
@@ -149,6 +149,14 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script>
+        function goBack() {
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = '@Url.Action("Centers", "SuperAdmin")';
+            }
+        }
+        
         function validateAndUpdate() {
             var form = $('#editCenterForm');
             form.validate();

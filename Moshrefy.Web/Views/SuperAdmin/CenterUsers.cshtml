@@ -21,10 +21,10 @@
             <i class="ti ti-user-plus icon"></i>
             Create User
           </a>
-          <a asp-action="CenterDetails" asp-route-centerId="@centerId" class="btn btn-secondary d-none d-sm-inline-block">
+          <button type="button" onclick="goBack()" class="btn btn-secondary d-none d-sm-inline-block">
             <i class="ti ti-arrow-left icon"></i>
             Back
-          </a>
+          </button>
         </div>
       </div>
     </div>
@@ -61,9 +61,9 @@
             </div>
           </div>
           <div class="card-footer">
-            <a asp-action="CenterDetails" asp-route-centerId="@centerId" class="btn btn-secondary">
-              <i class="ti ti-arrow-left"></i> Back to Center
-            </a>
+            <button type="button" onclick="goBack()" class="btn btn-secondary">
+              <i class="ti ti-arrow-left"></i> Back
+            </button>
             <a asp-action="Centers" class="btn btn-outline-secondary">
               <i class="ti ti-list"></i> All Centers
             </a>
@@ -76,6 +76,14 @@
 
 @section Scripts {
     <script>
+        function goBack() {
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = '@Url.Action("Centers", "SuperAdmin")';
+            }
+        }
+        
         $(document).ready(function () {
             var centerId = @centerId;
 
@@ -124,7 +132,7 @@
                         }
                     }
                 ],
-                pageLength: 25, order: [[9, 'desc']],
+                pageLength: 25, order: [[7, 'desc']],
                 language: {
                     search: '_INPUT_',
                     searchPlaceholder: 'Search users...',

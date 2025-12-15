@@ -15,9 +15,9 @@
         <h2 class="page-title"><i class="ti ti-edit"></i> Edit Academic Year</h2>
       </div>
       <div class="col-auto ms-auto">
-        <a asp-action="Details" asp-route-id="@academicYearId" class="btn btn-outline-secondary">
-          <i class="ti ti-arrow-left"></i> Back to Details
-        </a>
+        <button type="button" onclick="goBack()" class="btn btn-outline-secondary">
+          <i class="ti ti-arrow-left"></i> Back
+        </button>
       </div>
     </div>
   </div>
@@ -56,9 +56,9 @@
 
             <div class="card-footer">
               <div class="d-flex justify-content-between">
-                <a asp-action="Details" asp-route-id="@academicYearId" class="btn btn-outline-secondary">
+                <button type="button" onclick="goBack()" class="btn btn-outline-secondary">
                   <i class="ti ti-x"></i> Cancel
-                </a>
+                </button>
                 <button type="submit" class="btn btn-action-edit">
                   <i class="ti ti-device-floppy"></i> Save Changes
                 </button>
@@ -116,6 +116,15 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        function goBack() {
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = '@Url.Action("Index", "AcademicYear")';
+            }
+        }
+    </script>
 }
 
 <style>

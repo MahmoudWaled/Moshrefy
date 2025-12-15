@@ -80,9 +80,9 @@
         </div>
 
         <div class="card-footer text-end">
-          <a asp-action="Centers" class="btn btn-secondary me-2">
-            <i class="ti ti-arrow-left"></i> Back to List
-          </a>
+          <button type="button" onclick="goBack()" class="btn btn-secondary me-2">
+            <i class="ti ti-x"></i> Cancel
+          </button>
           <button type="button" id="createCenterBtn" class="btn btn-action-create" onclick="validateAndCreate()">
             <i class="ti ti-device-floppy"></i> Create Center
           </button>
@@ -95,6 +95,14 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script>
+        function goBack() {
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = '@Url.Action("Centers", "SuperAdmin")';
+            }
+        }
+        
         function validateAndCreate() {
             var form = $('#createCenterForm');
             form.validate();

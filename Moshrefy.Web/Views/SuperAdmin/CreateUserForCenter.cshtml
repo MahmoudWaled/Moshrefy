@@ -15,9 +15,9 @@
         <h2 class="page-title"><i class="ti ti-user-plus"></i> Create User for Center</h2>
       </div>
       <div class="col-auto ms-auto">
-        <a asp-action="Users" class="btn btn-outline-secondary">
-          <i class="ti ti-arrow-left"></i> Back to Users
-        </a>
+        <button type="button" onclick="goBack()" class="btn btn-outline-secondary">
+          <i class="ti ti-arrow-left"></i> Back
+        </button>
       </div>
     </div>
   </div>
@@ -193,18 +193,9 @@
           <div class="card">
             <div class="card-body">
               <div class="d-grid gap-2">
-                @if (Model.CenterId.HasValue && Model.CenterId.Value > 0)
-                {
-                  <a asp-action="CenterUsers" asp-route-centerId="@Model.CenterId" class="btn btn-outline-secondary">
-                    <i class="ti ti-arrow-left"></i> Back to Center Users
-                  </a>
-                }
-                else
-                {
-                  <a asp-action="Users" class="btn btn-outline-secondary">
-                    <i class="ti ti-x"></i> Cancel
-                  </a>
-                }
+                <button type="button" onclick="goBack()" class="btn btn-outline-secondary">
+                  <i class="ti ti-x"></i> Cancel
+                </button>
                 <button type="submit" class="btn btn-action-create">
                   <i class="ti ti-user-plus"></i> Create User
                 </button>
@@ -219,6 +210,15 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        function goBack() {
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = '@Url.Action("Users", "SuperAdmin")';
+            }
+        }
+    </script>
 }
 
 <style>
