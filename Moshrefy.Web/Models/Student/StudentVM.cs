@@ -29,5 +29,7 @@ namespace Moshrefy.Web.Models.Student
         public int Age => DateTime.Now.Year - DateOfBirth.Year;
 
         public int EnrolledCoursesCount { get; set; }
+        
+        public bool IsDeleted { get; set; }
     }
 }

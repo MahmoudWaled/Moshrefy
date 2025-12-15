@@ -1,0 +1,304 @@
+@{
+    ViewData["Title"] = "Students";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Page Header -->
+<div class="page-header-modern">
+    <div class="row g-2 align-items-center">
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb-modern">
+                    <li class="breadcrumb-item active" aria-current="page"><i class="ti ti-users"></i> Students</li>
+                </ol>
+            </nav>
+            <h2 class="page-title"><i class="ti ti-users"></i> Students</h2>
+        </div>
+        <div class="col-auto ms-auto d-print-none">
+            @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+            {
+                <a asp-action="Create" class="btn btn-action-create d-none d-sm-inline-block">
+                    <i class="ti ti-user-plus icon"></i> Add Student
+                </a>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Page body -->
+<div class="page-body">
+  <div class="container-xl">
+    <div class="row row-deck row-cards">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Manage Students</h3>
+            <div class="ms-auto d-flex gap-2">
+              <!-- Status Filter -->
+              <div class="btn-group" role="group" aria-label="Status filter">
+                <button type="button" class="btn btn-sm active" data-filter-status="all">
+                  <i class="ti ti-list icon"></i> All
+                </button>
+                <button type="button" class="btn btn-sm" data-filter-status="Active">
+                  Active
+                </button>
+                <button type="button" class="btn btn-sm" data-filter-status="Inactive">
+                  Inactive
+                </button>
+                <button type="button" class="btn btn-sm" data-filter-status="Suspended">
+                  Suspended
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table id="studentsTable" class="table table-vcenter table-hover">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Age</th>
+                    <th>Status</th>
+                    <th class="w-1">Actions</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            var currentStatusFilter = 'all';
+
+            var table = $('#studentsTable').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: '@Url.Action("GetStudentsData")',
+                    type: 'POST',
+                    data: function (d) {
+                        d.filterStatus = currentStatusFilter;
+                    },
+                    error: function () {
+                        TablerDialog.fire({ icon: 'error', title: 'Error Loading Data', text: 'Please refresh and try again.' });
+                    }
+                },
+                columns: [
+                    {
+                        data: null,
+                        orderable: false,
+                        searchable: false,
+                        width: '50px',
+                        className: 'text-center',
+                        render: function(data, type, row, meta) {
+                            return '<span class="text-muted">' + (meta.row + meta.settings._iDisplayStart + 1) + '</span>';
+                        }
+                    },
+                    {
+                        data: 'name',
+                        name: 'name',
+                        render: function(data) {
+                            return '<i class="ti ti-user text-primary me-1"></i> <strong>' + data + '</strong>';
+                        }
+                    },
+                    {
+                        data: 'firstPhone',
+                        name: 'firstPhone',
+                        render: function(data) {
+                            return '<i class="ti ti-phone text-success me-1"></i> ' + data;
+                        }
+                    },
+                    {
+                        data: 'age',
+                        name: 'age',
+                        className: 'text-center',
+                        render: function(data) {
+                            return '<span>' + data + ' yrs</span>';
+                        }
+                    },
+                    {
+                        data: 'studentStatus',
+                        name: 'studentStatus',
+                        className: 'text-center',
+                        render: function(data, type, row) {
+                            switch(data) {
+                                case 1: // Active
+                                    return '<span class="text-muted">Active</span>';
+                                case 2: // Inactive
+                                    return '<span class="badge bg-state-inactive text-white"><i class="ti ti-x"></i> Inactive</span>';
+                                case 3: // Suspended
+                                    return '<span class="badge bg-warning text-dark"><i class="ti ti-ban"></i> Suspended</span>';
+                                default:
+                                    return '<span class="text-muted">Unknown</span>';
+                            }
+                        }
+                    },
+                    {
+                        data: null,
+                        orderable: false,
+                        width: '180px',
+                        className: 'text-center',
+                        render: function(data, type, row) {
+                            var buttons = '<div class="btn-group btn-group-sm" role="group">';
+
+                            // View button (always visible)
+                            buttons += '<a href="/Student/Details/' + row.id + '" class="btn btn-action-icon action-view" title="View"><i class="ti ti-eye"></i></a>';
+
+                            @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                            {
+                                @:buttons += '<a href="/Student/Edit/' + row.id + '" class="btn btn-action-icon action-edit" title="Edit"><i class="ti ti-edit"></i></a>';
+
+                                @:// Status buttons based on current status
+                                @:if (row.studentStatus === 1) { // Active
+                                @:    buttons += '<button onclick="deactivateStudent(' + row.id + ')" class="btn btn-action-icon action-deactivate" title="Deactivate"><i class="ti ti-ban"></i></button>';
+                                @:    buttons += '<button onclick="suspendStudent(' + row.id + ')" class="btn btn-action-icon" title="Suspend" style="color:#f59f00;"><i class="ti ti-alert-triangle"></i></button>';
+                                @:} else if (row.studentStatus === 2) { // Inactive
+                                @:    buttons += '<button onclick="activateStudent(' + row.id + ')" class="btn btn-action-icon action-activate" title="Activate"><i class="ti ti-check"></i></button>';
+                                @:} else if (row.studentStatus === 3) { // Suspended
+                                @:    buttons += '<button onclick="activateStudent(' + row.id + ')" class="btn btn-action-icon action-activate" title="Activate"><i class="ti ti-check"></i></button>';
+                                @:}
+
+                                @:buttons += '<button onclick="deleteStudent(' + row.id + ', \'' + row.name.replace(/'/g, "\\'") + '\')" class="btn btn-action-icon action-delete" title="Delete"><i class="ti ti-trash"></i></button>';
+                            }
+
+                            buttons += '</div>';
+                            return buttons;
+                        }
+                    }
+                ],
+                order: [[1, 'asc']],
+                pageLength: 25,
+                lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
+                language: {
+                    search: '_INPUT_',
+                    searchPlaceholder: 'Search students...',
+                    lengthMenu: '_MENU_ entries',
+                    info: 'Showing _START_ to _END_ of _TOTAL_ students',
+                    infoEmpty: 'No students found',
+                    infoFiltered: '(from _MAX_ total)',
+                    zeroRecords: 'No matching students found',
+                    emptyTable: '<div class="p-4 text-center"><i class="ti ti-users" style="font-size: 4rem;"></i><h4 class="text-muted mt-3">No Students Found</h4><p class="text-muted">Add your first student to get started.</p></div>',
+                    paginate: { first: '«', last: '»', next: '›', previous: '‹' },
+                    processing: '<div class="spinner-border text-primary" role="status"></div><span class="ms-2">Loading...</span>'
+                }
+            });
+
+            // Status filter click handler
+            $('[data-filter-status]').click(function() {
+                $('[data-filter-status]').removeClass('active');
+                $(this).addClass('active');
+                currentStatusFilter = $(this).data('filter-status');
+                table.ajax.reload();
+            });
+        });
+
+        function activateStudent(id) {
+            TablerDialog.fire({
+                title: 'Activate Student?',
+                text: 'This student will be marked as active.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                confirmButtonText: '<i class="ti ti-check"></i> Yes, activate'
+            }).then((r) => {
+                if (r.isConfirmed) {
+                    $.post('@Url.Action("Activate")', { id: id }).done((res) => {
+                        if (res.success) {
+                            TablerDialog.fire({ icon: 'success', title: 'Activated!', timer: 2000, showConfirmButton: false });
+                            $('#studentsTable').DataTable().ajax.reload(null, false);
+                        } else {
+                            TablerDialog.fire('Error', res.message, 'error');
+                        }
+                    });
+                }
+            });
+        }
+
+        function deactivateStudent(id) {
+            TablerDialog.fire({
+                title: 'Deactivate Student?',
+                text: 'This student will be marked as inactive.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ffc107',
+                confirmButtonText: '<i class="ti ti-ban"></i> Yes, deactivate'
+            }).then((r) => {
+                if (r.isConfirmed) {
+                    $.post('@Url.Action("Deactivate")', { id: id }).done((res) => {
+                        if (res.success) {
+                            TablerDialog.fire({ icon: 'success', title: 'Deactivated!', timer: 2000, showConfirmButton: false });
+                            $('#studentsTable').DataTable().ajax.reload(null, false);
+                        } else {
+                            TablerDialog.fire('Error', res.message, 'error');
+                        }
+                    });
+                }
+            });
+        }
+
+        function suspendStudent(id) {
+            TablerDialog.fire({
+                title: 'Suspend Student?',
+                text: 'This student will be suspended.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#f59f00',
+                confirmButtonText: '<i class="ti ti-alert-triangle"></i> Yes, suspend'
+            }).then((r) => {
+                if (r.isConfirmed) {
+                    $.post('@Url.Action("Suspend")', { id: id }).done((res) => {
+                        if (res.success) {
+                            TablerDialog.fire({ icon: 'success', title: 'Suspended!', timer: 2000, showConfirmButton: false });
+                            $('#studentsTable').DataTable().ajax.reload(null, false);
+                        } else {
+                            TablerDialog.fire('Error', res.message, 'error');
+                        }
+                    });
+                }
+            });
+        }
+
+        function deleteStudent(id, name) {
+            TablerDialog.fire({
+                title: 'Delete Student',
+                html: '<div class="alert alert-danger mb-3"><i class="ti ti-alert-triangle me-2"></i>This action will delete <strong>' + name + '</strong></div>Type <code>Delete</code> to confirm:',
+                input: 'text',
+                inputPlaceholder: 'Type Delete',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                confirmButtonText: '<i class="ti ti-trash"></i> Delete',
+                inputValidator: function(value) {
+                    if (value !== 'Delete') {
+                        return 'You must type "Delete" to confirm';
+                    }
+                    return null;
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post('@Url.Action("Delete")', { id: id })
+                        .done(function(res) {
+                            if (res.success) {
+                                TablerDialog.fire({ icon: 'success', title: 'Deleted!', timer: 2000, showConfirmButton: false });
+                                $('#studentsTable').DataTable().ajax.reload(null, false);
+                            } else {
+                                TablerDialog.fire('Error', res.message, 'error');
+                            }
+                        })
+                        .fail(function() {
+                            TablerDialog.fire('Error', 'Failed to delete. Please try again.', 'error');
+                        });
+                }
+            });
+        }
+    </script>
+}

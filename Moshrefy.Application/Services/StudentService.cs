@@ -1,15 +1,22 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using Moshrefy.Application.DTOs.Student;
 using Moshrefy.Application.Interfaces.IUnitOfWork;
 using Moshrefy.Application.Interfaces.IServices;
 using Moshrefy.Domain.Entities;
 using Moshrefy.Domain.Enums;
 using Moshrefy.Domain.Exceptions;
+using Moshrefy.Domain.Identity;
 using Moshrefy.Domain.Paramter;
 
 namespace Moshrefy.Application.Services
 {
-    public class StudentService(IUnitOfWork unitOfWork, IMapper mapper) : IStudentService
+    public class StudentService(
+        IUnitOfWork unitOfWork, 
+        IMapper mapper,
+        ITenantContext tenantContext,
+        UserManager<ApplicationUser> userManager
+        ) : BaseService(tenantContext), IStudentService
     {
         public async Task<StudentResponseDTO> CreateAsync(CreateStudentDTO createStudentDTO)
         {
@@ -19,14 +26,22 @@ namespace Moshrefy.Application.Services
                 throw new BadRequestException("A student with this phone number already exists.");
             }
 
+            var currentCenterId = GetCurrentCenterIdOrThrow();
             var student = mapper.Map<Student>(createStudentDTO);
             student.StudentStatus = StudentStatus.Active;
+            
+            // Set audit fields
+            var currentUser = await userManager.FindByIdAsync(tenantContext.GetCurrentUserId());
+            student.CenterId = currentCenterId;
+            student.CreatedById = currentUser!.Id;
+            student.CreatedByName = currentUser!.UserName ?? string.Empty;
 
             await unitOfWork.Students.AddAsync(student);
             await unitOfWork.SaveChangesAsync();
 
             return mapper.Map<StudentResponseDTO>(student);
         }
+
 
         public async Task<StudentResponseDTO?> GetByIdAsync(int id)
         {
@@ -88,7 +103,16 @@ namespace Moshrefy.Application.Services
             if (student == null)
                 throw new NotFoundException<int>(nameof(student), "student", id);
 
+            ValidateCenterAccess(student.CenterId, nameof(Student));
+
             mapper.Map(updateStudentDTO, student);
+            
+            // Set audit fields
+            var currentUser = await userManager.FindByIdAsync(tenantContext.GetCurrentUserId());
+            student.ModifiedById = currentUser!.Id;
+            student.ModifiedByName = currentUser!.UserName ?? string.Empty;
+            student.ModifiedAt = DateTimeOffset.UtcNow;
+            
             unitOfWork.Students.UpdateAsync(student);
             await unitOfWork.SaveChangesAsync();
         }
@@ -98,6 +122,8 @@ namespace Moshrefy.Application.Services
             var student = await unitOfWork.Students.GetByIdAsync(id);
             if (student == null)
                 throw new NotFoundException<int>(nameof(student), "student", id);
+
+            ValidateCenterAccess(student.CenterId, nameof(Student));
 
             unitOfWork.Students.DeleteAsync(student);
             await unitOfWork.SaveChangesAsync();
@@ -109,7 +135,16 @@ namespace Moshrefy.Application.Services
             if (student == null)
                 throw new NotFoundException<int>(nameof(student), "student", id);
 
+            ValidateCenterAccess(student.CenterId, nameof(Student));
+
             student.IsDeleted = true;
+            
+            // Set audit fields
+            var currentUser = await userManager.FindByIdAsync(tenantContext.GetCurrentUserId());
+            student.ModifiedById = currentUser!.Id;
+            student.ModifiedByName = currentUser!.UserName ?? string.Empty;
+            student.ModifiedAt = DateTimeOffset.UtcNow;
+            
             unitOfWork.Students.UpdateAsync(student);
             await unitOfWork.SaveChangesAsync();
         }
@@ -120,7 +155,16 @@ namespace Moshrefy.Application.Services
             if (student == null)
                 throw new NotFoundException<int>(nameof(student), "student", id);
 
+            ValidateCenterAccess(student.CenterId, nameof(Student));
+
             student.IsDeleted = false;
+            
+            // Set audit fields
+            var currentUser = await userManager.FindByIdAsync(tenantContext.GetCurrentUserId());
+            student.ModifiedById = currentUser!.Id;
+            student.ModifiedByName = currentUser!.UserName ?? string.Empty;
+            student.ModifiedAt = DateTimeOffset.UtcNow;
+            
             unitOfWork.Students.UpdateAsync(student);
             await unitOfWork.SaveChangesAsync();
         }
@@ -131,7 +175,16 @@ namespace Moshrefy.Application.Services
             if (student == null)
                 throw new NotFoundException<int>(nameof(student), "student", id);
 
+            ValidateCenterAccess(student.CenterId, nameof(Student));
+
             student.StudentStatus = StudentStatus.Active;
+            
+            // Set audit fields
+            var currentUser = await userManager.FindByIdAsync(tenantContext.GetCurrentUserId());
+            student.ModifiedById = currentUser!.Id;
+            student.ModifiedByName = currentUser!.UserName ?? string.Empty;
+            student.ModifiedAt = DateTimeOffset.UtcNow;
+            
             unitOfWork.Students.UpdateAsync(student);
             await unitOfWork.SaveChangesAsync();
         }
@@ -142,7 +195,16 @@ namespace Moshrefy.Application.Services
             if (student == null)
                 throw new NotFoundException<int>(nameof(student), "student", id);
 
+            ValidateCenterAccess(student.CenterId, nameof(Student));
+
             student.StudentStatus = StudentStatus.Inactive;
+            
+            // Set audit fields
+            var currentUser = await userManager.FindByIdAsync(tenantContext.GetCurrentUserId());
+            student.ModifiedById = currentUser!.Id;
+            student.ModifiedByName = currentUser!.UserName ?? string.Empty;
+            student.ModifiedAt = DateTimeOffset.UtcNow;
+            
             unitOfWork.Students.UpdateAsync(student);
             await unitOfWork.SaveChangesAsync();
         }
@@ -153,7 +215,16 @@ namespace Moshrefy.Application.Services
             if (student == null)
                 throw new NotFoundException<int>(nameof(student), "student", id);
 
+            ValidateCenterAccess(student.CenterId, nameof(Student));
+
             student.StudentStatus = StudentStatus.Suspended;
+            
+            // Set audit fields
+            var currentUser = await userManager.FindByIdAsync(tenantContext.GetCurrentUserId());
+            student.ModifiedById = currentUser!.Id;
+            student.ModifiedByName = currentUser!.UserName ?? string.Empty;
+            student.ModifiedAt = DateTimeOffset.UtcNow;
+            
             unitOfWork.Students.UpdateAsync(student);
             await unitOfWork.SaveChangesAsync();
         }

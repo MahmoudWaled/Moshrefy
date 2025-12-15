@@ -26,6 +26,8 @@ namespace Moshrefy.Application.DTOs.Student
 
         public StudentStatus StudentStatus { get; set; }
 
+        public bool IsDeleted { get; set; }
+
         public int Age => DateTime.Now.Year - DateOfBirth.Year;
 
         public int EnrolledCoursesCount { get; set; }
