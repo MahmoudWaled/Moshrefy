@@ -19,17 +19,28 @@ namespace Moshrefy.Web.Controllers
             }
             else if (User.IsInRole("Manager"))
             {
-                // TODO: Create Manager dashboard
-                return RedirectToAction("Index", "Admin");
+                return RedirectToAction("Manager");
             }
             else if (User.IsInRole("Employee"))
             {
-                // TODO: Create Employee dashboard
-                return RedirectToAction("Index", "Admin");
+                return RedirectToAction("Employee");
             }
 
             // Default fallback - redirect to login
             return RedirectToAction("Login", "Auth");
         }
+
+        [Authorize(Roles = "Manager")]
+        public IActionResult Manager()
+        {
+            return View();
+        }
+
+        [Authorize(Roles = "Employee")]
+        public IActionResult Employee()
+        {
+            return View();
+        }
     }
 }
+

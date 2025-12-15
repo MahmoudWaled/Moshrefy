@@ -77,6 +77,11 @@
               </div>
             </a>
             <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+              <a href="#" class="dropdown-item">
+                <i class="ti ti-user me-2"></i>
+                Profile
+              </a>
+              <div class="dropdown-divider"></div>
               <form asp-controller="Auth" asp-action="Logout" method="post" class="m-0">
                 <button type="submit" class="dropdown-item">
                   <i class="ti ti-logout me-2"></i>
@@ -96,9 +101,10 @@
           <div class="container-xl">
             <ul class="navbar-nav">
               
-              <!-- Dashboard - All Roles -->
+              @* ===== SUPER ADMIN NAVIGATION ===== *@
               @if (User.IsInRole("SuperAdmin"))
               {
+                <!-- Dashboard -->
                 <li class="nav-item">
                   <a class="nav-link" asp-controller="SuperAdmin" asp-action="Index">
                     <span class="nav-link-icon d-md-none d-lg-inline-block">
@@ -107,74 +113,40 @@
                     <span class="nav-link-title">Dashboard</span>
                   </a>
                 </li>
-              }
-              else if (User.IsInRole("Admin"))
-              {
+
+                <!-- Centers -->
                 <li class="nav-item">
-                  <a class="nav-link" asp-controller="Admin" asp-action="Index">
+                  <a class="nav-link" asp-controller="SuperAdmin" asp-action="Centers">
                     <span class="nav-link-icon d-md-none d-lg-inline-block">
-                      <i class="ti ti-home"></i>
+                      <i class="ti ti-building"></i>
                     </span>
-                    <span class="nav-link-title">My Center</span>
+                    <span class="nav-link-title">Centers</span>
                   </a>
                 </li>
-              }
 
-              <!-- SuperAdmin Only -->
-              @if (User.IsInRole("SuperAdmin"))
-              {
-                <li class="nav-item dropdown">
-                  <a class="nav-link dropdown-toggle" href="#navbar-system" data-bs-toggle="dropdown" data-bs-auto-close="false" role="button" aria-expanded="false">
-                    <span class="nav-link-icon d-md-none d-lg-inline-block">
-                      <i class="ti ti-settings"></i>
-                    </span>
-                    <span class="nav-link-title">System Management</span>
-                  </a>
-                  <div class="dropdown-menu">
-                    <a class="dropdown-item" asp-controller="SuperAdmin" asp-action="Centers">
-                      <i class="ti ti-building me-2"></i>
-                      Centers
-                    </a>
-                    <a class="dropdown-item" asp-controller="SuperAdmin" asp-action="Users">
-                      <i class="ti ti-users me-2"></i>
-                      User Management
-                    </a>
-                    <a class="dropdown-item" asp-controller="SuperAdmin" asp-action="DeletedItems">
-                      <i class="ti ti-trash me-2"></i>
-                      Deleted Items
-                    </a>
-                  </div>
-                </li>
-              }
-
-              <!-- Admin Only - Team Management -->
-              @if (User.IsInRole("Admin"))
-              {
-                <li class="nav-item dropdown">
-                  <a class="nav-link dropdown-toggle" href="#navbar-team" data-bs-toggle="dropdown" data-bs-auto-close="false" role="button" aria-expanded="false">
+                <!-- User Management -->
+                <li class="nav-item">
+                  <a class="nav-link" asp-controller="SuperAdmin" asp-action="Users">
                     <span class="nav-link-icon d-md-none d-lg-inline-block">
                       <i class="ti ti-users"></i>
                     </span>
-                    <span class="nav-link-title">My Team</span>
+                    <span class="nav-link-title">User Management</span>
                   </a>
-                  <div class="dropdown-menu">
-                    <a class="dropdown-item" asp-controller="Admin" asp-action="Users">
-                      <i class="ti ti-users me-2"></i>
-                      Team Members
-                    </a>
-                    <a class="dropdown-item" asp-controller="Admin" asp-action="CreateUser">
-                      <i class="ti ti-user-plus me-2"></i>
-                      Add Team Member
-                    </a>
-                  </div>
                 </li>
-              }
 
-              <!-- Admin & SuperAdmin - Academic Management -->
-              @if (User.IsInRole("SuperAdmin") || User.IsInRole("Admin"))
-              {
+                <!-- Items -->
+                <li class="nav-item">
+                  <a class="nav-link" asp-controller="Item" asp-action="Index">
+                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                      <i class="ti ti-package"></i>
+                    </span>
+                    <span class="nav-link-title">Items</span>
+                  </a>
+                </li>
+
+                <!-- Academic Management Dropdown -->
                 <li class="nav-item dropdown">
-                  <a class="nav-link dropdown-toggle" href="#navbar-academic" data-bs-toggle="dropdown" data-bs-auto-close="false" role="button" aria-expanded="false">
+                  <a class="nav-link dropdown-toggle" href="#navbar-academic" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false">
                     <span class="nav-link-icon d-md-none d-lg-inline-block">
                       <i class="ti ti-school"></i>
                     </span>
@@ -189,31 +161,10 @@
                       <i class="ti ti-book me-2"></i>
                       Courses
                     </a>
-                    <a class="dropdown-item" asp-controller="Student" asp-action="Index">
-                      <i class="ti ti-user-circle me-2"></i>
-                      Students
-                    </a>
-                    <a class="dropdown-item" asp-controller="Teacher" asp-action="Index">
-                      <i class="ti ti-user-check me-2"></i>
-                      Teachers
-                    </a>
                   </div>
                 </li>
-              }
 
-              <!-- All Roles - Operations -->
-              <li class="nav-item">
-                <a class="nav-link" asp-controller="Attendance" asp-action="Index">
-                  <span class="nav-link-icon d-md-none d-lg-inline-block">
-                    <i class="ti ti-clipboard-check"></i>
-                  </span>
-                  <span class="nav-link-title">Attendance</span>
-                </a>
-              </li>
-
-              <!-- Financial - Admin & SuperAdmin & Manager -->
-              @if (User.IsInRole("SuperAdmin") || User.IsInRole("Admin") || User.IsInRole("Manager"))
-              {
+                <!-- Payments -->
                 <li class="nav-item">
                   <a class="nav-link" asp-controller="Payment" asp-action="Index">
                     <span class="nav-link-icon d-md-none d-lg-inline-block">
@@ -222,7 +173,376 @@
                     <span class="nav-link-title">Payments</span>
                   </a>
                 </li>
+
+                <!-- Invoices -->
+                <li class="nav-item">
+                  <a class="nav-link" asp-controller="Invoice" asp-action="Index">
+                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                      <i class="ti ti-file-invoice"></i>
+                    </span>
+                    <span class="nav-link-title">Invoices</span>
+                  </a>
+                </li>
               }
+
+              @* ===== ADMIN NAVIGATION ===== *@
+              @if (User.IsInRole("Admin"))
+              {
+                <!-- My Center -->
+                <li class="nav-item">
+                  <a class="nav-link" asp-controller="Admin" asp-action="Index">
+                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                      <i class="ti ti-home"></i>
+                    </span>
+                    <span class="nav-link-title">My Center</span>
+                  </a>
+                </li>
+
+                <!-- My Team -->
+                <li class="nav-item">
+                  <a class="nav-link" asp-controller="Admin" asp-action="Users">
+                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                      <i class="ti ti-users"></i>
+                    </span>
+                    <span class="nav-link-title">My Team</span>
+                  </a>
+                </li>
+
+                <!-- Academic Dropdown -->
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#navbar-academic" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false">
+                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                      <i class="ti ti-school"></i>
+                    </span>
+                    <span class="nav-link-title">Academic</span>
+                  </a>
+                  <div class="dropdown-menu">
+                    <a class="dropdown-item" asp-controller="AcademicYear" asp-action="Index">
+                      <i class="ti ti-calendar me-2"></i>
+                      Academic Years
+                    </a>
+                    <a class="dropdown-item" asp-controller="Course" asp-action="Index">
+                      <i class="ti ti-book me-2"></i>
+                      Courses
+                    </a>
+                    <a class="dropdown-item" asp-controller="Classroom" asp-action="Index">
+                      <i class="ti ti-door me-2"></i>
+                      Classrooms
+                    </a>
+                  </div>
+                </li>
+
+                <!-- Members Dropdown -->
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#navbar-members" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false">
+                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                      <i class="ti ti-users-group"></i>
+                    </span>
+                    <span class="nav-link-title">Members</span>
+                  </a>
+                  <div class="dropdown-menu">
+                    <a class="dropdown-item" asp-controller="Teacher" asp-action="Index">
+                      <i class="ti ti-user-check me-2"></i>
+                      Teachers
+                    </a>
+                    <a class="dropdown-item" asp-controller="Student" asp-action="Index">
+                      <i class="ti ti-user-circle me-2"></i>
+                      Students
+                    </a>
+                    <a class="dropdown-item" asp-controller="Enrollment" asp-action="Index">
+                      <i class="ti ti-clipboard-list me-2"></i>
+                      Enrollments
+                    </a>
+                  </div>
+                </li>
+
+                <!-- Operations Dropdown -->
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#navbar-operations" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false">
+                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                      <i class="ti ti-settings"></i>
+                    </span>
+                    <span class="nav-link-title">Operations</span>
+                  </a>
+                  <div class="dropdown-menu">
+                    <a class="dropdown-item" asp-controller="Session" asp-action="Index">
+                      <i class="ti ti-clock me-2"></i>
+                      Sessions
+                    </a>
+                    <a class="dropdown-item" asp-controller="Exam" asp-action="Index">
+                      <i class="ti ti-writing me-2"></i>
+                      Exams
+                    </a>
+                    <a class="dropdown-item" asp-controller="Attendance" asp-action="Index">
+                      <i class="ti ti-clipboard-check me-2"></i>
+                      Attendance
+                    </a>
+                  </div>
+                </li>
+
+                <!-- Finance Dropdown -->
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#navbar-finance" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false">
+                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                      <i class="ti ti-wallet"></i>
+                    </span>
+                    <span class="nav-link-title">Finance</span>
+                  </a>
+                  <div class="dropdown-menu">
+                    <a class="dropdown-item" asp-controller="Payment" asp-action="Index">
+                      <i class="ti ti-cash me-2"></i>
+                      Payments
+                    </a>
+                    <a class="dropdown-item" asp-controller="Invoice" asp-action="Index">
+                      <i class="ti ti-file-invoice me-2"></i>
+                      Invoices
+                    </a>
+                  </div>
+                </li>
+
+                <!-- Items -->
+                <li class="nav-item">
+                  <a class="nav-link" asp-controller="Item" asp-action="Index">
+                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                      <i class="ti ti-package"></i>
+                    </span>
+                    <span class="nav-link-title">Items</span>
+                  </a>
+                </li>
+              }
+
+              @* ===== MANAGER NAVIGATION ===== *@
+              @if (User.IsInRole("Manager"))
+              {
+                <!-- Home -->
+                <li class="nav-item">
+                  <a class="nav-link" asp-controller="Home" asp-action="Manager">
+                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                      <i class="ti ti-home"></i>
+                    </span>
+                    <span class="nav-link-title">Home</span>
+                  </a>
+                </li>
+
+                <!-- Academic Dropdown -->
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#navbar-academic" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false">
+                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                      <i class="ti ti-school"></i>
+                    </span>
+                    <span class="nav-link-title">Academic</span>
+                  </a>
+                  <div class="dropdown-menu">
+                    <a class="dropdown-item" asp-controller="AcademicYear" asp-action="Index">
+                      <i class="ti ti-calendar me-2"></i>
+                      Academic Years
+                    </a>
+                    <a class="dropdown-item" asp-controller="Course" asp-action="Index">
+                      <i class="ti ti-book me-2"></i>
+                      Courses
+                    </a>
+                    <a class="dropdown-item" asp-controller="Classroom" asp-action="Index">
+                      <i class="ti ti-door me-2"></i>
+                      Classrooms
+                    </a>
+                  </div>
+                </li>
+
+                <!-- Members Dropdown -->
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#navbar-members" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false">
+                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                      <i class="ti ti-users-group"></i>
+                    </span>
+                    <span class="nav-link-title">Members</span>
+                  </a>
+                  <div class="dropdown-menu">
+                    <a class="dropdown-item" asp-controller="Teacher" asp-action="Index">
+                      <i class="ti ti-user-check me-2"></i>
+                      Teachers
+                    </a>
+                    <a class="dropdown-item" asp-controller="Student" asp-action="Index">
+                      <i class="ti ti-user-circle me-2"></i>
+                      Students
+                    </a>
+                    <a class="dropdown-item" asp-controller="Enrollment" asp-action="Index">
+                      <i class="ti ti-clipboard-list me-2"></i>
+                      Enrollments
+                    </a>
+                  </div>
+                </li>
+
+                <!-- Operations Dropdown -->
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#navbar-operations" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false">
+                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                      <i class="ti ti-settings"></i>
+                    </span>
+                    <span class="nav-link-title">Operations</span>
+                  </a>
+                  <div class="dropdown-menu">
+                    <a class="dropdown-item" asp-controller="Session" asp-action="Index">
+                      <i class="ti ti-clock me-2"></i>
+                      Sessions
+                    </a>
+                    <a class="dropdown-item" asp-controller="Exam" asp-action="Index">
+                      <i class="ti ti-writing me-2"></i>
+                      Exams
+                    </a>
+                    <a class="dropdown-item" asp-controller="Attendance" asp-action="Index">
+                      <i class="ti ti-clipboard-check me-2"></i>
+                      Attendance
+                    </a>
+                  </div>
+                </li>
+
+                <!-- Finance Dropdown -->
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#navbar-finance" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false">
+                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                      <i class="ti ti-wallet"></i>
+                    </span>
+                    <span class="nav-link-title">Finance</span>
+                  </a>
+                  <div class="dropdown-menu">
+                    <a class="dropdown-item" asp-controller="Payment" asp-action="Index">
+                      <i class="ti ti-cash me-2"></i>
+                      Payments
+                    </a>
+                    <a class="dropdown-item" asp-controller="Invoice" asp-action="Index">
+                      <i class="ti ti-file-invoice me-2"></i>
+                      Invoices
+                    </a>
+                  </div>
+                </li>
+
+                <!-- Items -->
+                <li class="nav-item">
+                  <a class="nav-link" asp-controller="Item" asp-action="Index">
+                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                      <i class="ti ti-package"></i>
+                    </span>
+                    <span class="nav-link-title">Items</span>
+                  </a>
+                </li>
+              }
+
+              @* ===== EMPLOYEE NAVIGATION ===== *@
+              @if (User.IsInRole("Employee"))
+              {
+                <!-- Home -->
+                <li class="nav-item">
+                  <a class="nav-link" asp-controller="Home" asp-action="Employee">
+                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                      <i class="ti ti-home"></i>
+                    </span>
+                    <span class="nav-link-title">Home</span>
+                  </a>
+                </li>
+
+                <!-- Academic Dropdown -->
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#navbar-academic" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false">
+                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                      <i class="ti ti-school"></i>
+                    </span>
+                    <span class="nav-link-title">Academic</span>
+                  </a>
+                  <div class="dropdown-menu">
+                    <a class="dropdown-item" asp-controller="AcademicYear" asp-action="Index">
+                      <i class="ti ti-calendar me-2"></i>
+                      Academic Years
+                    </a>
+                    <a class="dropdown-item" asp-controller="Course" asp-action="Index">
+                      <i class="ti ti-book me-2"></i>
+                      Courses
+                    </a>
+                    <a class="dropdown-item" asp-controller="Classroom" asp-action="Index">
+                      <i class="ti ti-door me-2"></i>
+                      Classrooms
+                    </a>
+                  </div>
+                </li>
+
+                <!-- Members Dropdown -->
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#navbar-members" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false">
+                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                      <i class="ti ti-users-group"></i>
+                    </span>
+                    <span class="nav-link-title">Members</span>
+                  </a>
+                  <div class="dropdown-menu">
+                    <a class="dropdown-item" asp-controller="Teacher" asp-action="Index">
+                      <i class="ti ti-user-check me-2"></i>
+                      Teachers
+                    </a>
+                    <a class="dropdown-item" asp-controller="Student" asp-action="Index">
+                      <i class="ti ti-user-circle me-2"></i>
+                      Students
+                    </a>
+                    <a class="dropdown-item" asp-controller="Enrollment" asp-action="Index">
+                      <i class="ti ti-clipboard-list me-2"></i>
+                      Enrollments
+                    </a>
+                  </div>
+                </li>
+
+                <!-- Operations Dropdown -->
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#navbar-operations" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false">
+                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                      <i class="ti ti-settings"></i>
+                    </span>
+                    <span class="nav-link-title">Operations</span>
+                  </a>
+                  <div class="dropdown-menu">
+                    <a class="dropdown-item" asp-controller="Session" asp-action="Index">
+                      <i class="ti ti-clock me-2"></i>
+                      Sessions
+                    </a>
+                    <a class="dropdown-item" asp-controller="Exam" asp-action="Index">
+                      <i class="ti ti-writing me-2"></i>
+                      Exams
+                    </a>
+                    <a class="dropdown-item" asp-controller="Attendance" asp-action="Index">
+                      <i class="ti ti-clipboard-check me-2"></i>
+                      Attendance
+                    </a>
+                  </div>
+                </li>
+
+                <!-- Finance Dropdown -->
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#navbar-finance" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false">
+                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                      <i class="ti ti-wallet"></i>
+                    </span>
+                    <span class="nav-link-title">Finance</span>
+                  </a>
+                  <div class="dropdown-menu">
+                    <a class="dropdown-item" asp-controller="Payment" asp-action="Index">
+                      <i class="ti ti-cash me-2"></i>
+                      Payments
+                    </a>
+                    <a class="dropdown-item" asp-controller="Invoice" asp-action="Index">
+                      <i class="ti ti-file-invoice me-2"></i>
+                      Invoices
+                    </a>
+                  </div>
+                </li>
+
+                <!-- Items -->
+                <li class="nav-item">
+                  <a class="nav-link" asp-controller="Item" asp-action="Index">
+                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                      <i class="ti ti-package"></i>
+                    </span>
+                    <span class="nav-link-title">Items</span>
+                  </a>
+                </li>
+              }
+
             </ul>
           </div>
         </div>

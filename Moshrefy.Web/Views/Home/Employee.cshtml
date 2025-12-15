@@ -1,0 +1,170 @@
+@{
+    ViewData["Title"] = "Home";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Page header -->
+<div class="page-header d-print-none">
+  <div class="container-xl">
+    <div class="row g-2 align-items-center">
+      <div class="col">
+        <div class="page-pretitle">Employee</div>
+        <h2 class="page-title"><i class="ti ti-home"></i> Home</h2>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Page body -->
+<div class="page-body">
+  <div class="container-xl">
+    @{
+      var hasCenterIdClaim = User.Claims.Any(c => c.Type == "CenterId" && !string.IsNullOrEmpty(c.Value));
+    }
+    @if (!hasCenterIdClaim)
+    {
+      <div class="row mb-3">
+        <div class="col-12">
+          <div class="alert alert-warning">
+            <div class="d-flex">
+              <div><i class="ti ti-alert-triangle icon me-2"></i></div>
+              <div><strong>System Updated!</strong><br>We've made some improvements. Please <strong>log out and log back in</strong> to enjoy better performance.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Welcome Banner -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card" style="background: linear-gradient(135deg, #4263eb 0%, #3b5bdb 100%);">
+          <div class="card-body py-4">
+            <div class="row align-items-center">
+              <div class="col-md-8">
+                <h2 class="text-white mb-2"><i class="ti ti-mood-happy me-2"></i>Welcome, Employee!</h2>
+                <p class="text-white-50 mb-0">Access your daily tasks and operations from this dashboard.</p>
+              </div>
+              <div class="col-md-4 text-end d-none d-md-block">
+                <i class="ti ti-user" style="font-size: 5rem; opacity: 0.3; color: white;"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <h3 class="mb-3"><i class="ti ti-rocket me-2"></i>Quick Actions</h3>
+      </div>
+    </div>
+
+    <div class="row row-deck row-cards">
+      <!-- Students Card -->
+      <div class="col-sm-6 col-lg-3">
+        <div class="card card-sm">
+          <div class="card-body">
+            <div class="row align-items-center">
+              <div class="col-auto">
+                <span class="avatar bg-info text-white" style="width: 3rem; height: 3rem;">
+                  <i class="ti ti-user-circle" style="font-size: 1.5rem;"></i>
+                </span>
+              </div>
+              <div class="col">
+                <div class="fw-bold">Students</div>
+                <div class="text-muted small">View & manage students</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <a asp-controller="Student" asp-action="Index" class="btn btn-info w-100">
+              <i class="ti ti-arrow-right"></i> View Students
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Attendance Card -->
+      <div class="col-sm-6 col-lg-3">
+        <div class="card card-sm">
+          <div class="card-body">
+            <div class="row align-items-center">
+              <div class="col-auto">
+                <span class="avatar bg-success text-white" style="width: 3rem; height: 3rem;">
+                  <i class="ti ti-clipboard-check" style="font-size: 1.5rem;"></i>
+                </span>
+              </div>
+              <div class="col">
+                <div class="fw-bold">Attendance</div>
+                <div class="text-muted small">Track student attendance</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <a asp-controller="Attendance" asp-action="Index" class="btn btn-success w-100">
+              <i class="ti ti-arrow-right"></i> Attendance
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Enrollments Card -->
+      <div class="col-sm-6 col-lg-3">
+        <div class="card card-sm">
+          <div class="card-body">
+            <div class="row align-items-center">
+              <div class="col-auto">
+                <span class="avatar bg-warning text-white" style="width: 3rem; height: 3rem;">
+                  <i class="ti ti-clipboard-list" style="font-size: 1.5rem;"></i>
+                </span>
+              </div>
+              <div class="col">
+                <div class="fw-bold">Enrollments</div>
+                <div class="text-muted small">Manage enrollments</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <a asp-controller="Enrollment" asp-action="Index" class="btn btn-warning w-100">
+              <i class="ti ti-arrow-right"></i> Enrollments
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payments Card -->
+      <div class="col-sm-6 col-lg-3">
+        <div class="card card-sm">
+          <div class="card-body">
+            <div class="row align-items-center">
+              <div class="col-auto">
+                <span class="avatar bg-purple text-white" style="width: 3rem; height: 3rem;">
+                  <i class="ti ti-cash" style="font-size: 1.5rem;"></i>
+                </span>
+              </div>
+              <div class="col">
+                <div class="fw-bold">Payments</div>
+                <div class="text-muted small">View & add payments</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <a asp-controller="Payment" asp-action="Index" class="btn btn-purple w-100">
+              <i class="ti ti-arrow-right"></i> Payments
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .btn-purple { background-color: #6f42c1 !important; border-color: #6f42c1 !important; color: white; }
+  .btn-purple:hover { background-color: #5a32a3 !important; border-color: #5a32a3 !important; color: white; }
+  .bg-purple { background-color: #6f42c1 !important; }
+  .card { transition: transform 0.2s, box-shadow 0.2s; }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+</style>
