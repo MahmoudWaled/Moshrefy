@@ -55,12 +55,14 @@
               <table id="usersTable" class="table table-vcenter table-hover">
                 <thead>
                   <tr>
+                    <th>#</th>
                     <th>Name</th>
                     <th>Username</th>
                     <th>Email</th>
                     <th>Phone</th>
                     <th>Type</th>
                     <th>Status</th>
+                    <th>Created At</th>
                     <th class="w-1">Actions</th>
                   </tr>
                 </thead>
@@ -102,21 +104,25 @@
                     }
                 },
                 columns: [
+                    {
+                        data: null,
+                        orderable: false,
+                        searchable: false,
+                        width: '50px',
+                        className: 'text-center',
+                        render: function(data, type, row, meta) {
+                            return '<span class="text-muted">' + (meta.row + meta.settings._iDisplayStart + 1) + '</span>';
+                        }
+                    },
                     { data: 'name', name: 'name' },
                     { data: 'userName', name: 'userName' },
-                    { data: 'email', name: 'email', defaultContent: '' },
-                    { data: 'phoneNumber', name: 'phoneNumber', defaultContent: '' },
+                    { data: 'email', name: 'email', defaultContent: '<span class="text-muted">N/A</span>' },
+                    { data: 'phoneNumber', name: 'phoneNumber', defaultContent: '<span class="text-muted">N/A</span>' },
                     {
                         data: 'roleName',
                         name: 'roleName',
                         render: function (data, type, row) {
-                            if (data === 'Employee') {
-                                return '<span class="badge bg-role-employee"><i class="ti ti-user"></i> Employee</span>';
-                            } else if (data === 'Manager') {
-                                return '<span class="badge bg-role-manager"><i class="ti ti-user-cog"></i> Manager</span>';
-                            } else {
-                                return '<span class="badge bg-secondary">' + data + '</span>';
-                            }
+                            return '<span class="text-muted">' + (data || 'N/A') + '</span>';
                         }
                     },
                     {
@@ -124,10 +130,20 @@
                         name: 'isActive',
                         render: function (data, type, row) {
                             if (data) {
-                                return '<span class="badge bg-state-active"><i class="ti ti-check"></i> Active</span>';
+                                return '<span class="text-muted">Active</span>';
                             } else {
-                                return '<span class="badge bg-state-inactive"><i class="ti ti-x"></i> Inactive</span>';
+                                return '<span class="badge bg-state-inactive text-white"><i class="ti ti-x"></i> Inactive</span>';
                             }
+                        }
+                    },
+                    {
+                        data: 'createdAt',
+                        name: 'createdAt',
+                        className: 'text-center',
+                        render: function(data) {
+                            if (!data) return '<span class="text-muted">N/A</span>';
+                            var date = new Date(data);
+                            return '<small class="text-muted"><i class="ti ti-clock me-1"></i>' + date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) + '</small>';
                         }
                     },
                     {
@@ -153,11 +169,16 @@
                         }
                     }
                 ],
-                order: [[0, 'asc']],
+                order: [[8, 'desc']],
                 language: {
-                    processing: '<i class="ti ti-loader"></i> Loading...',
-                    emptyTable: 'No team members found',
-                    zeroRecords: 'No matching records found'
+                    search: '_INPUT_',
+                    searchPlaceholder: 'Search members...',
+                    lengthMenu: '_MENU_ entries',
+                    info: 'Showing _START_ to _END_ of _TOTAL_ members',
+                    infoEmpty: 'No team members found',
+                    infoFiltered: '(from _MAX_ total)',
+                    zeroRecords: 'No matching members found',
+                    paginate: { first: '«', last: '»', next: '›', previous: '‹' }
                 }
             });
 

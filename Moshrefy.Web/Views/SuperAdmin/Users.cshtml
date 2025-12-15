@@ -187,30 +187,7 @@
                         className: 'text-center align-middle',
                         render: function (data) {
                             if (data) {
-                                var badgeClass = 'bg-secondary';
-                                var icon = 'ti-user';
-                                
-                                switch(data) {
-                                    case 'SuperAdmin':
-                                        badgeClass = 'bg-role-superadmin';
-                                        icon = 'ti-shield';
-                                        break;
-                                    case 'Admin':
-                                        badgeClass = 'bg-role-admin';
-                                        icon = 'ti-user-check';
-                                        break;
-                                    case 'Manager':
-                                        badgeClass = 'bg-role-manager';
-                                        icon = 'ti-user-cog';
-                                        break;
-                                    case 'Employee':
-                                        badgeClass = 'bg-role-employee';
-                                        icon = 'ti-user';
-                                        break;
-                                }
-                                
-                                return '<span class="badge ' + badgeClass + '">' +
-                                       '<i class="ti ' + icon + '"></i> ' + data + '</span>';
+                                return '<span class="text-muted">' + data + '</span>';
                             }
                             return '<span class="text-muted">N/A</span>';
                         }
@@ -220,11 +197,14 @@
                         name: 'IsActive',
                         width: '85px',
                         className: 'text-center align-middle',
-                        render: function (data) {
-                            if (data) {
-                                return '<span class="badge bg-state-active"><i class="ti ti-check"></i> Active</span>';
+                        render: function (data, type, row) {
+                            if (row.isDeleted) {
+                                return '<span class="text-muted">Inactive</span>';
                             }
-                            return '<span class="badge bg-state-inactive"><i class="ti ti-x"></i> Inactive</span>';
+                            if (data) {
+                                return '<span class="text-muted">Active</span>';
+                            }
+                            return '<span class="badge bg-state-inactive text-white"><i class="ti ti-x"></i> Inactive</span>';
                         }
                     },
                     {
@@ -234,9 +214,9 @@
                         className: 'text-center align-middle',
                         render: function (data) {
                             if (data) {
-                                return '<span class="badge bg-action-delete"><i class="ti ti-trash"></i> Deleted</span>';
+                                return '<span class="badge bg-danger text-white"><i class="ti ti-trash"></i> Deleted</span>';
                             }
-                            return '<span class="badge bg-state-normal"><i class="ti ti-circle-check"></i> Normal</span>';
+                            return '<span class="text-muted">Normal</span>';
                         }
                     },
                     {
@@ -308,15 +288,16 @@
                 language: {
                     search: "_INPUT_",
                     searchPlaceholder: "Search users...",
-                    lengthMenu: "Show _MENU_ users",
+                    lengthMenu: "_MENU_ entries",
                     info: "Showing _START_ to _END_ of _TOTAL_ users",
                     infoEmpty: "No users to display",
-                    infoFiltered: "(filtered from _MAX_ total)",
+                    infoFiltered: "(from _MAX_ total)",
                     zeroRecords: "No matching users found",
                     emptyTable: '<div class="p-4 text-center">' +
                         '<i class="ti ti-users" style="font-size: 4rem;"></i>' +
                         '<h4 class="text-muted mt-3">No Deleted Users Found.</h4>' +
-                        '</div>'
+                        '</div>',
+                    paginate: { first: '«', last: '»', next: '›', previous: '‹' }
                 },
                 createdRow: function (row, data, dataIndex) {
                     if (data.isDeleted) {

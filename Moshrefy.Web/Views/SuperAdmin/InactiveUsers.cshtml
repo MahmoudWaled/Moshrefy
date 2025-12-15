@@ -82,12 +82,7 @@
                     {
                         data: 'roleName', name: 'RoleName', className: 'text-center',
                         render: function (d) {
-                            var cls = 'bg-secondary', icon = 'ti-user';
-                            if (d === 'SuperAdmin') { cls = 'bg-role-superadmin'; icon = 'ti-shield'; }
-                            else if (d === 'Admin') { cls = 'bg-role-admin'; icon = 'ti-user-check'; }
-                            else if (d === 'Manager') { cls = 'bg-role-manager'; icon = 'ti-user-cog'; }
-                            else if (d === 'Employee') { cls = 'bg-role-employee'; icon = 'ti-user'; }
-                            return '<span class="badge ' + cls + '"><i class="ti ' + icon + '"></i> ' + d + '</span>';
+                            return '<span class="text-muted">' + d + '</span>';
                         }
                     },
                     { data: 'createdAt', name: 'CreatedAt', className: 'text-center', render: function (d) { return '<small class="text-muted"><i class="ti ti-clock me-1"></i>' + new Date(d).toLocaleDateString() + '</small>'; } },
@@ -103,7 +98,15 @@
                 ],
                 pageLength: 25, order: [[7, 'desc']],
                 language: {
-                    emptyTable: '<div class=\"p-4 text-center\"><i class=\"ti ti-user-check\" style=\"font-size:4rem;color:#2fb344;\"></i><h4 class=\"text-success mt-3\">Great! No Inactive Users</h4><p class=\"text-muted\">All users are currently active.</p><a href=\"@Url.Action("Users", "SuperAdmin")\" class=\"btn btn-action-view\"><i class=\"ti ti-users\"></i> View All Users</a></div>'
+                    search: '_INPUT_',
+                    searchPlaceholder: 'Search users...',
+                    lengthMenu: '_MENU_ entries',
+                    info: 'Showing _START_ to _END_ of _TOTAL_ users',
+                    infoEmpty: 'No inactive users',
+                    infoFiltered: '(from _MAX_ total)',
+                    zeroRecords: 'No matching users found',
+                    emptyTable: '<div class=\"p-4 text-center\"><i class=\"ti ti-user-check\" style=\"font-size:4rem;color:#2fb344;\"></i><h4 class=\"text-success mt-3\">Great! No Inactive Users</h4><p class=\"text-muted\">All users are currently active.</p><a href=\"@Url.Action("Users", "SuperAdmin")\" class=\"btn btn-action-view\"><i class=\"ti ti-users\"></i> View All Users</a></div>',
+                    paginate: { first: '«', last: '»', next: '›', previous: '‹' }
                 }
             });
         });

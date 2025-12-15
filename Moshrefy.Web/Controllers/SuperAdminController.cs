@@ -272,10 +272,56 @@ namespace Moshrefy.Web.Controllers
         }
 
 
-        // Delete Center (Soft Delete)
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SoftDeleteCenter(int id)
+        // Activate Center
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ActivateCenter(int id)
+    {
+        if (id <= 0)
+        {
+            return Json(new { success = false, message = "Invalid center ID" });
+        }
+
+        try
+        {
+            await _superAdminService.ActivateCenterAsync(id);
+            _logger.LogInformation($"Center with ID {id} activated by SuperAdmin.", id);
+            return Json(new { success = true, message = "Center activated successfully!" });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Error activating center with ID {id}.", id);
+            return Json(new { success = false, message = $"Error activating center: {ex.Message}" });
+        }
+    }
+
+    // Deactivate Center
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeactivateCenter(int id)
+    {
+        if (id <= 0)
+        {
+            return Json(new { success = false, message = "Invalid center ID" });
+        }
+
+        try
+        {
+            await _superAdminService.DeactivateCenterAsync(id);
+            _logger.LogInformation($"Center with ID {id} deactivated by SuperAdmin.", id);
+            return Json(new { success = true, message = "Center deactivated successfully!" });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Error deactivating center with ID {id}.", id);
+            return Json(new { success = false, message = $"Error deactivating center: {ex.Message}" });
+        }
+    }
+
+    // Delete Center (Soft Delete)
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> SoftDeleteCenter(int id)
         {
             if (id <= 0)
             {

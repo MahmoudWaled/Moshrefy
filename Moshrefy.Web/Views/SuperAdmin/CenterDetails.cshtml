@@ -169,7 +169,6 @@
 
       <!-- Sidebar -->
       <div class="col-lg-4">
-        <!-- Actions Card -->
         <div class="card mb-3">
           <div class="card-header">
             <h3 class="card-title"><i class="ti ti-settings me-2"></i>Actions</h3>
@@ -182,6 +181,18 @@
               <a asp-action="EditCenter" asp-route-id="@Model.Id" class="btn btn-action-edit">
                 <i class="ti ti-edit me-2"></i> Edit Center
               </a>
+              @if (Model.IsActive)
+              {
+                <button onclick="deactivateCenter()" class="btn btn-state-deactive">
+                  <i class="ti ti-ban me-2"></i> Deactivate Center
+                </button>
+              }
+              else
+              {
+                <button onclick="activateCenter()" class="btn btn-state-active">
+                  <i class="ti ti-check me-2"></i> Activate Center
+                </button>
+              }
               <hr class="my-2">
               <button onclick="softDeleteCenter()" class="btn btn-outline-warning">
                 <i class="ti ti-trash me-2"></i> Move to Trash
@@ -217,6 +228,68 @@
 @section Scripts {
     <script>
         var token = $('input[name="__RequestVerificationToken"]').val();
+        
+        function activateCenter() {
+            Swal.fire({ 
+                title: 'Activate Center?', 
+                html: 'Activate <strong>@Model.Name</strong>?<br><br>This will make the center operational.', 
+                icon: 'question', 
+                showCancelButton: true, 
+                confirmButtonColor: '#28a745', 
+                confirmButtonText: '<i class="ti ti-check"></i> Yes, Activate'
+            })
+            .then((r) => { 
+                if (r.isConfirmed) { 
+                    $.ajax({
+                        url: '@Url.Action("ActivateCenter")',
+                        type: 'POST',
+                        data: { id: @Model.Id, __RequestVerificationToken: token },
+                        success: function(res) {
+                            if (res.success) { 
+                                Swal.fire({ icon: 'success', title: 'Activated!', text: res.message, timer: 2000, showConfirmButton: false })
+                                .then(() => window.location.reload()); 
+                            } else { 
+                                Swal.fire('Error', res.message || 'An error occurred', 'error'); 
+                            }
+                        },
+                        error: function() {
+                            Swal.fire('Error', 'Failed to activate center.', 'error');
+                        }
+                    }); 
+                } 
+            });
+        }
+
+        function deactivateCenter() {
+            Swal.fire({ 
+                title: 'Deactivate Center?', 
+                html: 'Deactivate <strong>@Model.Name</strong>?<br><br>This will make the center non-operational.', 
+                icon: 'warning', 
+                showCancelButton: true, 
+                confirmButtonColor: '#ffc107', 
+                confirmButtonText: '<i class="ti ti-ban"></i> Yes, Deactivate'
+            })
+            .then((r) => { 
+                if (r.isConfirmed) { 
+                    $.ajax({
+                        url: '@Url.Action("DeactivateCenter")',
+                        type: 'POST',
+                        data: { id: @Model.Id, __RequestVerificationToken: token },
+                        success: function(res) {
+                            if (res.success) { 
+                                Swal.fire({ icon: 'success', title: 'Deactivated!', text: res.message, timer: 2000, showConfirmButton: false })
+                                .then(() => window.location.reload()); 
+                            } else { 
+                                Swal.fire('Error', res.message || 'An error occurred', 'error'); 
+                            }
+                        },
+                        error: function() {
+                            Swal.fire('Error', 'Failed to deactivate center.', 'error');
+                        }
+                    }); 
+                } 
+            });
+        }
         
         function softDeleteCenter() {
             Swal.fire({ 

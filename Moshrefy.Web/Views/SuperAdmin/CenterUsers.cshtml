@@ -48,7 +48,6 @@
                     <th>#</th>
                     <th data-name="Name">Name</th>
                     <th data-name="UserName">Username</th>
-                    <th data-name="Email">Email</th>
                     <th data-name="PhoneNumber">Phone</th>
                     <th data-name="RoleName">Role</th>
                     <th data-name="IsActive">Status</th>
@@ -95,21 +94,15 @@
                     { data: null, orderable: false, searchable: false, className: 'text-center', render: function (d, t, r, m) { return '<span class="text-muted">' + (m.row + m.settings._iDisplayStart + 1) + '</span>'; } },
                     { data: 'name', name: 'Name', render: function (d) { return '<i class="ti ti-user text-primary me-1"></i> <strong>' + d + '</strong>'; } },
                     { data: 'userName', name: 'UserName', render: function (d) { return '<code>' + d + '</code>'; } },
-                    { data: 'email', name: 'Email', render: function (d) { return d ? '<a href="mailto:' + d + '">' + d + '</a>' : '<span class="text-muted">N/A</span>'; } },
                     { data: 'phoneNumber', name: 'PhoneNumber', render: function (d) { return d ? '<i class="ti ti-phone text-success me-1"></i>' + d : '<span class="text-muted">N/A</span>'; } },
                     {
                         data: 'roleName', name: 'RoleName', className: 'text-center',
                         render: function (d) {
-                            var cls = 'bg-secondary', icon = 'ti-user';
-                            if (d === 'SuperAdmin') { cls = 'bg-role-superadmin'; icon = 'ti-shield'; }
-                            else if (d === 'Admin') { cls = 'bg-role-admin'; icon = 'ti-user-check'; }
-                            else if (d === 'Manager') { cls = 'bg-role-manager'; icon = 'ti-user-cog'; }
-                            else if (d === 'Employee') { cls = 'bg-role-employee'; icon = 'ti-user'; }
-                            return '<span class="badge ' + cls + '"><i class="ti ' + icon + '"></i> ' + d + '</span>';
+                            return '<span class="text-muted">' + d + '</span>';
                         }
                     },
-                    { data: 'isActive', name: 'IsActive', className: 'text-center', render: function (d) { return d ? '<span class="badge bg-state-active"><i class="ti ti-check"></i> Active</span>' : '<span class="badge bg-state-inactive"><i class="ti ti-x"></i> Inactive</span>'; } },
-                    { data: 'isDeleted', name: 'IsDeleted', className: 'text-center', render: function (d) { return d ? '<span class=\"badge bg-action-delete\"><i class=\"ti ti-trash\"></i> Deleted</span>' : '<span class=\"badge bg-state-active\"><i class=\"ti ti-check\"></i> Normal</span>'; } },
+                    { data: 'isActive', name: 'IsActive', className: 'text-center', render: function (d, t, row) { if (row.isDeleted) return '<span class="text-muted">Inactive</span>'; return d ? '<span class="text-muted">Active</span>' : '<span class="badge bg-state-inactive text-white"><i class="ti ti-x"></i> Inactive</span>'; } },
+                    { data: 'isDeleted', name: 'IsDeleted', className: 'text-center', render: function (d) { return d ? '<span class="badge bg-danger text-white"><i class="ti ti-trash"></i> Deleted</span>' : '<span class="text-muted">Normal</span>'; } },
                     { data: 'createdAt', name: 'CreatedAt', className: 'text-center', render: function (d) { return '<small class="text-muted"><i class="ti ti-clock me-1"></i>' + new Date(d).toLocaleDateString() + '</small>'; } },
                     {
                         data: null, orderable: false, className: 'text-center',
@@ -131,7 +124,17 @@
                         }
                     }
                 ],
-                pageLength: 25, order: [[8, 'desc']],
+                pageLength: 25, order: [[9, 'desc']],
+                language: {
+                    search: '_INPUT_',
+                    searchPlaceholder: 'Search users...',
+                    lengthMenu: '_MENU_ entries',
+                    info: 'Showing _START_ to _END_ of _TOTAL_ users',
+                    infoEmpty: 'No users found',
+                    infoFiltered: '(from _MAX_ total)',
+                    zeroRecords: 'No matching users found',
+                    paginate: { first: '«', last: '»', next: '›', previous: '‹' }
+                },
                 createdRow: function (row, data) { if (data.isDeleted) $(row).addClass('table-danger'); }
             });
         });

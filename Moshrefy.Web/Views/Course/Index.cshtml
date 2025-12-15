@@ -44,9 +44,11 @@
               <table id="coursesTable" class="table table-vcenter table-hover">
                 <thead>
                   <tr>
+                    <th>#</th>
                     <th>Course Name</th>
                     <th>Academic Year</th>
                     <th>Status</th>
+                    <th>Created At</th>
                     <th class="w-1">Actions</th>
                   </tr>
                 </thead>
@@ -74,12 +76,31 @@
                     dataSrc: function(json) { return json.data; }
                 },
                 columns: [
+                    {
+                        data: null,
+                        orderable: false,
+                        searchable: false,
+                        width: '50px',
+                        className: 'text-center',
+                        render: function(data, type, row, meta) {
+                            return '<span class="text-muted">' + (meta.row + meta.settings._iDisplayStart + 1) + '</span>';
+                        }
+                    },
                     { data: 'name', name: 'name' },
-                    { data: 'academicYearName', name: 'academicYearName', defaultContent: 'N/A' },
+                    { data: 'academicYearName', name: 'academicYearName', defaultContent: '<span class="text-muted">N/A</span>' },
                     {
                         data: 'isActive', name: 'isActive',
                         render: function (d) {
-                            return d ? '<span class="badge bg-state-active"><i class="ti ti-check"></i> Active</span>' : '<span class="badge bg-state-inactive"><i class="ti ti-x"></i> Inactive</span>';
+                            return d ? '<span class="text-muted">Active</span>' : '<span class="badge bg-state-inactive text-white"><i class="ti ti-x"></i> Inactive</span>';
+                        }
+                    },
+                    {
+                        data: 'createdAt', name: 'createdAt',
+                        className: 'text-center',
+                        render: function(data) {
+                            if (!data) return '<span class="text-muted">N/A</span>';
+                            var date = new Date(data);
+                            return '<small class="text-muted"><i class="ti ti-clock me-1"></i>' + date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) + '</small>';
                         }
                     },
                     {
@@ -101,8 +122,17 @@
                         }
                     }
                 ],
-                order: [[0, 'asc']],
-                language: { processing: '<i class="ti ti-loader"></i> Loading...', emptyTable: 'No courses found' }
+                order: [[5, 'desc']],
+                language: {
+                    search: '_INPUT_',
+                    searchPlaceholder: 'Search courses...',
+                    lengthMenu: '_MENU_ entries',
+                    info: 'Showing _START_ to _END_ of _TOTAL_ courses',
+                    infoEmpty: 'No courses found',
+                    infoFiltered: '(from _MAX_ total)',
+                    zeroRecords: 'No matching courses found',
+                    paginate: { first: '«', last: '»', next: '›', previous: '‹' }
+                }
             });
 
             $('#filterStatus').change(function () { table.ajax.reload(); });

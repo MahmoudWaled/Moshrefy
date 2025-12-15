@@ -63,6 +63,7 @@
               <table class="table table-vcenter table-hover" id="centersTable">
                 <thead>
                   <tr>
+                    <th>#</th>
                     <th>Name</th>
                     <th>Location</th>
                     <th>Status</th>
@@ -109,6 +110,16 @@
           }
         },
         "columns": [
+          {
+            "data": null,
+            "orderable": false,
+            "searchable": false,
+            "width": "50px",
+            "className": "text-center",
+            "render": function(data, type, row, meta) {
+              return '<span class="text-muted">' + (meta.row + meta.settings._iDisplayStart + 1) + '</span>';
+            }
+          },
           { 
             "data": "name",
             "name": "Name",
@@ -129,12 +140,12 @@
             "name": "IsActive",
             "render": function(data, type, row) {
               if (row.isDeleted) {
-                return '<span class="badge bg-danger text-white">Deleted</span>';
+                return '<span class="text-muted">Inactive</span>';
               }
               if (data) {
-                return '<span class="badge bg-state-active">Active</span>';
+                return '<span class="text-muted">Active</span>';
               } else {
-                return '<span class="badge bg-state-inactive">Inactive</span>';
+                return '<span class="badge bg-state-inactive text-white"><i class="ti ti-x"></i> Inactive</span>';
               }
             }
           },
@@ -144,16 +155,16 @@
             "render": function(data, type, row) {
               if (data) {
                 var date = new Date(data);
-                return date.toLocaleDateString();
+                return '<small class="text-muted"><i class="ti ti-clock me-1"></i>' + date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) + '</small>';
               }
-              return '';
+              return '<span class="text-muted">N/A</span>';
             }
           },
           {
             "data": null,
             "orderable": false,
             "render": function(data, type, row) {
-              var actions = '<div class="btn-group" role="group">';
+              var actions = '<div class="btn-group btn-group-sm" role="group">';
               
               if (row.isDeleted) {
                 // Restore button for deleted centers
@@ -186,19 +197,21 @@
             }
           }
         ],
-        "order": [[3, "desc"]],
+        "order": [[5, "desc"]],
         "pageLength": 10,
         "language": {
-          "search": "Search:",
-          "lengthMenu": "Show _MENU_ entries",
+          "search": "_INPUT_",
+          "searchPlaceholder": "Search centers...",
+          "lengthMenu": "_MENU_ entries",
           "info": "Showing _START_ to _END_ of _TOTAL_ centers",
           "infoEmpty": "No centers found",
-          "infoFiltered": "(filtered from _MAX_ total centers)",
+          "infoFiltered": "(from _MAX_ total)",
+          "zeroRecords": "No matching centers found",
           "paginate": {
-            "first": "First",
-            "last": "Last",
-            "next": "Next",
-            "previous": "Previous"
+            "first": "«",
+            "last": "»",
+            "next": "›",
+            "previous": "‹"
           }
         }
       });
