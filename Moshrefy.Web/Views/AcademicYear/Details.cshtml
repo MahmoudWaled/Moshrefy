@@ -205,7 +205,7 @@
         }
         
         function deleteAcademicYear(id) {
-            Swal.fire({
+            TablerDialog.fire({
                 title: 'Delete Academic Year?',
                 html: 'This will permanently delete this academic year.<br><br>Type <strong>Delete</strong> to confirm:',
                 icon: 'warning',
@@ -226,7 +226,7 @@
                     $.post('@Url.Action("Delete")', { id: id })
                         .done(function(response) {
                             if (response.success) {
-                                Swal.fire({
+                                TablerDialog.fire({
                                     icon: 'success',
                                     title: 'Deleted!',
                                     text: response.message || 'Academic year deleted successfully.',
@@ -234,11 +234,11 @@
                                     showConfirmButton: false
                                 }).then(() => window.location.href = '@Url.Action("Index")');
                             } else {
-                                Swal.fire('Error', response.message, 'error');
+                                TablerDialog.fire('Error', response.message, 'error');
                             }
                         })
                         .fail(function() {
-                            Swal.fire('Error', 'An error occurred while deleting.', 'error');
+                            TablerDialog.fire('Error', 'An error occurred while deleting.', 'error');
                         });
                 }
             });

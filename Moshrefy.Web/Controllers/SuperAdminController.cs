@@ -507,30 +507,42 @@ namespace Moshrefy.Web.Controllers
                 if (!string.IsNullOrEmpty(filterRole) && filterRole != "all")
                 {
                     usersDTO = await _superAdminService.GetUsersByRoleAsync(filterRole, paginationParams);
-                    totalRecords = usersDTO.Count;
-                    filteredRecords = totalRecords;
                 }
                 else if (filterDeleted == "deleted")
                 {
                     // Show only deleted
                     usersDTO = await _superAdminService.GetDeletedUsersAsync(paginationParams);
-                    totalRecords = usersDTO.Count;
-                    filteredRecords = totalRecords;
-                }
-                else if (filterDeleted == "active")
-                {
-                    // Show only active (non-deleted)
-                    usersDTO = await _superAdminService.GetActiveUsersAsync(paginationParams);
-                    totalRecords = usersDTO.Count;
-                    filteredRecords = totalRecords;
                 }
                 else
                 {
-                    // Show all
+                    // Default to fetching all users and filtering in memory for non-deleted
+                    // Ideally we should have GetNonDeletedUsersAsync, but we'll filter GetAllUsersAsync to be safe
+                    // unless 'active' implies GetActiveUsersAsync (which might only be IsActive=true)
                     usersDTO = await _superAdminService.GetAllUsersAsync(paginationParams);
-                    totalRecords = usersDTO.Count;
-                    filteredRecords = totalRecords;
+                    usersDTO = usersDTO.Where(u => !u.IsDeleted).ToList();
                 }
+
+                // Apply active/inactive status filter (for non-deleted items)
+                if (filterDeleted != "deleted")
+                {
+                    // Get custom filter from request (need to extract it first)
+                    var activeFilter = Request.Form["activeFilter"].FirstOrDefault();
+
+                    if (!string.IsNullOrEmpty(activeFilter) && activeFilter != "all")
+                    {
+                        if (activeFilter == "active")
+                        {
+                            usersDTO = usersDTO.Where(u => u.IsActive).ToList();
+                        }
+                        else if (activeFilter == "inactive")
+                        {
+                            usersDTO = usersDTO.Where(u => !u.IsActive).ToList();
+                        }
+                    }
+                }
+
+                totalRecords = usersDTO.Count;
+                filteredRecords = totalRecords;
 
                 var usersVM = _mapper.Map<List<Models.User.UserVM>>(usersDTO);
 

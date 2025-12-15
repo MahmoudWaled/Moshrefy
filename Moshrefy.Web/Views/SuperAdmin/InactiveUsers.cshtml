@@ -73,12 +73,12 @@
     <script>
         $(document).ready(function () {
             var table = $('#inactiveUsersTable').DataTable({
-                processing: false,
+                processing: true,
                 serverSide: true,
                 ajax: {
                     url: '@Url.Action("GetInactiveUsersData", "SuperAdmin")',
                     type: 'POST',
-                    error: function () { Swal.fire({ icon: 'error', title: 'Error Loading Data', timer: 3000 }); }
+                    error: function () { TablerDialog.fire({ icon: 'error', title: 'Error Loading Data', timer: 3000 }); }
                 },
                 columns: [
                     { data: null, orderable: false, searchable: false, className: 'text-center', render: function (d, t, r, m) { return '<span class="text-muted">' + (m.row + m.settings._iDisplayStart + 1) + '</span>'; } },
@@ -113,14 +113,15 @@
                     infoFiltered: '(from _MAX_ total)',
                     zeroRecords: 'No matching users found',
                     emptyTable: '<div class=\"p-4 text-center\"><i class=\"ti ti-user-check\" style=\"font-size:4rem;color:#2fb344;\"></i><h4 class=\"text-success mt-3\">Great! No Inactive Users</h4><p class=\"text-muted\">All users are currently active.</p><a href=\"@Url.Action("Users", "SuperAdmin")\" class=\"btn btn-action-view\"><i class=\"ti ti-users\"></i> View All Users</a></div>',
-                    paginate: { first: '«', last: '»', next: '›', previous: '‹' }
+                    paginate: { first: '«', last: '»', next: '›', previous: '‹' },
+                    processing: '<div class="spinner-border text-primary" role="status"></div><span class="ms-2">Loading...</span>'
                 }
             });
         });
 
         function activateUser(userId, userName) {
-            Swal.fire({ title: 'Activate User?', html: 'Activate <strong>' + userName + '</strong>?', icon: 'question', showCancelButton: true, confirmButtonColor: '#28a745', confirmButtonText: '<i class="ti ti-check"></i> Yes, Activate' })
-            .then(function (r) { if (r.isConfirmed) { $.post('@Url.Action("ActivateUser", "SuperAdmin")', { id: userId }).done(function (res) { if (res.success) { Swal.fire({ icon: 'success', title: 'Activated!', timer: 2000, showConfirmButton: false }); $('#inactiveUsersTable').DataTable().ajax.reload(); } }); } });
+            TablerDialog.fire({ title: 'Activate User?', html: 'Activate <strong>' + userName + '</strong>?', icon: 'question', showCancelButton: true, confirmButtonColor: '#28a745', confirmButtonText: '<i class="ti ti-check"></i> Yes, Activate' })
+            .then(function (r) { if (r.isConfirmed) { $.post('@Url.Action("ActivateUser", "SuperAdmin")', { id: userId }).done(function (res) { if (res.success) { TablerDialog.fire({ icon: 'success', title: 'Activated!', timer: 2000, showConfirmButton: false }); $('#inactiveUsersTable').DataTable().ajax.reload(); } }); } });
         }
     </script>
 }

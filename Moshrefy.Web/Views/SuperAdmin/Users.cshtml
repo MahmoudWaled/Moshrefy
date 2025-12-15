@@ -51,9 +51,12 @@
                   <i class="ti ti-list icon"></i> All
                 </button>
                 <button type="button" class="btn btn-sm" id="hideDeleted">
-                  <i class="ti ti-filter icon"></i> Active
+                   Active
                 </button>
-                <button type="button" class="btn btn-sm" id="showDeleted">
+                <button type="button" class="btn btn-sm" id="showInactive">
+                  Inactive
+                </button>
+                <button type="button" class="btn btn-sm btn-action-delete" id="showDeleted">
                   <i class="ti ti-trash icon"></i> Deleted
                 </button>
               </div>
@@ -98,24 +101,25 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
-            var currentFilter = 'all';
+            var currentFilter = 'active'; // Default to non-deleted (active+inactive)
+            var activeFilter = 'all';     // Default to all states within non-deleted
             var currentRole = 'all';
-            var isFirstLoad = true;
-
+            
             // Initialize DataTable with server-side processing
             var table = $('#usersTable').DataTable({
-                processing: false,
+                processing: true,
                 serverSide: true,
                 ajax: {
                     url: '@Url.Action("GetUsersData", "SuperAdmin")',
                     type: 'POST',
                     data: function (d) {
                         d.filterDeleted = currentFilter;
+                        d.activeFilter = activeFilter;
                         d.filterRole = currentRole;
                     },
                     error: function (xhr, error, code) {
                         console.error('DataTables error:', error, code);
-                        Swal.fire({
+                        TablerDialog.fire({
                             icon: 'error',
                             title: 'Error Loading Data',
                             text: 'Please refresh the page and try again.',
@@ -206,6 +210,7 @@
                     {
                         data: 'isDeleted',
                         name: 'IsDeleted',
+                        visible: false, // Hidden by default
                         width: '85px',
                         className: 'text-center align-middle',
                         render: function (data) {
@@ -269,6 +274,11 @@
                                 buttons += '<button class="btn btn-action-icon action-restore" title="Restore" ' +
                                     'onclick="restoreUser(\'' + row.id + '\', \'' + row.userName.replace(/'/g, "\\'") + '\')">' +
                                     '<i class="ti ti-refresh"></i></button>';
+                                
+                                // Permanent Delete button
+                                buttons += '<button class="btn btn-action-icon action-delete" title="Permanent Delete" ' +
+                                    'onclick="permanentDeleteUser(\'' + row.id + '\', \'' + row.userName.replace(/'/g, "\\'") + '\')">' +
+                                    '<i class="ti ti-trash-x"></i></button>';
                             }
 
                             buttons += '</div>';
@@ -294,7 +304,8 @@
                         '<i class="ti ti-users" style="font-size: 4rem;"></i>' +
                         '<h4 class="text-muted mt-3">No Deleted Users Found.</h4>' +
                         '</div>',
-                    paginate: { first: '«', last: '»', next: '›', previous: '‹' }
+                    paginate: { first: '«', last: '»', next: '›', previous: '‹' },
+                    processing: '<div class="spinner-border text-primary" role="status"></div><span class="ms-2">Loading...</span>'
                 },
                 createdRow: function (row, data, dataIndex) {
                     if (data.isDeleted) {
@@ -303,9 +314,17 @@
                 }
             });
 
-            // Filter: Show All
+            // Helper to toggle State column visibility
+            function toggleStateColumn(show) {
+                var stateColumn = table.column('IsDeleted:name');
+                stateColumn.visible(show);
+            }
+
+            // Filter: Show All (Non-deleted)
             $('#showAll').click(function () {
-                currentFilter = 'all';
+                currentFilter = 'active'; // 'active' in backend means non-deleted
+                activeFilter = 'all';     // No secondary active/inactive filter
+                toggleStateColumn(false);
                 $('.btn-group .btn').removeClass('active');
                 $(this).addClass('active');
                 table.ajax.reload(null, false);
@@ -313,7 +332,19 @@
 
             // Filter: Active Only
             $('#hideDeleted').click(function () {
-                currentFilter = 'active';
+                currentFilter = 'active'; // 'active' in backend means non-deleted
+                activeFilter = 'active';  // Secondary filter: only IsActive=true
+                toggleStateColumn(false);
+                $('.btn-group .btn').removeClass('active');
+                $(this).addClass('active');
+                table.ajax.reload(null, false);
+            });
+
+            // Filter: Inactive Only
+            $('#showInactive').click(function () {
+                currentFilter = 'active'; // 'active' in backend means non-deleted
+                activeFilter = 'inactive'; // Secondary filter: only IsActive=false
+                toggleStateColumn(false);
                 $('.btn-group .btn').removeClass('active');
                 $(this).addClass('active');
                 table.ajax.reload(null, false);
@@ -322,6 +353,8 @@
             // Filter: Show Only Deleted
             $('#showDeleted').click(function () {
                 currentFilter = 'deleted';
+                activeFilter = 'all';     // Secondary filter ignored for deleted
+                toggleStateColumn(true);
                 $('.btn-group .btn').removeClass('active');
                 $(this).addClass('active');
                 table.ajax.reload(null, false);
@@ -336,7 +369,7 @@
 
         // Restore user function
         function restoreUser(userId, userName) {
-            Swal.fire({
+            TablerDialog.fire({
                 title: 'Restore User?',
                 html: 'Are you sure you want to restore<br><strong>' + userName + '</strong>?',
                 icon: 'question',
@@ -355,13 +388,13 @@
                             return response;
                         })
                         .catch(function (error) {
-                            Swal.showValidationMessage('Request failed: ' + error.message);
+                            TablerDialog.showValidationMessage('Request failed: ' + error.message);
                         });
                 },
-                allowOutsideClick: function () { return !Swal.isLoading(); }
+                allowOutsideClick: function () { return !TablerDialog.isLoading(); }
             }).then(function (result) {
                 if (result.isConfirmed) {
-                    Swal.fire({
+                    TablerDialog.fire({
                         title: 'Restored!',
                         text: result.value.message,
                         icon: 'success',
@@ -375,7 +408,7 @@
 
         // Activate user function
         function activateUser(userId, userName) {
-            Swal.fire({
+            TablerDialog.fire({
                 title: 'Activate User?',
                 html: 'Activate user<br><strong>' + userName + '</strong>?',
                 icon: 'question',
@@ -394,13 +427,13 @@
                             return response;
                         })
                         .catch(function (error) {
-                            Swal.showValidationMessage('Request failed: ' + error.message);
+                            TablerDialog.showValidationMessage('Request failed: ' + error.message);
                         });
                 },
-                allowOutsideClick: function () { return !Swal.isLoading(); }
+                allowOutsideClick: function () { return !TablerDialog.isLoading(); }
             }).then(function (result) {
                 if (result.isConfirmed) {
-                    Swal.fire({
+                    TablerDialog.fire({
                         title: 'Activated!',
                         text: result.value.message,
                         icon: 'success',
@@ -414,7 +447,7 @@
 
         // Deactivate user function
         function deactivateUser(userId, userName) {
-            Swal.fire({
+            TablerDialog.fire({
                 title: 'Deactivate User?',
                 html: 'Deactivate user<br><strong>' + userName + '</strong>?',
                 icon: 'warning',
@@ -433,13 +466,13 @@
                             return response;
                         })
                         .catch(function (error) {
-                            Swal.showValidationMessage('Request failed: ' + error.message);
+                            TablerDialog.showValidationMessage('Request failed: ' + error.message);
                         });
                 },
-                allowOutsideClick: function () { return !Swal.isLoading(); }
+                allowOutsideClick: function () { return !TablerDialog.isLoading(); }
             }).then(function (result) {
                 if (result.isConfirmed) {
-                    Swal.fire({
+                    TablerDialog.fire({
                         title: 'Deactivated!',
                         text: result.value.message,
                         icon: 'success',
@@ -453,7 +486,7 @@
 
         // Soft delete user function
         function softDeleteUser(userId, userName) {
-            Swal.fire({
+            TablerDialog.fire({
                 title: 'Delete User?',
                 html: 'Move <strong>' + userName + '</strong> to trash?<br><small class="text-muted">You can restore it later.</small>',
                 icon: 'warning',
@@ -472,13 +505,13 @@
                             return response;
                         })
                         .catch(function (error) {
-                            Swal.showValidationMessage('Request failed: ' + error.message);
+                            TablerDialog.showValidationMessage('Request failed: ' + error.message);
                         });
                 },
-                allowOutsideClick: function () { return !Swal.isLoading(); }
+                allowOutsideClick: function () { return !TablerDialog.isLoading(); }
             }).then(function (result) {
                 if (result.isConfirmed) {
-                    Swal.fire({
+                    TablerDialog.fire({
                         title: 'Deleted!',
                         text: result.value.message,
                         icon: 'success',
@@ -486,6 +519,60 @@
                         showConfirmButton: false
                     });
                     $('#usersTable').DataTable().ajax.reload(null, false);
+                }
+            });
+        }
+
+        // Permanent delete user function
+        function permanentDeleteUser(userId, userName) {
+            TablerDialog.fire({
+                title: 'PERMANENT DELETE',
+                html: '<div class="alert alert-danger mb-2"><strong>DANGER!</strong> This cannot be undone!</div>Type <code>DELETE</code> to confirm for <strong>' + userName + '</strong>:',
+                input: 'text',
+                inputPlaceholder: 'Type Delete',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="ti ti-trash-x"></i> PERMANENTLY DELETE',
+                cancelButtonText: 'Cancel',
+                preConfirm: function(value) {
+                    if (value !== 'Delete') {
+                        TablerDialog.showValidationMessage('You must type Delete to confirm');
+                    }
+                }
+            }).then(function(result) {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '@Url.Action("HardDeleteUser", "SuperAdmin")',
+                        type: 'POST',
+                        data: { id: userId },
+                        success: function(result) {
+                            if (result.success) {
+                                $('#usersTable').DataTable().ajax.reload(null, false);
+                                TablerDialog.fire({
+                                    icon: 'success',
+                                    title: 'Deleted!',
+                                    text: result.message || 'User permanently deleted',
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                });
+                            } else {
+                                TablerDialog.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: 'Error deleting user: ' + result.message
+                                });
+                            }
+                        },
+                        error: function() {
+                            TablerDialog.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Error deleting user'
+                            });
+                        }
+                    });
                 }
             });
         }

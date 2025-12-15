@@ -34,11 +34,17 @@
           <div class="card-header">
             <h3 class="card-title">Manage Courses</h3>
             <div class="ms-auto">
-              <select id="filterStatus" class="form-select form-select-sm" style="width: auto;">
-                <option value="all">All Courses</option>
-                <option value="active">Active Only</option>
-                <option value="inactive">Inactive Only</option>
-              </select>
+              <div class="btn-group" role="group" aria-label="Status filter">
+                <button type="button" class="btn btn-outline-secondary btn-sm active" data-filter-status="all">
+                  <i class="ti ti-list icon"></i> All
+                </button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-filter-status="active">
+                  Active
+                </button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-filter-status="inactive">
+                  Inactive
+                </button>
+              </div>
             </div>
           </div>
           <div class="card-body">
@@ -73,8 +79,8 @@
                 ajax: {
                     url: '@Url.Action("GetCoursesData")',
                     type: 'POST',
-                    data: function (d) { d.filterStatus = $('#filterStatus').val(); },
-                    error: function () { Swal.fire({ icon: 'error', title: 'Error Loading Data' }); },
+                    data: function (d) { d.filterStatus = currentStatusFilter; },
+                    error: function () { TablerDialog.fire({ icon: 'error', title: 'Error Loading Data' }); },
                     dataSrc: function(json) { return json.data; }
                 },
                 columns: [
@@ -134,26 +140,34 @@
                     infoEmpty: 'No courses found',
                     infoFiltered: '(from _MAX_ total)',
                     zeroRecords: 'No matching courses found',
-                    paginate: { first: '«', last: '»', next: '›', previous: '‹' }
+                    paginate: { first: '«', last: '»', next: '›', previous: '‹' },
+                    processing: '<div class="spinner-border text-primary" role="status"></div><span class="ms-2">Loading...</span>'
                 }
             });
 
-            $('#filterStatus').change(function () { table.ajax.reload(); });
+            // Status filter button click handler
+            var currentStatusFilter = 'all';
+            $('[data-filter-status]').click(function() {
+                $('[data-filter-status]').removeClass('active');
+                $(this).addClass('active');
+                currentStatusFilter = $(this).data('filter-status');
+                table.ajax.reload();
+            });
         });
 
         function activateCourse(id) {
-            Swal.fire({ title: 'Activate Course?', text: 'This course will be available for enrollment.', icon: 'question', showCancelButton: true, confirmButtonColor: '#28a745', confirmButtonText: '<i class="ti ti-check"></i> Yes, activate' })
-            .then((r) => { if (r.isConfirmed) { $.post('@Url.Action("Activate")', { id: id }).done((res) => { if (res.success) { Swal.fire({ icon: 'success', title: 'Activated!', timer: 2000, showConfirmButton: false }); $('#coursesTable').DataTable().ajax.reload(); } else { Swal.fire('Error', res.message, 'error'); } }); } });
+            TablerDialog.fire({ title: 'Activate Course?', text: 'This course will be available for enrollment.', icon: 'question', showCancelButton: true, confirmButtonColor: '#28a745', confirmButtonText: '<i class="ti ti-check"></i> Yes, activate' })
+            .then((r) => { if (r.isConfirmed) { $.post('@Url.Action("Activate")', { id: id }).done((res) => { if (res.success) { TablerDialog.fire({ icon: 'success', title: 'Activated!', timer: 2000, showConfirmButton: false }); $('#coursesTable').DataTable().ajax.reload(); } else { TablerDialog.fire('Error', res.message, 'error'); } }); } });
         }
 
         function deactivateCourse(id) {
-            Swal.fire({ title: 'Deactivate Course?', text: 'This course will not be available.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ffc107', confirmButtonText: '<i class="ti ti-ban"></i> Yes, deactivate' })
-            .then((r) => { if (r.isConfirmed) { $.post('@Url.Action("Deactivate")', { id: id }).done((res) => { if (res.success) { Swal.fire({ icon: 'success', title: 'Deactivated!', timer: 2000, showConfirmButton: false }); $('#coursesTable').DataTable().ajax.reload(); } else { Swal.fire('Error', res.message, 'error'); } }); } });
+            TablerDialog.fire({ title: 'Deactivate Course?', text: 'This course will not be available.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ffc107', confirmButtonText: '<i class="ti ti-ban"></i> Yes, deactivate' })
+            .then((r) => { if (r.isConfirmed) { $.post('@Url.Action("Deactivate")', { id: id }).done((res) => { if (res.success) { TablerDialog.fire({ icon: 'success', title: 'Deactivated!', timer: 2000, showConfirmButton: false }); $('#coursesTable').DataTable().ajax.reload(); } else { TablerDialog.fire('Error', res.message, 'error'); } }); } });
         }
 
         function deleteCourse(id) {
-            Swal.fire({ title: 'Delete Course?', text: 'This will permanently delete this course.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#dc3545', confirmButtonText: '<i class="ti ti-trash"></i> Yes, delete' })
-            .then((r) => { if (r.isConfirmed) { $.post('@Url.Action("Delete")', { id: id }).done((res) => { if (res.success) { Swal.fire({ icon: 'success', title: 'Deleted!', timer: 2000, showConfirmButton: false }); $('#coursesTable').DataTable().ajax.reload(); } else { Swal.fire('Error', res.message, 'error'); } }); } });
+            TablerDialog.fire({ title: 'Delete Course?', text: 'This will permanently delete this course.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#dc3545', confirmButtonText: '<i class="ti ti-trash"></i> Yes, delete' })
+            .then((r) => { if (r.isConfirmed) { $.post('@Url.Action("Delete")', { id: id }).done((res) => { if (res.success) { TablerDialog.fire({ icon: 'success', title: 'Deleted!', timer: 2000, showConfirmButton: false }); $('#coursesTable').DataTable().ajax.reload(); } else { TablerDialog.fire('Error', res.message, 'error'); } }); } });
         }
     </script>
 }

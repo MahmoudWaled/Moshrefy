@@ -39,7 +39,7 @@
             <div class="ms-auto d-flex gap-3 align-items-center">
               <!-- Role Type Filter Buttons -->
               <div class="btn-group" role="group" aria-label="Role filter">
-                <button type="button" class="btn btn-outline-secondary btn-sm active" data-filter-role="all">All</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm active" data-filter-role="all"><i class="ti ti-list icon"></i> All</button>
                 <button type="button" class="btn btn-outline-secondary btn-sm" data-filter-role="Employee">
                   <i class="ti ti-user"></i> Employees
                 </button>
@@ -48,11 +48,15 @@
                 </button>
               </div>
               <!-- Status Filter -->
-              <select id="filterStatus" class="form-select form-select-sm" style="width: auto;">
-                <option value="all">All Members</option>
-                <option value="active">Active Members</option>
-                <option value="inactive">Inactive Members</option>
-              </select>
+              <div class="btn-group" role="group" aria-label="Status filter">
+                <button type="button" class="btn btn-outline-secondary btn-sm active" data-filter-status="all"><i class="ti ti-list icon"></i> All</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-filter-status="active">
+                  Active
+                </button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-filter-status="inactive">
+                  Inactive
+                </button>
+              </div>
             </div>
           </div>
           <div class="card-body">
@@ -85,6 +89,7 @@
     <script>
         $(document).ready(function () {
             var currentRoleFilter = 'all';
+            var currentStatusFilter = 'all';
             
             var table = $('#usersTable').DataTable({
                 processing: true,
@@ -93,12 +98,12 @@
                     url: '@Url.Action("GetUsersData")',
                     type: 'POST',
                     data: function (d) {
-                        d.filterStatus = $('#filterStatus').val();
+                        d.filterStatus = currentStatusFilter;
                         d.filterRole = currentRoleFilter;
                     },
                     error: function (xhr, error, thrown) {
                         console.error('DataTable Error:', error, thrown);
-                        Swal.fire({
+                        TablerDialog.fire({
                             icon: 'error',
                             title: 'Error Loading Data',
                             text: error + '. Check console for details.'
@@ -184,7 +189,8 @@
                     infoEmpty: 'No team members found',
                     infoFiltered: '(from _MAX_ total)',
                     zeroRecords: 'No matching members found',
-                    paginate: { first: '«', last: '»', next: '›', previous: '‹' }
+                    paginate: { first: '«', last: '»', next: '›', previous: '‹' },
+                    processing: '<div class="spinner-border text-primary" role="status"></div><span class="ms-2">Loading...</span>'
                 }
             });
 
@@ -196,14 +202,24 @@
                 table.ajax.reload();
             });
 
-            // Reload table when status filter changes
-            $('#filterStatus').change(function () {
+            // Status filter button click handler
+            var currentStatusFilter = 'all';
+            $('[data-filter-status]').click(function() {
+                $('[data-filter-status]').removeClass('active');
+                $(this).addClass('active');
+                currentStatusFilter = $(this).data('filter-status');
                 table.ajax.reload();
+            });
+
+            // Update AJAX data function
+            table.on('preXhr.dt', function (e, settings, data) {
+                data.filterStatus = currentStatusFilter;
+                data.filterRole = currentRoleFilter;
             });
         });
 
         function activateUser(id) {
-            Swal.fire({
+            TablerDialog.fire({
                 title: 'Enable Access?',
                 text: 'Enable access for this team member?',
                 icon: 'question',
@@ -217,7 +233,7 @@
                     $.post('@Url.Action("ActivateUser")', { id: id })
                         .done(function (response) {
                             if (response.success) {
-                                Swal.fire({
+                                TablerDialog.fire({
                                     icon: 'success',
                                     title: 'Success!',
                                     text: response.message,
@@ -226,18 +242,18 @@
                                 });
                                 $('#usersTable').DataTable().ajax.reload();
                             } else {
-                                Swal.fire('Error', response.message, 'error');
+                                TablerDialog.fire('Error', response.message, 'error');
                             }
                         })
                         .fail(function () {
-                            Swal.fire('Error', 'An error occurred', 'error');
+                            TablerDialog.fire('Error', 'An error occurred', 'error');
                         });
                 }
             });
         }
 
         function deactivateUser(id) {
-            Swal.fire({
+            TablerDialog.fire({
                 title: 'Disable Access?',
                 text: 'This member will not be able to log in.',
                 icon: 'warning',
@@ -251,7 +267,7 @@
                     $.post('@Url.Action("DeactivateUser")', { id: id })
                         .done(function (response) {
                             if (response.success) {
-                                Swal.fire({
+                                TablerDialog.fire({
                                     icon: 'success',
                                     title: 'Success!',
                                     text: response.message,
@@ -260,18 +276,18 @@
                                 });
                                 $('#usersTable').DataTable().ajax.reload();
                             } else {
-                                Swal.fire('Error', response.message, 'error');
+                                TablerDialog.fire('Error', response.message, 'error');
                             }
                         })
                         .fail(function () {
-                            Swal.fire('Error', 'An error occurred', 'error');
+                            TablerDialog.fire('Error', 'An error occurred', 'error');
                         });
                 }
             });
         }
 
         function deleteUser(id) {
-            Swal.fire({
+            TablerDialog.fire({
                 title: 'Remove Team Member?',
                 html: 'This action cannot be undone.<br><br>Type <strong>Delete</strong> to confirm:',
                 icon: 'warning',
@@ -292,7 +308,7 @@
                     $.post('@Url.Action("SoftDeleteUser")', { id: id })
                         .done(function (response) {
                             if (response.success) {
-                                Swal.fire({
+                                TablerDialog.fire({
                                     icon: 'success',
                                     title: 'Removed!',
                                     text: response.message,
@@ -301,11 +317,11 @@
                                 });
                                 $('#usersTable').DataTable().ajax.reload();
                             } else {
-                                Swal.fire('Error', response.message, 'error');
+                                TablerDialog.fire('Error', response.message, 'error');
                             }
                         })
                         .fail(function () {
-                            Swal.fire('Error', 'An error occurred', 'error');
+                            TablerDialog.fire('Error', 'An error occurred', 'error');
                         });
                 }
             });

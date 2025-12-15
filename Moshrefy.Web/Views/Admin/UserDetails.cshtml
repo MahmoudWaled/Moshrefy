@@ -237,7 +237,7 @@
             if (changeRoleModal) {
                 changeRoleModal.show(); 
             } else {
-                Swal.fire('Error', 'Could not open modal. Please refresh the page.', 'error');
+                TablerDialog.fire('Error', 'Could not open modal. Please refresh the page.', 'error');
             }
         }
 
@@ -255,10 +255,10 @@
         function changeRole() {
             var newRole = $('#newRoleSelect').val();
             if (!newRole) { 
-                Swal.fire('Error', 'Please select a member type', 'error'); 
+                TablerDialog.fire('Error', 'Please select a member type', 'error'); 
                 return; 
             }
-            Swal.fire({ 
+            TablerDialog.fire({ 
                 title: 'Change Type?', 
                 text: 'Change to ' + newRole + '?', 
                 icon: 'question', 
@@ -272,7 +272,7 @@
                     .done((res) => { 
                         if (res.success) { 
                             if (changeRoleModal) changeRoleModal.hide(); 
-                            Swal.fire({ 
+                            TablerDialog.fire({ 
                                 icon: 'success', 
                                 title: 'Success!', 
                                 text: res.message,
@@ -280,28 +280,28 @@
                                 showConfirmButton: false 
                             }).then(() => location.reload()); 
                         } else { 
-                            Swal.fire('Error', res.message, 'error'); 
+                            TablerDialog.fire('Error', res.message, 'error'); 
                         } 
                     })
                     .fail(function() {
-                        Swal.fire('Error', 'An error occurred while changing type.', 'error');
+                        TablerDialog.fire('Error', 'An error occurred while changing type.', 'error');
                     }); 
                 } 
             });
         }
 
         function activateMember() {
-            Swal.fire({ title: 'Enable Access?', icon: 'question', showCancelButton: true, confirmButtonColor: '#28a745', confirmButtonText: '<i class="ti ti-check"></i> Yes, enable' })
-            .then((r) => { if (r.isConfirmed) { $.post('@Url.Action("ActivateUser")', { id: '@Model.Id' }).done((res) => { if (res.success) { Swal.fire({ icon: 'success', title: 'Enabled!', timer: 2000, showConfirmButton: false }).then(() => location.reload()); } }); } });
+            TablerDialog.fire({ title: 'Enable Access?', icon: 'question', showCancelButton: true, confirmButtonColor: '#28a745', confirmButtonText: '<i class="ti ti-check"></i> Yes, enable' })
+            .then((r) => { if (r.isConfirmed) { $.post('@Url.Action("ActivateUser")', { id: '@Model.Id' }).done((res) => { if (res.success) { TablerDialog.fire({ icon: 'success', title: 'Enabled!', timer: 2000, showConfirmButton: false }).then(() => location.reload()); } }); } });
         }
 
         function deactivateMember() {
-            Swal.fire({ title: 'Disable Access?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ffc107', confirmButtonText: '<i class="ti ti-ban"></i> Yes, disable' })
-            .then((r) => { if (r.isConfirmed) { $.post('@Url.Action("DeactivateUser")', { id: '@Model.Id' }).done((res) => { if (res.success) { Swal.fire({ icon: 'success', title: 'Disabled!', timer: 2000, showConfirmButton: false }).then(() => location.reload()); } }); } });
+            TablerDialog.fire({ title: 'Disable Access?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ffc107', confirmButtonText: '<i class="ti ti-ban"></i> Yes, disable' })
+            .then((r) => { if (r.isConfirmed) { $.post('@Url.Action("DeactivateUser")', { id: '@Model.Id' }).done((res) => { if (res.success) { TablerDialog.fire({ icon: 'success', title: 'Disabled!', timer: 2000, showConfirmButton: false }).then(() => location.reload()); } }); } });
         }
 
         function removeMember() {
-            Swal.fire({
+            TablerDialog.fire({
                 title: 'Remove Team Member?',
                 html: 'This action cannot be undone.<br><br>Type <strong>Delete</strong> to confirm:',
                 icon: 'warning',
@@ -322,7 +322,7 @@
                     $.post('@Url.Action("SoftDeleteUser")', { id: '@Model.Id' })
                         .done(function(response) {
                             if (response.success) {
-                                Swal.fire({
+                                TablerDialog.fire({
                                     icon: 'success',
                                     title: 'Removed!',
                                     text: response.message,
@@ -330,11 +330,11 @@
                                     showConfirmButton: false
                                 }).then(() => window.location.href = '@Url.Action("Users")');
                             } else {
-                                Swal.fire('Error', response.message, 'error');
+                                TablerDialog.fire('Error', response.message, 'error');
                             }
                         })
                         .fail(function() {
-                            Swal.fire('Error', 'An error occurred', 'error');
+                            TablerDialog.fire('Error', 'An error occurred', 'error');
                         });
                 }
             });

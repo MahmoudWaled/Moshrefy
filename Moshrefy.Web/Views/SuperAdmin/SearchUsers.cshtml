@@ -111,17 +111,17 @@
             $('#searchByEmailForm').on('submit', function (e) {
                 e.preventDefault();
                 const email = $('#emailInput').val().trim();
-                if (!email) { Swal.fire('Error', 'Please enter an email address', 'error'); return; }
-                Swal.fire({ title: 'Searching...', html: 'Looking for: <strong>' + email + '</strong>', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-                $.post('@Url.Action("SearchUserByEmail")', { email: email }).done(function (res) { Swal.close(); if (res.success) { displayUserResult(res.user); } else { Swal.fire({ icon: 'error', title: 'Not Found', html: res.message }); } });
+                if (!email) { TablerDialog.fire('Error', 'Please enter an email address', 'error'); return; }
+                TablerDialog.fire({ title: 'Searching...', html: 'Looking for: <strong>' + email + '</strong>', allowOutsideClick: false, didOpen: () => TablerDialog.showLoading() });
+                $.post('@Url.Action("SearchUserByEmail")', { email: email }).done(function (res) { TablerDialog.close(); if (res.success) { displayUserResult(res.user); } else { TablerDialog.fire({ icon: 'error', title: 'Not Found', html: res.message }); } });
             });
 
             $('#searchByUsernameForm').on('submit', function (e) {
                 e.preventDefault();
                 const username = $('#usernameInput').val().trim();
-                if (!username) { Swal.fire('Error', 'Please enter a username', 'error'); return; }
-                Swal.fire({ title: 'Searching...', html: 'Looking for: <strong>' + username + '</strong>', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-                $.post('@Url.Action("SearchUserByUsername")', { username: username }).done(function (res) { Swal.close(); if (res.success) { displayUserResult(res.user); } else { Swal.fire({ icon: 'error', title: 'Not Found', html: res.message }); } });
+                if (!username) { TablerDialog.fire('Error', 'Please enter a username', 'error'); return; }
+                TablerDialog.fire({ title: 'Searching...', html: 'Looking for: <strong>' + username + '</strong>', allowOutsideClick: false, didOpen: () => TablerDialog.showLoading() });
+                $.post('@Url.Action("SearchUserByUsername")', { username: username }).done(function (res) { TablerDialog.close(); if (res.success) { displayUserResult(res.user); } else { TablerDialog.fire({ icon: 'error', title: 'Not Found', html: res.message }); } });
             });
 
             function displayUserResult(user) {

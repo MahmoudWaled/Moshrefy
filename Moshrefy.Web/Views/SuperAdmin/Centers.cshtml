@@ -44,7 +44,7 @@
             <div class="ms-auto">
               <div class="btn-group" role="group">
                 <button type="button" class="btn btn-sm" id="filterAll">
-                  All
+                  <i class="ti ti-list icon"></i> All
                 </button>
                 <button type="button" class="btn btn-sm" id="filterActive">
                   Active
@@ -67,6 +67,7 @@
                     <th>Name</th>
                     <th>Location</th>
                     <th>Status</th>
+                    <th>State</th>
                     <th>Created Date</th>
                     <th class="w-1">Actions</th>
                   </tr>
@@ -101,7 +102,7 @@
           },
           "error": function(xhr, error, code) {
             console.error('DataTables error:', error, code);
-            Swal.fire({
+            TablerDialog.fire({
               icon: 'error',
               title: 'Error Loading Data',
               text: 'Please refresh the page and try again.',
@@ -147,6 +148,17 @@
               } else {
                 return '<span class="badge bg-state-inactive text-white"><i class="ti ti-x"></i> Inactive</span>';
               }
+            }
+          },
+          { 
+            "data": "isDeleted",
+            "name": "State",
+            "visible": false, // Hidden by default
+            "render": function(data, type, row) {
+              if (data) {
+                return '<span class="badge bg-danger text-white"><i class="ti ti-trash"></i> Deleted</span>';
+              }
+              return '<span class="text-muted">Normal</span>';
             }
           },
           { 
@@ -198,7 +210,7 @@
           }
 
         ],
-        "order": [[5, "desc"]],
+        "order": [[6, "desc"]], // Adjusted order index due to new column
         "pageLength": 10,
         "language": {
           "search": "_INPUT_",
@@ -213,14 +225,22 @@
             "last": "»",
             "next": "›",
             "previous": "‹"
-          }
+          },
+          "processing": '<div class="spinner-border text-primary" role="status"></div><span class="ms-2">Loading...</span>'
         }
       });
+
+      // Helper to toggle State column visibility
+      function toggleStateColumn(show) {
+          var stateColumn = table.column('State:name');
+          stateColumn.visible(show);
+      }
 
       // Filter buttons - Active/Inactive status filter
       $('#filterAll').click(function() {
         $('#centersTable').data('activeFilter', 'all');
         $('#centersTable').data('filterDeleted', 'active'); // Show non-deleted
+        toggleStateColumn(false);
         table.ajax.reload();
         $('.btn-group .btn').removeClass('active');
         $(this).addClass('active');
@@ -230,6 +250,7 @@
       $('#filterActive').click(function() {
         $('#centersTable').data('activeFilter', 'active');
         $('#centersTable').data('filterDeleted', 'active');
+        toggleStateColumn(false);
         table.ajax.reload();
         $('.btn-group .btn').removeClass('active');
         $(this).addClass('active');
@@ -239,6 +260,7 @@
       $('#filterInactive').click(function() {
         $('#centersTable').data('activeFilter', 'inactive');
         $('#centersTable').data('filterDeleted', 'active');
+        toggleStateColumn(false);
         table.ajax.reload();
         $('.btn-group .btn').removeClass('active');
         $(this).addClass('active');
@@ -249,6 +271,7 @@
       $('#filterDeleted').click(function() {
         $('#centersTable').data('activeFilter', 'all');
         $('#centersTable').data('filterDeleted', 'deleted');
+        toggleStateColumn(true);
         table.ajax.reload();
         $('.btn-group .btn').removeClass('active');
         $(this).addClass('active');
@@ -262,7 +285,7 @@
     });
 
     function deleteCenter(id) {
-      Swal.fire({
+      TablerDialog.fire({
         title: 'Move to Trash?',
         html: 'This center will be moved to trash.<br>You can restore it later from the Deleted tab.<br><br>Type <strong>Delete</strong> to confirm:',
         icon: 'warning',
@@ -287,7 +310,7 @@
             success: function(result) {
               if (result.success) {
                 $('#centersTable').DataTable().ajax.reload();
-                Swal.fire({
+                TablerDialog.fire({
                   icon: 'success',
                   title: 'Moved to Trash!',
                   text: result.message || 'Center moved to trash successfully. You can restore it from the Deleted tab.',
@@ -295,7 +318,7 @@
                   showConfirmButton: false
                 });
               } else {
-                Swal.fire({
+                TablerDialog.fire({
                   icon: 'error',
                   title: 'Error',
                   text: 'Error: ' + result.message
@@ -303,7 +326,7 @@
               }
             },
             error: function() {
-              Swal.fire({
+              TablerDialog.fire({
                 icon: 'error',
                 title: 'Error',
                 text: 'Error moving center to trash'
@@ -315,7 +338,7 @@
     }
 
     function restoreCenter(id) {
-      Swal.fire({
+      TablerDialog.fire({
         title: 'Restore Center?',
         text: 'Are you sure you want to restore this center?',
         icon: 'question',
@@ -333,7 +356,7 @@
             success: function(result) {
               if (result.success) {
                 $('#centersTable').DataTable().ajax.reload();
-                Swal.fire({
+                TablerDialog.fire({
                   icon: 'success',
                   title: 'Restored!',
                   text: result.message || 'Center restored successfully',
@@ -341,7 +364,7 @@
                   showConfirmButton: false
                 });
               } else {
-                Swal.fire({
+                TablerDialog.fire({
                   icon: 'error',
                   title: 'Error',
                   text: 'Error restoring center: ' + result.message
@@ -349,7 +372,7 @@
               }
             },
             error: function() {
-              Swal.fire({
+              TablerDialog.fire({
                 icon: 'error',
                 title: 'Error',
                 text: 'Error restoring center'
@@ -361,7 +384,7 @@
     }
 
     function permanentDeleteCenter(id) {
-      Swal.fire({
+      TablerDialog.fire({
         title: 'PERMANENT DELETE',
         html: '<div class="alert alert-danger mb-2"><strong>DANGER!</strong> This cannot be undone!</div>Type <code>DELETE</code> to confirm:',
         input: 'text',
@@ -374,7 +397,7 @@
         cancelButtonText: 'Cancel',
         preConfirm: function(value) {
           if (value !== 'Delete') {
-            Swal.showValidationMessage('You must type Delete to confirm');
+            TablerDialog.showValidationMessage('You must type Delete to confirm');
           }
         }
       }).then(function(result) {
@@ -386,7 +409,7 @@
             success: function(result) {
               if (result.success) {
                 $('#centersTable').DataTable().ajax.reload();
-                Swal.fire({
+                TablerDialog.fire({
                   icon: 'success',
                   title: 'Deleted!',
                   text: result.message || 'Center permanently deleted',
@@ -394,7 +417,7 @@
                   showConfirmButton: false
                 });
               } else {
-                Swal.fire({
+                TablerDialog.fire({
                   icon: 'error',
                   title: 'Error',
                   text: 'Error deleting center: ' + result.message
@@ -402,7 +425,7 @@
               }
             },
             error: function() {
-              Swal.fire({
+              TablerDialog.fire({
                 icon: 'error',
                 title: 'Error',
                 text: 'Error deleting center'

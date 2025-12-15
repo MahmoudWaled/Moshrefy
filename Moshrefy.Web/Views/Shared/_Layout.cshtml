@@ -12,8 +12,6 @@
     <link href="~/tabler/css/tabler-icons.min.css" rel="stylesheet"/>
     <!-- DataTables CSS -->
     <link rel="stylesheet" href="~/tabler/css/dataTables.bootstrap5.min.css">
-    <!-- SweetAlert2 -->
-    <link rel="stylesheet" href="~/tabler/css/sweetalert2.css">
  
   <!-- Custom styles with color palette -->
   <link href="~/css/site.css" rel="stylesheet"/>
@@ -597,19 +595,17 @@
             </div>
           </div>
         </div>
-      </footer>
-    </div>
-  </div>
-  
-  <!-- jQuery (required for DataTables) -->
-  <script src="~/tabler/js/jquery-3.7.0.min.js"></script>
-  <!-- DataTables JS -->
-  <script src="~/tabler/js/jquery.dataTables.min.js"></script>
-  <script src="~/tabler/js/dataTables.bootstrap5.min.js"></script>
-  <!-- Tabler Core (includes Bootstrap) -->
-  <script src="~/tabler/js/tabler.min.js"></script>
-  <!-- SweetAlert2 -->
-  <script src="~/tabler/js/sweetalert2@11.js"></script>
-  @RenderSection("Scripts", required: false)
+    <!-- jQuery (required for DataTables and TablerDialog) -->
+    <script src="~/tabler/js/jquery-3.7.0.min.js"></script>
+
+    <!-- Core Scripts -->
+    <script src="~/tabler/js/tabler.min.js" defer></script>
+    <script src="~/js/tabler-dialogs.js" defer></script>
+    
+    <!-- DataTables -->
+    <script src="~/tabler/js/jquery.dataTables.min.js"></script>
+    <script src="~/tabler/js/dataTables.bootstrap5.min.js"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

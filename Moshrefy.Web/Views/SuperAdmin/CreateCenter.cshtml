@@ -118,7 +118,7 @@
             form.validate();
             if (form.valid()) {
                 var name = $('#Name').val();
-                Swal.fire({ title: 'Create Center?', html: 'Center: <strong>' + name + '</strong><br>Will be created and set active.', icon: 'question', showCancelButton: true, confirmButtonColor: '#28a745', confirmButtonText: '<i class="ti ti-check"></i> Yes, Create' })
+                TablerDialog.fire({ title: 'Create Center?', html: 'Center: <strong>' + name + '</strong><br>Will be created and set active.', icon: 'question', showCancelButton: true, confirmButtonColor: '#28a745', confirmButtonText: '<i class="ti ti-check"></i> Yes, Create' })
                 .then((r) => { if (r.isConfirmed) { $('#createCenterBtn').prop('disabled', true).html('<i class="ti ti-loader"></i> Creating...'); form.submit(); } });
             }
         }

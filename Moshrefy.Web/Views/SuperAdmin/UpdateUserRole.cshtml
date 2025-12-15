@@ -131,7 +131,7 @@
         $('#updateRoleForm').on('submit', function (e) {
             e.preventDefault();
             const selectedRole = $('input[name="Role"]:checked').closest('label').find('.badge').text().trim();
-            Swal.fire({ title: 'Confirm Role Update', html: 'Update <strong>@ViewBag.UserName</strong> role to:<br><br><span class="badge bg-purple">' + selectedRole + '</span>', icon: 'question', showCancelButton: true, confirmButtonColor: '#28a745', confirmButtonText: '<i class="ti ti-check"></i> Yes, Update' })
+            TablerDialog.fire({ title: 'Confirm Role Update', html: 'Update <strong>@ViewBag.UserName</strong> role to:<br><br><span class="badge bg-purple">' + selectedRole + '</span>', icon: 'question', showCancelButton: true, confirmButtonColor: '#28a745', confirmButtonText: '<i class="ti ti-check"></i> Yes, Update' })
             .then((r) => { if (r.isConfirmed) { this.submit(); } });
         });
     </script>

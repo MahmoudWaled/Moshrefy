@@ -98,14 +98,14 @@
             var centerId = @centerId;
 
             var table = $('#centerUsersTable').DataTable({
-                processing: false,
+                processing: true,
                 serverSide: true,
                 ajax: {
                     url: '@Url.Action("GetCenterUsersData", "SuperAdmin")',
                     type: 'POST',
                     data: function (d) { d.centerId = centerId; },
                     error: function (xhr, error, code) {
-                        Swal.fire({ icon: 'error', title: 'Error Loading Data', text: 'Please refresh the page.', timer: 3000 });
+                        TablerDialog.fire({ icon: 'error', title: 'Error Loading Data', text: 'Please refresh the page.', timer: 3000 });
                     }
                 },
                 columns: [
@@ -127,8 +127,8 @@
                         render: function (d, t, row) {
                             var b = '<div class="btn-group btn-group-sm">';
                             b += '<a href="@Url.Action("UserDetails", "SuperAdmin")/' + row.id + '" class="btn btn-action-icon action-view" title="View"><i class="ti ti-eye"></i></a>';
+                            b += '<a href="@Url.Action("EditUser", "SuperAdmin")/' + row.id + '" class="btn btn-action-icon action-edit" title="Edit"><i class="ti ti-edit"></i></a>';
                             if (!row.isDeleted) {
-                                b += '<a href="@Url.Action("EditUser", "SuperAdmin")/' + row.id + '" class="btn btn-action-icon action-edit" title="Edit"><i class="ti ti-edit"></i></a>';
                                 if (row.isActive) {
                                     b += '<button class="btn btn-action-icon action-deactivate" title="Deactivate" onclick="deactivateUser(\'' + row.id + '\', \'' + row.userName.replace(/'/g, "\\'") + '\')"><i class="ti ti-ban"></i></button>';
                                 } else {
@@ -152,30 +152,31 @@
                     infoEmpty: 'No users found',
                     infoFiltered: '(from _MAX_ total)',
                     zeroRecords: 'No matching users found',
-                    paginate: { first: '«', last: '»', next: '›', previous: '‹' }
+                    paginate: { first: '«', last: '»', next: '›', previous: '‹' },
+                    processing: '<div class="spinner-border text-primary" role="status"></div><span class="ms-2">Loading...</span>'
                 },
                 createdRow: function (row, data) { if (data.isDeleted) $(row).addClass('table-danger'); }
             });
         });
 
         function restoreUser(userId, userName) {
-            Swal.fire({ title: 'Restore User?', html: 'Restore <strong>' + userName + '</strong>?', icon: 'question', showCancelButton: true, confirmButtonColor: '#28a745', confirmButtonText: '<i class="ti ti-refresh"></i> Yes, Restore' })
-            .then(function (r) { if (r.isConfirmed) { $.post('@Url.Action("RestoreUser", "SuperAdmin")', { id: userId }).done(function (res) { if (res.success) { Swal.fire({ icon: 'success', title: 'Restored!', timer: 2000, showConfirmButton: false }); $('#centerUsersTable').DataTable().ajax.reload(); } }); } });
+            TablerDialog.fire({ title: 'Restore User?', html: 'Restore <strong>' + userName + '</strong>?', icon: 'question', showCancelButton: true, confirmButtonColor: '#28a745', confirmButtonText: '<i class="ti ti-refresh"></i> Yes, Restore' })
+            .then(function (r) { if (r.isConfirmed) { $.post('@Url.Action("RestoreUser", "SuperAdmin")', { id: userId }).done(function (res) { if (res.success) { TablerDialog.fire({ icon: 'success', title: 'Restored!', timer: 2000, showConfirmButton: false }); $('#centerUsersTable').DataTable().ajax.reload(); } }); } });
         }
 
         function activateUser(userId, userName) {
-            Swal.fire({ title: 'Activate User?', html: 'Activate <strong>' + userName + '</strong>?', icon: 'question', showCancelButton: true, confirmButtonColor: '#28a745', confirmButtonText: '<i class="ti ti-check"></i> Yes, Activate' })
-            .then(function (r) { if (r.isConfirmed) { $.post('@Url.Action("ActivateUser", "SuperAdmin")', { id: userId }).done(function (res) { if (res.success) { Swal.fire({ icon: 'success', title: 'Activated!', timer: 2000, showConfirmButton: false }); $('#centerUsersTable').DataTable().ajax.reload(); } }); } });
+            TablerDialog.fire({ title: 'Activate User?', html: 'Activate <strong>' + userName + '</strong>?', icon: 'question', showCancelButton: true, confirmButtonColor: '#28a745', confirmButtonText: '<i class="ti ti-check"></i> Yes, Activate' })
+            .then(function (r) { if (r.isConfirmed) { $.post('@Url.Action("ActivateUser", "SuperAdmin")', { id: userId }).done(function (res) { if (res.success) { TablerDialog.fire({ icon: 'success', title: 'Activated!', timer: 2000, showConfirmButton: false }); $('#centerUsersTable').DataTable().ajax.reload(); } }); } });
         }
 
         function deactivateUser(userId, userName) {
-            Swal.fire({ title: 'Deactivate User?', html: 'Deactivate <strong>' + userName + '</strong>?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ffc107', confirmButtonText: '<i class="ti ti-ban"></i> Yes, Deactivate' })
-            .then(function (r) { if (r.isConfirmed) { $.post('@Url.Action("DeactivateUser", "SuperAdmin")', { id: userId }).done(function (res) { if (res.success) { Swal.fire({ icon: 'success', title: 'Deactivated!', timer: 2000, showConfirmButton: false }); $('#centerUsersTable').DataTable().ajax.reload(); } }); } });
+            TablerDialog.fire({ title: 'Deactivate User?', html: 'Deactivate <strong>' + userName + '</strong>?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ffc107', confirmButtonText: '<i class="ti ti-ban"></i> Yes, Deactivate' })
+            .then(function (r) { if (r.isConfirmed) { $.post('@Url.Action("DeactivateUser", "SuperAdmin")', { id: userId }).done(function (res) { if (res.success) { TablerDialog.fire({ icon: 'success', title: 'Deactivated!', timer: 2000, showConfirmButton: false }); $('#centerUsersTable').DataTable().ajax.reload(); } }); } });
         }
 
         function softDeleteUser(userId, userName) {
-            Swal.fire({ title: 'Delete User?', html: 'Move <strong>' + userName + '</strong> to trash?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#dc3545', confirmButtonText: '<i class="ti ti-trash"></i> Yes, Delete' })
-            .then(function (r) { if (r.isConfirmed) { $.post('@Url.Action("SoftDeleteUser", "SuperAdmin")', { id: userId }).done(function (res) { if (res.success) { Swal.fire({ icon: 'success', title: 'Deleted!', timer: 2000, showConfirmButton: false }); $('#centerUsersTable').DataTable().ajax.reload(); } }); } });
+            TablerDialog.fire({ title: 'Delete User?', html: 'Move <strong>' + userName + '</strong> to trash?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#dc3545', confirmButtonText: '<i class="ti ti-trash"></i> Yes, Delete' })
+            .then(function (r) { if (r.isConfirmed) { $.post('@Url.Action("SoftDeleteUser", "SuperAdmin")', { id: userId }).done(function (res) { if (res.success) { TablerDialog.fire({ icon: 'success', title: 'Deleted!', timer: 2000, showConfirmButton: false }); $('#centerUsersTable').DataTable().ajax.reload(); } }); } });
         }
     </script>
 }

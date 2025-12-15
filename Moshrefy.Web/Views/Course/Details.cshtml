@@ -177,17 +177,17 @@
         }
         
         function activateCourse() {
-            Swal.fire({ title: 'Activate Course?', text: 'Make this course available for enrollment?', icon: 'question', showCancelButton: true, confirmButtonColor: '#28a745', confirmButtonText: '<i class="ti ti-check"></i> Activate' })
-            .then((r) => { if (r.isConfirmed) { $.post('@Url.Action("Activate")', { id: @Model.Id }).done((res) => { if (res.success) { Swal.fire({ icon: 'success', title: 'Activated!', text: res.message, timer: 2000, showConfirmButton: false }).then(() => location.reload()); } else { Swal.fire('Error', res.message, 'error'); } }).fail(() => Swal.fire('Error', 'An error occurred', 'error')); } });
+            TablerDialog.fire({ title: 'Activate Course?', text: 'Make this course available for enrollment?', icon: 'question', showCancelButton: true, confirmButtonColor: '#28a745', confirmButtonText: '<i class="ti ti-check"></i> Activate' })
+            .then((r) => { if (r.isConfirmed) { $.post('@Url.Action("Activate")', { id: @Model.Id }).done((res) => { if (res.success) { TablerDialog.fire({ icon: 'success', title: 'Activated!', text: res.message, timer: 2000, showConfirmButton: false }).then(() => location.reload()); } else { TablerDialog.fire('Error', res.message, 'error'); } }).fail(() => TablerDialog.fire('Error', 'An error occurred', 'error')); } });
         }
 
         function deactivateCourse() {
-            Swal.fire({ title: 'Deactivate Course?', text: 'This will hide the course from enrollment.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ffc107', confirmButtonText: '<i class="ti ti-ban"></i> Deactivate' })
-            .then((r) => { if (r.isConfirmed) { $.post('@Url.Action("Deactivate")', { id: @Model.Id }).done((res) => { if (res.success) { Swal.fire({ icon: 'success', title: 'Deactivated!', text: res.message, timer: 2000, showConfirmButton: false }).then(() => location.reload()); } else { Swal.fire('Error', res.message, 'error'); } }).fail(() => Swal.fire('Error', 'An error occurred', 'error')); } });
+            TablerDialog.fire({ title: 'Deactivate Course?', text: 'This will hide the course from enrollment.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ffc107', confirmButtonText: '<i class="ti ti-ban"></i> Deactivate' })
+            .then((r) => { if (r.isConfirmed) { $.post('@Url.Action("Deactivate")', { id: @Model.Id }).done((res) => { if (res.success) { TablerDialog.fire({ icon: 'success', title: 'Deactivated!', text: res.message, timer: 2000, showConfirmButton: false }).then(() => location.reload()); } else { TablerDialog.fire('Error', res.message, 'error'); } }).fail(() => TablerDialog.fire('Error', 'An error occurred', 'error')); } });
         }
 
         function deleteCourse() {
-            Swal.fire({ 
+            TablerDialog.fire({ 
                 title: 'Delete Course?', 
                 html: 'This action cannot be undone.<br><br>Type <strong>Delete</strong> to confirm:', 
                 icon: 'error', 
@@ -202,7 +202,7 @@
                     }
                 }
             })
-            .then((r) => { if (r.isConfirmed) { $.post('@Url.Action("Delete")', { id: @Model.Id }).done((res) => { if (res.success) { Swal.fire({ icon: 'success', title: 'Deleted!', text: res.message, timer: 2000, showConfirmButton: false }).then(() => window.location.href = '@Url.Action("Index")'); } else { Swal.fire('Error', res.message, 'error'); } }).fail(() => Swal.fire('Error', 'An error occurred', 'error')); } });
+            .then((r) => { if (r.isConfirmed) { $.post('@Url.Action("Delete")', { id: @Model.Id }).done((res) => { if (res.success) { TablerDialog.fire({ icon: 'success', title: 'Deleted!', text: res.message, timer: 2000, showConfirmButton: false }).then(() => window.location.href = '@Url.Action("Index")'); } else { TablerDialog.fire('Error', res.message, 'error'); } }).fail(() => TablerDialog.fire('Error', 'An error occurred', 'error')); } });
         }
     </script>
 }

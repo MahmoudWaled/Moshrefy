@@ -248,7 +248,7 @@
         var token = $('input[name="__RequestVerificationToken"]').val();
         
         function activateCenter() {
-            Swal.fire({ 
+            TablerDialog.fire({ 
                 title: 'Activate Center?', 
                 html: 'Activate <strong>@Model.Name</strong>?<br><br>This will make the center operational.', 
                 icon: 'question', 
@@ -264,14 +264,14 @@
                         data: { id: @Model.Id, __RequestVerificationToken: token },
                         success: function(res) {
                             if (res.success) { 
-                                Swal.fire({ icon: 'success', title: 'Activated!', text: res.message, timer: 2000, showConfirmButton: false })
+                                TablerDialog.fire({ icon: 'success', title: 'Activated!', text: res.message, timer: 2000, showConfirmButton: false })
                                 .then(() => window.location.reload()); 
                             } else { 
-                                Swal.fire('Error', res.message || 'An error occurred', 'error'); 
+                                TablerDialog.fire('Error', res.message || 'An error occurred', 'error'); 
                             }
                         },
                         error: function() {
-                            Swal.fire('Error', 'Failed to activate center.', 'error');
+                            TablerDialog.fire('Error', 'Failed to activate center.', 'error');
                         }
                     }); 
                 } 
@@ -279,7 +279,7 @@
         }
 
         function deactivateCenter() {
-            Swal.fire({ 
+            TablerDialog.fire({ 
                 title: 'Deactivate Center?', 
                 html: 'Deactivate <strong>@Model.Name</strong>?<br><br>This will make the center non-operational.', 
                 icon: 'warning', 
@@ -295,14 +295,14 @@
                         data: { id: @Model.Id, __RequestVerificationToken: token },
                         success: function(res) {
                             if (res.success) { 
-                                Swal.fire({ icon: 'success', title: 'Deactivated!', text: res.message, timer: 2000, showConfirmButton: false })
+                                TablerDialog.fire({ icon: 'success', title: 'Deactivated!', text: res.message, timer: 2000, showConfirmButton: false })
                                 .then(() => window.location.reload()); 
                             } else { 
-                                Swal.fire('Error', res.message || 'An error occurred', 'error'); 
+                                TablerDialog.fire('Error', res.message || 'An error occurred', 'error'); 
                             }
                         },
                         error: function() {
-                            Swal.fire('Error', 'Failed to deactivate center.', 'error');
+                            TablerDialog.fire('Error', 'Failed to deactivate center.', 'error');
                         }
                     }); 
                 } 
@@ -310,7 +310,7 @@
         }
         
         function softDeleteCenter() {
-            Swal.fire({ 
+            TablerDialog.fire({ 
                 title: 'Move to Trash?', 
                 html: 'Move <strong>@Model.Name</strong> to trash.<br><br>Type <strong>Delete</strong> to confirm:', 
                 icon: 'warning', 
@@ -333,14 +333,14 @@
                         data: { id: @Model.Id, __RequestVerificationToken: token },
                         success: function(res) {
                             if (res.success) { 
-                                Swal.fire({ icon: 'success', title: 'Moved to Trash!', text: res.message, timer: 2000, showConfirmButton: false })
+                                TablerDialog.fire({ icon: 'success', title: 'Moved to Trash!', text: res.message, timer: 2000, showConfirmButton: false })
                                 .then(() => window.location.href = '@Url.Action("Centers")'); 
                             } else { 
-                                Swal.fire('Error', res.message || 'An error occurred', 'error'); 
+                                TablerDialog.fire('Error', res.message || 'An error occurred', 'error'); 
                             }
                         },
                         error: function() {
-                            Swal.fire('Error', 'Failed to move center to trash.', 'error');
+                            TablerDialog.fire('Error', 'Failed to move center to trash.', 'error');
                         }
                     }); 
                 } 
@@ -348,7 +348,7 @@
         }
 
         function hardDeleteCenter() {
-            Swal.fire({ 
+            TablerDialog.fire({ 
                 title: 'PERMANENT DELETE', 
                 html: '<div class="alert alert-danger mb-2"><strong>WARNING!</strong> This cannot be undone!</div>Delete <strong>@Model.Name</strong> forever?<br><br>Type <strong>Delete</strong> to confirm:', 
                 icon: 'error', 
@@ -371,14 +371,14 @@
                         data: { id: @Model.Id, __RequestVerificationToken: token },
                         success: function(res) {
                             if (res.success) { 
-                                Swal.fire({ icon: 'success', title: 'Deleted!', text: res.message, timer: 2000, showConfirmButton: false })
+                                TablerDialog.fire({ icon: 'success', title: 'Deleted!', text: res.message, timer: 2000, showConfirmButton: false })
                                 .then(() => window.location.href = '@Url.Action("Centers")'); 
                             } else { 
-                                Swal.fire('Error', res.message || 'An error occurred', 'error'); 
+                                TablerDialog.fire('Error', res.message || 'An error occurred', 'error'); 
                             }
                         },
                         error: function() {
-                            Swal.fire('Error', 'Failed to delete center.', 'error');
+                            TablerDialog.fire('Error', 'Failed to delete center.', 'error');
                         }
                     }); 
                 } 

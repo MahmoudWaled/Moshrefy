@@ -1158,3 +1158,72 @@ table.dataTable .badge {
   font-size: 0.8125rem;
 }
 
+/* ========================================
+   18. ENHANCED ALERT VISIBILITY
+   Clearer alert colors while staying modern
+   ======================================== */
+
+/* Success Alert - More visible green */
+.alert-success {
+  background-color: rgba(47, 179, 68, 0.12) !important;
+  border: 1px solid rgba(47, 179, 68, 0.3) !important;
+  color: #1a7f2e !important;
+}
+
+.alert-success .alert-title {
+  color: #1a7f2e !important;
+}
+
+.alert-success .alert-icon {
+  color: #2fb344 !important;
+}
+
+.alert-success .text-secondary,
+.alert-success .text-muted {
+  color: #2d6e3a !important;
+}
+
+/* Error/Danger Alert - Clearer red */
+.alert-danger {
+  background-color: rgba(214, 57, 57, 0.12) !important;
+  border: 1px solid rgba(214, 57, 57, 0.3) !important;
+  color: #a32929 !important;
+}
+
+.alert-danger .alert-title {
+  color: #a32929 !important;
+}
+
+.alert-danger .alert-icon {
+  color: #d63939 !important;
+}
+
+.alert-danger .text-secondary,
+.alert-danger .text-muted {
+  color: #8b3232 !important;
+}
+
+/* Warning Alert - Clearer orange */
+.alert-warning {
+  background-color: rgba(247, 158, 27, 0.12) !important;
+  border: 1px solid rgba(247, 158, 27, 0.3) !important;
+  color: #a86b00 !important;
+}
+
+.alert-warning .alert-title,
+.alert-warning .alert-icon {
+  color: #cf8400 !important;
+}
+
+/* Info Alert - Clearer blue */
+.alert-info {
+  background-color: rgba(66, 153, 225, 0.12) !important;
+  border: 1px solid rgba(66, 153, 225, 0.3) !important;
+  color: #1a6eb3 !important;
+}
+
+.alert-info .alert-title,
+.alert-info .alert-icon {
+  color: #2d8fd8 !important;
+}
+

@@ -34,11 +34,17 @@
           <div class="card-header">
             <h3 class="card-title">Manage Academic Years</h3>
             <div class="ms-auto">
-              <select id="filterStatus" class="form-select form-select-sm" style="width: auto;">
-                <option value="all">All Academic Years</option>
-                <option value="active">Active Only</option>
-                <option value="inactive">Inactive Only</option>
-              </select>
+              <div class="btn-group" role="group" aria-label="Status filter">
+                <button type="button" class="btn btn-outline-secondary btn-sm active" data-filter-status="all">
+                  <i class="ti ti-list icon"></i> All
+                </button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-filter-status="active">
+                  Active
+                </button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-filter-status="inactive">
+                  Inactive
+                </button>
+              </div>
             </div>
           </div>
           <div class="card-body">
@@ -73,8 +79,8 @@
                 ajax: {
                     url: '@Url.Action("GetAcademicYearsData")',
                     type: 'POST',
-                    data: function (d) { d.filterStatus = $('#filterStatus').val(); },
-                    error: function () { Swal.fire({ icon: 'error', title: 'Error Loading Data' }); },
+                    data: function (d) { d.filterStatus = currentStatusFilter; },
+                    error: function () { TablerDialog.fire({ icon: 'error', title: 'Error Loading Data' }); },
                     dataSrc: function(json) { return json.data; }
                 },
                 columns: [
@@ -129,16 +135,24 @@
                     infoEmpty: 'No academic years found',
                     infoFiltered: '(from _MAX_ total)',
                     zeroRecords: 'No matching academic years found',
-                    paginate: { first: '«', last: '»', next: '›', previous: '‹' }
+                    paginate: { first: '«', last: '»', next: '›', previous: '‹' },
+                    processing: '<div class="spinner-border text-primary" role="status"></div><span class="ms-2">Loading...</span>'
                 }
             });
 
-            $('#filterStatus').change(function () { table.ajax.reload(); });
+            // Status filter button click handler
+            var currentStatusFilter = 'all';
+            $('[data-filter-status]').click(function() {
+                $('[data-filter-status]').removeClass('active');
+                $(this).addClass('active');
+                currentStatusFilter = $(this).data('filter-status');
+                table.ajax.reload();
+            });
         });
 
         function deleteAcademicYear(id) {
-            Swal.fire({ title: 'Delete Academic Year?', text: 'This will permanently delete this academic year.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#dc3545', confirmButtonText: '<i class="ti ti-trash"></i> Yes, delete' })
-            .then((r) => { if (r.isConfirmed) { $.post('@Url.Action("Delete")', { id: id }).done((res) => { if (res.success) { Swal.fire({ icon: 'success', title: 'Deleted!', timer: 2000, showConfirmButton: false }); $('#academicYearsTable').DataTable().ajax.reload(); } else { Swal.fire('Error', res.message, 'error'); } }); } });
+            TablerDialog.fire({ title: 'Delete Academic Year?', text: 'This will permanently delete this academic year.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#dc3545', confirmButtonText: '<i class="ti ti-trash"></i> Yes, delete' })
+            .then((r) => { if (r.isConfirmed) { $.post('@Url.Action("Delete")', { id: id }).done((res) => { if (res.success) { TablerDialog.fire({ icon: 'success', title: 'Deleted!', timer: 2000, showConfirmButton: false }); $('#academicYearsTable').DataTable().ajax.reload(); } else { TablerDialog.fire('Error', res.message, 'error'); } }); } });
         }
     </script>
 }

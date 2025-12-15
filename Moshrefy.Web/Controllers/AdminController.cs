@@ -58,6 +58,7 @@ namespace Moshrefy.Web.Controllers
                 int pageNumber = (skip / pageSize) + 1;
 
                 var filterStatus = Request.Form["filterStatus"].FirstOrDefault();
+                var filterRole = Request.Form["filterRole"].FirstOrDefault();
 
                 var paginationParams = new PaginationParamter
                 {
@@ -91,6 +92,12 @@ namespace Moshrefy.Web.Controllers
                         (u.Email != null && u.Email.Contains(searchValue, StringComparison.OrdinalIgnoreCase)) ||
                         (u.PhoneNumber != null && u.PhoneNumber.Contains(searchValue, StringComparison.OrdinalIgnoreCase))
                     ).ToList();
+                }
+
+                // Apply Role Filter
+                if (!string.IsNullOrEmpty(filterRole) && filterRole != "all")
+                {
+                    usersVM = usersVM.Where(u => u.RoleName.Equals(filterRole, StringComparison.OrdinalIgnoreCase)).ToList();
                 }
 
                 var jsonData = new
