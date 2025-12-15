@@ -1,0 +1,79 @@
+@* 
+    Modern Page Header Partial View
+    Usage: @await Html.PartialAsync("_PageHeader", new PageHeaderVM { ... })
+    
+    This partial expects a PageHeaderVM with:
+    - Title: Page title text
+    - Icon: Tabler icon class (e.g., "ti-building")
+    - Breadcrumbs: List of (Text, Url) tuples for breadcrumb trail
+    - ActionButtons: Optional HTML content for action buttons
+*@
+@model dynamic
+
+<div class="page-header-modern">
+    <div class="row g-2 align-items-center">
+        <div class="col">
+            @* Breadcrumb Navigation *@
+            @if (Model.Breadcrumbs != null && ((IEnumerable<dynamic>)Model.Breadcrumbs).Any())
+            {
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb-modern">
+                        @{
+                            var breadcrumbs = (IEnumerable<dynamic>)Model.Breadcrumbs;
+                            var count = breadcrumbs.Count();
+                            var index = 0;
+                        }
+                        @foreach (var crumb in breadcrumbs)
+                        {
+                            index++;
+                            var isLast = index == count;
+                            
+                            if (isLast)
+                            {
+                                <li class="breadcrumb-item active" aria-current="page">@crumb.Text</li>
+                            }
+                            else
+                            {
+                                <li class="breadcrumb-item">
+                                    <a href="@crumb.Url">
+                                        @if (index == 1)
+                                        {
+                                            <i class="ti ti-home"></i>
+                                        }
+                                        @crumb.Text
+                                    </a>
+                                    <i class="ti ti-chevron-right breadcrumb-separator ms-2"></i>
+                                </li>
+                            }
+                        }
+                    </ol>
+                </nav>
+            }
+            
+            @* Page Title *@
+            <h2 class="page-title">
+                @if (!string.IsNullOrEmpty(Model.Icon))
+                {
+                    <i class="ti @Model.Icon"></i>
+                }
+                @Model.Title
+            </h2>
+            
+            @* Optional Subtitle *@
+            @if (!string.IsNullOrEmpty(Model.Subtitle))
+            {
+                <div class="page-subtitle">@Model.Subtitle</div>
+            }
+        </div>
+        
+        @* Action Buttons *@
+        @if (Model.ActionButtons != null)
+        {
+            <div class="col-auto ms-auto d-print-none">
+                <div class="btn-list">
+                    @Html.Raw(Model.ActionButtons)
+                </div>
+            </div>
+        }
+    </div>
+</div>

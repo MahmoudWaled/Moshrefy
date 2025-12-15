@@ -3,24 +3,29 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<!-- Page header -->
-<div class="page-header d-print-none">
-  <div class="container-xl">
+<!-- Page Header -->
+<div class="page-header-modern">
     <div class="row g-2 align-items-center">
-      <div class="col">
-        <div class="page-pretitle">Admin</div>
-        <h2 class="page-title">My Team</h2>
-      </div>
-      <div class="col-auto ms-auto d-print-none">
-        <div class="btn-list">
-          <a asp-action="CreateUser" class="btn btn-action-create d-none d-sm-inline-block">
-            <i class="ti ti-user-plus icon"></i>
-            Add New Member
-          </a>
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb-modern">
+                    <li class="breadcrumb-item">
+                        <a asp-controller="Admin" asp-action="Index"><i class="ti ti-home"></i> My Center</a>
+                        <i class="ti ti-chevron-right breadcrumb-separator ms-2"></i>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">My Team</li>
+                </ol>
+            </nav>
+            <h2 class="page-title"><i class="ti ti-users"></i> My Team</h2>
         </div>
-      </div>
+        <div class="col-auto ms-auto d-print-none">
+            <div class="btn-list">
+                <a asp-action="CreateUser" class="btn btn-action-create d-none d-sm-inline-block">
+                    <i class="ti ti-user-plus icon"></i> Add New Member
+                </a>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 
 <!-- Page body -->

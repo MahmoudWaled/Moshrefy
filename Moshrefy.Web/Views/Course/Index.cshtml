@@ -3,24 +3,26 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<!-- Page header -->
-<div class="page-header d-print-none">
-  <div class="container-xl">
+<!-- Page Header -->
+<div class="page-header-modern">
     <div class="row g-2 align-items-center">
-      <div class="col">
-        <div class="page-pretitle">Management</div>
-        <h2 class="page-title"><i class="ti ti-book"></i> Courses</h2>
-      </div>
-      <div class="col-auto ms-auto d-print-none">
-        @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
-        {
-          <a asp-action="Create" class="btn btn-action-create d-none d-sm-inline-block">
-            <i class="ti ti-plus icon"></i> Add Course
-          </a>
-        }
-      </div>
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb-modern">
+                    <li class="breadcrumb-item active" aria-current="page"><i class="ti ti-book"></i> Courses</li>
+                </ol>
+            </nav>
+            <h2 class="page-title"><i class="ti ti-book"></i> Courses</h2>
+        </div>
+        <div class="col-auto ms-auto d-print-none">
+            @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+            {
+                <a asp-action="Create" class="btn btn-action-create d-none d-sm-inline-block">
+                    <i class="ti ti-plus icon"></i> Add Course
+                </a>
+            }
+        </div>
     </div>
-  </div>
 </div>
 
 <!-- Page body -->

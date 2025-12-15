@@ -3,16 +3,22 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<!-- Page header -->
-<div class="page-header d-print-none">
-  <div class="container-xl">
+<!-- Page Header -->
+<div class="page-header-modern">
     <div class="row g-2 align-items-center">
-      <div class="col">
-        <div class="page-pretitle">Users</div>
-        <h2 class="page-title"><i class="ti ti-search"></i> Search Users</h2>
-      </div>
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb-modern">
+                    <li class="breadcrumb-item">
+                        <a asp-controller="SuperAdmin" asp-action="Index"><i class="ti ti-home"></i> Dashboard</a>
+                        <i class="ti ti-chevron-right breadcrumb-separator ms-2"></i>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Search Users</li>
+                </ol>
+            </nav>
+            <h2 class="page-title"><i class="ti ti-search"></i> Search Users</h2>
+        </div>
     </div>
-  </div>
 </div>
 
 <!-- Page body -->

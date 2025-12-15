@@ -5,30 +5,40 @@
     var centerAddress = ViewBag.CenterAddress as string ?? "";
 }
 
-<!-- Page header -->
-<div class="page-header d-print-none">
-  <div class="container-xl">
+<!-- Page Header -->
+<div class="page-header-modern">
     <div class="row g-2 align-items-center">
-      <div class="col">
-        <div class="page-pretitle">@centerAddress</div>
-        <h2 class="page-title">
-          <i class="ti ti-users"></i> @centerName - Users
-        </h2>
-      </div>
-      <div class="col-auto ms-auto d-print-none">
-        <div class="btn-list">
-          <a asp-action="CreateUserForCenter" asp-route-centerId="@centerId" class="btn btn-action-create d-none d-sm-inline-block">
-            <i class="ti ti-user-plus icon"></i>
-            Create User
-          </a>
-          <button type="button" onclick="goBack()" class="btn btn-secondary d-none d-sm-inline-block">
-            <i class="ti ti-arrow-left icon"></i>
-            Back
-          </button>
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb-modern">
+                    <li class="breadcrumb-item">
+                        <a asp-controller="SuperAdmin" asp-action="Index"><i class="ti ti-home"></i> Dashboard</a>
+                        <i class="ti ti-chevron-right breadcrumb-separator ms-2"></i>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a asp-controller="SuperAdmin" asp-action="Centers">Centers</a>
+                        <i class="ti ti-chevron-right breadcrumb-separator ms-2"></i>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a asp-controller="SuperAdmin" asp-action="CenterDetails" asp-route-centerId="@centerId">@centerName</a>
+                        <i class="ti ti-chevron-right breadcrumb-separator ms-2"></i>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Users</li>
+                </ol>
+            </nav>
+            <h2 class="page-title"><i class="ti ti-users"></i> @centerName - Users</h2>
         </div>
-      </div>
+        <div class="col-auto ms-auto d-print-none">
+            <div class="btn-list">
+                <a asp-action="CreateUserForCenter" asp-route-centerId="@centerId" class="btn btn-action-create d-none d-sm-inline-block">
+                    <i class="ti ti-user-plus icon"></i> Create User
+                </a>
+                <button type="button" onclick="goBack()" class="btn d-none d-sm-inline-block">
+                    <i class="ti ti-arrow-left icon"></i> Back
+                </button>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 
 <!-- Page body -->

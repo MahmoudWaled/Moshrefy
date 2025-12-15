@@ -4,21 +4,31 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<!-- Page header -->
-<div class="page-header d-print-none">
-  <div class="container-xl">
+<!-- Page Header -->
+<div class="page-header-modern">
     <div class="row g-2 align-items-center">
-      <div class="col">
-        <div class="page-pretitle">Admin</div>
-        <h2 class="page-title"><i class="ti ti-user-plus"></i> Add New Team Member</h2>
-      </div>
-      <div class="col-auto ms-auto">
-        <button type="button" onclick="goBack()" class="btn btn-outline-secondary">
-          <i class="ti ti-arrow-left"></i> Back
-        </button>
-      </div>
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb-modern">
+                    <li class="breadcrumb-item">
+                        <a asp-controller="Admin" asp-action="Index"><i class="ti ti-home"></i> My Center</a>
+                        <i class="ti ti-chevron-right breadcrumb-separator ms-2"></i>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a asp-controller="Admin" asp-action="Users">My Team</a>
+                        <i class="ti ti-chevron-right breadcrumb-separator ms-2"></i>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Add Member</li>
+                </ol>
+            </nav>
+            <h2 class="page-title"><i class="ti ti-user-plus"></i> Add New Team Member</h2>
+        </div>
+        <div class="col-auto ms-auto">
+            <button type="button" onclick="goBack()" class="btn">
+                <i class="ti ti-arrow-left"></i> Back
+            </button>
+        </div>
     </div>
-  </div>
 </div>
 
 <!-- Page body -->

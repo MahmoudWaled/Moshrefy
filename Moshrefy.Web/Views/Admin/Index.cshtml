@@ -3,16 +3,18 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<!-- Page header -->
-<div class="page-header d-print-none">
-  <div class="container-xl">
+<!-- Page Header -->
+<div class="page-header-modern">
     <div class="row g-2 align-items-center">
-      <div class="col">
-        <div class="page-pretitle">Admin</div>
-        <h2 class="page-title"><i class="ti ti-home"></i> My Center Dashboard</h2>
-      </div>
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb-modern">
+                    <li class="breadcrumb-item active" aria-current="page"><i class="ti ti-home"></i> My Center</li>
+                </ol>
+            </nav>
+            <h2 class="page-title"><i class="ti ti-home"></i> Center Dashboard</h2>
+        </div>
     </div>
-  </div>
 </div>
 
 <!-- Page body -->
@@ -34,25 +36,6 @@
         </div>
       </div>
     }
-
-    <!-- Welcome Banner -->
-    <div class="row mb-4">
-      <div class="col-12">
-        <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-          <div class="card-body py-4">
-            <div class="row align-items-center">
-              <div class="col-md-8">
-                <h2 class="text-white mb-2"><i class="ti ti-mood-happy me-2"></i>Welcome to Your Dashboard!</h2>
-                <p class="text-white-50 mb-0">Manage your team members, academic years, and courses all from one place.</p>
-              </div>
-              <div class="col-md-4 text-end d-none d-md-block">
-                <i class="ti ti-dashboard" style="font-size: 5rem; opacity: 0.3; color: white;"></i>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
 
     <!-- Quick Actions -->
     <div class="row mb-4">
