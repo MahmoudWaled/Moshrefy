@@ -1,299 +1,295 @@
-﻿<!DOCTYPE html>
+﻿<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Moshrefy | @ViewData["Title"] </title>
-
-  <!-- Google Font: Source Sans Pro -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
-  <!-- Font Awesome Icons -->
-  <link rel="stylesheet" href="~/plugins/fontawesome-free/css/all.min.css">
-  <!-- Theme style -->
-  <link rel="stylesheet" href="~/dist/css/adminlte.min.css">
-  <!-- Custom styles -->
-  <link rel="stylesheet" href="~/css/site.css">
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+  <title>Moshrefy | @ViewData["Title"]</title>
+  
+   <!-- Tabler CSS -->
+  <link href="~/tabler/css/tabler.min.css" rel="stylesheet"/>
+  <!-- Tabler Icons -->
+    <link href="~/tabler/css/tabler-icons.min.css" rel="stylesheet"/>
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="~/tabler/css/dataTables.bootstrap5.min.css">
+    <!-- SweetAlert2 -->
+    <link rel="stylesheet" href="~/tabler/css/sweetalert2.css">
+ 
+  <!-- Custom styles with color palette -->
+  <link href="~/css/site.css" rel="stylesheet"/>
 </head>
-
-<body class="hold-transition sidebar-mini">
-
-
-<div class="wrapper">
-
-  <!-- Navbar -->
-        <nav class="main-header navbar navbar-expand navbar-light ">
-    <!-- Left navbar links -->
-    <ul class="navbar-nav">
-      <li class="nav-item">
-        <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
-      </li>
-      
-    </ul>
-
-    <!-- Right navbar links -->
-    <ul class="navbar-nav ml-auto">
-      <!-- Navbar Search -->
-      <li class="nav-item">
-        <a class="nav-link" data-widget="navbar-search" href="#" role="button">
-          <i class="fas fa-search"></i>
-        </a>
-        <div class="navbar-search-block">
-          <form class="form-inline">
-            <div class="input-group input-group-sm">
-              <input class="form-control form-control-navbar" type="search" placeholder="Search" aria-label="Search">
-              <div class="input-group-append">
-                <button class="btn btn-navbar" type="submit">
-                  <i class="fas fa-search"></i>
-                </button>
-                <button class="btn btn-navbar" type="button" data-widget="navbar-search">
-                  <i class="fas fa-times"></i>
-                </button>
-              </div>
-            </div>
-          </form>
-        </div>
-      </li>
-
-      <!-- User Info -->
-      <li class="nav-item">
-        <a class="nav-link" href="#">
-          <i class="fas fa-user mr-2"></i>
-          @{
-            var displayRole = "User";
-            if (User.IsInRole("SuperAdmin"))
-            {
-              displayRole = "Super Admin";
-            }
-            else if (User.IsInRole("Admin"))
-            {
-              displayRole = "Admin";
-            }
-            else if (User.IsInRole("Manager"))
-            {
-              displayRole = "Manager";
-            }
-            else if (User.IsInRole("Employee"))
-            {
-              displayRole = "Employee";
-            }
+<body>
+  <div class="page">
+    <!-- Navbar -->
+    <header class="navbar navbar-expand-md d-print-none">
+      <div class="container-xl">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <h1 class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pe-0 pe-md-3">
+          @if (User.IsInRole("SuperAdmin"))
+          {
+            <a asp-controller="SuperAdmin" asp-action="Index" class="text-decoration-none">
+              <span class="fw-bold">Moshrefy</span>
+            </a>
           }
-          <span>@User.Identity?.Name (@displayRole)</span>
-        </a>
-      </li>
-     
-    </ul>
-  </nav>
-  <!-- /.navbar -->
-
-  <!-- Main Sidebar Container -->
-  <aside class="main-sidebar sidebar-dark-primary elevation-4 z-3 ">
-    <!-- Brand Logo -->
-    @if (User.IsInRole("SuperAdmin"))
-    {
-      <a asp-controller="SuperAdmin" asp-action="Index" class="brand-link">
-        <span class="brand-text font-weight-light">Moshrefy</span>
-      </a>
-    }
-    else if (User.IsInRole("Admin"))
-    {
-      <a asp-controller="Admin" asp-action="Index" class="brand-link">
-        <span class="brand-text font-weight-light">Moshrefy</span>
-      </a>
-    }
-    else
-    {
-      <a href="#" class="brand-link">
-        <span class="brand-text font-weight-light">Moshrefy</span>
-      </a>
-    }
-
-    <!-- Sidebar -->
-    <div class="sidebar">
-      <!-- Sidebar Menu -->
-      <nav class="mt-2">
-        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-        
-        <!-- Dashboard - All Roles -->
-        @if (User.IsInRole("SuperAdmin"))
-        {
-          <li class="nav-item">
-            <a asp-controller="SuperAdmin" asp-action="Index" class="nav-link">
-              <i class="nav-icon fas fa-tachometer-alt"></i>
-              <p>Dashboard</p>
+          else if (User.IsInRole("Admin"))
+          {
+            <a asp-controller="Admin" asp-action="Index" class="text-decoration-none">
+              <span class="fw-bold">Moshrefy</span>
             </a>
-          </li>
-        }
-        else if (User.IsInRole("Admin"))
-        {
-          <li class="nav-item">
-            <a asp-controller="Admin" asp-action="Index" class="nav-link">
-              <i class="nav-icon fas fa-home"></i>
-              <p>My Center</p>
+          }
+          else
+          {
+            <span class="fw-bold">Moshrefy</span>
+          }
+        </h1>
+        <div class="navbar-nav flex-row order-md-last">
+          <div class="nav-item dropdown">
+            <a href="#" class="nav-link d-flex lh-1 text-reset p-0" data-bs-toggle="dropdown" aria-label="Open user menu">
+              <span class="avatar avatar-sm">
+                @{
+                  var displayRole = "User";
+                  var userInitial = User.Identity?.Name?.Substring(0, 1).ToUpper() ?? "U";
+                  
+                  if (User.IsInRole("SuperAdmin"))
+                  {
+                    displayRole = "Super Admin";
+                  }
+                  else if (User.IsInRole("Admin"))
+                  {
+                    displayRole = "Admin";
+                  }
+                  else if (User.IsInRole("Manager"))
+                  {
+                    displayRole = "Manager";
+                  }
+                  else if (User.IsInRole("Employee"))
+                  {
+                    displayRole = "Employee";
+                  }
+                }
+                @userInitial
+              </span>
+              <div class="d-none d-xl-block ps-2">
+                <div>@User.Identity?.Name</div>
+                <div class="mt-1 small text-muted">@displayRole</div>
+              </div>
             </a>
-          </li>
-        }
+            <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+              <form asp-controller="Auth" asp-action="Logout" method="post" class="m-0">
+                <button type="submit" class="dropdown-item">
+                  <i class="ti ti-logout me-2"></i>
+                  Logout
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+    
+    <!-- Sidebar Navigation -->
+    <header class="navbar-expand-md">
+      <div class="collapse navbar-collapse" id="navbar-menu">
+        <div class="navbar">
+          <div class="container-xl">
+            <ul class="navbar-nav">
+              
+              <!-- Dashboard - All Roles -->
+              @if (User.IsInRole("SuperAdmin"))
+              {
+                <li class="nav-item">
+                  <a class="nav-link" asp-controller="SuperAdmin" asp-action="Index">
+                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                      <i class="ti ti-dashboard"></i>
+                    </span>
+                    <span class="nav-link-title">Dashboard</span>
+                  </a>
+                </li>
+              }
+              else if (User.IsInRole("Admin"))
+              {
+                <li class="nav-item">
+                  <a class="nav-link" asp-controller="Admin" asp-action="Index">
+                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                      <i class="ti ti-home"></i>
+                    </span>
+                    <span class="nav-link-title">My Center</span>
+                  </a>
+                </li>
+              }
 
-        <!-- SuperAdmin Only -->
-        @if (User.IsInRole("SuperAdmin"))
-        {
-          <li class="nav-header">SYSTEM MANAGEMENT</li>
-          
-          <li class="nav-item">
-            <a asp-controller="SuperAdmin" asp-action="Centers" class="nav-link">
-              <i class="nav-icon fas fa-building"></i>
-              <p>Centers</p>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a asp-controller="SuperAdmin" asp-action="Users" class="nav-link">
-              <i class="nav-icon fas fa-users-cog"></i>
-              <p>User Management</p>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a asp-controller="SuperAdmin" asp-action="DeletedItems" class="nav-link">
-              <i class="nav-icon fas fa-trash-restore"></i>
-              <p>Deleted Items</p>
-            </a>
-          </li>
-        }
+              <!-- SuperAdmin Only -->
+              @if (User.IsInRole("SuperAdmin"))
+              {
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#navbar-system" data-bs-toggle="dropdown" data-bs-auto-close="false" role="button" aria-expanded="false">
+                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                      <i class="ti ti-settings"></i>
+                    </span>
+                    <span class="nav-link-title">System Management</span>
+                  </a>
+                  <div class="dropdown-menu">
+                    <a class="dropdown-item" asp-controller="SuperAdmin" asp-action="Centers">
+                      <i class="ti ti-building me-2"></i>
+                      Centers
+                    </a>
+                    <a class="dropdown-item" asp-controller="SuperAdmin" asp-action="Users">
+                      <i class="ti ti-users me-2"></i>
+                      User Management
+                    </a>
+                    <a class="dropdown-item" asp-controller="SuperAdmin" asp-action="DeletedItems">
+                      <i class="ti ti-trash me-2"></i>
+                      Deleted Items
+                    </a>
+                  </div>
+                </li>
+              }
 
-        <!-- Admin Only - Team Management -->
-        @if (User.IsInRole("Admin"))
-        {
-          <li class="nav-header">MY TEAM</li>
-          
-          <li class="nav-item">
-            <a asp-controller="Admin" asp-action="Users" class="nav-link">
-              <i class="nav-icon fas fa-users"></i>
-              <p>Team Members</p>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a asp-controller="Admin" asp-action="CreateUser" class="nav-link">
-              <i class="nav-icon fas fa-user-plus"></i>
-              <p>Add Team Member</p>
-            </a>
-          </li>
-        }
+              <!-- Admin Only - Team Management -->
+              @if (User.IsInRole("Admin"))
+              {
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#navbar-team" data-bs-toggle="dropdown" data-bs-auto-close="false" role="button" aria-expanded="false">
+                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                      <i class="ti ti-users"></i>
+                    </span>
+                    <span class="nav-link-title">My Team</span>
+                  </a>
+                  <div class="dropdown-menu">
+                    <a class="dropdown-item" asp-controller="Admin" asp-action="Users">
+                      <i class="ti ti-users me-2"></i>
+                      Team Members
+                    </a>
+                    <a class="dropdown-item" asp-controller="Admin" asp-action="CreateUser">
+                      <i class="ti ti-user-plus me-2"></i>
+                      Add Team Member
+                    </a>
+                  </div>
+                </li>
+              }
 
-        <!-- Admin & SuperAdmin -->
-        @if (User.IsInRole("SuperAdmin") || User.IsInRole("Admin"))
-        {
-          <li class="nav-header">ACADEMIC MANAGEMENT</li>
-          
-          <li class="nav-item">
-            <a asp-controller="AcademicYear" asp-action="Index" class="nav-link">
-              <i class="nav-icon fas fa-calendar-alt"></i>
-              <p>Academic Years</p>
-            </a>
-          </li>
+              <!-- Admin & SuperAdmin - Academic Management -->
+              @if (User.IsInRole("SuperAdmin") || User.IsInRole("Admin"))
+              {
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#navbar-academic" data-bs-toggle="dropdown" data-bs-auto-close="false" role="button" aria-expanded="false">
+                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                      <i class="ti ti-school"></i>
+                    </span>
+                    <span class="nav-link-title">Academic Management</span>
+                  </a>
+                  <div class="dropdown-menu">
+                    <a class="dropdown-item" asp-controller="AcademicYear" asp-action="Index">
+                      <i class="ti ti-calendar me-2"></i>
+                      Academic Years
+                    </a>
+                    <a class="dropdown-item" asp-controller="Course" asp-action="Index">
+                      <i class="ti ti-book me-2"></i>
+                      Courses
+                    </a>
+                    <a class="dropdown-item" asp-controller="Student" asp-action="Index">
+                      <i class="ti ti-user-circle me-2"></i>
+                      Students
+                    </a>
+                    <a class="dropdown-item" asp-controller="Teacher" asp-action="Index">
+                      <i class="ti ti-user-check me-2"></i>
+                      Teachers
+                    </a>
+                  </div>
+                </li>
+              }
 
-          <li class="nav-item">
-            <a asp-controller="Course" asp-action="Index" class="nav-link">
-              <i class="nav-icon fas fa-book"></i>
-              <p>Courses</p>
-            </a>
-          </li>
+              <!-- All Roles - Operations -->
+              <li class="nav-item">
+                <a class="nav-link" asp-controller="Attendance" asp-action="Index">
+                  <span class="nav-link-icon d-md-none d-lg-inline-block">
+                    <i class="ti ti-clipboard-check"></i>
+                  </span>
+                  <span class="nav-link-title">Attendance</span>
+                </a>
+              </li>
 
-          <li class="nav-item">
-            <a asp-controller="Student" asp-action="Index" class="nav-link">
-              <i class="nav-icon fas fa-user-graduate"></i>
-              <p>Students</p>
-            </a>
-          </li>
-
-          <li class="nav-item">
-            <a asp-controller="Teacher" asp-action="Index" class="nav-link">
-              <i class="nav-icon fas fa-chalkboard-teacher"></i>
-              <p>Teachers</p>
-            </a>
-          </li>
-        }
-
-        <!-- All Roles - Sessions & Attendance -->
-        <li class="nav-header">OPERATIONS</li>
-        
-        <li class="nav-item">
-          <a asp-controller="Attendance" asp-action="Index" class="nav-link">
-            <i class="nav-icon fas fa-clipboard-check"></i>
-            <p>Attendance</p>
-          </a>
-        </li>
-
-        <!-- Financial - Admin & SuperAdmin -->
-        @if (User.IsInRole("SuperAdmin") || User.IsInRole("Admin") || User.IsInRole("Manager"))
-        {
-          <li class="nav-header">FINANCIAL</li>
-          
-          <li class="nav-item">
-            <a asp-controller="Payment" asp-action="Index" class="nav-link">
-              <i class="nav-icon fas fa-money-bill-wave"></i>
-              <p>Payments</p>
-            </a>
-          </li>
-        }
-
-        <!-- Logout - All Roles -->
-        <li class="nav-item">
-          <form asp-controller="Auth" asp-action="Logout" method="post">
-            <button type="submit" class="nav-link btn btn-link text-left w-100">
-              <i class="nav-icon fas fa-sign-out-alt"></i>
-              <p>Logout</p>
-            </button>
-          </form>
-        </li>
-
-      </ul>
-    </nav>
-    <!-- /.sidebar-menu -->
+              <!-- Financial - Admin & SuperAdmin & Manager -->
+              @if (User.IsInRole("SuperAdmin") || User.IsInRole("Admin") || User.IsInRole("Manager"))
+              {
+                <li class="nav-item">
+                  <a class="nav-link" asp-controller="Payment" asp-action="Index">
+                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                      <i class="ti ti-cash"></i>
+                    </span>
+                    <span class="nav-link-title">Payments</span>
+                  </a>
+                </li>
+              }
+            </ul>
+          </div>
+        </div>
+      </div>
+    </header>
+    
+    <!-- Page Content -->
+    <div class="page-wrapper">
+      <div class="page-body">
+        <div class="container-xl">
+          <!-- TempData Success/Error Messages -->
+          @if (TempData["SuccessMessage"] != null)
+          {
+            <div class="alert alert-success alert-dismissible fade show" role="alert" id="tempSuccessAlert">
+              <div class="d-flex">
+                <div><i class="ti ti-check icon alert-icon"></i></div>
+                <div>
+                  <h4 class="alert-title">Success!</h4>
+                  <div class="text-secondary">@TempData["SuccessMessage"]</div>
+                </div>
+              </div>
+              <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
+            </div>
+          }
+          @if (TempData["ErrorMessage"] != null)
+          {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert" id="tempErrorAlert">
+              <div class="d-flex">
+                <div><i class="ti ti-alert-circle icon alert-icon"></i></div>
+                <div>
+                  <h4 class="alert-title">Error</h4>
+                  <div class="text-secondary">@TempData["ErrorMessage"]</div>
+                </div>
+              </div>
+              <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
+            </div>
+          }
+          @RenderBody()
+        </div>
+      </div>
+      
+      <!-- Footer -->
+      <footer class="footer footer-transparent d-print-none">
+        <div class="container-xl">
+          <div class="row text-center align-items-center">
+            <div class="col-12 col-lg-auto mt-3 mt-lg-0">
+              <ul class="list-inline list-inline-dots mb-0">
+                <li class="list-inline-item">
+                  Copyright &copy; 2024-2025 <a href="." class="link-secondary">Moshrefy</a>. All rights reserved.
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
   </div>
-  <!-- /.sidebar -->
-  </aside>
-
-  <!-- Content Wrapper. Contains page content -->
-  <div class="content-wrapper pt-5">
-    <!-- Main content -->
-    <div class="content pt-4">
-      <div class="container-fluid pt-2 ">
-            @RenderBody()
-      </div><!-- /.container-fluid -->
-    </div>
-    <!-- /.content -->
-  </div>
-  <!-- /.content-wrapper -->
-
-  <!-- Control Sidebar -->
-  <aside class="control-sidebar control-sidebar-dark">
-    <!-- Control sidebar content goes here -->
-    <div class="p-3">
-      <h5>Title</h5>
-      <p>Sidebar content</p>
-    </div>
-  </aside>
-  <!-- /.control-sidebar -->
-
-  <!-- Main Footer -->
-  <footer class="main-footer">
-    <!-- To the right -->
-    <div class="float-right d-none d-sm-inline">
-      Anything you want
-    </div>
-    <!-- Default to the left -->
-    <strong>Copyright &copy; 2024-2025 Moshrefy </strong> All rights reserved.
-  </footer>
-</div>
-<!-- ./wrapper -->
-
-<!-- REQUIRED SCRIPTS -->
-
-<!-- jQuery -->
-<script src="~/plugins/jquery/jquery.min.js"></script>
-<!-- Bootstrap 4 -->
-<script src="~/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-<!-- AdminLTE App -->
-<script src="~/dist/js/adminlte.min.js"></script>
-    @RenderSection("Scripts", required: false)
-<script src="~/js/sidebarToggleHandler.js"></script>
+  
+  <!-- jQuery (required for DataTables) -->
+  <script src="~/tabler/js/jquery-3.7.0.min.js"></script>
+  <!-- DataTables JS -->
+  <script src="~/tabler/js/jquery.dataTables.min.js"></script>
+  <script src="~/tabler/js/dataTables.bootstrap5.min.js"></script>
+  <!-- Tabler Core (includes Bootstrap) -->
+  <script src="~/tabler/js/tabler.min.js"></script>
+  <!-- SweetAlert2 -->
+  <script src="~/tabler/js/sweetalert2@11.js"></script>
+  @RenderSection("Scripts", required: false)
 </body>
 </html>

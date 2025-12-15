@@ -4,152 +4,226 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<!-- Content Header -->
-<section class="content-header">
-    <div class="container-fluid">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1><i class="fas fa-user-plus"></i> Add New Team Member</h1>
-            </div>
-            <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a asp-action="Index">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a asp-action="Users">My Team</a></li>
-                    <li class="breadcrumb-item active">Add Member</li>
-                </ol>
-            </div>
-        </div>
+<!-- Page header -->
+<div class="page-header d-print-none">
+  <div class="container-xl">
+    <div class="row g-2 align-items-center">
+      <div class="col">
+        <div class="page-pretitle">Admin</div>
+        <h2 class="page-title"><i class="ti ti-user-plus"></i> Add New Team Member</h2>
+      </div>
+      <div class="col-auto ms-auto">
+        <a asp-action="Users" class="btn btn-outline-secondary">
+          <i class="ti ti-arrow-left"></i> Back to Team
+        </a>
+      </div>
     </div>
-</section>
+  </div>
+</div>
 
-<!-- Main content -->
-<section class="content">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-8 offset-md-2">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Member Information</h3>
-                    </div>
-                    <form asp-action="CreateUser" method="post">
-                        <div class="card-body">
-                            <!-- Success/Error Messages -->
-                            @if (TempData["SuccessMessage"] != null)
-                            {
-                                <div class="alert alert-success alert-dismissible">
-                                    <button type="button" class="close" data-dismiss="alert">&times;</button>
-                                    <i class="icon fas fa-check"></i> @TempData["SuccessMessage"]
-                                </div>
-                            }
-                            @if (TempData["ErrorMessage"] != null)
-                            {
-                                <div class="alert alert-danger alert-dismissible">
-                                    <button type="button" class="close" data-dismiss="alert">&times;</button>
-                                    <i class="icon fas fa-ban"></i> @TempData["ErrorMessage"]
-                                </div>
-                            }
-
-                            <!-- Personal Information -->
-                            <div class="form-group">
-                                <label asp-for="Name">Full Name <span class="text-danger">*</span></label>
-                                <input asp-for="Name" class="form-control" placeholder="Enter full name" />
-                                <span asp-validation-for="Name" class="text-danger"></span>
-                            </div>
-
-                            <div class="form-group">
-                                <label asp-for="UserName">Username <span class="text-danger">*</span></label>
-                                <input asp-for="UserName" class="form-control" placeholder="Choose a username" />
-                                <small class="form-text text-muted">This will be used for logging in</small>
-                                <span asp-validation-for="UserName" class="text-danger"></span>
-                            </div>
-
-                            <div class="form-group">
-                                <label asp-for="Password">Password <span class="text-danger">*</span></label>
-                                <input asp-for="Password" type="password" class="form-control" placeholder="Create a strong password" />
-                                <span asp-validation-for="Password" class="text-danger"></span>
-                            </div>
-
-                            <!-- Role Selection -->
-                            <div class="form-group">
-                                <label>Team Member Type <span class="text-danger">*</span></label>
-                                <select asp-for="RoleName" class="form-control" id="roleSelect">
-                                    <option value="">-- Select Type --</option>
-                                    <option value="Employee">Employee</option>
-                                    <option value="Manager">Manager</option>
-                                </select>
-                                <span asp-validation-for="RoleName" class="text-danger"></span>
-                            </div>
-
-                            <!-- Role Description -->
-                            <div class="alert alert-info alert-hidden" id="roleDescription">
-                                <i class="icon fas fa-info-circle"></i>
-                                <span id="roleDescriptionText"></span>
-                            </div>
-
-                            <!-- Contact Information -->
-                            <hr />
-                            <h5><i class="fas fa-address-book"></i> Contact Details</h5>
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label asp-for="Email">Email Address</label>
-                                        <input asp-for="Email" type="email" class="form-control" placeholder="email@example.com" />
-                                        <span asp-validation-for="Email" class="text-danger"></span>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label asp-for="PhoneNumber">Phone Number</label>
-                                        <input asp-for="PhoneNumber" class="form-control" placeholder="Phone number" />
-                                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Info Box -->
-                            <div class="callout callout-info">
-                                <h5><i class="fas fa-info-circle"></i> Note</h5>
-                                <p>This team member will be able to access your center's system. You can disable their access anytime from the team list.</p>
-                            </div>
-                        </div>
-
-                        <div class="card-footer">
-                            <button type="submit" class="btn btn-action-create">
-                                <i class="fas fa-check"></i> Add Team Member
-                            </button>
-                            <a asp-action="Users" class="btn btn-outline-secondary">
-                                <i class="fas fa-times"></i> Cancel
-                            </a>
-                        </div>
-                    </form>
+<!-- Page body -->
+<div class="page-body">
+  <div class="container-xl">
+    <form asp-action="CreateUser" method="post">
+      <div class="row">
+        <!-- Main Form Column -->
+        <div class="col-lg-8">
+          <!-- Personal Information Card -->
+          <div class="card mb-3">
+            <div class="card-header">
+              <div class="d-flex align-items-center">
+                <span class="avatar bg-primary text-white me-3">
+                  <i class="ti ti-user"></i>
+                </span>
+                <div>
+                  <h3 class="card-title mb-0">Personal Information</h3>
+                  <small class="text-muted">Basic details about the team member</small>
                 </div>
+              </div>
             </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-12 mb-3">
+                  <label class="form-label required" asp-for="Name">Full Name</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="ti ti-user"></i></span>
+                    <input asp-for="Name" class="form-control" placeholder="Enter full name" />
+                  </div>
+                  <span asp-validation-for="Name" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label required" asp-for="UserName">Username</label>
+                  <div class="input-group">
+                    <span class="input-group-text">@@</span>
+                    <input asp-for="UserName" class="form-control" placeholder="Choose a username" />
+                  </div>
+                  <small class="form-hint"><i class="ti ti-info-circle"></i> This will be used for logging in</small>
+                  <span asp-validation-for="UserName" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label required" asp-for="Password">Password</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="ti ti-lock"></i></span>
+                    <input asp-for="Password" type="password" class="form-control" placeholder="Create a strong password" />
+                  </div>
+                  <span asp-validation-for="Password" class="text-danger small"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Contact Information Card -->
+          <div class="card mb-3">
+            <div class="card-header">
+              <div class="d-flex align-items-center">
+                <span class="avatar bg-info text-white me-3">
+                  <i class="ti ti-address-book"></i>
+                </span>
+                <div>
+                  <h3 class="card-title mb-0">Contact Information</h3>
+                  <small class="text-muted">Optional contact details</small>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label" asp-for="Email">Email Address</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="ti ti-mail"></i></span>
+                    <input asp-for="Email" type="email" class="form-control" placeholder="email@example.com" />
+                  </div>
+                  <span asp-validation-for="Email" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label" asp-for="PhoneNumber">Phone Number</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="ti ti-phone"></i></span>
+                    <input asp-for="PhoneNumber" class="form-control" placeholder="Phone number" />
+                  </div>
+                  <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-    </div>
-</section>
+
+        <!-- Sidebar Column -->
+        <div class="col-lg-4">
+          <!-- Role Selection Card -->
+          <div class="card mb-3">
+            <div class="card-header">
+              <div class="d-flex align-items-center">
+                <span class="avatar bg-purple text-white me-3">
+                  <i class="ti ti-shield"></i>
+                </span>
+                <div>
+                  <h3 class="card-title mb-0">Member Type</h3>
+                  <small class="text-muted">Select role and permissions</small>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="mb-3">
+                <div class="form-selectgroup form-selectgroup-boxes d-flex flex-column">
+                  <label class="form-selectgroup-item flex-fill">
+                    <input type="radio" asp-for="RoleName" value="Employee" class="form-selectgroup-input" />
+                    <div class="form-selectgroup-label d-flex align-items-center p-3">
+                      <div class="me-3">
+                        <span class="form-selectgroup-check"></span>
+                      </div>
+                      <div class="form-selectgroup-label-content d-flex align-items-center">
+                        <span class="avatar bg-role-employee text-white me-3">
+                          <i class="ti ti-user"></i>
+                        </span>
+                        <div>
+                          <div class="font-weight-medium">Employee</div>
+                          <div class="text-muted small">Day-to-day tasks, attendance, basic operations</div>
+                        </div>
+                      </div>
+                    </div>
+                  </label>
+                  <label class="form-selectgroup-item flex-fill">
+                    <input type="radio" asp-for="RoleName" value="Manager" class="form-selectgroup-input" />
+                    <div class="form-selectgroup-label d-flex align-items-center p-3">
+                      <div class="me-3">
+                        <span class="form-selectgroup-check"></span>
+                      </div>
+                      <div class="form-selectgroup-label-content d-flex align-items-center">
+                        <span class="avatar bg-role-manager text-white me-3">
+                          <i class="ti ti-user-cog"></i>
+                        </span>
+                        <div>
+                          <div class="font-weight-medium">Manager</div>
+                          <div class="text-muted small">Finances, reports, and oversight</div>
+                        </div>
+                      </div>
+                    </div>
+                  </label>
+                </div>
+                <span asp-validation-for="RoleName" class="text-danger small"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Info Card -->
+          <div class="card bg-azure-lt">
+            <div class="card-body">
+              <div class="d-flex">
+                <div>
+                  <i class="ti ti-info-circle icon text-azure me-2" style="font-size: 1.5rem;"></i>
+                </div>
+                <div>
+                  <h4 class="mb-1">Good to Know</h4>
+                  <p class="text-muted mb-0 small">
+                    This team member will be able to access your center's system. You can disable their access anytime from the team list.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="card mt-3">
+            <div class="card-body">
+              <div class="d-flex gap-2">
+                <a asp-action="Users" class="btn btn-outline-secondary flex-fill">
+                  <i class="ti ti-x"></i> Cancel
+                </a>
+                <button type="submit" class="btn btn-action-create flex-fill">
+                  <i class="ti ti-check"></i> Add Member
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    
-    <script>
-        $(document).ready(function() {
-            const roleDescriptions = {
-                'Employee': 'Regular team member who can handle day-to-day tasks like recording attendance, managing student information, and basic operations.',
-                'Manager': 'Senior team member with additional permissions to manage finances, generate reports, and oversee operations.'
-            };
-
-            $('#roleSelect').change(function() {
-                var selectedRole = $(this).val();
-                
-                if (selectedRole && roleDescriptions[selectedRole]) {
-                    $('#roleDescriptionText').text(roleDescriptions[selectedRole]);
-                    $('#roleDescription').slideDown();
-                } else {
-                    $('#roleDescription').slideUp();
-                }
-            });
-        });
-    </script>
 }
 
+<style>
+  .form-selectgroup-item .form-selectgroup-label {
+    border: 2px solid #e6e8ec;
+    border-radius: 8px;
+    transition: all 0.2s;
+  }
+  .form-selectgroup-item .form-selectgroup-input:checked + .form-selectgroup-label {
+    border-color: var(--tblr-primary);
+    background: rgba(var(--tblr-primary-rgb), 0.05);
+  }
+  .form-selectgroup-item:hover .form-selectgroup-label {
+    border-color: var(--tblr-primary);
+  }
+  .bg-purple {
+    background-color: #6f42c1 !important;
+  }
+  .required::after {
+    content: " *";
+    color: #dc3545;
+  }
+</style>

@@ -37,5 +37,12 @@ namespace Moshrefy.infrastructure.Repositories
                 .Where(c => c.Name.Contains(courseName))
                 .ToListAsync();
         }
+
+        public async Task<Course?> GetByIdWithAcademicYearAsync(int id)
+        {
+            return await appDbContext.Set<Course>()
+                .Include(c => c.AcademicYear)
+                .FirstOrDefaultAsync(c => c.Id == id);
+        }
     }
 }

@@ -1,213 +1,229 @@
 @model Moshrefy.Web.Models.User.CreateUserVM
-
 @{
     ViewData["Title"] = "Create User for Center";
+    Layout = "~/Views/Shared/_Layout.cshtml";
     var preSelectedCenter = ViewBag.PreSelectedCenter as bool? ?? false;
     var centerName = ViewBag.CenterName as string;
 }
 
-<!-- Content Header -->
-<section class="content-header">
-    <div class="container-fluid">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1>
-                    <i class="fas fa-user-plus"></i> Create User for Center
-                </h1>
-            </div>
-            <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a asp-action="Index">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a asp-action="Users">Users</a></li>
-                    <li class="breadcrumb-item active">Create User</li>
-                </ol>
-            </div>
-        </div>
+<!-- Page header -->
+<div class="page-header d-print-none">
+  <div class="container-xl">
+    <div class="row g-2 align-items-center">
+      <div class="col">
+        <div class="page-pretitle">Users</div>
+        <h2 class="page-title"><i class="ti ti-user-plus"></i> Create User for Center</h2>
+      </div>
+      <div class="col-auto ms-auto">
+        <a asp-action="Users" class="btn btn-outline-secondary">
+          <i class="ti ti-arrow-left"></i> Back to Users
+        </a>
+      </div>
     </div>
-</section>
+  </div>
+</div>
 
-<!-- Main content -->
-<section class="content">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-8 offset-md-2">
-                <div class="card card-success">
-                    <div class="card-header">
-                        <h3 class="card-title">User Information</h3>
-                    </div>
+<!-- Page body -->
+<div class="page-body">
+  <div class="container-xl">
+    @if (preSelectedCenter && !string.IsNullOrEmpty(centerName))
+    {
+      <div class="row mb-3">
+        <div class="col-12">
+          <div class="alert alert-info">
+            <div class="d-flex align-items-center">
+              <i class="ti ti-building icon me-2" style="font-size: 1.5rem;"></i>
+              <div>
+                <strong>Creating user for:</strong> @centerName
+                <div class="text-muted small">The center has been pre-selected</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
 
-                    <form asp-action="CreateUserForCenter" method="post">
-                        <div class="card-body">
-                            <!-- Alert messages -->
-                            @if (TempData["ErrorMessage"] != null)
-                            {
-                                <div class="alert alert-danger alert-dismissible fade show">
-                                    <button type="button" class="close" data-dismiss="alert">&times;</button>
-                                    <i class="fas fa-exclamation-circle"></i> @TempData["ErrorMessage"]
-                                </div>
-                            }
-
-                            @if (preSelectedCenter && !string.IsNullOrEmpty(centerName))
-                            {
-                                <div class="alert alert-info">
-                                    <i class="fas fa-building"></i>
-                                    <strong>Creating user for:</strong> @centerName
-                                </div>
-                            }
-
-                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-                            <!-- Center Selection -->
-                            <div class="form-group">
-                                <label asp-for="CenterId" class="control-label">
-                                    <i class="fas fa-building"></i> Select Center *
-                                </label>
-                                <select asp-for="CenterId" 
-                                        class="form-control select2" 
-                                        asp-items="Model.Centers"
-                                        class="form-control select2 select-full-width">
-                                    <option value="">-- Select a Center --</option>
-                                </select>
-                                <span asp-validation-for="CenterId" class="text-danger"></span>
-                                <small class="form-text text-muted">
-                                    @if (preSelectedCenter)
-                                    {
-                                        <text>Center is pre-selected. You can change it if needed.</text>
-                                    }
-                                    else
-                                    {
-                                        <text>Select the center this user will belong to</text>
-                                    }
-                                </small>
-                            </div>
-
-                            <!-- Role Selection -->
-                            <div class="form-group">
-                                <label asp-for="RoleName" class="control-label">
-                                    <i class="fas fa-user-tag"></i> User Role *
-                                </label>
-                                <select asp-for="RoleName" class="form-control">
-                                    <option value="">-- Select a Role --</option>
-                                    <option value="Manager">Manager</option>
-                                    <option value="Employee">Employee</option>
-                                </select>
-                                <span asp-validation-for="RoleName" class="text-danger"></span>
-                                <small class="form-text text-muted">
-                                    Select the role for this user
-                                </small>
-                            </div>
-
-                            <!-- Full Name -->
-                            <div class="form-group">
-                                <label asp-for="Name" class="control-label">
-                                    <i class="fas fa-user"></i> Full Name *
-                                </label>
-                                <input asp-for="Name" class="form-control" placeholder="Enter full name" />
-                                <span asp-validation-for="Name" class="text-danger"></span>
-                            </div>
-
-                            <!-- Username -->
-                            <div class="form-group">
-                                <label asp-for="UserName" class="control-label">
-                                    <i class="fas fa-at"></i> Username *
-                                </label>
-                                <input asp-for="UserName" class="form-control" placeholder="Enter username" />
-                                <span asp-validation-for="UserName" class="text-danger"></span>
-                                <small class="form-text text-muted">
-                                    Used for login. Must be unique.
-                                </small>
-                            </div>
-
-                            <!-- Email -->
-                            <div class="form-group">
-                                <label asp-for="Email" class="control-label">
-                                    <i class="fas fa-envelope"></i> Email Address
-                                </label>
-                                <input asp-for="Email" class="form-control" placeholder="user@example.com" />
-                                <span asp-validation-for="Email" class="text-danger"></span>
-                            </div>
-
-                            <!-- Phone Number -->
-                            <div class="form-group">
-                                <label asp-for="PhoneNumber" class="control-label">
-                                    <i class="fas fa-phone"></i> Phone Number
-                                </label>
-                                <input asp-for="PhoneNumber" class="form-control" placeholder="+1234567890" />
-                                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-                            </div>
-
-                            <!-- Password -->
-                            <div class="form-group">
-                                <label asp-for="Password" class="control-label">
-                                    <i class="fas fa-lock"></i> Password *
-                                </label>
-                                <input asp-for="Password" class="form-control" placeholder="Enter password" />
-                                <span asp-validation-for="Password" class="text-danger"></span>
-                                <small class="form-text text-muted">
-                                    Minimum 6 characters. The user can change this later.
-                                </small>
-                            </div>
-
-                            <div class="alert alert-info">
-                                <i class="fas fa-info-circle"></i>
-                                <strong>Note:</strong> This will create a user account for the selected center with the specified role.
-                            </div>
-                        </div>
-
-                        <div class="card-footer">
-                            <button type="submit" class="btn btn-action-create">
-                                <i class="fas fa-save"></i> Create User
-                            </button>
-                            @if (Model.CenterId.HasValue && Model.CenterId.Value > 0)
-                            {
-                                <a asp-action="CenterUsers" asp-route-centerId="@Model.CenterId" class="btn btn-secondary">
-                                    <i class="fas fa-arrow-left"></i> Back to Center Users
-                                </a>
-                            }
-                            <a asp-action="Users" class="btn btn-default">
-                                <i class="fas fa-times"></i> Cancel
-                            </a>
-                        </div>
-                    </form>
+    <form asp-action="CreateUserForCenter" method="post">
+      <div class="row">
+        <!-- Main Form Column -->
+        <div class="col-lg-8">
+          <!-- Center & Role Selection Card -->
+          <div class="card mb-3">
+            <div class="card-header">
+              <div class="d-flex align-items-center">
+                <span class="avatar bg-primary text-white me-3">
+                  <i class="ti ti-building"></i>
+                </span>
+                <div>
+                  <h3 class="card-title mb-0">Center & Role</h3>
+                  <small class="text-muted">Assign user to center with role</small>
                 </div>
+              </div>
             </div>
+            <div class="card-body">
+              <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label required" asp-for="CenterId">Select Center</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="ti ti-building"></i></span>
+                    <select asp-for="CenterId" asp-items="Model.Centers" class="form-select">
+                      <option value="">-- Select a Center --</option>
+                    </select>
+                  </div>
+                  <span asp-validation-for="CenterId" class="text-danger small"></span>
+                  <small class="form-hint">@(preSelectedCenter ? "Center is pre-selected. You can change if needed." : "Select the center this user will belong to")</small>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label required" asp-for="RoleName">User Role</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="ti ti-tag"></i></span>
+                    <select asp-for="RoleName" class="form-select">
+                      <option value="">-- Select a Role --</option>
+                      <option value="Manager">Manager</option>
+                      <option value="Employee">Employee</option>
+                    </select>
+                  </div>
+                  <span asp-validation-for="RoleName" class="text-danger small"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Personal Information Card -->
+          <div class="card mb-3">
+            <div class="card-header">
+              <div class="d-flex align-items-center">
+                <span class="avatar bg-info text-white me-3">
+                  <i class="ti ti-user"></i>
+                </span>
+                <div>
+                  <h3 class="card-title mb-0">Personal Information</h3>
+                  <small class="text-muted">User account details</small>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label required" asp-for="Name">Full Name</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="ti ti-user"></i></span>
+                    <input asp-for="Name" class="form-control" placeholder="Enter full name" />
+                  </div>
+                  <span asp-validation-for="Name" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label required" asp-for="UserName">Username</label>
+                  <div class="input-group">
+                    <span class="input-group-text">@@</span>
+                    <input asp-for="UserName" class="form-control" placeholder="Enter username" />
+                  </div>
+                  <span asp-validation-for="UserName" class="text-danger small"></span>
+                  <small class="form-hint">Used for login. Must be unique.</small>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label" asp-for="Email">Email Address</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="ti ti-mail"></i></span>
+                    <input asp-for="Email" type="email" class="form-control" placeholder="user@example.com" />
+                  </div>
+                  <span asp-validation-for="Email" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label" asp-for="PhoneNumber">Phone Number</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="ti ti-phone"></i></span>
+                    <input asp-for="PhoneNumber" class="form-control" placeholder="+1234567890" />
+                  </div>
+                  <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Security Card -->
+          <div class="card mb-3">
+            <div class="card-header">
+              <div class="d-flex align-items-center">
+                <span class="avatar bg-warning text-white me-3">
+                  <i class="ti ti-lock"></i>
+                </span>
+                <div>
+                  <h3 class="card-title mb-0">Security</h3>
+                  <small class="text-muted">Login credentials</small>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="mb-3">
+                <label class="form-label required" asp-for="Password">Password</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="ti ti-lock"></i></span>
+                  <input asp-for="Password" type="password" class="form-control" placeholder="Enter password" />
+                </div>
+                <span asp-validation-for="Password" class="text-danger small"></span>
+                <small class="form-hint">Minimum 6 characters. The user can change this later.</small>
+              </div>
+            </div>
+          </div>
         </div>
-    </div>
-</section>
+
+        <!-- Sidebar Column -->
+        <div class="col-lg-4">
+          <!-- Role Description Card -->
+          <div class="card mb-3">
+            <div class="card-header">
+              <h3 class="card-title"><i class="ti ti-info-circle me-2"></i>Role Permissions</h3>
+            </div>
+            <div class="card-body">
+              <div class="mb-3">
+                <h5 class="mb-2"><span class="badge bg-role-manager py-2 px-3"><i class="ti ti-settings me-1"></i>Manager</span></h5>
+                <p class="text-muted small mb-0">Senior team member with additional permissions for managing tasks.</p>
+              </div>
+              <hr>
+              <div>
+                <h5 class="mb-2"><span class="badge bg-role-employee py-2 px-3"><i class="ti ti-user me-1"></i>Employee</span></h5>
+                <p class="text-muted small mb-0">Regular team member for handling day-to-day tasks.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="card">
+            <div class="card-body">
+              <div class="d-grid gap-2">
+                @if (Model.CenterId.HasValue && Model.CenterId.Value > 0)
+                {
+                  <a asp-action="CenterUsers" asp-route-centerId="@Model.CenterId" class="btn btn-outline-secondary">
+                    <i class="ti ti-arrow-left"></i> Back to Center Users
+                  </a>
+                }
+                else
+                {
+                  <a asp-action="Users" class="btn btn-outline-secondary">
+                    <i class="ti ti-x"></i> Cancel
+                  </a>
+                }
+                <button type="submit" class="btn btn-action-create">
+                  <i class="ti ti-user-plus"></i> Create User
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    
-    <!-- Select2 -->
-    <link rel="stylesheet" href="~/plugins/select2/css/select2.min.css">
-    <link rel="stylesheet" href="~/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
-    <script src="~/plugins/select2/js/select2.full.min.js"></script>
-
-    <script>
-        $(function () {
-            // Initialize Select2 with search
-            $('.select2').select2({
-                theme: 'bootstrap4',
-                placeholder: '-- Select a Center --',
-                allowClear: true,
-                ajax: {
-                    url: '@Url.Action("SearchCenters", "SuperAdmin")',
-                    dataType: 'json',
-                    delay: 250,
-                    data: function (params) {
-                        return {
-                            term: params.term // search term
-                        };
-                    },
-                    processResults: function (data) {
-                        return {
-                            results: data.results
-                        };
-                    },
-                    cache: true
-                },
-                minimumInputLength: 0
-            });
-        });
-    </script>
 }
+
+<style>
+  .required::after {
+    content: " *";
+    color: #dc3545;
+  }
+</style>

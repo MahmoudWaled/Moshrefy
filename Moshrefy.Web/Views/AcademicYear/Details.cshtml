@@ -4,169 +4,227 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<!-- Content Header -->
-<section class="content-header">
-    <div class="container-fluid">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1><i class="fas fa-calendar-alt"></i> Academic Year Details</h1>
-            </div>
-            <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a asp-controller="Admin" asp-action="Index">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a asp-action="Index">Academic Years</a></li>
-                    <li class="breadcrumb-item active">Details</li>
-                </ol>
-            </div>
-        </div>
+<!-- Page header -->
+<div class="page-header d-print-none">
+  <div class="container-xl">
+    <div class="row g-2 align-items-center">
+      <div class="col">
+        <div class="page-pretitle">Academic Years</div>
+        <h2 class="page-title"><i class="ti ti-calendar"></i> @Model.Name</h2>
+      </div>
+      <div class="col-auto ms-auto">
+        <a asp-action="Index" class="btn btn-outline-secondary">
+          <i class="ti ti-arrow-left"></i> Back to List
+        </a>
+      </div>
     </div>
-</section>
+  </div>
+</div>
 
-<!-- Main content -->
-<section class="content">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-8 offset-md-2">
-                <!-- Success/Error Messages -->
-                @if (TempData["SuccessMessage"] != null)
-                {
-                    <div class="alert alert-success alert-dismissible">
-                        <button type="button" class="close" data-dismiss="alert">&times;</button>
-                        <i class="icon fas fa-check"></i> @TempData["SuccessMessage"]
-                    </div>
-                }
-                @if (TempData["ErrorMessage"] != null)
-                {
-                    <div class="alert alert-danger alert-dismissible">
-                        <button type="button" class="close" data-dismiss="alert">&times;</button>
-                        <i class="icon fas fa-ban"></i> @TempData["ErrorMessage"]
-                    </div>
-                }
-
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">@Model.Name</h3>
-                        <div class="card-tools">
-                            @if (Model.IsActive)
-                            {
-                                <span class="badge badge-state-active">Active</span>
-                            }
-                            else
-                            {
-                                <span class="badge badge-state-deactive">Inactive</span>
-                            }
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h5><i class="fas fa-info-circle"></i> Basic Information</h5>
-                                <table class="table table-sm">
-                                    <tr>
-                                        <th style="width: 40%">ID:</th>
-                                        <td>@Model.Id</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Name:</th>
-                                        <td>@Model.Name</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Status:</th>
-                                        <td>
-                                            @if (Model.IsActive)
-                                            {
-                                                <span class="badge badge-state-active">Active</span>
-                                            }
-                                            else
-                                            {
-                                                <span class="badge badge-state-deactive">Inactive</span>
-                                            }
-                                        </td>
-                                    </tr>
-                                </table>
-                            </div>
-                            <div class="col-md-6">
-                                <h5><i class="fas fa-history"></i> Audit Information</h5>
-                                <table class="table table-sm">
-                                    <tr>
-                                        <th style="width: 40%">Created By:</th>
-                                        <td>@(Model.CreatedByName ?? "N/A")</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Created At:</th>
-                                        <td>@Model.CreatedAt.ToString("MMM dd, yyyy hh:mm tt")</td>
-                                    </tr>
-                                    @if (Model.ModifiedAt.HasValue)
-                                    {
-                                        <tr>
-                                            <th>Modified By:</th>
-                                            <td>@(Model.ModifiedByName ?? "N/A")</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Modified At:</th>
-                                            <td>@Model.ModifiedAt.Value.ToString("MMM dd, yyyy hh:mm tt")</td>
-                                        </tr>
-                                    }
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-footer">
-                        @if (User.IsInRole("Admin"))
-                        {
-                            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-action-edit">
-                                <i class="fas fa-edit"></i> Edit
-                            </a>
-                            <button onclick="deleteAcademicYear(@Model.Id)" class="btn btn-action-delete">
-                                <i class="fas fa-trash"></i> Delete
-                            </button>
-                        }
-                        <a asp-action="Index" class="btn btn-outline-secondary">
-                            <i class="fas fa-arrow-left"></i> Back to List
-                        </a>
-                    </div>
+<!-- Page body -->
+<div class="page-body">
+  <div class="container-xl">
+    <div class="row">
+      <!-- Main Content -->
+      <div class="col-lg-8">
+        <!-- Status Banner -->
+        <div class="card mb-3 @(Model.IsActive ? "border-success" : "border-secondary")">
+          <div class="card-body py-3">
+            <div class="d-flex align-items-center">
+              @if (Model.IsActive)
+              {
+                <span class="avatar bg-state-active text-white me-3">
+                  <i class="ti ti-check"></i>
+                </span>
+                <div>
+                  <h3 class="mb-0 text-success">Active Academic Year</h3>
+                  <small class="text-muted">This academic year is currently in use</small>
                 </div>
+              }
+              else
+              {
+                <span class="avatar bg-state-inactive text-white me-3">
+                  <i class="ti ti-x"></i>
+                </span>
+                <div>
+                  <h3 class="mb-0 text-muted">Inactive Academic Year</h3>
+                  <small class="text-muted">This academic year is not in use</small>
+                </div>
+              }
             </div>
+          </div>
         </div>
+
+        <!-- Details Card -->
+        <div class="card mb-3">
+          <div class="card-header">
+            <div class="d-flex align-items-center">
+              <span class="avatar bg-primary text-white me-3">
+                <i class="ti ti-info-circle"></i>
+              </span>
+              <h3 class="card-title mb-0">Academic Year Information</h3>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label text-muted small mb-1">
+                    <i class="ti ti-calendar me-1"></i> Year Name
+                  </label>
+                  <div class="h4 mb-0">@Model.Name</div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label text-muted small mb-1">
+                    <i class="ti ti-toggle-left me-1"></i> Status
+                  </label>
+                  <div>
+                    @if (Model.IsActive)
+                    {
+                      <span class="badge bg-state-active py-2 px-3">
+                        <i class="ti ti-check me-1"></i> Active
+                      </span>
+                    }
+                    else
+                    {
+                      <span class="badge bg-state-inactive py-2 px-3">
+                        <i class="ti ti-x me-1"></i> Inactive
+                      </span>
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Audit Trail Card -->
+        <div class="card">
+          <div class="card-header">
+            <div class="d-flex align-items-center">
+              <span class="avatar bg-secondary text-white me-3">
+                <i class="ti ti-history"></i>
+              </span>
+              <h3 class="card-title mb-0">Audit Trail</h3>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="d-flex align-items-start">
+                  <div class="avatar avatar-sm bg-green-lt text-green me-3">
+                    <i class="ti ti-plus"></i>
+                  </div>
+                  <div>
+                    <div class="text-muted small">Created By</div>
+                    <div class="fw-medium">@(Model.CreatedByName ?? "N/A")</div>
+                    <div class="text-muted small">@Model.CreatedAt.ToString("MMM dd, yyyy 'at' hh:mm tt")</div>
+                  </div>
+                </div>
+              </div>
+              @if (Model.ModifiedAt.HasValue)
+              {
+                <div class="col-md-6">
+                  <div class="d-flex align-items-start">
+                    <div class="avatar avatar-sm bg-yellow-lt text-yellow me-3">
+                      <i class="ti ti-edit"></i>
+                    </div>
+                    <div>
+                      <div class="text-muted small">Last Modified By</div>
+                      <div class="fw-medium">@(Model.ModifiedByName ?? "N/A")</div>
+                      <div class="text-muted small">@Model.ModifiedAt.Value.ToString("MMM dd, yyyy 'at' hh:mm tt")</div>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="col-lg-4">
+        @if (User.IsInRole("Admin"))
+        {
+          <!-- Actions Card -->
+          <div class="card mb-3">
+            <div class="card-header">
+              <h3 class="card-title"><i class="ti ti-settings me-2"></i>Actions</h3>
+            </div>
+            <div class="card-body">
+              <div class="d-grid gap-2">
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-action-edit">
+                  <i class="ti ti-edit me-2"></i> Edit Academic Year
+                </a>
+                <hr class="my-2">
+                <button onclick="deleteAcademicYear(@Model.Id)" class="btn btn-outline-danger">
+                  <i class="ti ti-trash me-2"></i> Delete Academic Year
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Warning Card -->
+          <div class="card bg-red-lt">
+            <div class="card-body">
+              <div class="d-flex">
+                <div>
+                  <i class="ti ti-alert-triangle icon text-red me-2" style="font-size: 1.5rem;"></i>
+                </div>
+                <div>
+                  <h4 class="text-red mb-1">Delete Warning</h4>
+                  <p class="text-muted mb-0 small">
+                    Deleting this academic year will remove all associated data. This action requires confirmation.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
     </div>
-</section>
+  </div>
+</div>
 
 @section Scripts {
-    <!-- SweetAlert2 -->
-    <link rel="stylesheet" href="~/plugins/sweetalert2/sweetalert2.min.css">
-    <script src="~/plugins/sweetalert2/sweetalert2.min.js"></script>
-
     <script>
         function deleteAcademicYear(id) {
             Swal.fire({
                 title: 'Delete Academic Year?',
-                text: 'This will permanently delete this academic year and all associated data.',
+                html: 'This will permanently delete this academic year.<br><br>Type <strong>Delete</strong> to confirm:',
                 icon: 'warning',
+                input: 'text',
+                inputPlaceholder: 'Type Delete here',
                 showCancelButton: true,
                 confirmButtonColor: '#dc3545',
                 cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Yes, delete',
-                cancelButtonText: 'Cancel'
+                confirmButtonText: '<i class="ti ti-trash"></i> Delete',
+                cancelButtonText: 'Cancel',
+                inputValidator: (value) => {
+                    if (value !== 'Delete') {
+                        return 'Please type "Delete" to confirm';
+                    }
+                }
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.post('@Url.Action("Delete")', { id: id })
-                        .done(function (response) {
+                        .done(function(response) {
                             if (response.success) {
                                 Swal.fire({
                                     icon: 'success',
                                     title: 'Deleted!',
-                                    text: response.message,
+                                    text: response.message || 'Academic year deleted successfully.',
                                     timer: 2000,
                                     showConfirmButton: false
-                                }).then(() => {
-                                    window.location.href = '@Url.Action("Index")';
-                                });
+                                }).then(() => window.location.href = '@Url.Action("Index")');
                             } else {
                                 Swal.fire('Error', response.message, 'error');
                             }
                         })
-                        .fail(function () {
-                            Swal.fire('Error', 'An error occurred', 'error');
+                        .fail(function() {
+                            Swal.fire('Error', 'An error occurred while deleting.', 'error');
                         });
                 }
             });

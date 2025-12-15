@@ -4,255 +4,178 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<!-- Content Header -->
-<section class="content-header">
-    <div class="container-fluid">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1>Edit Center</h1>
-            </div>
-            <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a asp-controller="SuperAdmin" asp-action="Index">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a asp-action="Centers">Centers</a></li>
-                    <li class="breadcrumb-item active">Edit</li>
-                </ol>
-            </div>
-        </div>
+<!-- Page header -->
+<div class="page-header d-print-none">
+  <div class="container-xl">
+    <div class="row g-2 align-items-center">
+      <div class="col">
+        <div class="page-pretitle">Centers</div>
+        <h2 class="page-title"><i class="ti ti-edit"></i> Edit Center</h2>
+      </div>
+      <div class="col-auto ms-auto">
+        <a asp-action="Centers" class="btn btn-outline-secondary">
+          <i class="ti ti-arrow-left"></i> Back to Centers
+        </a>
+      </div>
     </div>
-</section>
+  </div>
+</div>
 
-<!-- Main content -->
-<section class="content">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-12">
-                <!-- Edit Center Form Card -->
-                <div class="card card-warning">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-edit mr-1"></i>
-                            Update Center Information
-                        </h3>
-                    </div>
-                    <form asp-action="EditCenter" asp-route-id="@ViewContext.RouteData.Values["id"]" method="post" id="editCenterForm">
-                        <div class="card-body">
-                            @if (TempData["ErrorMessage"] != null)
-                            {
-                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                    <i class="fas fa-exclamation-circle"></i>
-                                    @TempData["ErrorMessage"]
-                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                            }
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <!-- Center Name -->
-                                    <div class="form-group">
-                                        <label asp-for="Name" class="form-label">
-                                            <i class="fas fa-building text-primary"></i> @Html.DisplayNameFor(model => model.Name)
-                                        </label>
-                                        <div class="input-group">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text">
-                                                    <i class="fas fa-building"></i>
-                                                </span>
-                                            </div>
-                                            <input asp-for="Name" class="form-control" placeholder="Enter center name" />
-                                        </div>
-                                        <span asp-validation-for="Name" class="text-danger small"></span>
-                                    </div>
-
-                                    <!-- Phone Number -->
-                                    <div class="form-group">
-                                        <label asp-for="Phone" class="form-label">
-                                            <i class="fas fa-phone text-success"></i> @Html.DisplayNameFor(model => model.Phone)
-                                        </label>
-                                        <div class="input-group">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text">
-                                                    <i class="fas fa-phone"></i>
-                                                </span>
-                                            </div>
-                                            <input asp-for="Phone" class="form-control" placeholder="Enter phone number" />
-                                        </div>
-                                        <span asp-validation-for="Phone" class="text-danger small"></span>
-                                    </div>
-
-                                    <!-- Address -->
-                                    <div class="form-group">
-                                        <label asp-for="Address" class="form-label">
-                                            <i class="fas fa-map-marker-alt text-danger"></i> @Html.DisplayNameFor(model => model.Address)
-                                        </label>
-                                        <div class="input-group">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text">
-                                                    <i class="fas fa-map-marker-alt"></i>
-                                                </span>
-                                            </div>
-                                            <input asp-for="Address" class="form-control" placeholder="Enter address" />
-                                        </div>
-                                        <span asp-validation-for="Address" class="text-danger small"></span>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <!-- Email Address -->
-                                    <div class="form-group">
-                                        <label asp-for="Email" class="form-label">
-                                            <i class="fas fa-envelope text-info"></i> @Html.DisplayNameFor(model => model.Email)
-                                        </label>
-                                        <div class="input-group">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text">
-                                                    <i class="fas fa-envelope"></i>
-                                                </span>
-                                            </div>
-                                            <input asp-for="Email" class="form-control" placeholder="Enter email address" />
-                                        </div>
-                                        <span asp-validation-for="Email" class="text-danger small"></span>
-                                        <small class="form-text text-muted">Optional</small>
-                                    </div>
-
-                                    <!-- Description -->
-                                    <div class="form-group">
-                                        <label asp-for="Description" class="form-label">
-                                            <i class="fas fa-file-alt text-secondary"></i> @Html.DisplayNameFor(model => model.Description)
-                                        </label>
-                                        <div class="input-group">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text">
-                                                    <i class="fas fa-file-alt"></i>
-                                                </span>
-                                            </div>
-                                            <textarea asp-for="Description" class="form-control textarea-resizable" rows="4" placeholder="Enter description (optional)"></textarea>
-                                        </div>
-                                        <span asp-validation-for="Description" class="text-danger small"></span>
-                                        <small class="form-text text-muted">Optional</small>
-                                    </div>
-
-                                    <!-- Is Active -->
-                                    <div class="form-group">
-                                        <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
-                                            <input type="checkbox" asp-for="IsActive" class="custom-control-input" id="isActiveSwitch">
-                                            <label class="custom-control-label" for="isActiveSwitch">
-                                                <i class="fas fa-toggle-on"></i> @Html.DisplayNameFor(model => model.IsActive)
-                                            </label>
-                                        </div>
-                                        <small class="form-text text-muted">Toggle to activate or deactivate this center</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="card-footer">
-                            <div class="row">
-                                <div class="col-12">
-                                    <a asp-action="CenterDetails" asp-route-centerId="@ViewContext.RouteData.Values["id"]" class="btn btn-default">
-                                        <i class="fas fa-arrow-left"></i> Back to Details
-                                    </a>
-                                    <button type="button" id="updateCenterBtn" class="btn btn-warning" onclick="validateAndShowModal()">
-                                        <i class="fas fa-save"></i> Update Center
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
+<!-- Page body -->
+<div class="page-body">
+  <div class="container-xl">
+    <form asp-action="EditCenter" asp-route-id="@ViewBag.CenterId" method="post" id="editCenterForm">
+      <div class="row">
+        <!-- Main Form Column -->
+        <div class="col-lg-8">
+          <!-- Basic Information Card -->
+          <div class="card mb-3">
+            <div class="card-header">
+              <div class="d-flex align-items-center">
+                <span class="avatar bg-primary text-white me-3">
+                  <i class="ti ti-building"></i>
+                </span>
+                <div>
+                  <h3 class="card-title mb-0">Basic Information</h3>
+                  <small class="text-muted">Update center details</small>
                 </div>
+              </div>
             </div>
-        </div>
-    </div>
-</section>
-
-<!-- Update Confirmation Modal -->
-<div class="modal fade" id="confirmUpdateModal" tabindex="-1" role="dialog" aria-labelledby="confirmUpdateModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header bg-warning">
-                <h5 class="modal-title" id="confirmUpdateModalLabel">
-                    <i class="fas fa-question-circle"></i> Confirm Update
-                </h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <p>Are you sure you want to update this center?</p>
-                <div class="alert alert-info">
-                    <i class="fas fa-info-circle"></i>
-                    <strong>Center Name:</strong> <span id="modalCenterName"></span>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-12 mb-3">
+                  <label class="form-label required" asp-for="Name">Center Name</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="ti ti-building"></i></span>
+                    <input asp-for="Name" class="form-control" placeholder="Enter center name" />
+                  </div>
+                  <span asp-validation-for="Name" class="text-danger small"></span>
                 </div>
-                <p class="text-muted">
-                    <i class="fas fa-check-circle"></i>
-                    All changes will be saved immediately.
-                </p>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label required" asp-for="Phone">Phone Number</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="ti ti-phone"></i></span>
+                    <input asp-for="Phone" class="form-control" placeholder="Enter phone number" />
+                  </div>
+                  <span asp-validation-for="Phone" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label" asp-for="Email">Email Address</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="ti ti-mail"></i></span>
+                    <input asp-for="Email" type="email" class="form-control" placeholder="email@example.com" />
+                  </div>
+                  <span asp-validation-for="Email" class="text-danger small"></span>
+                </div>
+              </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                    <i class="fas fa-times"></i> Cancel
-                </button>
-                <button type="button" class="btn btn-action-edit" onclick="submitForm()">
-                    <i class="fas fa-save"></i> Yes, Update
-                </button>
+          </div>
+
+          <!-- Location & Description Card -->
+          <div class="card mb-3">
+            <div class="card-header">
+              <div class="d-flex align-items-center">
+                <span class="avatar bg-info text-white me-3">
+                  <i class="ti ti-map-pin"></i>
+                </span>
+                <div>
+                  <h3 class="card-title mb-0">Location & Description</h3>
+                  <small class="text-muted">Additional details</small>
+                </div>
+              </div>
             </div>
+            <div class="card-body">
+              <div class="mb-3">
+                <label class="form-label required" asp-for="Address">Address</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="ti ti-map-pin"></i></span>
+                  <input asp-for="Address" class="form-control" placeholder="Enter full address" />
+                </div>
+                <span asp-validation-for="Address" class="text-danger small"></span>
+              </div>
+              <div class="mb-3">
+                <label class="form-label" asp-for="Description">Description</label>
+                <textarea asp-for="Description" class="form-control" rows="4" placeholder="Enter center description (optional)"></textarea>
+                <span asp-validation-for="Description" class="text-danger small"></span>
+              </div>
+            </div>
+          </div>
         </div>
-    </div>
+
+        <!-- Sidebar Column -->
+        <div class="col-lg-4">
+          <!-- Status Card -->
+          <div class="card mb-3">
+            <div class="card-header">
+              <div class="d-flex align-items-center">
+                <span class="avatar bg-success text-white me-3">
+                  <i class="ti ti-toggle-right"></i>
+                </span>
+                <h3 class="card-title mb-0">Status</h3>
+              </div>
+            </div>
+            <div class="card-body">
+              <label class="form-selectgroup-item flex-fill d-block">
+                <div class="form-check form-switch">
+                  <input type="checkbox" asp-for="IsActive" class="form-check-input">
+                  <span class="form-check-label">
+                    <strong>Center Active</strong>
+                    <div class="text-muted small">Active centers are visible and operational</div>
+                  </span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="card">
+            <div class="card-body">
+              <div class="d-grid gap-2">
+                <a asp-action="CenterDetails" asp-route-centerId="@ViewBag.CenterId" class="btn btn-outline-secondary">
+                  <i class="ti ti-arrow-left"></i> Back to Details
+                </a>
+                <button type="button" id="updateCenterBtn" class="btn btn-action-edit" onclick="validateAndUpdate()">
+                  <i class="ti ti-device-floppy"></i> Save Changes
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
 </div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    
     <script>
-        // Validate form and show modal if valid
-        function validateAndShowModal() {
+        function validateAndUpdate() {
             var form = $('#editCenterForm');
-            
-            // Trigger validation
             form.validate();
-            
-            // Check if form is valid
             if (form.valid()) {
-                // Update modal with center name
-                var centerName = $('#Name').val();
-                if (centerName) {
-                    $('#modalCenterName').text(centerName);
-                } else {
-                    $('#modalCenterName').text('(Not provided)');
-                }
-                
-                // Show the modal
-                $('#confirmUpdateModal').modal('show');
+                var name = $('#Name').val();
+                Swal.fire({ 
+                    title: 'Update Center?', 
+                    html: 'Save changes to <strong>' + name + '</strong>?', 
+                    icon: 'question', 
+                    showCancelButton: true, 
+                    confirmButtonColor: '#f39c12', 
+                    confirmButtonText: '<i class="ti ti-device-floppy"></i> Yes, Update' 
+                })
+                .then((r) => { 
+                    if (r.isConfirmed) { 
+                        $('#updateCenterBtn').prop('disabled', true).html('<i class="ti ti-loader"></i> Saving...'); 
+                        form.submit(); 
+                    } 
+                });
             }
         }
-
-        // Submit form function
-        function submitForm() {
-            var form = $('#editCenterForm');
-            
-            // Double-check validation
-            if (form.valid()) {
-                $('#confirmUpdateModal').modal('hide');
-                
-                // Show loading spinner only if form is valid
-                var submitBtn = $('#updateCenterBtn');
-                submitBtn.prop('disabled', true);
-                submitBtn.html('<i class="fas fa-spinner fa-spin"></i> Updating...');
-                
-                form.submit();
-            } else {
-                // Close modal and let user see validation errors
-                $('#confirmUpdateModal').modal('hide');
-            }
-        }
-
-        // Reset button state when modal is closed without submission
-        $('#confirmUpdateModal').on('hidden.bs.modal', function () {
-            var submitBtn = $('#updateCenterBtn');
-            submitBtn.prop('disabled', false);
-            submitBtn.html('<i class="fas fa-save"></i> Update Center');
-        });
     </script>
 }
+
+<style>
+  .required::after {
+    content: " *";
+    color: #dc3545;
+  }
+</style>

@@ -7,6 +7,8 @@ namespace Moshrefy.Application.Interfaces.IRepositories
     {
 
         public Task<IEnumerable<Domain.Entities.Course>> GetByName(string courseName);
+        
+        public Task<Course?> GetByIdWithAcademicYearAsync(int id);
 
     }
 }

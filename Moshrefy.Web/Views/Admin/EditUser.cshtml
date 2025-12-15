@@ -4,114 +4,161 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<!-- Content Header -->
-<section class="content-header">
-    <div class="container-fluid">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1><i class="fas fa-user-edit"></i> Edit Team Member</h1>
-            </div>
-            <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a asp-action="Index">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a asp-action="Users">My Team</a></li>
-                    <li class="breadcrumb-item active">Edit</li>
-                </ol>
-            </div>
-        </div>
+<!-- Page header -->
+<div class="page-header d-print-none">
+  <div class="container-xl">
+    <div class="row g-2 align-items-center">
+      <div class="col">
+        <div class="page-pretitle">Admin</div>
+        <h2 class="page-title"><i class="ti ti-user-edit"></i> Edit Team Member</h2>
+      </div>
+      <div class="col-auto ms-auto">
+        <a asp-action="UserDetails" asp-route-id="@ViewBag.UserId" class="btn btn-outline-secondary">
+          <i class="ti ti-arrow-left"></i> Back to Details
+        </a>
+      </div>
     </div>
-</section>
+  </div>
+</div>
 
-<!-- Main content -->
-<section class="content">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-8 offset-md-2">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Update Member Information</h3>
-                    </div>
-                    <form asp-action="EditUser" asp-route-id="@ViewBag.UserId" method="post">
-                        <div class="card-body">
-                            <!-- Success/Error Messages -->
-                            @if (TempData["SuccessMessage"] != null)
-                            {
-                                <div class="alert alert-success alert-dismissible">
-                                    <button type="button" class="close" data-dismiss="alert">&times;</button>
-                                    <i class="icon fas fa-check"></i> @TempData["SuccessMessage"]
-                                </div>
-                            }
-                            @if (TempData["ErrorMessage"] != null)
-                            {
-                                <div class="alert alert-danger alert-dismissible">
-                                    <button type="button" class="close" data-dismiss="alert">&times;</button>
-                                    <i class="icon fas fa-ban"></i> @TempData["ErrorMessage"]
-                                </div>
-                            }
-
-                            <!-- Personal Information -->
-                            <div class="form-group">
-                                <label asp-for="Name">Full Name <span class="text-danger">*</span></label>
-                                <input asp-for="Name" class="form-control" />
-                                <span asp-validation-for="Name" class="text-danger"></span>
-                            </div>
-
-                            <div class="form-group">
-                                <label asp-for="UserName">Username <span class="text-danger">*</span></label>
-                                <input asp-for="UserName" class="form-control" />
-                                <small class="form-text text-muted">Used for logging in</small>
-                                <span asp-validation-for="UserName" class="text-danger"></span>
-                            </div>
-
-                            <!-- Contact Information -->
-                            <hr />
-                            <h5><i class="fas fa-address-book"></i> Contact Details</h5>
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label asp-for="Email">Email Address</label>
-                                        <input asp-for="Email" type="email" class="form-control" />
-                                        <span asp-validation-for="Email" class="text-danger"></span>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label asp-for="PhoneNumber">Phone Number</label>
-                                        <input asp-for="PhoneNumber" class="form-control" />
-                                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Status -->
-                            <hr />
-                            <div class="form-group">
-                                <div class="custom-control custom-switch">
-                                    <input type="checkbox" asp-for="IsActive" class="custom-control-input" id="isActiveSwitch" />
-                                    <label class="custom-control-label" for="isActiveSwitch">
-                                        <strong>Access Enabled</strong>
-                                        <small class="d-block text-muted">When enabled, this member can log in to the system</small>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="card-footer">
-                            <button type="submit" class="btn btn-action-edit">
-                                <i class="fas fa-save"></i> Save Changes
-                            </button>
-                            <a asp-action="Users" class="btn btn-outline-secondary">
-                                <i class="fas fa-times"></i> Cancel
-                            </a>
-                        </div>
-                    </form>
+<!-- Page body -->
+<div class="page-body">
+  <div class="container-xl">
+    <form asp-action="EditUser" asp-route-id="@ViewBag.UserId" method="post">
+      <div class="row">
+        <!-- Main Form Column -->
+        <div class="col-lg-8">
+          <!-- Personal Information Card -->
+          <div class="card mb-3">
+            <div class="card-header">
+              <div class="d-flex align-items-center">
+                <span class="avatar bg-primary text-white me-3">
+                  <i class="ti ti-user"></i>
+                </span>
+                <div>
+                  <h3 class="card-title mb-0">Personal Information</h3>
+                  <small class="text-muted">Update member's basic details</small>
                 </div>
+              </div>
             </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-12 mb-3">
+                  <label class="form-label required" asp-for="Name">Full Name</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="ti ti-user"></i></span>
+                    <input asp-for="Name" class="form-control" placeholder="Enter full name" />
+                  </div>
+                  <span asp-validation-for="Name" class="text-danger small"></span>
+                </div>
+                <div class="col-md-12 mb-3">
+                  <label class="form-label required" asp-for="UserName">Username</label>
+                  <div class="input-group">
+                    <span class="input-group-text">@@</span>
+                    <input asp-for="UserName" class="form-control" placeholder="Enter username" />
+                  </div>
+                  <small class="form-hint"><i class="ti ti-info-circle"></i> This is used for logging in</small>
+                  <span asp-validation-for="UserName" class="text-danger small"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Contact Information Card -->
+          <div class="card mb-3">
+            <div class="card-header">
+              <div class="d-flex align-items-center">
+                <span class="avatar bg-info text-white me-3">
+                  <i class="ti ti-address-book"></i>
+                </span>
+                <div>
+                  <h3 class="card-title mb-0">Contact Information</h3>
+                  <small class="text-muted">Update contact details</small>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label" asp-for="Email">Email Address</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="ti ti-mail"></i></span>
+                    <input asp-for="Email" type="email" class="form-control" placeholder="email@example.com" />
+                  </div>
+                  <span asp-validation-for="Email" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label" asp-for="PhoneNumber">Phone Number</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="ti ti-phone"></i></span>
+                    <input asp-for="PhoneNumber" class="form-control" placeholder="Phone number" />
+                  </div>
+                  <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-    </div>
-</section>
+
+        <!-- Sidebar Column -->
+        <div class="col-lg-4">
+          <!-- Access Control Card -->
+          <div class="card mb-3">
+            <div class="card-header">
+              <div class="d-flex align-items-center">
+                <span class="avatar bg-success text-white me-3">
+                  <i class="ti ti-key"></i>
+                </span>
+                <div>
+                  <h3 class="card-title mb-0">Access Control</h3>
+                  <small class="text-muted">Manage member access</small>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="form-selectgroup form-selectgroup-boxes d-flex flex-column">
+                <label class="form-selectgroup-item flex-fill">
+                  <input type="checkbox" asp-for="IsActive" class="form-check-input" />
+                  <div class="form-selectgroup-label d-flex align-items-center p-3 border rounded">
+                    <div>
+                      <i class="ti ti-shield-check text-success me-2" style="font-size: 1.5rem;"></i>
+                    </div>
+                    <div>
+                      <div class="font-weight-medium">Access Enabled</div>
+                      <div class="text-muted small">Member can log in to the system</div>
+                    </div>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="card">
+            <div class="card-body">
+              <div class="d-flex gap-2">
+                <a asp-action="Users" class="btn btn-outline-secondary flex-fill">
+                  <i class="ti ti-x"></i> Cancel
+                </a>
+                <button type="submit" class="btn btn-action-edit flex-fill">
+                  <i class="ti ti-device-floppy"></i> Save Changes
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
+
+<style>
+  .required::after {
+    content: " *";
+    color: #dc3545;
+  }
+</style>

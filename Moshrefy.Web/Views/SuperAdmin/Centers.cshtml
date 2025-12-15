@@ -1,401 +1,402 @@
 @{
-    ViewData["Title"] = "Centers";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Centers Management";
 }
 
-<!-- Content Header -->
-<section class="content-header">
-    <div class="container-fluid">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1>
-                    <i class="fas fa-building"></i> Centers Management
-                </h1>
-            </div>
-            <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a asp-controller="SuperAdmin" asp-action="Index">Dashboard</a></li>
-                    <li class="breadcrumb-item active">Centers</li>
-                </ol>
-            </div>
+<!-- Page header -->
+<div class="page-header d-print-none">
+  <div class="container-xl">
+    <div class="row g-2 align-items-center">
+      <div class="col">
+        <!-- Page pre-title -->
+        <div class="page-pretitle">
+          Management
         </div>
-    </div>
-</section>
-
-<!-- Main content -->
-<section class="content">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-list"></i> All Centers
-                        </h3>
-                        <div class="card-tools">
-                            <a asp-action="CreateCenter" class="btn btn-action-create btn-sm">
-                                <i class="fas fa-plus"></i> Create New Center
-                            </a>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <!-- Alerts -->
-                        @if (TempData["SuccessMessage"] != null)
-                        {
-                            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                <i class="fas fa-check-circle"></i>
-                                @TempData["SuccessMessage"]
-                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                        }
-                        @if (TempData["ErrorMessage"] != null)
-                        {
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                <i class="fas fa-exclamation-circle"></i>
-                                @TempData["ErrorMessage"]
-                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                        }
-
-                        <!-- Filter Controls -->
-                        <div class="row mb-3">
-                            <div class="col-md-12">
-                                <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                                    <label class="btn btn-outline-primary active" id="showAll">
-                                        <input type="radio" name="filterOptions" checked> 
-                                        <i class="fas fa-list"></i> Show All
-                                    </label>
-                                    <label class="btn btn-outline-success" id="hideDeleted">
-                                        <input type="radio" name="filterOptions"> 
-                                        <i class="fas fa-filter"></i> Hide Deleted
-                                    </label>
-                                    <label class="btn btn-outline-danger" id="showDeleted">
-                                        <input type="radio" name="filterOptions"> 
-                                        <i class="fas fa-trash"></i> Show Only Deleted
-                                    </label>
-                                </div>
-                                <span class="ml-3 text-muted">
-                                    <i class="fas fa-info-circle"></i>
-                                    <span id="filterInfo">Showing all centers</span>
-                                </span>
-                            </div>
-                        </div>
-
-                        <div class="table-responsive">
-                            <table id="centersTable" class="table table-bordered table-hover table-striped">
-                                <thead class="thead-light">
-                                    <tr>
-                                        <th>#</th>
-                                        <th data-name="Id">ID</th>
-                                        <th data-name="Name">Name</th>
-                                        <th data-name="Email">Email</th>
-                                        <th data-name="Phone">Phone</th>
-                                        <th data-name="Address">Address</th>
-                                        <th data-name="IsActive">Status</th>
-                                        <th data-name="IsDeleted">State</th>
-                                        <th data-name="CreatedAt">Created</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Data loaded via AJAX -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <h2 class="page-title">
+          Centers
+        </h2>
+      </div>
+      <!-- Page title actions -->
+      <div class="col-auto ms-auto d-print-none">
+        <div class="btn-list">
+          <a asp-action="CreateCenter" class="btn btn-action-create d-none d-sm-inline-block">
+            <i class="ti ti-plus icon"></i>
+            Create New Center
+          </a>
+          <a asp-action="Create" class="btn btn-action-create d-sm-none btn-icon">
+            <i class="ti ti-plus icon"></i>
+          </a>
         </div>
+      </div>
     </div>
-</section>
+  </div>
+</div>
+
+@Html.AntiForgeryToken()
+
+<!-- Page body -->
+<div class="page-body">
+  <div class="container-xl">
+    <div class="row row-deck row-cards">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title" id="cardTitle">All Centers</h3>
+            <div class="ms-auto">
+              <div class="btn-group" role="group">
+                <button type="button" class="btn btn-sm" id="filterAll">
+                  All
+                </button>
+                <button type="button" class="btn btn-sm" id="filterActive">
+                  Active
+                </button>
+                <button type="button" class="btn btn-sm" id="filterInactive">
+                  Inactive
+                </button>
+                <button type="button" class="btn btn-sm btn-action-delete" id="filterDeleted">
+                  <i class="ti ti-trash icon"></i> Deleted
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-vcenter table-hover" id="centersTable">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Location</th>
+                    <th>Status</th>
+                    <th>Created Date</th>
+                    <th class="w-1">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Data loaded via AJAX -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 @section Scripts {
-<!-- DataTables CSS -->
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap4.min.css">
-<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap4.min.css">
-    
-<!-- Custom CSS for better table appearance -->
-    
-<!-- DataTables JS -->
-<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap4.min.js"></script>
-<script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
-<script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap4.min.js"></script>
-    
-<!-- SweetAlert2 -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+ 
+  <script>
+    var token = $('input[name="__RequestVerificationToken"]').val();
 
-    <script>
-        $(document).ready(function() {
-            var currentFilter = 'all';
-            var isFirstLoad = true;
-
-            // Initialize DataTable with server-side processing
-            var table = $('#centersTable').DataTable({
-                processing: false,  // ? Disable annoying spinner
-                serverSide: true,
-                ajax: {
-                    url: '@Url.Action("GetCentersData", "SuperAdmin")',
-                    type: 'POST',
-                    data: function(d) {
-                        d.filterDeleted = currentFilter;
-                    },
-                    error: function(xhr, error, code) {
-                        console.error('DataTables error:', error, code);
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error Loading Data',
-                            text: 'Please refresh the page and try again.',
-                            timer: 3000
-                        });
-                    },
-                    // ? Show spinner ONLY on first load
-                    beforeSend: function() {
-                        if (isFirstLoad) {
-                            $('#centersTable tbody').html(
-                                '<tr><td colspan="10" class="text-center py-5">' +
-                                '<div class="spinner-border text-primary" role="status">' +
-                                '<span class="sr-only">Loading...</span></div>' +
-                                '<br><span class="text-muted mt-2">Loading centers...</span>' +
-                                '</td></tr>'
-                            );
-                        }
-                    },
-                    complete: function() {
-                        isFirstLoad = false;
-                    }
-                },
-                columns: [
-                    { 
-                        data: null,
-                        orderable: false,
-                        searchable: false,
-                        width: '40px',
-                        className: 'text-center align-middle',
-                        render: function(data, type, row, meta) {
-                            return '<span class="text-muted">' + (meta.row + meta.settings._iDisplayStart + 1) + '</span>';
-                        }
-                    },
-                    { 
-                        data: 'id',
-                        name: 'Id',
-                        width: '50px',
-                        className: 'text-center align-middle',
-                        render: function(data) {
-                            return '<strong class="text-primary">#' + data + '</strong>';
-                        }
-                    },
-                    { 
-                        data: 'name',
-                        name: 'Name',
-                        width: '200px',
-                        className: 'align-middle',
-                        render: function(data) {
-                            return '<i class="fas fa-building text-primary mr-1"></i> <strong>' + data + '</strong>';
-                        }
-                    },
-                    { 
-                        data: 'email',
-                        name: 'Email',
-                        width: '180px',
-                        className: 'align-middle',
-                        render: function(data) {
-                            if (data && data !== '') {
-                                return '<a href="mailto:' + data + '" class="text-info">' + data + '</a>';
-                            }
-                            return '<span class="text-muted">N/A</span>';
-                        }
-                    },
-                    { 
-                        data: 'phone',
-                        name: 'Phone',
-                        width: '140px',
-                        className: 'align-middle text-nowrap',
-                        render: function(data) {
-                            return '<i class="fas fa-phone text-success mr-1"></i> ' + data;
-                        }
-                    },
-                    { 
-                        data: 'address',
-                        name: 'Address',
-                        width: '180px',
-                        className: 'align-middle',
-                        render: function(data) {
-                            var truncated = data.length > 35 ? data.substring(0, 35) + '...' : data;
-                            return '<small class="text-muted" title="' + data + '">' + truncated + '</small>';
-                        }
-                    },
-                    { 
-                        data: 'isActive',
-                        name: 'IsActive',
-                        width: '85px',
-                        className: 'text-center align-middle',
-                        render: function(data) {
-                            if (data) {
-                                return '<span class="badge badge-state-active px-2"><i class="fas fa-check-circle"></i> Active</span>';
-                            }
-                            return '<span class="badge badge-state-deactive px-2"><i class="fas fa-times-circle"></i> Inactive</span>';
-                        }
-                    },
-                    { 
-                        data: 'isDeleted',
-                        name: 'IsDeleted',
-                        width: '85px',
-                        className: 'text-center align-middle',
-                        render: function(data) {
-                            if (data) {
-                                return '<span class="badge badge-state-deleted px-2"><i class="fas fa-trash-alt"></i> Deleted</span>';
-                            }
-                            return '<span class="badge badge-state-normal px-2"><i class="fas fa-check"></i> Normal</span>';
-                        }
-                    },
-                    { 
-                        data: 'createdAt',
-                        name: 'CreatedAt',
-                        width: '110px',
-                        className: 'text-center align-middle',
-                        render: function(data) {
-                            var date = new Date(data);
-                            var formatted = date.toLocaleDateString('en-US', { 
-                                year: 'numeric', 
-                                month: 'short', 
-                                day: 'numeric' 
-                            });
-                            return '<small class="text-muted"><i class="fas fa-clock mr-1"></i>' + formatted + '</small>';
-                        }
-                    },
-                    { 
-                        data: null,
-                        orderable: false,
-                        width: '90px',
-                        className: 'text-center align-middle',
-                        render: function(data, type, row) {
-                            var detailsUrl = '@Url.Action("CenterDetails", "SuperAdmin")' + '?centerId=' + row.id;
-                            var editUrl = '@Url.Action("EditCenter", "SuperAdmin")' + '/' + row.id;
-                            
-                            var buttons = '<div class="btn-group btn-group-sm" role="group">' +
-                                         '<a href="' + detailsUrl + 
-                                         '" class="btn btn-action-view" title="View Details">' +
-                                         '<i class="fas fa-eye"></i></a>';
-                            
-                            if (!row.isDeleted) {
-                                buttons += '<a href="' + editUrl + 
-                                          '" class="btn btn-action-edit" title="Edit">' +
-                                          '<i class="fas fa-edit"></i></a>';
-                            } else {
-                                buttons += '<button class="btn btn-state-restore" title="Restore" ' +
-                                          'onclick="restoreCenter(' + row.id + ', \'' + row.name.replace(/'/g, "\\'") + '\')">'+
-                                          '<i class="fas fa-undo"></i></button>';
-                            }
-                            
-                            buttons += '</div>';
-                            return buttons;
-                        }
-                    }
-                ],
-                pageLength: 25,
-                lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
-                order: [[0, 'desc']],
-                autoWidth: false,
-                responsive: true,
-                language: {
-                    search: "_INPUT_",
-                    searchPlaceholder: "Search centers...",
-                    lengthMenu: "Show _MENU_ centers",
-                    info: "Showing _START_ to _END_ of _TOTAL_ centers",
-                    infoEmpty: "No centers to display",
-                    infoFiltered: "(filtered from _MAX_ total)",
-                    zeroRecords: "No matching centers found",
-                    emptyTable: '<div class="p-4 text-center">' +
-                                '<i class="fas fa-building fa-4x text-muted mb-3"></i>' +
-                                '<h4 class="text-muted">No Centers Found</h4>' +
-                                '<p class="text-muted">Get started by creating your first center.</p>' +
-                                '<a href="@Url.Action("CreateCenter", "SuperAdmin")" class="btn btn-action-create">' +
-                                '<i class="fas fa-plus"></i> Create Your First Center</a></div>'
-                },
-                columnDefs: [
-                    { responsivePriority: 1, targets: 0 },  // # - always visible
-                    { responsivePriority: 2, targets: 1 },  // ID - always visible
-                    { responsivePriority: 3, targets: 2 },  // Name - always visible
-                    { responsivePriority: 4, targets: 9 },  // Actions - always visible
-                    { responsivePriority: 5, targets: 6 },  // Status
-                    { responsivePriority: 6, targets: 7 },  // State
-                    { responsivePriority: 7, targets: 4 },  // Phone
-                    { responsivePriority: 8, targets: 3 },  // Email
-                    { responsivePriority: 9, targets: 5 },  // Address
-                    { responsivePriority: 10, targets: 8 }  // Created
-                ],
-                createdRow: function(row, data, dataIndex) {
-                    if (data.isDeleted) {
-                        $(row).addClass('table-danger');
-                    }
-                }
-            });
-
-            // Filter: Show All
-            $('#showAll').click(function() {
-                currentFilter = 'all';
-                $('#filterInfo').text('Showing all centers');
-                table.ajax.reload(null, false);  // ? false = keep current page
-            });
-
-            // Filter: Hide Deleted
-            $('#hideDeleted').click(function() {
-                currentFilter = 'active';
-                $('#filterInfo').text('Hiding deleted centers');
-                table.ajax.reload(null, false);
-            });
-
-            // Filter: Show Only Deleted
-            $('#showDeleted').click(function() {
-                currentFilter = 'deleted';
-                $('#filterInfo').text('Showing only deleted centers');
-                table.ajax.reload(null, false);
-            });
-        });
-
-        // Restore center function with SweetAlert2
-        function restoreCenter(centerId, centerName) {
+    $(document).ready(function() {
+      var table = $('#centersTable').DataTable({
+        "processing": true,
+        "serverSide": true,
+        "ajax": {
+          "url": "@Url.Action("GetCentersData", "SuperAdmin")",
+          "type": "POST",
+          "data": function(d) {
+            d.activeFilter = $('#centersTable').data('activeFilter') || 'all';
+            d.filterDeleted = $('#centersTable').data('filterDeleted') || 'active';
+          },
+          "error": function(xhr, error, code) {
+            console.error('DataTables error:', error, code);
             Swal.fire({
-                title: 'Restore Center?',
-                html: 'Are you sure you want to restore<br><strong>' + centerName + '</strong>?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#28a745',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: '<i class="fas fa-undo"></i> Yes, Restore',
-                cancelButtonText: 'Cancel',
-                showLoaderOnConfirm: true,  // ? Show spinner ONLY during restore
-                preConfirm: function() {
-                    return $.post('@Url.Action("RestoreCenter", "SuperAdmin")', { id: centerId })
-                        .then(function(response) {
-                            if (!response.success) {
-                                throw new Error(response.message);
-                            }
-                            return response;
-                        })
-                        .catch(function(error) {
-                            Swal.showValidationMessage('Request failed: ' + error.message);
-                        });
-                },
-                allowOutsideClick: function() { return !Swal.isLoading(); }
-            }).then(function(result) {
-                if (result.isConfirmed) {
-                    Swal.fire({
-                        title: 'Restored!',
-                        text: result.value.message,
-                        icon: 'success',
-                        timer: 2000,
-                        showConfirmButton: false
-                    });
-                    // ? Reload table without resetting page
-                    $('#centersTable').DataTable().ajax.reload(null, false);
-                }
+              icon: 'error',
+              title: 'Error Loading Data',
+              text: 'Please refresh the page and try again.',
+              timer: 3000
             });
+          }
+        },
+        "columns": [
+          { 
+            "data": "name",
+            "name": "Name",
+            "render": function(data, type, row) {
+              return '<div class="d-flex py-1 align-items-center">' +
+                     '<div class="flex-fill">' +
+                     '<div class="font-weight-medium">' + data + '</div>' +
+                     '</div>' +
+                     '</div>';
+            }
+          },
+          { 
+            "data": "address",
+            "name": "Address"
+          },
+          { 
+            "data": "isActive",
+            "name": "IsActive",
+            "render": function(data, type, row) {
+              if (row.isDeleted) {
+                return '<span class="badge bg-danger text-white">Deleted</span>';
+              }
+              if (data) {
+                return '<span class="badge bg-state-active">Active</span>';
+              } else {
+                return '<span class="badge bg-state-inactive">Inactive</span>';
+              }
+            }
+          },
+          { 
+            "data": "createdAt",
+            "name": "CreatedAt",
+            "render": function(data, type, row) {
+              if (data) {
+                var date = new Date(data);
+                return date.toLocaleDateString();
+              }
+              return '';
+            }
+          },
+          {
+            "data": null,
+            "orderable": false,
+            "render": function(data, type, row) {
+              var actions = '<div class="btn-group" role="group">';
+              
+              if (row.isDeleted) {
+                // Restore button for deleted centers
+                actions += '<a href="javascript:void(0)" onclick="restoreCenter(' + row.id + ')" class="btn btn-sm btn-action-activate" title="Restore">' +
+                          '<i class="ti ti-restore icon"></i>' +
+                          '</a>';
+                // Permanent delete button
+                actions += '<a href="javascript:void(0)" onclick="permanentDeleteCenter(' + row.id + ')" class="btn btn-sm btn-action-delete" title="Permanent Delete">' +
+                          '<i class="ti ti-trash-x icon"></i>' +
+                          '</a>';
+              } else {
+                // View button
+                actions += '<a href="@Url.Action("CenterDetails", "SuperAdmin")?centerId=' + row.id + '" class="btn btn-sm btn-action-view" title="View">' +
+                          '<i class="ti ti-eye icon"></i>' +
+                          '</a>';
+                
+                // Edit button
+                actions += '<a href="@Url.Action("EditCenter", "SuperAdmin")?id=' + row.id + '" class="btn btn-sm btn-action-edit" title="Edit">' +
+                          '<i class="ti ti-edit icon"></i>' +
+                          '</a>';
+                
+                // Delete button
+                actions += '<a href="javascript:void(0)" onclick="deleteCenter(' + row.id + ')" class="btn btn-sm btn-action-delete" title="Delete">' +
+                          '<i class="ti ti-trash icon"></i>' +
+                          '</a>';
+              }
+              
+              actions += '</div>';
+              return actions;
+            }
+          }
+        ],
+        "order": [[3, "desc"]],
+        "pageLength": 10,
+        "language": {
+          "search": "Search:",
+          "lengthMenu": "Show _MENU_ entries",
+          "info": "Showing _START_ to _END_ of _TOTAL_ centers",
+          "infoEmpty": "No centers found",
+          "infoFiltered": "(filtered from _MAX_ total centers)",
+          "paginate": {
+            "first": "First",
+            "last": "Last",
+            "next": "Next",
+            "previous": "Previous"
+          }
         }
-    </script>
+      });
+
+      // Filter buttons - Active/Inactive status filter
+      $('#filterAll').click(function() {
+        $('#centersTable').data('activeFilter', 'all');
+        $('#centersTable').data('filterDeleted', 'active'); // Show non-deleted
+        table.ajax.reload();
+        $('.btn-group .btn').removeClass('active');
+        $(this).addClass('active');
+        $('#cardTitle').text('All Centers');
+      });
+
+      $('#filterActive').click(function() {
+        $('#centersTable').data('activeFilter', 'active');
+        $('#centersTable').data('filterDeleted', 'active');
+        table.ajax.reload();
+        $('.btn-group .btn').removeClass('active');
+        $(this).addClass('active');
+        $('#cardTitle').text('Active Centers');
+      });
+
+      $('#filterInactive').click(function() {
+        $('#centersTable').data('activeFilter', 'inactive');
+        $('#centersTable').data('filterDeleted', 'active');
+        table.ajax.reload();
+        $('.btn-group .btn').removeClass('active');
+        $(this).addClass('active');
+        $('#cardTitle').text('Inactive Centers');
+      });
+
+      // Deleted centers filter
+      $('#filterDeleted').click(function() {
+        $('#centersTable').data('activeFilter', 'all');
+        $('#centersTable').data('filterDeleted', 'deleted');
+        table.ajax.reload();
+        $('.btn-group .btn').removeClass('active');
+        $(this).addClass('active');
+        $('#cardTitle').text('Deleted Centers');
+      });
+
+      // Set default filter
+      $('#centersTable').data('activeFilter', 'all');
+      $('#centersTable').data('filterDeleted', 'active');
+      $('#filterAll').addClass('active');
+    });
+
+    function deleteCenter(id) {
+      Swal.fire({
+        title: 'Move to Trash?',
+        html: 'This center will be moved to trash.<br>You can restore it later from the Deleted tab.<br><br>Type <strong>Delete</strong> to confirm:',
+        icon: 'warning',
+        input: 'text',
+        inputPlaceholder: 'Type Delete here',
+        showCancelButton: true,
+        confirmButtonColor: '#ffc107',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: '<i class="ti ti-trash"></i> Move to Trash',
+        cancelButtonText: 'Cancel',
+        inputValidator: function(value) {
+          if (value !== 'Delete') {
+            return 'Please type "Delete" to confirm';
+          }
+        }
+      }).then(function(result) {
+        if (result.isConfirmed) {
+          $.ajax({
+            url: '@Url.Action("SoftDeleteCenter", "SuperAdmin")',
+            type: 'POST',
+            data: { id: id, __RequestVerificationToken: token },
+            success: function(result) {
+              if (result.success) {
+                $('#centersTable').DataTable().ajax.reload();
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Moved to Trash!',
+                  text: result.message || 'Center moved to trash successfully. You can restore it from the Deleted tab.',
+                  timer: 2500,
+                  showConfirmButton: false
+                });
+              } else {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Error',
+                  text: 'Error: ' + result.message
+                });
+              }
+            },
+            error: function() {
+              Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Error moving center to trash'
+              });
+            }
+          });
+        }
+      });
+    }
+
+    function restoreCenter(id) {
+      Swal.fire({
+        title: 'Restore Center?',
+        text: 'Are you sure you want to restore this center?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#28a745',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: '<i class="ti ti-restore"></i> Yes, Restore',
+        cancelButtonText: 'Cancel'
+      }).then(function(result) {
+        if (result.isConfirmed) {
+          $.ajax({
+            url: '@Url.Action("RestoreCenter", "SuperAdmin")',
+            type: 'POST',
+            data: { id: id, __RequestVerificationToken: token },
+            success: function(result) {
+              if (result.success) {
+                $('#centersTable').DataTable().ajax.reload();
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Restored!',
+                  text: result.message || 'Center restored successfully',
+                  timer: 2000,
+                  showConfirmButton: false
+                });
+              } else {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Error',
+                  text: 'Error restoring center: ' + result.message
+                });
+              }
+            },
+            error: function() {
+              Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Error restoring center'
+              });
+            }
+          });
+        }
+      });
+    }
+
+    function permanentDeleteCenter(id) {
+      Swal.fire({
+        title: 'PERMANENT DELETE',
+        html: '<div class="alert alert-danger mb-2"><strong>DANGER!</strong> This cannot be undone!</div>Type <code>DELETE</code> to confirm:',
+        input: 'text',
+        inputPlaceholder: 'Type Delete',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: '<i class="ti ti-trash-x"></i> PERMANENTLY DELETE',
+        cancelButtonText: 'Cancel',
+        preConfirm: function(value) {
+          if (value !== 'Delete') {
+            Swal.showValidationMessage('You must type Delete to confirm');
+          }
+        }
+      }).then(function(result) {
+        if (result.isConfirmed) {
+          $.ajax({
+            url: '@Url.Action("HardDeleteCenter", "SuperAdmin")',
+            type: 'POST',
+            data: { id: id, __RequestVerificationToken: token },
+            success: function(result) {
+              if (result.success) {
+                $('#centersTable').DataTable().ajax.reload();
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Deleted!',
+                  text: result.message || 'Center permanently deleted',
+                  timer: 2000,
+                  showConfirmButton: false
+                });
+              } else {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Error',
+                  text: 'Error deleting center: ' + result.message
+                });
+              }
+            },
+            error: function() {
+              Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Error deleting center'
+              });
+            }
+          });
+        }
+      });
+    }
+  </script>
 }

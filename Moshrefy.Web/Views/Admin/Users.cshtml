@@ -3,90 +3,81 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<!-- Content Header -->
-<section class="content-header">
-    <div class="container-fluid">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1><i class="fas fa-users"></i> My Team</h1>
-            </div>
-            <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a asp-action="Index">Dashboard</a></li>
-                    <li class="breadcrumb-item active">My Team</li>
-                </ol>
-            </div>
+<!-- Page header -->
+<div class="page-header d-print-none">
+  <div class="container-xl">
+    <div class="row g-2 align-items-center">
+      <div class="col">
+        <div class="page-pretitle">Admin</div>
+        <h2 class="page-title">My Team</h2>
+      </div>
+      <div class="col-auto ms-auto d-print-none">
+        <div class="btn-list">
+          <a asp-action="CreateUser" class="btn btn-action-create d-none d-sm-inline-block">
+            <i class="ti ti-user-plus icon"></i>
+            Add New Member
+          </a>
         </div>
+      </div>
     </div>
-</section>
+  </div>
+</div>
 
-<!-- Main content -->
-<section class="content">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Team Members</h3>
-                        <div class="card-tools">
-                            <a asp-action="CreateUser" class="btn btn-action-create btn-sm">
-                                <i class="fas fa-plus"></i> Add New Member
-                            </a>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <!-- Filter Options -->
-                        <div class="row mb-3">
-                            <div class="col-md-4">
-                                <label>Show:</label>
-                                <select id="filterStatus" class="form-control">
-                                    <option value="all">All Members</option>
-                                    <option value="active">Active Members</option>
-                                    <option value="inactive">Inactive Members</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <!-- DataTable -->
-                        <table id="usersTable" class="table table-bordered table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Username</th>
-                                    <th>Email</th>
-                                    <th>Phone</th>
-                                    <th>Type</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                </div>
+<!-- Page body -->
+<div class="page-body">
+  <div class="container-xl">
+    <div class="row row-deck row-cards">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Team Members</h3>
+            <div class="ms-auto d-flex gap-3 align-items-center">
+              <!-- Role Type Filter Buttons -->
+              <div class="btn-group" role="group" aria-label="Role filter">
+                <button type="button" class="btn btn-outline-secondary btn-sm active" data-filter-role="all">All</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-filter-role="Employee">
+                  <i class="ti ti-user"></i> Employees
+                </button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-filter-role="Manager">
+                  <i class="ti ti-user-cog"></i> Managers
+                </button>
+              </div>
+              <!-- Status Filter -->
+              <select id="filterStatus" class="form-select form-select-sm" style="width: auto;">
+                <option value="all">All Members</option>
+                <option value="active">Active Members</option>
+                <option value="inactive">Inactive Members</option>
+              </select>
             </div>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table id="usersTable" class="table table-vcenter table-hover">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th class="w-1">Actions</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
-</section>
+  </div>
+</div>
 
 @section Scripts {
-    <!-- DataTables CSS -->
-    <link rel="stylesheet" href="~/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
-    <link rel="stylesheet" href="~/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
-    
-    <!-- DataTables JS -->
-    <script src="~/plugins/datatables/jquery.dataTables.min.js"></script>
-    <script src="~/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
-    <script src="~/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
-    <script src="~/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
-    
-    <!-- SweetAlert2 -->
-    <link rel="stylesheet" href="~/plugins/sweetalert2/sweetalert2.min.css">
-    <script src="~/plugins/sweetalert2/sweetalert2.min.js"></script>
-    
     <script>
         $(document).ready(function () {
-            console.log('Initializing Users DataTable...');
+            var currentRoleFilter = 'all';
             
             var table = $('#usersTable').DataTable({
                 processing: true,
@@ -96,11 +87,10 @@
                     type: 'POST',
                     data: function (d) {
                         d.filterStatus = $('#filterStatus').val();
-                        console.log('Sending request with filter:', d.filterStatus);
+                        d.filterRole = currentRoleFilter;
                     },
                     error: function (xhr, error, thrown) {
                         console.error('DataTable Error:', error, thrown);
-                        console.error('Response:', xhr.responseText);
                         Swal.fire({
                             icon: 'error',
                             title: 'Error Loading Data',
@@ -108,7 +98,6 @@
                         });
                     },
                     dataSrc: function(json) {
-                        console.log('Received data:', json);
                         return json.data;
                     }
                 },
@@ -122,11 +111,11 @@
                         name: 'roleName',
                         render: function (data, type, row) {
                             if (data === 'Employee') {
-                                return '<span class="badge badge-role-employee">Employee</span>';
+                                return '<span class="badge bg-role-employee"><i class="ti ti-user"></i> Employee</span>';
                             } else if (data === 'Manager') {
-                                return '<span class="badge badge-role-manager">Manager</span>';
+                                return '<span class="badge bg-role-manager"><i class="ti ti-user-cog"></i> Manager</span>';
                             } else {
-                                return '<span class="badge badge-secondary">' + data + '</span>';
+                                return '<span class="badge bg-secondary">' + data + '</span>';
                             }
                         }
                     },
@@ -135,9 +124,9 @@
                         name: 'isActive',
                         render: function (data, type, row) {
                             if (data) {
-                                return '<span class="badge badge-state-active">Active</span>';
+                                return '<span class="badge bg-state-active"><i class="ti ti-check"></i> Active</span>';
                             } else {
-                                return '<span class="badge badge-state-deactive">Inactive</span>';
+                                return '<span class="badge bg-state-inactive"><i class="ti ti-x"></i> Inactive</span>';
                             }
                         }
                     },
@@ -146,17 +135,17 @@
                         orderable: false,
                         render: function (data, type, row) {
                             var actions = '<div class="btn-group btn-group-sm">';
-                            actions += '<a href="/Admin/UserDetails/' + row.id + '" class="btn btn-action-view" title="View Details"><i class="fas fa-eye"></i></a>';
-                            actions += '<a href="/Admin/EditUser/' + row.id + '" class="btn btn-action-edit" title="Edit"><i class="fas fa-edit"></i></a>';
+                            actions += '<a href="/Admin/UserDetails/' + row.id + '" class="btn btn-action-view" title="View Details"><i class="ti ti-eye"></i></a>';
+                            actions += '<a href="/Admin/EditUser/' + row.id + '" class="btn btn-action-edit" title="Edit"><i class="ti ti-edit"></i></a>';
 
                             if (row.isActive) {
-                                actions += '<button onclick="deactivateUser(\'' + row.id + '\')" class="btn btn-state-deactive" title="Disable Access"><i class="fas fa-ban"></i></button>';
+                                actions += '<button onclick="deactivateUser(\'' + row.id + '\')" class="btn btn-state-deactive" title="Disable Access"><i class="ti ti-ban"></i></button>';
                             } else {
-                                actions += '<button onclick="activateUser(\'' + row.id + '\')" class="btn btn-state-active" title="Enable Access"><i class="fas fa-check"></i></button>';
+                                actions += '<button onclick="activateUser(\'' + row.id + '\')" class="btn btn-state-active" title="Enable Access"><i class="ti ti-check"></i></button>';
                             }
 
                             if (!row.isDeleted) {
-                                actions += '<button onclick="deleteUser(\'' + row.id + '\')" class="btn btn-action-delete" title="Remove"><i class="fas fa-trash"></i></button>';
+                                actions += '<button onclick="deleteUser(\'' + row.id + '\')" class="btn btn-action-delete" title="Remove"><i class="ti ti-trash"></i></button>';
                             }
 
                             actions += '</div>';
@@ -166,15 +155,22 @@
                 ],
                 order: [[0, 'asc']],
                 language: {
-                    processing: '<i class="fas fa-spinner fa-spin fa-2x"></i> Loading...',
+                    processing: '<i class="ti ti-loader"></i> Loading...',
                     emptyTable: 'No team members found',
                     zeroRecords: 'No matching records found'
                 }
             });
 
-            // Reload table when filter changes
+            // Role filter button click handler
+            $('[data-filter-role]').click(function() {
+                $('[data-filter-role]').removeClass('active');
+                $(this).addClass('active');
+                currentRoleFilter = $(this).data('filter-role');
+                table.ajax.reload();
+            });
+
+            // Reload table when status filter changes
             $('#filterStatus').change(function () {
-                console.log('Filter changed to:', $(this).val());
                 table.ajax.reload();
             });
         });
@@ -187,7 +183,7 @@
                 showCancelButton: true,
                 confirmButtonColor: '#28a745',
                 cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Yes, enable',
+                confirmButtonText: '<i class="ti ti-check"></i> Yes, enable',
                 cancelButtonText: 'Cancel'
             }).then((result) => {
                 if (result.isConfirmed) {
@@ -221,7 +217,7 @@
                 showCancelButton: true,
                 confirmButtonColor: '#ffc107',
                 cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Yes, disable',
+                confirmButtonText: '<i class="ti ti-ban"></i> Yes, disable',
                 cancelButtonText: 'Cancel'
             }).then((result) => {
                 if (result.isConfirmed) {
@@ -250,13 +246,20 @@
         function deleteUser(id) {
             Swal.fire({
                 title: 'Remove Team Member?',
-                text: 'This member will be delted. ',
+                html: 'This action cannot be undone.<br><br>Type <strong>Delete</strong> to confirm:',
                 icon: 'warning',
+                input: 'text',
+                inputPlaceholder: 'Type Delete here',
                 showCancelButton: true,
                 confirmButtonColor: '#dc3545',
                 cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Yes, remove',
-                cancelButtonText: 'Cancel'
+                confirmButtonText: '<i class="ti ti-trash"></i> Remove',
+                cancelButtonText: 'Cancel',
+                inputValidator: (value) => {
+                    if (value !== 'Delete') {
+                        return 'Please type "Delete" to confirm';
+                    }
+                }
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.post('@Url.Action("SoftDeleteUser")', { id: id })
@@ -282,6 +285,4 @@
         }
     </script>
 }
-
-
 

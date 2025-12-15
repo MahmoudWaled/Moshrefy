@@ -4,392 +4,294 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<!-- Content Header -->
-<section class="content-header">
-    <div class="container-fluid">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1>Center Details</h1>
-            </div>
-            <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a asp-controller="SuperAdmin" asp-action="Index">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a asp-action="Centers">Centers</a></li>
-                    <li class="breadcrumb-item active">Details</li>
-                </ol>
-            </div>
-        </div>
+<!-- Page header -->
+<div class="page-header d-print-none">
+  <div class="container-xl">
+    <div class="row g-2 align-items-center">
+      <div class="col">
+        <div class="page-pretitle">Centers</div>
+        <h2 class="page-title"><i class="ti ti-building"></i> @Model.Name</h2>
+      </div>
+      <div class="col-auto ms-auto">
+        <a asp-action="Centers" class="btn btn-outline-secondary">
+          <i class="ti ti-arrow-left"></i> Back to Centers
+        </a>
+      </div>
     </div>
-</section>
-
-<!-- Main content -->
-<section class="content">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-12">
-                <!-- Center Information Card -->
-                <div class="card card-primary card-outline">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-building mr-1"></i>
-                            @Model.Name
-                        </h3>
-                        <div class="card-tools">
-                            @if (Model.IsActive)
-                            {
-                                <span class="badge badge-success">Active</span>
-                            }
-                            else
-                            {
-                                <span class="badge badge-danger">Inactive</span>
-                            }
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <strong><i class="fas fa-id-badge mr-1"></i> ID</strong>
-                                <p class="text-muted">
-                                    @Model.Id
-                                </p>
-                                <hr>
-
-                                <strong><i class="fas fa-building mr-1"></i> Name</strong>
-                                <p class="text-muted">
-                                    @Model.Name
-                                </p>
-                                <hr>
-
-                                <strong><i class="fas fa-phone mr-1"></i> Phone</strong>
-                                <p class="text-muted">
-                                    @Model.Phone
-                                </p>
-                                <hr>
-                            </div>
-
-                            <div class="col-md-6">
-                                <strong><i class="fas fa-envelope mr-1"></i> Email</strong>
-                                <p class="text-muted">
-                                    @if (!string.IsNullOrEmpty(Model.Email))
-                                    {
-                                        <a href="mailto:@Model.Email">@Model.Email</a>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">N/A</span>
-                                    }
-                                </p>
-                                <hr>
-
-                                <strong><i class="fas fa-map-marker-alt mr-1"></i> Address</strong>
-                                <p class="text-muted">
-                                    @Model.Address
-                                </p>
-                                <hr>
-
-                                <strong><i class="fas fa-toggle-on mr-1"></i> Status</strong>
-                                <p class="text-muted">
-                                    @if (Model.IsActive)
-                                    {
-                                        <span class="badge badge-success"><i class="fas fa-check-circle"></i> Active</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge badge-danger"><i class="fas fa-times-circle"></i> Inactive</span>
-                                    }
-                                </p>
-                                <hr>
-                            </div>
-                        </div>
-
-                        @if (!string.IsNullOrEmpty(Model.Description))
-                        {
-                            <div class="row">
-                                <div class="col-12">
-                                    <strong><i class="fas fa-file-alt mr-1"></i> Description</strong>
-                                    <p class="text-muted mt-2">
-                                        @Model.Description
-                                    </p>
-                                </div>
-                            </div>
-                        }
-                    </div>
-                </div>
-
-                <!-- Audit Information Card -->
-                <div class="card card-secondary card-outline mt-3">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-history mr-1"></i>
-                            Audit Information
-                        </h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="info-box bg-gradient-info">
-                                    <span class="info-box-icon">
-                                        <i class="fas fa-user-plus"></i>
-                                    </span>
-                                    <div class="info-box-content">
-                                        <span class="info-box-text">Created By</span>
-                                        <span class="info-box-number">@Model.CreatedByName</span>
-                                        <div class="progress">
-                                            <div class="progress-bar" style="width: 100%"></div>
-                                        </div>
-                                        <span class="progress-description">
-                                            <i class="fas fa-clock"></i> @Model.CreatedAt.ToLocalTime().ToString("MMM dd, yyyy 'at' hh:mm tt")
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                @if (Model.ModifiedAt.HasValue && !string.IsNullOrEmpty(Model.ModifiedByName))
-                                {
-                                    <div class="info-box bg-gradient-warning">
-                                        <span class="info-box-icon">
-                                            <i class="fas fa-user-edit"></i>
-                                        </span>
-                                        <div class="info-box-content">
-                                            <span class="info-box-text">Last Modified By</span>
-                                            <span class="info-box-number">@Model.ModifiedByName</span>
-                                            <div class="progress">
-                                                <div class="progress-bar" style="width: 100%"></div>
-                                            </div>
-                                            <span class="progress-description">
-                                                <i class="fas fa-clock"></i> @Model.ModifiedAt.Value.ToLocalTime().ToString("MMM dd, yyyy 'at' hh:mm tt")
-                                            </span>
-                                        </div>
-                                    </div>
-                                }
-                                else
-                                {
-                                    <div class="info-box bg-gradient-secondary">
-                                        <span class="info-box-icon">
-                                            <i class="fas fa-user-edit"></i>
-                                        </span>
-                                        <div class="info-box-content">
-                                            <span class="info-box-text">Last Modified</span>
-                                            <span class="info-box-number">Never Modified</span>
-                                            <div class="progress">
-                                                <div class="progress-bar" style="width: 0%"></div>
-                                            </div>
-                                            <span class="progress-description">
-                                                <i class="fas fa-info-circle"></i> No modifications yet
-                                            </span>
-                                        </div>
-                                    </div>
-                                }
-                            </div>
-                        </div>
-
-                        <!-- Timeline View -->
-                        <div class="row mt-3">
-                            <div class="col-12">
-                                <div class="timeline">
-                                    <!-- Timeline item: Created -->
-                                    <div>
-                                        <i class="fas fa-plus-circle bg-info"></i>
-                                        <div class="timeline-item">
-                                            <span class="time">
-                                                <i class="fas fa-clock"></i> @Model.CreatedAt.ToLocalTime().ToString("MMM dd, yyyy hh:mm tt")
-                                            </span>
-                                            <h3 class="timeline-header">
-                                                <i class="fas fa-user-plus text-info"></i> 
-                                                <strong>@Model.CreatedByName</strong> created this center
-                                            </h3>
-                                            <div class="timeline-body">
-                                                Initial center setup with name: <strong>@Model.Name</strong>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Timeline item: Modified -->
-                                    @if (Model.ModifiedAt.HasValue && !string.IsNullOrEmpty(Model.ModifiedByName))
-                                    {
-                                        <div>
-                                            <i class="fas fa-edit bg-warning"></i>
-                                            <div class="timeline-item">
-                                                <span class="time">
-                                                    <i class="fas fa-clock"></i> @Model.ModifiedAt.Value.ToLocalTime().ToString("MMM dd, yyyy hh:mm tt")
-                                                </span>
-                                                <h3 class="timeline-header">
-                                                    <i class="fas fa-user-edit text-warning"></i>
-                                                    <strong>@Model.ModifiedByName</strong> updated this center
-                                                </h3>
-                                                <div class="timeline-body">
-                                                    Last modification made to center information
-                                                </div>
-                                            </div>
-                                        </div>
-                                    }
-
-                                    <!-- Timeline end -->
-                                    <div>
-                                        <i class="fas fa-clock bg-gray"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-footer">
-                        <div class="row">
-                            <div class="col-12">
-                                <a asp-action="Centers" class="btn btn-default">
-                                    <i class="fas fa-arrow-left"></i> Back to List
-                                </a>
-                                <a asp-action="CenterUsers" asp-route-centerId="@Model.Id" class="btn btn-info">
-                                    <i class="fas fa-users"></i> View Center Users
-                                </a>
-                                <a asp-action="EditCenter" asp-route-id="@Model.Id" class="btn btn-warning">
-                                    <i class="fas fa-edit"></i> Edit
-                                </a>
-                                <div class="btn-group">
-                                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#softDeleteModal">
-                                        <i class="fas fa-trash-alt"></i> Delete
-                                    </button>
-                                    <button type="button" class="btn btn-danger dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <span class="sr-only">Toggle Dropdown</span>
-                                    </button>
-                                    <div class="dropdown-menu">
-                                        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#softDeleteModal">
-                                            <i class="fas fa-trash text-warning"></i> Move to Trash
-                                        </a>
-                                        <div class="dropdown-divider"></div>
-                                        <a class="dropdown-item text-danger" href="#" data-toggle="modal" data-target="#hardDeleteModal">
-                                            <i class="fas fa-exclamation-triangle"></i> Permanent Delete
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Soft Delete Confirmation Modal -->
-<div class="modal fade" id="softDeleteModal" tabindex="-1" role="dialog" aria-labelledby="softDeleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header bg-warning">
-                <h5 class="modal-title" id="softDeleteModalLabel">
-                    <i class="fas fa-trash-alt"></i> Move to Trash
-                </h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <p>Are you sure you want to move this center to trash?</p>
-                <div class="alert alert-info">
-                    <i class="fas fa-info-circle"></i>
-                    <strong>Center:</strong> @Model.Name
-                </div>
-                <p class="text-muted">
-                    <i class="fas fa-undo"></i>
-                    <strong>Don't worry!</strong> This center will be moved to trash and can be restored later.
-                </p>
-                <ul class="text-muted">
-                    <li>The center will be hidden from active lists</li>
-                    <li>Data will be preserved</li>
-                    <li>You can restore it anytime from trash</li>
-                </ul>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                    <i class="fas fa-times"></i> Cancel
-                </button>
-                <form asp-action="SoftDeleteCenter" asp-route-id="@Model.Id" method="post" style="display: inline;">
-                    <button type="submit" class="btn btn-warning">
-                        <i class="fas fa-trash-alt"></i> Move to Trash
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
+  </div>
 </div>
 
-<!-- Hard Delete Confirmation Modal -->
-<div class="modal fade" id="hardDeleteModal" tabindex="-1" role="dialog" aria-labelledby="hardDeleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header bg-danger">
-                <h5 class="modal-title" id="hardDeleteModalLabel">
-                    <i class="fas fa-exclamation-triangle"></i> PERMANENT DELETE WARNING
-                </h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="alert alert-danger">
-                    <h4 class="alert-heading">
-                        <i class="fas fa-skull-crossbones"></i> DANGER ZONE
-                    </h4>
-                    <p>You are about to <strong>PERMANENTLY DELETE</strong> this center!</p>
-                </div>
-                
-                <div class="callout callout-danger">
-                    <h5><i class="fas fa-building"></i> Center to be deleted:</h5>
-                    <p class="mb-0"><strong>@Model.Name</strong></p>
-                </div>
+@Html.AntiForgeryToken()
 
-                <div class="alert alert-warning">
-                    <h5 class="text-danger"><i class="fas fa-exclamation-triangle"></i> This action will:</h5>
-                    <ul class="mb-0">
-                        <li><strong>Permanently delete</strong> all center data</li>
-                        <li><strong>Remove</strong> all associated records</li>
-                        <li><strong>Cannot be undone or restored</strong></li>
-                        <li><strong>Affect</strong> related users, courses, and sessions</li>
-                    </ul>
+<!-- Page body -->
+<div class="page-body">
+  <div class="container-xl">
+    <div class="row">
+      <!-- Main Content -->
+      <div class="col-lg-8">
+        <!-- Status Banner -->
+        <div class="card mb-3 @(Model.IsActive ? "border-success" : "border-secondary")">
+          <div class="card-body py-3">
+            <div class="d-flex align-items-center">
+              @if (Model.IsActive)
+              {
+                <span class="avatar bg-state-active text-white me-3">
+                  <i class="ti ti-check"></i>
+                </span>
+                <div>
+                  <h3 class="mb-0 text-success">Active Center</h3>
+                  <small class="text-muted">This center is operational</small>
                 </div>
-
-                <div class="form-group">
-                    <label for="confirmText" class="text-danger">
-                        <i class="fas fa-keyboard"></i> Type <code>DELETE</code> to confirm:
-                    </label>
-                    <input type="text" class="form-control form-control-lg" id="confirmText" placeholder="Type DELETE here">
-                    <small class="form-text text-muted">This is to prevent accidental deletion.</small>
+              }
+              else
+              {
+                <span class="avatar bg-state-inactive text-white me-3">
+                  <i class="ti ti-x"></i>
+                </span>
+                <div>
+                  <h3 class="mb-0 text-muted">Inactive Center</h3>
+                  <small class="text-muted">This center is not operational</small>
                 </div>
+              }
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                    <i class="fas fa-times"></i> Cancel
-                </button>
-                <form asp-action="HardDeleteCenter" asp-route-id="@Model.Id" method="post" style="display: inline;">
-                    <button type="submit" id="hardDeleteBtn" class="btn btn-danger" disabled>
-                        <i class="fas fa-skull-crossbones"></i> PERMANENTLY DELETE
-                    </button>
-                </form>
-            </div>
+          </div>
         </div>
+
+        <!-- Center Information Card -->
+        <div class="card mb-3">
+          <div class="card-header">
+            <div class="d-flex align-items-center">
+              <span class="avatar bg-primary text-white me-3">
+                <i class="ti ti-building"></i>
+              </span>
+              <h3 class="card-title mb-0">Center Information</h3>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label text-muted small mb-1">
+                    <i class="ti ti-building me-1"></i> Center Name
+                  </label>
+                  <div class="h4 mb-0">@Model.Name</div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label text-muted small mb-1">
+                    <i class="ti ti-phone me-1"></i> Phone
+                  </label>
+                  <div class="h5 mb-0">@Model.Phone</div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label text-muted small mb-1">
+                    <i class="ti ti-mail me-1"></i> Email
+                  </label>
+                  <div>
+                    @if (!string.IsNullOrEmpty(Model.Email))
+                    {
+                      <a href="mailto:@Model.Email">@Model.Email</a>
+                    }
+                    else
+                    {
+                      <span class="text-muted">Not provided</span>
+                    }
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label text-muted small mb-1">
+                    <i class="ti ti-map-pin me-1"></i> Address
+                  </label>
+                  <div>@Model.Address</div>
+                </div>
+              </div>
+              @if (!string.IsNullOrEmpty(Model.Description))
+              {
+                <div class="col-12">
+                  <label class="form-label text-muted small mb-1">
+                    <i class="ti ti-file-text me-1"></i> Description
+                  </label>
+                  <p class="text-muted mb-0">@Model.Description</p>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Audit Trail Card -->
+        <div class="card">
+          <div class="card-header">
+            <div class="d-flex align-items-center">
+              <span class="avatar bg-secondary text-white me-3">
+                <i class="ti ti-history"></i>
+              </span>
+              <h3 class="card-title mb-0">Audit Trail</h3>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="d-flex align-items-start">
+                  <div class="avatar avatar-sm bg-green-lt text-green me-3">
+                    <i class="ti ti-plus"></i>
+                  </div>
+                  <div>
+                    <div class="text-muted small">Created By</div>
+                    <div class="fw-medium">@(Model.CreatedByName ?? "N/A")</div>
+                    <div class="text-muted small">@Model.CreatedAt.ToLocalTime().ToString("MMM dd, yyyy 'at' hh:mm tt")</div>
+                  </div>
+                </div>
+              </div>
+              @if (Model.ModifiedAt.HasValue && !string.IsNullOrEmpty(Model.ModifiedByName))
+              {
+                <div class="col-md-6">
+                  <div class="d-flex align-items-start">
+                    <div class="avatar avatar-sm bg-yellow-lt text-yellow me-3">
+                      <i class="ti ti-edit"></i>
+                    </div>
+                    <div>
+                      <div class="text-muted small">Last Modified By</div>
+                      <div class="fw-medium">@Model.ModifiedByName</div>
+                      <div class="text-muted small">@Model.ModifiedAt.Value.ToLocalTime().ToString("MMM dd, yyyy 'at' hh:mm tt")</div>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="col-lg-4">
+        <!-- Actions Card -->
+        <div class="card mb-3">
+          <div class="card-header">
+            <h3 class="card-title"><i class="ti ti-settings me-2"></i>Actions</h3>
+          </div>
+          <div class="card-body">
+            <div class="d-grid gap-2">
+              <a asp-action="CenterUsers" asp-route-centerId="@Model.Id" class="btn btn-action-view">
+                <i class="ti ti-users me-2"></i> View Center Users
+              </a>
+              <a asp-action="EditCenter" asp-route-id="@Model.Id" class="btn btn-action-edit">
+                <i class="ti ti-edit me-2"></i> Edit Center
+              </a>
+              <hr class="my-2">
+              <button onclick="softDeleteCenter()" class="btn btn-outline-warning">
+                <i class="ti ti-trash me-2"></i> Move to Trash
+              </button>
+              <button onclick="hardDeleteCenter()" class="btn btn-outline-danger">
+                <i class="ti ti-trash-x me-2"></i> Permanent Delete
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Warning Card -->
+        <div class="card bg-red-lt">
+          <div class="card-body">
+            <div class="d-flex">
+              <div>
+                <i class="ti ti-alert-triangle icon text-red me-2" style="font-size: 1.5rem;"></i>
+              </div>
+              <div>
+                <h4 class="text-red mb-1">Delete Warning</h4>
+                <p class="text-muted mb-0 small">
+                  Deleting this center will affect all associated users and data. This action requires confirmation.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 </div>
 
 @section Scripts {
     <script>
-        // Enable hard delete button only when user types "DELETE"
-        $('#confirmText').on('input', function() {
-            var confirmText = $(this).val().toUpperCase();
-            if (confirmText === 'DELETE') {
-                $('#hardDeleteBtn').prop('disabled', false);
-                $('#hardDeleteBtn').removeClass('btn-secondary').addClass('btn-danger');
-            } else {
-                $('#hardDeleteBtn').prop('disabled', true);
-                $('#hardDeleteBtn').removeClass('btn-danger').addClass('btn-secondary');
-            }
-        });
+        var token = $('input[name="__RequestVerificationToken"]').val();
+        
+        function softDeleteCenter() {
+            Swal.fire({ 
+                title: 'Move to Trash?', 
+                html: 'Move <strong>@Model.Name</strong> to trash.<br><br>Type <strong>Delete</strong> to confirm:', 
+                icon: 'warning', 
+                input: 'text',
+                inputPlaceholder: 'Type Delete here',
+                showCancelButton: true, 
+                confirmButtonColor: '#ffc107', 
+                confirmButtonText: '<i class="ti ti-trash"></i> Move to Trash',
+                inputValidator: (value) => {
+                    if (value !== 'Delete') {
+                        return 'Please type "Delete" to confirm';
+                    }
+                }
+            })
+            .then((r) => { 
+                if (r.isConfirmed) { 
+                    $.ajax({
+                        url: '@Url.Action("SoftDeleteCenter")',
+                        type: 'POST',
+                        data: { id: @Model.Id, __RequestVerificationToken: token },
+                        success: function(res) {
+                            if (res.success) { 
+                                Swal.fire({ icon: 'success', title: 'Moved to Trash!', text: res.message, timer: 2000, showConfirmButton: false })
+                                .then(() => window.location.href = '@Url.Action("Centers")'); 
+                            } else { 
+                                Swal.fire('Error', res.message || 'An error occurred', 'error'); 
+                            }
+                        },
+                        error: function() {
+                            Swal.fire('Error', 'Failed to move center to trash.', 'error');
+                        }
+                    }); 
+                } 
+            });
+        }
 
-        // Reset confirmation when modal is closed
-        $('#hardDeleteModal').on('hidden.bs.modal', function () {
-            $('#confirmText').val('');
-            $('#hardDeleteBtn').prop('disabled', true);
-            $('#hardDeleteBtn').removeClass('btn-danger').addClass('btn-secondary');
-        });
+        function hardDeleteCenter() {
+            Swal.fire({ 
+                title: 'PERMANENT DELETE', 
+                html: '<div class="alert alert-danger mb-2"><strong>WARNING!</strong> This cannot be undone!</div>Delete <strong>@Model.Name</strong> forever?<br><br>Type <strong>Delete</strong> to confirm:', 
+                icon: 'error', 
+                input: 'text',
+                inputPlaceholder: 'Type Delete here',
+                showCancelButton: true, 
+                confirmButtonColor: '#dc3545', 
+                confirmButtonText: '<i class="ti ti-trash-x"></i> DELETE FOREVER',
+                inputValidator: (value) => {
+                    if (value !== 'Delete') {
+                        return 'Please type "Delete" to confirm';
+                    }
+                }
+            })
+            .then((r) => { 
+                if (r.isConfirmed) { 
+                    $.ajax({
+                        url: '@Url.Action("HardDeleteCenter")',
+                        type: 'POST',
+                        data: { id: @Model.Id, __RequestVerificationToken: token },
+                        success: function(res) {
+                            if (res.success) { 
+                                Swal.fire({ icon: 'success', title: 'Deleted!', text: res.message, timer: 2000, showConfirmButton: false })
+                                .then(() => window.location.href = '@Url.Action("Centers")'); 
+                            } else { 
+                                Swal.fire('Error', res.message || 'An error occurred', 'error'); 
+                            }
+                        },
+                        error: function() {
+                            Swal.fire('Error', 'Failed to delete center.', 'error');
+                        }
+                    }); 
+                } 
+            });
+        }
     </script>
 }
-

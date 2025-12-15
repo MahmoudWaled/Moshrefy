@@ -71,8 +71,9 @@ namespace Moshrefy.Web.Controllers
                 int skip = start != null ? Convert.ToInt32(start) : 0;
                 int pageNumber = (skip / pageSize) + 1;
 
-                // Get custom filter parameter
+                // Get custom filter parameters
                 var filterDeleted = Request.Form["filterDeleted"].FirstOrDefault();
+                var activeFilter = Request.Form["activeFilter"].FirstOrDefault();
 
                 var paginationParams = new PaginationParamter
                 {
@@ -105,6 +106,20 @@ namespace Moshrefy.Web.Controllers
                     centersDTO = await _superAdminService.GetAllCentersAsync(paginationParams);
                     totalRecords = await _superAdminService.GetTotalCentersCountAsync();
                     filteredRecords = totalRecords;
+                }
+
+                // Apply active/inactive filter if specified
+                if (!string.IsNullOrEmpty(activeFilter) && activeFilter != "all")
+                {
+                    if (activeFilter == "active")
+                    {
+                        centersDTO = centersDTO.Where(c => c.IsActive).ToList();
+                    }
+                    else if (activeFilter == "inactive")
+                    {
+                        centersDTO = centersDTO.Where(c => !c.IsActive).ToList();
+                    }
+                    filteredRecords = centersDTO.Count;
                 }
 
                 var centersVM = _mapper.Map<List<CenterVM>>(centersDTO);
@@ -218,6 +233,7 @@ namespace Moshrefy.Web.Controllers
                     IsActive = centerVM.IsActive
                 };
 
+                ViewBag.CenterId = id;
                 return View(updateCenterVM);
             }
             catch (Exception ex)
@@ -263,6 +279,10 @@ namespace Moshrefy.Web.Controllers
         {
             if (id <= 0)
             {
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest" || Request.ContentType?.Contains("application/json") == true)
+                {
+                    return Json(new { success = false, message = "Invalid center ID" });
+                }
                 return NotFound();
             }
 
@@ -270,11 +290,24 @@ namespace Moshrefy.Web.Controllers
             {
                 await _superAdminService.SoftDeleteCenterAsync(id);
                 _logger.LogInformation($"Center with ID {id} soft deleted by SuperAdmin.", id);
+                
+                // Check if it's an AJAX request
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest" || Request.ContentType?.Contains("application/json") == true || Request.Headers["Accept"].ToString().Contains("application/json"))
+                {
+                    return Json(new { success = true, message = "Center moved to trash! You can restore it later." });
+                }
+                
                 TempData["SuccessMessage"] = "Center moved to trash! You can restore it later.";
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error soft deleting center with ID {id}.", id);
+                
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest" || Request.ContentType?.Contains("application/json") == true || Request.Headers["Accept"].ToString().Contains("application/json"))
+                {
+                    return Json(new { success = false, message = $"Error deleting center: {ex.Message}" });
+                }
+                
                 TempData["ErrorMessage"] = $"Error deleting center: {ex.Message}";
             }
 
@@ -288,6 +321,10 @@ namespace Moshrefy.Web.Controllers
         {
             if (id <= 0)
             {
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest" || Request.ContentType?.Contains("application/json") == true)
+                {
+                    return Json(new { success = false, message = "Invalid center ID" });
+                }
                 return NotFound();
             }
 
@@ -295,11 +332,24 @@ namespace Moshrefy.Web.Controllers
             {
                 await _superAdminService.DeleteCenterAsync(id);
                 _logger.LogWarning($"Center with ID {id} permanently deleted by SuperAdmin.", id);
+                
+                // Check if it's an AJAX request
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest" || Request.ContentType?.Contains("application/json") == true || Request.Headers["Accept"].ToString().Contains("application/json"))
+                {
+                    return Json(new { success = true, message = "Center permanently deleted!" });
+                }
+                
                 TempData["SuccessMessage"] = "Center permanently deleted!";
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error permanently deleting center with ID {id}.", id);
+                
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest" || Request.ContentType?.Contains("application/json") == true || Request.Headers["Accept"].ToString().Contains("application/json"))
+                {
+                    return Json(new { success = false, message = $"Error permanently deleting center: {ex.Message}" });
+                }
+                
                 TempData["ErrorMessage"] = $"Error permanently deleting center: {ex.Message}";
             }
 

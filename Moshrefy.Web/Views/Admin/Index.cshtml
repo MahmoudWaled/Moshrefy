@@ -3,122 +3,210 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<!-- Content Header -->
-<section class="content-header">
-    <div class="container-fluid">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1><i class="fas fa-home"></i> My Center</h1>
-            </div>
-            <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item active">Dashboard</li>
-                </ol>
-            </div>
-        </div>
+<!-- Page header -->
+<div class="page-header d-print-none">
+  <div class="container-xl">
+    <div class="row g-2 align-items-center">
+      <div class="col">
+        <div class="page-pretitle">Admin</div>
+        <h2 class="page-title"><i class="ti ti-home"></i> My Center Dashboard</h2>
+      </div>
     </div>
-</section>
+  </div>
+</div>
 
-<!-- Main content -->
-<section class="content">
-    <div class="container-fluid">
-        <!-- System Update Notice (if needed) -->
-        @{
-            var hasCenterIdClaim = User.Claims.Any(c => c.Type == "CenterId" && !string.IsNullOrEmpty(c.Value));
-        }
-        @if (!hasCenterIdClaim)
-        {
+<!-- Page body -->
+<div class="page-body">
+  <div class="container-xl">
+    @{
+      var hasCenterIdClaim = User.Claims.Any(c => c.Type == "CenterId" && !string.IsNullOrEmpty(c.Value));
+    }
+    @if (!hasCenterIdClaim)
+    {
+      <div class="row mb-3">
+        <div class="col-12">
+          <div class="alert alert-warning">
+            <div class="d-flex">
+              <div><i class="ti ti-alert-triangle icon me-2"></i></div>
+              <div><strong>System Updated!</strong><br>We've made some improvements. Please <strong>log out and log back in</strong> to enjoy better performance.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Welcome Banner -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+          <div class="card-body py-4">
+            <div class="row align-items-center">
+              <div class="col-md-8">
+                <h2 class="text-white mb-2"><i class="ti ti-mood-happy me-2"></i>Welcome to Your Dashboard!</h2>
+                <p class="text-white-50 mb-0">Manage your team members, academic years, and courses all from one place.</p>
+              </div>
+              <div class="col-md-4 text-end d-none d-md-block">
+                <i class="ti ti-dashboard" style="font-size: 5rem; opacity: 0.3; color: white;"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <h3 class="mb-3"><i class="ti ti-rocket me-2"></i>Quick Actions</h3>
+      </div>
+    </div>
+
+    <div class="row row-deck row-cards">
+      <!-- Team Members Card -->
+      <div class="col-sm-6 col-lg-3">
+        <div class="card card-sm">
+          <div class="card-body">
+            <div class="row align-items-center">
+              <div class="col-auto">
+                <span class="avatar bg-role-employee text-white" style="width: 3rem; height: 3rem;">
+                  <i class="ti ti-users" style="font-size: 1.5rem;"></i>
+                </span>
+              </div>
+              <div class="col">
+                <div class="fw-bold">Team Members</div>
+                <div class="text-muted small">Manage employees & managers</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <a asp-action="Users" class="btn btn-primary w-100">
+              <i class="ti ti-arrow-right"></i> View Team
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add Team Member Card -->
+      <div class="col-sm-6 col-lg-3">
+        <div class="card card-sm">
+          <div class="card-body">
+            <div class="row align-items-center">
+              <div class="col-auto">
+                <span class="avatar bg-action-create text-white" style="width: 3rem; height: 3rem;">
+                  <i class="ti ti-user-plus" style="font-size: 1.5rem;"></i>
+                </span>
+              </div>
+              <div class="col">
+                <div class="fw-bold">Add Member</div>
+                <div class="text-muted small">Create new team member</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <a asp-action="CreateUser" class="btn btn-success w-100">
+              <i class="ti ti-plus"></i> Add New
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Academic Years Card -->
+      <div class="col-sm-6 col-lg-3">
+        <div class="card card-sm">
+          <div class="card-body">
+            <div class="row align-items-center">
+              <div class="col-auto">
+                <span class="avatar bg-info text-white" style="width: 3rem; height: 3rem;">
+                  <i class="ti ti-calendar" style="font-size: 1.5rem;"></i>
+                </span>
+              </div>
+              <div class="col">
+                <div class="fw-bold">Academic Years</div>
+                <div class="text-muted small">Manage academic periods</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <a asp-controller="AcademicYear" asp-action="Index" class="btn btn-info w-100">
+              <i class="ti ti-arrow-right"></i> View Years
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Courses Card -->
+      <div class="col-sm-6 col-lg-3">
+        <div class="card card-sm">
+          <div class="card-body">
+            <div class="row align-items-center">
+              <div class="col-auto">
+                <span class="avatar bg-purple text-white" style="width: 3rem; height: 3rem;">
+                  <i class="ti ti-book" style="font-size: 1.5rem;"></i>
+                </span>
+              </div>
+              <div class="col">
+                <div class="fw-bold">Courses</div>
+                <div class="text-muted small">Manage course catalog</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <a asp-controller="Course" asp-action="Index" class="btn btn-purple w-100">
+              <i class="ti ti-arrow-right"></i> View Courses
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Help Section -->
+    <div class="row mt-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title"><i class="ti ti-help me-2"></i>Quick Help</h3>
+          </div>
+          <div class="card-body">
             <div class="row">
-                <div class="col-12">
-                    <div class="alert alert-warning alert-dismissible">
-                        <button type="button" class="close" data-dismiss="alert">&times;</button>
-                        <h5><i class="icon fas fa-exclamation-triangle"></i> System Updated!</h5>
-                        We've made some improvements. Please <strong>log out and log back in</strong> to enjoy better performance.
-                    </div>
+              <div class="col-md-4 mb-3 mb-md-0">
+                <div class="d-flex">
+                  <span class="avatar bg-azure-lt text-azure me-3"><i class="ti ti-users"></i></span>
+                  <div>
+                    <h4 class="mb-1">Managing Team</h4>
+                    <p class="text-muted small mb-0">Add, edit, or remove team members from your center.</p>
+                  </div>
                 </div>
-            </div>
-        }
-
-        <!-- Welcome Card -->
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-body">
-                        <h4><i class="fas fa-smile"></i> Welcome to Your Center Dashboard!</h4>
-                        <p class="text-muted">Manage your team members and track your center's activities from here.</p>
-                    </div>
+              </div>
+              <div class="col-md-4 mb-3 mb-md-0">
+                <div class="d-flex">
+                  <span class="avatar bg-green-lt text-green me-3"><i class="ti ti-calendar"></i></span>
+                  <div>
+                    <h4 class="mb-1">Academic Years</h4>
+                    <p class="text-muted small mb-0">Organize courses by academic periods.</p>
+                  </div>
                 </div>
+              </div>
+              <div class="col-md-4">
+                <div class="d-flex">
+                  <span class="avatar bg-purple-lt text-purple me-3"><i class="ti ti-book"></i></span>
+                  <div>
+                    <h4 class="mb-1">Courses</h4>
+                    <p class="text-muted small mb-0">Create and manage courses for students.</p>
+                  </div>
+                </div>
+              </div>
             </div>
+          </div>
         </div>
-
-        <!-- Quick Actions -->
-        <div class="row">
-            <div class="col-lg-4 col-md-6">
-                <div class="small-box bg-white border">
-                    <div class="inner">
-                        <h4><i class="fas fa-users text-primary"></i></h4>
-                        <p>My Team</p>
-                    </div>
-                    <a asp-action="Users" class="btn btn-action-view btn-sm">
-                        View All Team Members <i class="fas fa-arrow-circle-right"></i>
-                    </a>
-                </div>
-            </div>
-
-            <div class="col-lg-4 col-md-6">
-                <div class="small-box bg-white border">
-                    <div class="inner">
-                        <h4><i class="fas fa-user-plus text-success"></i></h4>
-                        <p>Add New Member</p>
-                    </div>
-                    <a asp-action="CreateUser" class="btn btn-action-create btn-sm">
-                        Add Team Member <i class="fas fa-arrow-circle-right"></i>
-                    </a>
-                </div>
-            </div>
-
-            <div class="col-lg-4 col-md-6">
-                <div class="small-box bg-white border">
-                    <div class="inner">
-                        <h4><i class="fas fa-book text-info"></i></h4>
-                        <p>Courses & Classes</p>
-                    </div>
-                    <a href="#" class="small-box-footer">
-                        Manage Courses <i class="fas fa-arrow-circle-right"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Information Card -->
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-info-circle"></i> Quick Guide</h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h5><i class="fas fa-users text-primary"></i> Managing Your Team</h5>
-                                <ul>
-                                    <li>Add new team members to help run your center</li>
-                                    <li>Update member information anytime</li>
-                                    <li>Enable or disable member access as needed</li>
-                                </ul>
-                            </div>
-                            <div class="col-md-6">
-                                <h5><i class="fas fa-shield-alt text-success"></i> Your Center, Your Control</h5>
-                                <ul>
-                                    <li>All changes only affect your center</li>
-                                    <li>Your data is private and secure</li>
-                                    <li>Easy-to-use interface designed for you</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
-</section>
+  </div>
+</div>
+
+<style>
+  .btn-purple { background-color: #6f42c1 !important; border-color: #6f42c1 !important; color: white; }
+  .btn-purple:hover { background-color: #5a32a3 !important; border-color: #5a32a3 !important; color: white; }
+  .bg-purple { background-color: #6f42c1 !important; }
+  .card { transition: transform 0.2s, box-shadow 0.2s; }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+</style>

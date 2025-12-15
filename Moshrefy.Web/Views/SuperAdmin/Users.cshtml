@@ -2,158 +2,104 @@
     ViewData["Title"] = "User Management";
 }
 
-<!-- Content Header -->
-<section class="content-header">
-    <div class="container-fluid">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1>
-                    <i class="fas fa-users-cog"></i> User Management
-                </h1>
-            </div>
-            <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a asp-action="Index">Dashboard</a></li>
-                    <li class="breadcrumb-item active">Users</li>
-                </ol>
-            </div>
+<!-- Page header -->
+<div class="page-header d-print-none">
+  <div class="container-xl">
+    <div class="row g-2 align-items-center">
+      <div class="col">
+        <!-- Page pre-title -->
+        <div class="page-pretitle">
+          Management
         </div>
-    </div>
-</section>
-
-<!-- Main content -->
-<section class="content">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-list"></i> All Users
-                        </h3>
-                        <div class="card-tools">
-                            <div class="btn-group">
-                                <a asp-action="SearchUsers" class="btn btn-action-view btn-sm" title="Advanced Search">
-                                    <i class="fas fa-search"></i> Search Users
-                                </a>
-                                <a asp-action="InactiveUsers" class="btn btn-state-deactive btn-sm" title="View Inactive Users">
-                                    <i class="fas fa-user-times"></i> Inactive Users
-                                </a>
-                                <a asp-action="CreateCenterAdmin" class="btn btn-role-admin btn-sm">
-                                    <i class="fas fa-user-shield"></i> Create Center Admin
-                                </a>
-                                <a asp-action="CreateUserForCenter" class="btn btn-action-create btn-sm">
-                                    <i class="fas fa-user-plus"></i> Create User
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <!-- Alert messages -->
-                        @if (TempData["SuccessMessage"] != null)
-                        {
-                            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                <i class="fas fa-check-circle"></i>
-                                @TempData["SuccessMessage"]
-                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                        }
-                        @if (TempData["ErrorMessage"] != null)
-                        {
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                <i class="fas fa-exclamation-circle"></i>
-                                @TempData["ErrorMessage"]
-                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                        }
-
-                        <!-- Filter Controls -->
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                                    <label class="btn btn-outline-primary active" id="showAll">
-                                        <input type="radio" name="filterOptions" checked>
-                                        <i class="fas fa-list"></i> Show All
-                                    </label>
-                                    <label class="btn btn-outline-success" id="hideDeleted">
-                                        <input type="radio" name="filterOptions">
-                                        <i class="fas fa-filter"></i> Active Only
-                                    </label>
-                                    <label class="btn btn-outline-danger" id="showDeleted">
-                                        <input type="radio" name="filterOptions">
-                                        <i class="fas fa-trash"></i> Show Only Deleted
-                                    </label>
-                                </div>
-                                <span class="ml-3 text-muted">
-                                    <i class="fas fa-info-circle"></i>
-                                    <span id="filterInfo">Showing all users</span>
-                                </span>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group mb-0">
-                                    <label for="roleFilter" class="mr-2">
-                                        <i class="fas fa-user-tag"></i> Filter by Role:
-                                    </label>
-                                    <select id="roleFilter" class="form-control d-inline-block role-filter-select">
-                                        <option value="all">All Roles</option>
-                                        <option value="SuperAdmin">Super Admin</option>
-                                        <option value="Admin">Admin</option>
-                                        <option value="Manager">Manager</option>
-                                        <option value="Employee">Employee</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="table-responsive">
-                            <table id="usersTable" class="table table-bordered table-hover table-striped">
-                                <thead class="thead-light">
-                                    <tr>
-                                        <th>#</th>
-                                        <th data-name="Name">Name</th>
-                                        <th data-name="UserName">Username</th>
-                                        <th data-name="Email">Email</th>
-                                        <th data-name="PhoneNumber">Phone</th>
-                                        <th data-name="CenterName">Center</th>
-                                        <th data-name="RoleName">Role</th>
-                                        <th data-name="IsActive">Status</th>
-                                        <th data-name="IsDeleted">State</th>
-                                        <th data-name="CreatedAt">Created</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Data loaded via AJAX -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <h2 class="page-title">
+          Users
+        </h2>
+      </div>
+      <!-- Page title actions -->
+      <div class="col-auto ms-auto d-print-none">
+        <div class="btn-list">
+          <a asp-action="SearchUsers" class="btn btn-action-view d-none d-sm-inline-block" title="Advanced Search">
+            <i class="ti ti-search icon"></i>
+            Search Users
+          </a>
+          <a asp-action="InactiveUsers" class="btn btn-state-deactive d-none d-sm-inline-block" title="View Inactive Users">
+            <i class="ti ti-user-off icon"></i>
+            Inactive Users
+          </a>
+          <a asp-action="CreateCenterAdmin" class="btn btn-role-admin d-none d-sm-inline-block">
+            <i class="ti ti-shield icon"></i>
+            Create Center Admin
+          </a>
+          <a asp-action="CreateUserForCenter" class="btn btn-action-create d-none d-sm-inline-block">
+            <i class="ti ti-user-plus icon"></i>
+            Create User
+          </a>
         </div>
+      </div>
     </div>
-</section>
+  </div>
+</div>
+
+<!-- Page body -->
+<div class="page-body">
+  <div class="container-xl">
+    <div class="row row-deck row-cards">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">All Users</h3>
+            <div class="ms-auto">
+              <!-- Filter Controls -->
+              <div class="btn-group" role="group">
+                <button type="button" class="btn btn-sm active" id="showAll">
+                  <i class="ti ti-list icon"></i> All
+                </button>
+                <button type="button" class="btn btn-sm" id="hideDeleted">
+                  <i class="ti ti-filter icon"></i> Active
+                </button>
+                <button type="button" class="btn btn-sm" id="showDeleted">
+                  <i class="ti ti-trash icon"></i> Deleted
+                </button>
+              </div>
+              <select id="roleFilter" class="form-select form-select-sm d-inline-block ms-2" style="width: auto;">
+                <option value="all">All Roles</option>
+                <option value="SuperAdmin">Super Admin</option>
+                <option value="Admin">Admin</option>
+                <option value="Manager">Manager</option>
+                <option value="Employee">Employee</option>
+              </select>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table id="usersTable" class="table table-vcenter table-hover">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th data-name="Name">Name</th>
+                    <th data-name="UserName">Username</th>
+                    <th data-name="PhoneNumber">Phone</th>
+                    <th data-name="CenterName">Center</th>
+                    <th data-name="RoleName">Role</th>
+                    <th data-name="IsActive">Status</th>
+                    <th data-name="IsDeleted">State</th>
+                    <th data-name="CreatedAt">Created</th>
+                    <th class="w-1">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Data loaded via AJAX -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 @section Scripts {
-    <!-- DataTables CSS -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap4.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap4.min.css">
-
-    <!-- Custom CSS for better table appearance -->
-
-    <!-- DataTables JS -->
-    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap4.min.js"></script>
-    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
-    <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap4.min.js"></script>
-
-    <!-- SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
     <script>
         $(document).ready(function () {
             var currentFilter = 'all';
@@ -179,20 +125,6 @@
                             text: 'Please refresh the page and try again.',
                             timer: 3000
                         });
-                    },
-                    beforeSend: function () {
-                        if (isFirstLoad) {
-                            $('#usersTable tbody').html(
-                                '<tr><td colspan="11" class="text-center py-5">' +
-                                '<div class="spinner-border text-primary" role="status">' +
-                                '<span class="sr-only">Loading...</span></div>' +
-                                '<br><span class="text-muted mt-2">Loading users...</span>' +
-                                '</td></tr>'
-                            );
-                        }
-                    },
-                    complete: function () {
-                        isFirstLoad = false;
                     }
                 },
                 columns: [
@@ -212,7 +144,7 @@
                         width: '150px',
                         className: 'align-middle',
                         render: function (data) {
-                            return '<i class="fas fa-user text-primary mr-1"></i> <strong>' + data + '</strong>';
+                            return '<i class="ti ti-user text-primary me-1"></i> <strong>' + data + '</strong>';
                         }
                     },
                     {
@@ -225,25 +157,13 @@
                         }
                     },
                     {
-                        data: 'email',
-                        name: 'Email',
-                        width: '180px',
-                        className: 'align-middle',
-                        render: function (data) {
-                            if (data && data !== '') {
-                                return '<a href="mailto:' + data + '" class="text-info">' + data + '</a>';
-                            }
-                            return '<span class="text-muted">N/A</span>';
-                        }
-                    },
-                    {
                         data: 'phoneNumber',
                         name: 'PhoneNumber',
                         width: '120px',
                         className: 'align-middle text-nowrap',
                         render: function (data) {
                             if (data && data !== '') {
-                                return '<i class="fas fa-phone text-success mr-1"></i> ' + data;
+                                return '<i class="ti ti-phone text-success me-1"></i> ' + data;
                             }
                             return '<span class="text-muted">N/A</span>';
                         }
@@ -255,7 +175,7 @@
                         className: 'align-middle',
                         render: function (data) {
                             if (data && data !== '') {
-                                return '<i class="fas fa-building text-info mr-1"></i> <small>' + data + '</small>';
+                                return '<i class="ti ti-building text-info me-1"></i> <small>' + data + '</small>';
                             }
                             return '<span class="text-muted">N/A</span>';
                         }
@@ -267,30 +187,30 @@
                         className: 'text-center align-middle',
                         render: function (data) {
                             if (data) {
-                                var badgeClass = 'badge-secondary';
-                                var icon = 'fa-user';
+                                var badgeClass = 'bg-secondary';
+                                var icon = 'ti-user';
                                 
                                 switch(data) {
                                     case 'SuperAdmin':
-                                        badgeClass = 'badge-role-superadmin';
-                                        icon = 'fa-user-shield';
+                                        badgeClass = 'bg-role-superadmin';
+                                        icon = 'ti-shield';
                                         break;
                                     case 'Admin':
-                                        badgeClass = 'badge-role-admin';
-                                        icon = 'fa-user-tie';
+                                        badgeClass = 'bg-role-admin';
+                                        icon = 'ti-user-check';
                                         break;
                                     case 'Manager':
-                                        badgeClass = 'badge-role-manager';
-                                        icon = 'fa-user-cog';
+                                        badgeClass = 'bg-role-manager';
+                                        icon = 'ti-user-cog';
                                         break;
                                     case 'Employee':
-                                        badgeClass = 'badge-role-employee';
-                                        icon = 'fa-user';
+                                        badgeClass = 'bg-role-employee';
+                                        icon = 'ti-user';
                                         break;
                                 }
                                 
-                                return '<span class="badge ' + badgeClass + ' px-2">' +
-                                       '<i class="fas ' + icon + '"></i> ' + data + '</span>';
+                                return '<span class="badge ' + badgeClass + '">' +
+                                       '<i class="ti ' + icon + '"></i> ' + data + '</span>';
                             }
                             return '<span class="text-muted">N/A</span>';
                         }
@@ -302,9 +222,9 @@
                         className: 'text-center align-middle',
                         render: function (data) {
                             if (data) {
-                                return '<span class="badge badge-state-active px-2"><i class="fas fa-check-circle"></i> Active</span>';
+                                return '<span class="badge bg-state-active"><i class="ti ti-check"></i> Active</span>';
                             }
-                            return '<span class="badge badge-state-deactive px-2"><i class="fas fa-times-circle"></i> Inactive</span>';
+                            return '<span class="badge bg-state-inactive"><i class="ti ti-x"></i> Inactive</span>';
                         }
                     },
                     {
@@ -314,9 +234,9 @@
                         className: 'text-center align-middle',
                         render: function (data) {
                             if (data) {
-                                return '<span class="badge badge-state-deleted px-2"><i class="fas fa-trash-alt"></i> Deleted</span>';
+                                return '<span class="badge bg-action-delete"><i class="ti ti-trash"></i> Deleted</span>';
                             }
-                            return '<span class="badge badge-state-normal px-2"><i class="fas fa-check"></i> Normal</span>';
+                            return '<span class="badge bg-state-normal"><i class="ti ti-circle-check"></i> Normal</span>';
                         }
                     },
                     {
@@ -331,7 +251,7 @@
                                 month: 'short',
                                 day: 'numeric'
                             });
-                            return '<small class="text-muted"><i class="fas fa-clock mr-1"></i>' + formatted + '</small>';
+                            return '<small class="text-muted"><i class="ti ti-clock me-1"></i>' + formatted + '</small>';
                         }
                     },
                     {
@@ -345,44 +265,34 @@
                             // View button (always visible)
                             buttons += '<a href="@Url.Action("UserDetails", "SuperAdmin")/' + row.id + '" ' +
                                 'class="btn btn-action-view" title="View Details">' +
-                                '<i class="fas fa-eye"></i></a>';
+                                '<i class="ti ti-eye"></i></a>';
 
                             if (!row.isDeleted) {
                                 // Edit button
                                 buttons += '<a href="@Url.Action("EditUser", "SuperAdmin")/' + row.id + '" ' +
                                     'class="btn btn-action-edit" title="Edit">' +
-                                    '<i class="fas fa-edit"></i></a>';
+                                    '<i class="ti ti-edit"></i></a>';
 
                                 // Active/Deactivate button
                                 if (row.isActive) {
                                     buttons += '<button class="btn btn-state-deactive" title="Deactivate" ' +
                                         'onclick="deactivateUser(\'' + row.id + '\', \'' + row.userName.replace(/'/g, "\\'") + '\')">' +
-                                        '<i class="fas fa-ban"></i></button>';
+                                        '<i class="ti ti-ban"></i></button>';
                                 } else {
                                     buttons += '<button class="btn btn-state-active" title="Activate" ' +
                                         'onclick="activateUser(\'' + row.id + '\', \'' + row.userName.replace(/'/g, "\\'") + '\')">' +
-                                        '<i class="fas fa-check"></i></button>';
+                                        '<i class="ti ti-check"></i></button>';
                                 }
 
-                                // Delete dropdown button
-                                buttons += '<div class="btn-group btn-group-sm" role="group">' +
-                                    '<button type="button" class="btn btn-action-delete dropdown-toggle" ' +
-                                    'data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Delete Options">' +
-                                    '<i class="fas fa-trash"></i></button>' +
-                                    '<div class="dropdown-menu dropdown-menu-right">' +
-                                    '<a class="dropdown-item text-warning" href="#" ' +
-                                    'onclick="event.preventDefault(); softDeleteUser(\'' + row.id + '\', \'' + row.userName.replace(/'/g, "\\'") + '\')">' +
-                                    '<i class="fas fa-trash-alt mr-2"></i>Soft Delete (Restorable)</a>' +
-                                    '<div class="dropdown-divider"></div>' +
-                                    '<a class="dropdown-item text-danger" href="#" ' +
-                                    'onclick="event.preventDefault(); hardDeleteUser(\'' + row.id + '\', \'' + row.userName.replace(/'/g, "\\'") + '\')">' +
-                                    '<i class="fas fa-trash mr-2"></i>Hard Delete (Permanent)</a>' +
-                                    '</div></div>';
+                                // Delete button
+                                buttons += '<button class="btn btn-action-delete" title="Delete" ' +
+                                    'onclick="softDeleteUser(\'' + row.id + '\', \'' + row.userName.replace(/'/g, "\\'") + '\')">' +
+                                    '<i class="ti ti-trash"></i></button>';
                             } else {
                                 // Restore button
                                 buttons += '<button class="btn btn-state-restore" title="Restore" ' +
                                     'onclick="restoreUser(\'' + row.id + '\', \'' + row.userName.replace(/'/g, "\\'") + '\')">' +
-                                    '<i class="fas fa-undo"></i></button>';
+                                    '<i class="ti ti-refresh"></i></button>';
                             }
 
                             buttons += '</div>';
@@ -392,7 +302,7 @@
                 ],
                 pageLength: 25,
                 lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
-                order: [[8, 'desc']], // Sort by created date descending
+                order: [[9, 'desc']], // Sort by created date descending
                 autoWidth: false,
                 responsive: true,
                 language: {
@@ -404,25 +314,10 @@
                     infoFiltered: "(filtered from _MAX_ total)",
                     zeroRecords: "No matching users found",
                     emptyTable: '<div class="p-4 text-center">' +
-                        '<i class="fas fa-users fa-4x text-muted mb-3"></i>' +
-                        '<h4 class="text-muted">No Users Found</h4>' +
-                        '<p class="text-muted">Get started by creating your first user.</p>' +
-                        '<a href="@Url.Action("CreateUserForCenter", "SuperAdmin")" class="btn btn-success">' +
-                        '<i class="fas fa-plus"></i> Create Your First User</a></div>'
+                        '<i class="ti ti-users" style="font-size: 4rem;"></i>' +
+                        '<h4 class="text-muted mt-3">No Deleted Users Found.</h4>' +
+                        '</div>'
                 },
-                columnDefs: [
-                    { responsivePriority: 1, targets: 0 },  // # - always visible
-                    { responsivePriority: 2, targets: 1 },  // Name - always visible
-                    { responsivePriority: 3, targets: 2 },  // Username - always visible
-                    { responsivePriority: 4, targets: 10 }, // Actions - always visible
-                    { responsivePriority: 5, targets: 6 },  // Role
-                    { responsivePriority: 6, targets: 7 },  // Status
-                    { responsivePriority: 7, targets: 8 },  // State
-                    { responsivePriority: 8, targets: 5 },  // Center
-                    { responsivePriority: 9, targets: 3 },  // Email
-                    { responsivePriority: 10, targets: 4 }, // Phone
-                    { responsivePriority: 11, targets: 9 }  // Created
-                ],
                 createdRow: function (row, data, dataIndex) {
                     if (data.isDeleted) {
                         $(row).addClass('table-danger');
@@ -433,21 +328,24 @@
             // Filter: Show All
             $('#showAll').click(function () {
                 currentFilter = 'all';
-                $('#filterInfo').text('Showing all users');
+                $('.btn-group .btn').removeClass('active');
+                $(this).addClass('active');
                 table.ajax.reload(null, false);
             });
 
             // Filter: Active Only
             $('#hideDeleted').click(function () {
                 currentFilter = 'active';
-                $('#filterInfo').text('Showing active users only');
+                $('.btn-group .btn').removeClass('active');
+                $(this).addClass('active');
                 table.ajax.reload(null, false);
             });
 
             // Filter: Show Only Deleted
             $('#showDeleted').click(function () {
                 currentFilter = 'deleted';
-                $('#filterInfo').text('Showing only deleted users');
+                $('.btn-group .btn').removeClass('active');
+                $(this).addClass('active');
                 table.ajax.reload(null, false);
             });
 
@@ -467,7 +365,7 @@
                 showCancelButton: true,
                 confirmButtonColor: '#28a745',
                 cancelButtonColor: '#6c757d',
-                confirmButtonText: '<i class="fas fa-undo"></i> Yes, Restore',
+                confirmButtonText: '<i class="ti ti-refresh"></i> Yes, Restore',
                 cancelButtonText: 'Cancel',
                 showLoaderOnConfirm: true,
                 preConfirm: function () {
@@ -506,7 +404,7 @@
                 showCancelButton: true,
                 confirmButtonColor: '#28a745',
                 cancelButtonColor: '#6c757d',
-                confirmButtonText: '<i class="fas fa-check"></i> Yes, Activate',
+                confirmButtonText: '<i class="ti ti-check"></i> Yes, Activate',
                 cancelButtonText: 'Cancel',
                 showLoaderOnConfirm: true,
                 preConfirm: function () {
@@ -545,7 +443,7 @@
                 showCancelButton: true,
                 confirmButtonColor: '#ffc107',
                 cancelButtonColor: '#6c757d',
-                confirmButtonText: '<i class="fas fa-ban"></i> Yes, Deactivate',
+                confirmButtonText: '<i class="ti ti-ban"></i> Yes, Deactivate',
                 cancelButtonText: 'Cancel',
                 showLoaderOnConfirm: true,
                 preConfirm: function () {
@@ -578,13 +476,13 @@
         // Soft delete user function
         function softDeleteUser(userId, userName) {
             Swal.fire({
-                title: 'Soft Delete User?',
-                html: 'Move<br><strong>' + userName + '</strong><br>to trash?<br><small class="text-muted">You can restore it later.</small>',
+                title: 'Delete User?',
+                html: 'Move <strong>' + userName + '</strong> to trash?<br><small class="text-muted">You can restore it later.</small>',
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#ffc107',
+                confirmButtonColor: '#dc3545',
                 cancelButtonColor: '#6c757d',
-                confirmButtonText: '<i class="fas fa-trash-alt"></i> Yes, Soft Delete',
+                confirmButtonText: '<i class="ti ti-trash"></i> Yes, Delete',
                 cancelButtonText: 'Cancel',
                 showLoaderOnConfirm: true,
                 preConfirm: function () {
@@ -613,49 +511,5 @@
                 }
             });
         }
-
-        // Hard delete user function
-        function hardDeleteUser(userId, userName) {
-            Swal.fire({
-                title: 'Permanently Delete User?',
-                html: '<strong class="text-danger">⚠️ WARNING</strong><br>' +
-                      'This will <strong>PERMANENTLY DELETE</strong><br>' +
-                      '<strong>' + userName + '</strong><br><br>' +
-                      '<span class="text-danger">This action CANNOT be undone!</span><br>' +
-                      '<small class="text-muted">All user data will be lost forever.</small>',
-                icon: 'error',
-                showCancelButton: true,
-                confirmButtonColor: '#dc3545',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: '<i class="fas fa-trash"></i> Yes, DELETE PERMANENTLY',
-                cancelButtonText: 'Cancel',
-                showLoaderOnConfirm: true,
-                preConfirm: function () {
-                    return $.post('@Url.Action("HardDeleteUser", "SuperAdmin")', { id: userId })
-                        .then(function (response) {
-                            if (!response.success) {
-                                throw new Error(response.message);
-                            }
-                            return response;
-                        })
-                        .catch(function (error) {
-                            Swal.showValidationMessage('Request failed: ' + error.message);
-                        });
-                },
-                allowOutsideClick: function () { return !Swal.isLoading(); }
-            }).then(function (result) {
-                if (result.isConfirmed) {
-                    Swal.fire({
-                        title: 'Permanently Deleted!',
-                        text: result.value.message,
-                        icon: 'success',
-                        timer: 2000,
-                        showConfirmButton: false
-                    });
-                    $('#usersTable').DataTable().ajax.reload(null, false);
-                }
-            });
-        }
     </script>
 }
-
