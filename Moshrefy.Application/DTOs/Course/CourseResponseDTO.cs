@@ -11,5 +11,9 @@ namespace Moshrefy.Application.DTOs.Course
         public string? AcademicYearName { get; set; }
 
         public bool IsActive { get; set; }
+
+        public DateTimeOffset CreatedAt { get; set; }
+
+        public bool IsDeleted { get; set; }
     }
 }

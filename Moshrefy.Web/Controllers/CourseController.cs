@@ -14,17 +14,20 @@ namespace Moshrefy.Web.Controllers
     {
         private readonly ICourseService _courseService;
         private readonly IAcademicYearService _academicYearService;
+        private readonly ITeacherCourseService _teacherCourseService;
         private readonly IMapper _mapper;
         private readonly ILogger<CourseController> _logger;
 
         public CourseController(
             ICourseService courseService,
             IAcademicYearService academicYearService,
+            ITeacherCourseService teacherCourseService,
             IMapper _mapper,
             ILogger<CourseController> logger)
         {
             _courseService = courseService;
             _academicYearService = academicYearService;
+            _teacherCourseService = teacherCourseService;
             this._mapper = _mapper;
             _logger = logger;
         }
@@ -347,6 +350,31 @@ namespace Moshrefy.Web.Controllers
             catch
             {
                 return new List<SelectListItem>();
+            }
+        }
+
+        // GET: Course/GetAssignedTeachers/5 (AJAX)
+        [HttpGet]
+        public async Task<IActionResult> GetAssignedTeachers(int id)
+        {
+            try
+            {
+                var teacherCourses = await _teacherCourseService.GetByCourseIdAsync(id);
+                var assignedTeachers = teacherCourses
+                    .Where(tc => !tc.IsDeleted)
+                    .Select(tc => new
+                    {
+                        teacherId = tc.TeacherId,
+                        teacherName = tc.TeacherName,
+                        isActive = tc.IsActive
+                    })
+                    .ToList();
+                return Json(assignedTeachers);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error loading assigned teachers for course {id}");
+                return Json(new List<object>());
             }
         }
     }

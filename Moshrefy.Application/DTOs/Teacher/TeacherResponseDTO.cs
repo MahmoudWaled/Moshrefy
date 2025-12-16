@@ -13,5 +13,7 @@ namespace Moshrefy.Application.DTOs.Teacher
         public string Specialization { get; set; } = default!;
 
         public bool IsActive { get; set; }
+
+        public bool IsDeleted { get; set; }
     }
 }

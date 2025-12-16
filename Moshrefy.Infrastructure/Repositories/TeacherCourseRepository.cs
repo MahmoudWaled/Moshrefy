@@ -11,6 +11,9 @@ namespace Moshrefy.infrastructure.Repositories
         public async Task<IEnumerable<TeacherCourse>> GetByTeacherIdAsync(int teacherId)
         {
             return await appDbContext.Set<TeacherCourse>()
+                .Include(tc => tc.Teacher)
+                .Include(tc => tc.Course)
+                    .ThenInclude(c => c.AcademicYear)
                 .Where(tc => tc.TeacherId == teacherId)
                 .ToListAsync();
         }
@@ -28,6 +31,15 @@ namespace Moshrefy.infrastructure.Repositories
             return await appDbContext.Set<TeacherCourse>()
                 .Include(tc => tc.Teacher)
                 .Where(tc => tc.Teacher.Phone == teacherPhone)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<TeacherCourse>> GetByCourseIdAsync(int courseId)
+        {
+            return await appDbContext.Set<TeacherCourse>()
+                .Include(tc => tc.Teacher)
+                .Include(tc => tc.Course)
+                .Where(tc => tc.CourseId == courseId)
                 .ToListAsync();
         }
     }

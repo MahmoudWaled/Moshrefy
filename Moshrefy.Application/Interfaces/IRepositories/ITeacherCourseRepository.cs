@@ -9,5 +9,6 @@ namespace Moshrefy.Application.Interfaces.IRepositories
         public Task<IEnumerable<TeacherCourse>> GetByTeacherNameAsync(string teacherName);
         public Task<IEnumerable<TeacherCourse>> GetByTeacherPhoneAsync(string teacherPhone);
         public Task<IEnumerable<TeacherCourse>> GetByTeacherIdAsync(int teacherId);
+        public Task<IEnumerable<TeacherCourse>> GetByCourseIdAsync(int courseId);
     }
 }

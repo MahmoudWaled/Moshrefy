@@ -11,6 +11,7 @@ namespace Moshrefy.Web.MappingProfiles
             CreateMap<CreateTeacherVM, CreateTeacherDTO>().ReverseMap();
             CreateMap<UpdateTeacherVM, UpdateTeacherDTO>().ReverseMap();
             CreateMap<TeacherVM, TeacherResponseDTO>().ReverseMap();
+            CreateMap<TeacherResponseDTO, UpdateTeacherVM>();
         }
     }
 }

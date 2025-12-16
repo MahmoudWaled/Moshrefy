@@ -1,18 +1,31 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using Moshrefy.Application.DTOs.Teacher;
 using Moshrefy.Application.Interfaces.IUnitOfWork;
 using Moshrefy.Application.Interfaces.IServices;
 using Moshrefy.Domain.Entities;
 using Moshrefy.Domain.Exceptions;
+using Moshrefy.Domain.Identity;
 using Moshrefy.Domain.Paramter;
 
 namespace Moshrefy.Application.Services
 {
-    public class TeacherService(IUnitOfWork unitOfWork, IMapper mapper) : ITeacherService
+    public class TeacherService(
+        IUnitOfWork unitOfWork, 
+        IMapper mapper,
+        ITenantContext tenantContext,
+        UserManager<ApplicationUser> userManager) : BaseService(tenantContext), ITeacherService
     {
         public async Task<TeacherResponseDTO> CreateAsync(CreateTeacherDTO createTeacherDTO)
         {
             var teacher = mapper.Map<Teacher>(createTeacherDTO);
+            
+            // Set audit fields
+            teacher.CenterId = tenantContext.GetCurrentCenterId() ?? 0;
+            var currentUser = await userManager.FindByIdAsync(tenantContext.GetCurrentUserId());
+            teacher.CreatedById = currentUser!.Id;
+            teacher.CreatedByName = currentUser!.UserName ?? string.Empty;
+            
             await unitOfWork.Teachers.AddAsync(teacher);
             await unitOfWork.SaveChangesAsync();
             return mapper.Map<TeacherResponseDTO>(teacher);
@@ -67,7 +80,16 @@ namespace Moshrefy.Application.Services
             if (teacher == null)
                 throw new NotFoundException<int>(nameof(teacher), "teacher", id);
 
+            ValidateCenterAccess(teacher.CenterId, nameof(Teacher));
+
             mapper.Map(updateTeacherDTO, teacher);
+            
+            // Set audit fields
+            var currentUser = await userManager.FindByIdAsync(tenantContext.GetCurrentUserId());
+            teacher.ModifiedById = currentUser!.Id;
+            teacher.ModifiedByName = currentUser!.UserName ?? string.Empty;
+            teacher.ModifiedAt = DateTimeOffset.UtcNow;
+            
             unitOfWork.Teachers.UpdateAsync(teacher);
             await unitOfWork.SaveChangesAsync();
         }
@@ -77,6 +99,8 @@ namespace Moshrefy.Application.Services
             var teacher = await unitOfWork.Teachers.GetByIdAsync(id);
             if (teacher == null)
                 throw new NotFoundException<int>(nameof(teacher), "teacher", id);
+
+            ValidateCenterAccess(teacher.CenterId, nameof(Teacher));
 
             unitOfWork.Teachers.DeleteAsync(teacher);
             await unitOfWork.SaveChangesAsync();
@@ -88,7 +112,16 @@ namespace Moshrefy.Application.Services
             if (teacher == null)
                 throw new NotFoundException<int>(nameof(teacher), "teacher", id);
 
+            ValidateCenterAccess(teacher.CenterId, nameof(Teacher));
+
             teacher.IsActive = true;
+            
+            // Set audit fields
+            var currentUser = await userManager.FindByIdAsync(tenantContext.GetCurrentUserId());
+            teacher.ModifiedById = currentUser!.Id;
+            teacher.ModifiedByName = currentUser!.UserName ?? string.Empty;
+            teacher.ModifiedAt = DateTimeOffset.UtcNow;
+            
             unitOfWork.Teachers.UpdateAsync(teacher);
             await unitOfWork.SaveChangesAsync();
         }
@@ -99,7 +132,16 @@ namespace Moshrefy.Application.Services
             if (teacher == null)
                 throw new NotFoundException<int>(nameof(teacher), "teacher", id);
 
+            ValidateCenterAccess(teacher.CenterId, nameof(Teacher));
+
             teacher.IsActive = false;
+            
+            // Set audit fields
+            var currentUser = await userManager.FindByIdAsync(tenantContext.GetCurrentUserId());
+            teacher.ModifiedById = currentUser!.Id;
+            teacher.ModifiedByName = currentUser!.UserName ?? string.Empty;
+            teacher.ModifiedAt = DateTimeOffset.UtcNow;
+            
             unitOfWork.Teachers.UpdateAsync(teacher);
             await unitOfWork.SaveChangesAsync();
         }
@@ -110,7 +152,16 @@ namespace Moshrefy.Application.Services
             if (teacher == null)
                 throw new NotFoundException<int>(nameof(teacher), "teacher", id);
 
+            ValidateCenterAccess(teacher.CenterId, nameof(Teacher));
+
             teacher.IsDeleted = true;
+            
+            // Set audit fields
+            var currentUser = await userManager.FindByIdAsync(tenantContext.GetCurrentUserId());
+            teacher.ModifiedById = currentUser!.Id;
+            teacher.ModifiedByName = currentUser!.UserName ?? string.Empty;
+            teacher.ModifiedAt = DateTimeOffset.UtcNow;
+            
             unitOfWork.Teachers.UpdateAsync(teacher);
             await unitOfWork.SaveChangesAsync();
         }
@@ -121,7 +172,16 @@ namespace Moshrefy.Application.Services
             if (teacher == null)
                 throw new NotFoundException<int>(nameof(teacher), "teacher", id);
 
+            ValidateCenterAccess(teacher.CenterId, nameof(Teacher));
+
             teacher.IsDeleted = false;
+            
+            // Set audit fields
+            var currentUser = await userManager.FindByIdAsync(tenantContext.GetCurrentUserId());
+            teacher.ModifiedById = currentUser!.Id;
+            teacher.ModifiedByName = currentUser!.UserName ?? string.Empty;
+            teacher.ModifiedAt = DateTimeOffset.UtcNow;
+            
             unitOfWork.Teachers.UpdateAsync(teacher);
             await unitOfWork.SaveChangesAsync();
         }

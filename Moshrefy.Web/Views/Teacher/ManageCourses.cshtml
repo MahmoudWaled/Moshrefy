@@ -1,0 +1,287 @@
+@model Moshrefy.Web.Models.Teacher.TeacherVM
+@{
+    ViewData["Title"] = "Manage Courses";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Page Header -->
+<div class="page-header-modern">
+    <div class="row g-2 align-items-center">
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb-modern">
+                    <li class="breadcrumb-item">
+                        <a asp-controller="Teacher" asp-action="Index"><i class="ti ti-user-check"></i> Teachers</a>
+                        <i class="ti ti-chevron-right breadcrumb-separator ms-2"></i>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a asp-controller="Teacher" asp-action="Details" asp-route-id="@Model.Id">@Model.Name</a>
+                        <i class="ti ti-chevron-right breadcrumb-separator ms-2"></i>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Manage Courses</li>
+                </ol>
+            </nav>
+            <h2 class="page-title"><i class="ti ti-book"></i> Manage Courses for @Model.Name</h2>
+        </div>
+        <div class="col-auto ms-auto">
+            <a asp-action="Details" asp-route-id="@Model.Id" class="btn">
+                <i class="ti ti-arrow-left"></i> Back to Details
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Page body -->
+<div class="page-body">
+  <div class="container-xl">
+    <div class="row">
+      <!-- Assigned Courses -->
+      <div class="col-lg-6 mb-3">
+        <div class="card">
+          <div class="card-header">
+            <div class="d-flex align-items-center">
+              <span class="avatar bg-success text-white me-3">
+                <i class="ti ti-check"></i>
+              </span>
+              <h3 class="card-title mb-0">Assigned Courses</h3>
+            </div>
+          </div>
+          <div class="card-body">
+            <div id="assignedCoursesList">
+              <div class="text-center text-muted py-4">
+                <span class="spinner-border spinner-border-sm"></span> Loading...
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Available Courses -->
+      <div class="col-lg-6 mb-3">
+        <div class="card">
+          <div class="card-header">
+            <div class="d-flex align-items-center">
+              <span class="avatar bg-primary text-white me-3">
+                <i class="ti ti-plus"></i>
+              </span>
+              <h3 class="card-title mb-0">Available Courses</h3>
+            </div>
+          </div>
+          <div class="card-body">
+            <div id="availableCoursesList">
+              <div class="text-center text-muted py-4">
+                <span class="spinner-border spinner-border-sm"></span> Loading...
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Info Card -->
+    <div class="card bg-azure-lt">
+      <div class="card-body">
+        <div class="d-flex">
+          <div>
+            <i class="ti ti-info-circle icon text-azure me-2" style="font-size: 1.5rem;"></i>
+          </div>
+          <div>
+            <h4 class="mb-1">Course Assignment</h4>
+            <p class="text-muted mb-0 small">
+              Assign courses to this teacher by clicking the <strong>+ Assign</strong> button. 
+              Remove assignments by clicking the <strong>× Remove</strong> button.
+              Each teacher can be assigned to multiple courses.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+@section Scripts {
+    <script>
+        var teacherId = @Model.Id;
+
+        $(document).ready(function() {
+            loadAssignedCourses();
+            loadAvailableCourses();
+        });
+
+        function loadAssignedCourses() {
+            $.get('@Url.Action("GetAssignedCourses")/' + teacherId, function(courses) {
+                var html = '';
+                if (courses.length === 0) {
+                    html = '<div class="text-center text-muted py-4"><i class="ti ti-book-off" style="font-size: 2rem;"></i><p class="mt-2">No courses assigned yet</p></div>';
+                } else {
+                    html = '<div class="list-group list-group-flush">';
+                    courses.forEach(function(course) {
+                        var courseName = course.courseName || 'Unknown Course';
+                        html += '<div class="list-group-item d-flex justify-content-between align-items-center">';
+                        html += '<div>';
+                        html += '<i class="ti ti-book text-success me-2"></i>';
+                        html += '<strong>' + courseName + '</strong>';
+                        if (!course.isActive) {
+                            html += ' <span class="badge bg-secondary ms-2">Inactive</span>';
+                        }
+                        html += '</div>';
+                        html += '<button type="button" class="btn btn-sm btn-outline-danger" onclick="unassignCourse(' + course.teacherCourseId + ', \'' + courseName.replace(/'/g, "\\'") + '\')">';
+                        html += '<i class="ti ti-x"></i> Remove</button>';
+                        html += '</div>';
+                    });
+                    html += '</div>';
+                }
+                $('#assignedCoursesList').html(html);
+            });
+        }
+
+        function loadAvailableCourses() {
+            $.get('@Url.Action("GetAvailableCourses")/' + teacherId, function(courses) {
+                var html = '';
+                if (courses.length === 0) {
+                    html = '<div class="text-center text-muted py-4"><i class="ti ti-check-all" style="font-size: 2rem;"></i><p class="mt-2">All courses assigned!</p></div>';
+                } else {
+                    // Group courses by academic year
+                    var grouped = {};
+                    courses.forEach(function(course) {
+                        var year = course.academicYear || 'Other';
+                        if (!grouped[year]) grouped[year] = [];
+                        grouped[year].push(course);
+                    });
+
+                    // Build accordion for each year
+                    html = '<div class="accordion mb-3" id="yearAccordion">';
+                    var index = 0;
+                    for (var year in grouped) {
+                        var yearId = 'year' + index;
+                        html += '<div class="accordion-item">';
+                        html += '<h2 class="accordion-header">';
+                        html += '<button class="accordion-button' + (index > 0 ? ' collapsed' : '') + '" type="button" data-bs-toggle="collapse" data-bs-target="#' + yearId + '">';
+                        html += '<i class="ti ti-calendar me-2"></i>' + year + ' <span class="badge bg-secondary ms-2">' + grouped[year].length + '</span>';
+                        html += '</button></h2>';
+                        html += '<div id="' + yearId + '" class="accordion-collapse collapse' + (index === 0 ? ' show' : '') + '">';
+                        html += '<div class="accordion-body p-0">';
+                        html += '<div class="list-group list-group-flush">';
+                        grouped[year].forEach(function(course) {
+                            html += '<div class="list-group-item d-flex justify-content-between align-items-center">';
+                            html += '<div class="form-check">';
+                            html += '<input class="form-check-input course-checkbox" type="checkbox" value="' + course.id + '" data-name="' + (course.name || '').replace(/"/g, '&quot;') + '" id="course' + course.id + '">';
+                            html += '<label class="form-check-label" for="course' + course.id + '">' + course.name + '</label>';
+                            html += '</div>';
+                            html += '<button type="button" class="btn btn-sm btn-success" onclick="assignCourse(' + course.id + ', \'' + (course.name || '').replace(/'/g, "\\'") + '\')">';
+                            html += '<i class="ti ti-plus"></i></button>';
+                            html += '</div>';
+                        });
+                        html += '</div></div></div></div>';
+                        index++;
+                    }
+                    html += '</div>';
+
+                    // Bulk assign button
+                    html += '<div class="d-flex justify-content-between align-items-center">';
+                    html += '<div class="form-check"><input class="form-check-input" type="checkbox" id="selectAllCourses" onclick="toggleSelectAll(this)"><label class="form-check-label" for="selectAllCourses">Select All</label></div>';
+                    html += '<button type="button" class="btn btn-success" onclick="assignSelectedCourses()"><i class="ti ti-plus me-1"></i>Assign Selected</button>';
+                    html += '</div>';
+                }
+                $('#availableCoursesList').html(html);
+            });
+        }
+
+        function toggleSelectAll(checkbox) {
+            $('.course-checkbox').prop('checked', checkbox.checked);
+        }
+
+        function assignCourse(courseId, courseName) {
+            TablerDialog.fire({
+                title: 'Assign Course',
+                text: 'Assign "' + courseName + '" to this teacher?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                confirmButtonText: '<i class="ti ti-check"></i> Yes, assign'
+            }).then((r) => {
+                if (r.isConfirmed) {
+                    $.post('@Url.Action("AssignCourse")', { teacherId: teacherId, courseId: courseId })
+                        .done(function(res) {
+                            if (res.success) {
+                                TablerDialog.fire({ icon: 'success', title: 'Assigned!', timer: 1500, showConfirmButton: false });
+                                loadAssignedCourses();
+                                loadAvailableCourses();
+                            } else {
+                                TablerDialog.fire('Error', res.message, 'error');
+                            }
+                        })
+                        .fail(function() {
+                            TablerDialog.fire('Error', 'An error occurred', 'error');
+                        });
+                }
+            });
+        }
+
+        function unassignCourse(teacherCourseId, courseName) {
+            TablerDialog.fire({
+                title: 'Remove Course',
+                text: 'Remove "' + courseName + '" from this teacher?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                confirmButtonText: '<i class="ti ti-x"></i> Yes, remove'
+            }).then((r) => {
+                if (r.isConfirmed) {
+                    $.post('@Url.Action("UnassignCourse")', { teacherCourseId: teacherCourseId })
+                        .done(function(res) {
+                            if (res.success) {
+                                TablerDialog.fire({ icon: 'success', title: 'Removed!', timer: 1500, showConfirmButton: false });
+                                loadAssignedCourses();
+                                loadAvailableCourses();
+                            } else {
+                                TablerDialog.fire('Error', res.message, 'error');
+                            }
+                        })
+                        .fail(function() {
+                            TablerDialog.fire('Error', 'An error occurred', 'error');
+                        });
+                }
+            });
+        }
+
+        function assignSelectedCourses() {
+            var selectedIds = [];
+            var selectedNames = [];
+            $('.course-checkbox:checked').each(function() {
+                selectedIds.push($(this).val());
+                selectedNames.push($(this).data('name'));
+            });
+
+            if (selectedIds.length === 0) {
+                TablerDialog.fire('No Selection', 'Please select at least one course to assign.', 'info');
+                return;
+            }
+
+            TablerDialog.fire({
+                title: 'Assign ' + selectedIds.length + ' Course(s)?',
+                text: 'Assign the selected courses to this teacher?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                confirmButtonText: '<i class="ti ti-check"></i> Yes, assign all'
+            }).then((r) => {
+                if (r.isConfirmed) {
+                    $.post('@Url.Action("AssignMultipleCourses")', { teacherId: teacherId, courseIds: selectedIds })
+                        .done(function(res) {
+                            if (res.success) {
+                                TablerDialog.fire({ icon: 'success', title: 'Assigned!', text: res.message, timer: 2000, showConfirmButton: false });
+                                loadAssignedCourses();
+                                loadAvailableCourses();
+                            } else {
+                                TablerDialog.fire('Error', res.message, 'error');
+                            }
+                        })
+                        .fail(function() {
+                            TablerDialog.fire('Error', 'An error occurred', 'error');
+                        });
+                }
+            });
+        }
+    </script>
+}

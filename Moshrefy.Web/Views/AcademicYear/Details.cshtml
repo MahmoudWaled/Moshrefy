@@ -148,6 +148,25 @@
             </div>
           </div>
         </div>
+
+        <!-- Related Courses Card -->
+        <div class="card mb-3">
+          <div class="card-header">
+            <div class="d-flex align-items-center">
+              <span class="avatar bg-info text-white me-3">
+                <i class="ti ti-book"></i>
+              </span>
+              <h3 class="card-title mb-0">Related Courses</h3>
+            </div>
+          </div>
+          <div class="card-body">
+            <div id="relatedCoursesList">
+              <div class="text-center text-muted py-3">
+                <span class="spinner-border spinner-border-sm"></span> Loading...
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Sidebar -->
@@ -196,6 +215,34 @@
 
 @section Scripts {
     <script>
+        $(document).ready(function() {
+            loadRelatedCourses();
+        });
+
+        function loadRelatedCourses() {
+            $.get('@Url.Action("GetCourses")/@Model.Id', function(courses) {
+                var html = '';
+                if (courses.length === 0) {
+                    html = '<div class="text-center text-muted py-2"><i class="ti ti-book-off me-1"></i> No courses in this academic year</div>';
+                } else {
+                    html = '<ul class="list-group list-group-flush">';
+                    courses.forEach(function(course) {
+                        html += '<li class="list-group-item d-flex align-items-center justify-content-between">';
+                        html += '<div>';
+                        html += '<i class="ti ti-book text-info me-2"></i>';
+                        html += '<a href="/Course/Details/' + course.id + '" class="text-decoration-none">' + course.name + '</a>';
+                        html += '</div>';
+                        if (!course.isActive) {
+                            html += '<span class="badge bg-secondary">Inactive</span>';
+                        }
+                        html += '</li>';
+                    });
+                    html += '</ul>';
+                }
+                $('#relatedCoursesList').html(html);
+            });
+        }
+
         function goBack() {
             if (window.history.length > 1) {
                 window.history.back();

@@ -1,6 +1,27 @@
+
 /* ========================================
-   MOSHREFY CUSTOM COLOR PALETTE
+   0. LAYOUT SHIFT FIX - Prevent page shift when modals open
    ======================================== */
+html {
+  overflow-y: scroll; /* Always show scrollbar to prevent layout shift */
+  margin: 0 !important; /* Reset any margin (e.g., from browser extensions) */
+}
+
+body {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+
+body.modal-open {
+  position: fixed;
+  width: 100%;
+  top: var(--scroll-y, 0);
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow-y: scroll; /* Keep scrollbar visible to prevent layout shift */
+}
+
 
 /* ========================================
    1. CSS VARIABLES - Color Definitions

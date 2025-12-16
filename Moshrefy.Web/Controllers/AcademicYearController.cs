@@ -12,15 +12,18 @@ namespace Moshrefy.Web.Controllers
     public class AcademicYearController : Controller
     {
         private readonly IAcademicYearService _academicYearService;
+        private readonly ICourseService _courseService;
         private readonly IMapper _mapper;
         private readonly ILogger<AcademicYearController> _logger;
 
         public AcademicYearController(
             IAcademicYearService academicYearService,
+            ICourseService courseService,
             IMapper mapper,
             ILogger<AcademicYearController> logger)
         {
             _academicYearService = academicYearService;
+            _courseService = courseService;
             _mapper = mapper;
             _logger = logger;
         }
@@ -249,6 +252,31 @@ namespace Moshrefy.Web.Controllers
             {
                 _logger.LogError(ex, $"Error deleting academic year {id}");
                 return Json(new { success = false, message = $"Error: {ex.Message}" });
+            }
+        }
+
+        // GET: AcademicYear/GetCourses/5 (AJAX)
+        [HttpGet]
+        public async Task<IActionResult> GetCourses(int id)
+        {
+            try
+            {
+                var courses = await _courseService.GetByAcademicYearIdAsync(id);
+                var result = courses
+                    .Where(c => !c.IsDeleted)
+                    .Select(c => new
+                    {
+                        id = c.Id,
+                        name = c.Name,
+                        isActive = c.IsActive
+                    })
+                    .ToList();
+                return Json(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error loading courses for academic year {id}");
+                return Json(new List<object>());
             }
         }
     }

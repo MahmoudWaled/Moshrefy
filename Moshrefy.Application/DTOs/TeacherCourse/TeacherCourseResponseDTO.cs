@@ -13,5 +13,11 @@ namespace Moshrefy.Application.DTOs.TeacherCourse
         public string? CourseName { get; set; }
 
         public bool IsActive { get; set; }
+
+        public bool IsDeleted { get; set; }
+
+        public bool CourseIsDeleted { get; set; }
+
+        public string? AcademicYearName { get; set; }
     }
 }

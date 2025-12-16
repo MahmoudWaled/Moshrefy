@@ -59,6 +59,19 @@ window.TablerDialog = (function() {
         return null;
     }
 
+    // Scroll position preservation - save scroll position before modal opens
+    let savedScrollY = 0;
+    function saveScrollPosition() {
+        savedScrollY = window.scrollY;
+        document.body.style.setProperty('--scroll-y', `-${savedScrollY}px`);
+    }
+
+    // Restore scroll position after modal closes
+    function restoreScrollPosition() {
+        document.body.style.removeProperty('--scroll-y');
+        window.scrollTo({ top: savedScrollY, behavior: 'instant' });
+    }
+
     // Create and show modal
     function createModal(options) {
 
@@ -204,6 +217,9 @@ window.TablerDialog = (function() {
             }
 
             modalElement.addEventListener('hidden.bs.modal', function() {
+                // Restore scroll position when modal closes
+                restoreScrollPosition();
+                
                 if (!isConfirmed) {
                     resolve({ isConfirmed: false, isDismissed: true });
                 }
@@ -222,7 +238,8 @@ window.TablerDialog = (function() {
                 }, config.timer);
             }
 
-
+            // Save scroll position before showing modal
+            saveScrollPosition();
             modal.show();
         });
     }

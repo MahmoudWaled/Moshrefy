@@ -13,5 +13,9 @@ namespace Moshrefy.Web.Models.Teacher
         public string Specialization { get; set; } = default!;
 
         public bool IsActive { get; set; }
+
+        public bool IsDeleted { get; set; }
+
+        public int CourseCount { get; set; }
     }
 }
