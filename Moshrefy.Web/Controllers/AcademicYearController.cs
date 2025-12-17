@@ -5,12 +5,16 @@ using Moshrefy.Application.DTOs.AcademicYear;
 using Moshrefy.Application.Interfaces.IServices;
 using Moshrefy.Domain.Paramter;
 using Moshrefy.Web.Models.AcademicYear;
+using Moshrefy.Web.Extensions;
+using Moshrefy.Application.DTOs.Common;
 
 namespace Moshrefy.Web.Controllers
 {
     [Authorize(Policy = "AcademicYear.View")]
     public class AcademicYearController : Controller
     {
+        #region Dependencies
+
         private readonly IAcademicYearService _academicYearService;
         private readonly ICourseService _courseService;
         private readonly IMapper _mapper;
@@ -28,92 +32,26 @@ namespace Moshrefy.Web.Controllers
             _logger = logger;
         }
 
-        // GET: AcademicYear/Index
+        #endregion
+
+        #region Academic Year Management
+
+        // List all academic years
         [HttpGet]
         public IActionResult Index()
         {
             return View();
         }
 
-        // POST: AcademicYear/GetAcademicYearsData (AJAX for DataTables)
+        // DataTables - Get academic years data
         [HttpPost]
         public async Task<IActionResult> GetAcademicYearsData()
         {
             try
             {
-                var draw = Request.Form["draw"].FirstOrDefault();
-                var start = Request.Form["start"].FirstOrDefault();
-                var length = Request.Form["length"].FirstOrDefault();
-                var searchValue = Request.Form["search[value]"].FirstOrDefault();
-
-                int pageSize = length != null ? Convert.ToInt32(length) : 25;
-                int skip = start != null ? Convert.ToInt32(start) : 0;
-                int pageNumber = (skip / pageSize) + 1;
-
-                var filterStatus = Request.Form["filterStatus"].FirstOrDefault();
-
-                // Get total count from database efficiently
-                int totalRecords = 0;
-                try
-                {
-                    totalRecords = await _academicYearService.GetTotalCountAsync();
-                }
-                catch (Exception)
-                {
-                    // No data, total is 0
-                }
-
-                // Fetch current page (service filters by CenterId at database level)
-                var paginationParams = new PaginationParamter
-                {
-                    PageNumber = pageNumber,
-                    PageSize = pageSize
-                };
-
-                List<AcademicYearResponseDTO> academicYearsDTO;
-
-                try
-                {
-                    academicYearsDTO = await _academicYearService.GetAllAcademicYearsAsync(paginationParams);
-                }
-                catch (Exception)
-                {
-                    // No data found, return empty list
-                    academicYearsDTO = new List<AcademicYearResponseDTO>();
-                }
-
-                var academicYearsVM = _mapper.Map<List<AcademicYearVM>>(academicYearsDTO);
-
-                // Apply UI filters on the current page
-                if (!string.IsNullOrEmpty(filterStatus))
-                {
-                    if (filterStatus == "active")
-                    {
-                        academicYearsVM = academicYearsVM.Where(ay => ay.IsActive).ToList();
-                    }
-                    else if (filterStatus == "inactive")
-                    {
-                        academicYearsVM = academicYearsVM.Where(ay => !ay.IsActive).ToList();
-                    }
-                }
-
-                if (!string.IsNullOrEmpty(searchValue))
-                {
-                    academicYearsVM = academicYearsVM.Where(ay =>
-                        ay.Name.Contains(searchValue, StringComparison.OrdinalIgnoreCase) ||
-                        (ay.CreatedByName != null && ay.CreatedByName.Contains(searchValue, StringComparison.OrdinalIgnoreCase))
-                    ).ToList();
-                }
-
-                var jsonData = new
-                {
-                    draw = draw,
-                    recordsTotal = totalRecords,
-                    recordsFiltered = totalRecords,
-                    data = academicYearsVM
-                };
-
-                return Ok(jsonData);
+                var request = Request.GetDataTableRequest();
+                var response = await _academicYearService.GetAcademicYearsDataTableAsync(request);
+                return Ok(response);
             }
             catch (Exception ex)
             {
@@ -122,10 +60,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-
-
-
-        // GET: AcademicYear/Details/5
+        // View academic year details
         [HttpGet]
         public async Task<IActionResult> Details(int id)
         {
@@ -148,7 +83,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // GET: AcademicYear/Create
+        // Create academic year - GET
         [HttpGet]
         [Authorize(Policy = "AcademicYear.Add")]
         public IActionResult Create()
@@ -156,7 +91,7 @@ namespace Moshrefy.Web.Controllers
             return View(new CreateAcademicYearVM());
         }
 
-        // POST: AcademicYear/Create
+        // Create academic year - POST
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Policy = "AcademicYear.Add")]
@@ -182,7 +117,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // GET: AcademicYear/Edit/5
+        // Edit academic year - GET
         [HttpGet]
         [Authorize(Policy = "AcademicYear.Update")]
         public async Task<IActionResult> Edit(int id)
@@ -213,7 +148,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // POST: AcademicYear/Edit/5
+        // Edit academic year - POST
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Policy = "AcademicYear.Update")]
@@ -246,7 +181,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // POST: AcademicYear/Delete/5
+        // Delete academic year
         [HttpPost]
         [Authorize(Policy = "AcademicYear.Delete")]
         public async Task<IActionResult> Delete(int id)
@@ -269,7 +204,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // GET: AcademicYear/GetCourses/5 (AJAX)
+        // Get courses for academic year (AJAX)
         [HttpGet]
         public async Task<IActionResult> GetCourses(int id)
         {
@@ -293,5 +228,7 @@ namespace Moshrefy.Web.Controllers
                 return Json(new List<object>());
             }
         }
+
+        #endregion
     }
 }

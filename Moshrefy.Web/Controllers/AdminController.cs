@@ -5,12 +5,16 @@ using Moshrefy.Application.Interfaces.IServices;
 using Moshrefy.Domain.Enums;
 using Moshrefy.Domain.Paramter;
 using Moshrefy.Web.Models.User;
+using Moshrefy.Web.Extensions;
+using Moshrefy.Application.DTOs.Common;
 
 namespace Moshrefy.Web.Controllers
 {
     [Authorize(Roles = nameof(RolesNames.Admin))]
     public class AdminController : Controller
     {
+        #region Dependencies
+
         private readonly IUserManagementService _userManagementService;
         private readonly ITenantContext _tenantContext;
         private readonly IMapper _mapper;
@@ -28,116 +32,60 @@ namespace Moshrefy.Web.Controllers
             _logger = logger;
         }
 
-        // Dashboard
+        #endregion
+
+        #region Dashboard
+
         [HttpGet]
         public IActionResult Index()
         {
             return View();
         }
 
-        // Users Management
+        #endregion
+
+        #region User Management
+
+        // List all users
         [HttpGet]
         public IActionResult Users()
         {
             return View();
         }
 
-        // Get users data via AJAX
+        // DataTables - Get users data
         [HttpPost]
         public async Task<IActionResult> GetUsersData()
         {
             try
             {
-                var draw = Request.Form["draw"].FirstOrDefault();
-                var start = Request.Form["start"].FirstOrDefault();
-                var length = Request.Form["length"].FirstOrDefault();
-                var searchValue = Request.Form["search[value]"].FirstOrDefault();
+                var request = Request.GetDataTableRequest();
+                var response = await _userManagementService.GetUsersDataTableAsync(request);
+                var usersVM = _mapper.Map<List<UserVM>>(response.Data);
 
-                int pageSize = length != null ? Convert.ToInt32(length) : 25;
-                int skip = start != null ? Convert.ToInt32(start) : 0;
-                int pageNumber = (skip / pageSize) + 1;
-
-                var filterStatus = Request.Form["filterStatus"].FirstOrDefault();
-                var filterRole = Request.Form["filterRole"].FirstOrDefault();
-
-                // Get total count from database efficiently
-                int totalRecords = 0;
-                try
+                return Ok(new
                 {
-                    totalRecords = await _userManagementService.GetTotalCountAsync();
-                }
-                catch (Exception)
-                {
-                    // No data, total is 0
-                }
-
-                // Fetch current page (service applies CenterId filtering at database level)
-                var paginationParams = new PaginationParamter
-                {
-                    PageNumber = pageNumber,
-                    PageSize = pageSize
-                };
-
-                List<Application.DTOs.User.UserResponseDTO> usersDTO;
-
-                if (filterStatus == "inactive")
-                {
-                    usersDTO = await _userManagementService.GetInactiveUsersInMyCenterAsync(paginationParams);
-                }
-                else if (filterStatus == "active")
-                {
-                    usersDTO = await _userManagementService.GetActiveUsersInMyCenterAsync(paginationParams);
-                }
-                else
-                {
-                    usersDTO = await _userManagementService.GetAllUsersInMyCenterAsync(paginationParams);
-                }
-
-                var usersVM = _mapper.Map<List<UserVM>>(usersDTO);
-
-                // Apply UI filters on the current page
-                if (!string.IsNullOrEmpty(searchValue))
-                {
-                    usersVM = usersVM.Where(u =>
-                        u.Name.Contains(searchValue, StringComparison.OrdinalIgnoreCase) ||
-                        u.UserName.Contains(searchValue, StringComparison.OrdinalIgnoreCase) ||
-                        (u.Email != null && u.Email.Contains(searchValue, StringComparison.OrdinalIgnoreCase)) ||
-                        (u.PhoneNumber != null && u.PhoneNumber.Contains(searchValue, StringComparison.OrdinalIgnoreCase))
-                    ).ToList();
-                }
-
-                if (!string.IsNullOrEmpty(filterRole) && filterRole != "all")
-                {
-                    usersVM = usersVM.Where(u => u.RoleName.Equals(filterRole, StringComparison.OrdinalIgnoreCase)).ToList();
-                }
-
-                var jsonData = new
-                {
-                    draw = draw,
-                    recordsTotal = totalRecords,
-                    recordsFiltered = totalRecords,
+                    draw = response.Draw,
+                    recordsTotal = response.RecordsTotal,
+                    recordsFiltered = response.RecordsFiltered,
                     data = usersVM
-                };
-
-                return Ok(jsonData);
+                });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error loading users data");
+                _logger.LogError(ex, "Error loading users data for DataTables");
                 return StatusCode(500, new { error = "Error loading data. Please try again." });
             }
         }
 
-
-
-
-        // Create User
+        // Create user - GET
         [HttpGet]
         public IActionResult CreateUser()
         {
             return View(new CreateUserVM());
         }
 
+        // Create user - POST
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateUser(CreateUserVM model)
@@ -173,7 +121,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // User Details
+        // View user details
         [HttpGet]
         public async Task<IActionResult> UserDetails(string id)
         {
@@ -196,7 +144,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // Edit User
+        // Edit user - GET
         [HttpGet]
         public async Task<IActionResult> EditUser(string id)
         {
@@ -231,6 +179,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
+        // Edit user - POST
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditUser(string id, UpdateUserVM model)
@@ -248,7 +197,7 @@ namespace Moshrefy.Web.Controllers
 
             try
             {
-                // Set the CenterId to the current admin's center (same as current user's center)
+                // Set the CenterId to the current admin's center
                 model.CenterId = _tenantContext.GetCurrentCenterId();
                 
                 var updateUserDTO = _mapper.Map<Application.DTOs.User.UpdateUserDTO>(model);
@@ -266,7 +215,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // Activate User
+        // Activate user
         [HttpPost]
         public async Task<IActionResult> ActivateUser(string id)
         {
@@ -288,7 +237,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // Deactivate User
+        // Deactivate user
         [HttpPost]
         public async Task<IActionResult> DeactivateUser(string id)
         {
@@ -310,7 +259,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // Soft Delete User
+        // Soft delete user
         [HttpPost]
         public async Task<IActionResult> SoftDeleteUser(string id)
         {
@@ -332,7 +281,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // Change User Role
+        // Change user role
         [HttpPost]
         public async Task<IActionResult> ChangeUserRole(string id, string newRole)
         {
@@ -360,9 +309,7 @@ namespace Moshrefy.Web.Controllers
                     return Json(new { success = false, message = "You can only assign Employee or Manager types" });
                 }
 
-                // Update user role
                 await _userManagementService.UpdateUserRoleAsync(id, newRole);
-                
                 _logger.LogInformation($"User {id} role changed to {newRole}");
                 
                 return Json(new { 
@@ -376,8 +323,7 @@ namespace Moshrefy.Web.Controllers
                 return Json(new { success = false, message = $"Error: {ex.Message}" });
             }
         }
+
+        #endregion
     }
 }
-
-
-

@@ -75,6 +75,11 @@ namespace Moshrefy.infrastructure.Repositories.GenericRepository
         {
             return await appDbContext.Set<TEntity>().CountAsync(predicate);
         }
+
+        public IQueryable<TEntity> GetQueryable()
+        {
+            return appDbContext.Set<TEntity>().AsQueryable();
+        }
     }
 }
 

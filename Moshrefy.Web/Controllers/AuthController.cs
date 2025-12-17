@@ -47,6 +47,8 @@ namespace Moshrefy.Web.Controllers
                 await _authService.CookieLoginAsync(loginVM.UserName, loginVM.Password);
 
                 _logger.LogInformation($"User {loginVM.UserName} logged in successfully at {DateTime.UtcNow}");
+                
+                TempData["SuccessMessage"] = "Login successful!";
                 return RedirectToAction("Index", "Home");
             }
             catch (UnauthorizedAccessException ex)
@@ -74,6 +76,8 @@ namespace Moshrefy.Web.Controllers
                 await _authService.CookieLogoutAsync();
 
                 _logger.LogInformation($"User {userName} logged out successfully at {DateTime.UtcNow}");
+                
+                TempData["SuccessMessage"] = "You have been logged out successfully.";
                 return RedirectToAction("Login");
             }
             catch (Exception ex)

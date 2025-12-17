@@ -6,12 +6,16 @@ using Moshrefy.Application.Interfaces.IServices;
 using Moshrefy.Domain.Enums;
 using Moshrefy.Domain.Paramter;
 using Moshrefy.Web.Models.Student;
+using Moshrefy.Web.Extensions;
+using Moshrefy.Application.DTOs.Common;
 
 namespace Moshrefy.Web.Controllers
 {
     [Authorize(Roles = "Admin,Manager,Employee")]
     public class StudentController : Controller
     {
+        #region Dependencies
+
         private readonly IStudentService _studentService;
         private readonly IMapper _mapper;
         private readonly ILogger<StudentController> _logger;
@@ -26,109 +30,27 @@ namespace Moshrefy.Web.Controllers
             _logger = logger;
         }
 
-        // GET: Student/Index
+        #endregion
+
+        #region Student Management
+
+        // List all students
         [HttpGet]
         public IActionResult Index()
         {
             return View();
         }
 
-        // POST: Student/GetStudentsData (AJAX for DataTables)
+        // DataTables - Get students data
         [HttpPost]
         public async Task<IActionResult> GetStudentsData()
         {
             try
             {
-                var draw = Request.Form["draw"].FirstOrDefault();
-                var start = Request.Form["start"].FirstOrDefault();
-                var length = Request.Form["length"].FirstOrDefault();
-                var searchValue = Request.Form["search[value]"].FirstOrDefault();
-
-                int pageSize = length != null ? Convert.ToInt32(length) : 25;
-                int skip = start != null ? Convert.ToInt32(start) : 0;
-                int pageNumber = (skip / pageSize) + 1;
-
-                var filterStatus = Request.Form["filterStatus"].FirstOrDefault();
-
-                // Get total count from database efficiently
-                int totalRecords = 0;
-                try
-                {
-                    totalRecords = await _studentService.GetTotalCountAsync();
-                }
-                catch (Exception)
-                {
-                    // No data, total is 0
-                }
-
-                // Fetch current page (service filters by CenterId at database level)
-                var paginationParams = new PaginationParamter
-                {
-                    PageNumber = pageNumber,
-                    PageSize = pageSize
-                };
-
-                List<StudentResponseDTO> studentsDTO;
-
-                try
-                {
-                    studentsDTO = await _studentService.GetAllAsync(paginationParams);
-                }
-                catch (Exception)
-                {
-                    studentsDTO = new List<StudentResponseDTO>();
-                }
-
-                var studentsVM = _mapper.Map<List<StudentVM>>(studentsDTO);
-
-                // Apply UI filters on the current page
-                if (!string.IsNullOrEmpty(filterStatus) && filterStatus != "all")
-                {
-                    if (Enum.TryParse<StudentStatus>(filterStatus, true, out var status))
-                    {
-                        studentsVM = studentsVM.Where(s => s.StudentStatus == status).ToList();
-                    }
-                }
-
-                if (!string.IsNullOrEmpty(searchValue))
-                {
-                    studentsVM = studentsVM.Where(s =>
-                        s.Name.Contains(searchValue, StringComparison.OrdinalIgnoreCase) ||
-                        s.FirstPhone.Contains(searchValue, StringComparison.OrdinalIgnoreCase) ||
-                        (s.NationalId != null && s.NationalId.Contains(searchValue, StringComparison.OrdinalIgnoreCase))
-                    ).ToList();
-                }
-
-                // Apply sorting
-                var sortColumn = Request.Form["order[0][column]"].FirstOrDefault();
-                var sortDirection = Request.Form["order[0][dir]"].FirstOrDefault();
-
-                if (!string.IsNullOrEmpty(sortColumn))
-                {
-                    int colIndex = int.Parse(sortColumn);
-                    bool isAsc = sortDirection == "asc";
-
-                    studentsVM = colIndex switch
-                    {
-                        1 => isAsc ? studentsVM.OrderBy(s => s.Name).ToList() : studentsVM.OrderByDescending(s => s.Name).ToList(),
-                        2 => isAsc ? studentsVM.OrderBy(s => s.FirstPhone).ToList() : studentsVM.OrderByDescending(s => s.FirstPhone).ToList(),
-                        3 => isAsc ? studentsVM.OrderBy(s => s.Age).ToList() : studentsVM.OrderByDescending(s => s.Age).ToList(),
-                        4 => isAsc ? studentsVM.OrderBy(s => s.StudentStatus).ToList() : studentsVM.OrderByDescending(s => s.StudentStatus).ToList(),
-                        _ => studentsVM.OrderBy(s => s.Name).ToList()
-                    };
-                }
-
-                var jsonData = new
-                {
-                    draw = draw,
-                    recordsTotal = totalRecords,
-                    recordsFiltered = totalRecords,
-                    data = studentsVM
-                };
-
-                return Ok(jsonData);
+                var request = Request.GetDataTableRequest();
+                var response = await _studentService.GetStudentsDataTableAsync(request);
+                return Ok(response);
             }
-
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error loading students data");
@@ -136,7 +58,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // GET: Student/Details/5
+        // View student details
         [HttpGet]
         public async Task<IActionResult> Details(int id)
         {
@@ -159,7 +81,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // GET: Student/Create
+        // Create student - GET
         [HttpGet]
         [Authorize(Roles = "Admin,Manager")]
         public IActionResult Create()
@@ -167,7 +89,7 @@ namespace Moshrefy.Web.Controllers
             return View(new CreateStudentVM());
         }
 
-        // POST: Student/Create
+        // Create student - POST
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin,Manager")]
@@ -193,7 +115,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // GET: Student/Edit/5
+        // Edit student - GET
         [HttpGet]
         [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> Edit(int id)
@@ -220,7 +142,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // POST: Student/Edit/5
+        // Edit student - POST
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin,Manager")]
@@ -253,7 +175,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // POST: Student/Activate/5
+        // Activate student
         [HttpPost]
         [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> Activate(int id)
@@ -276,7 +198,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // POST: Student/Deactivate/5
+        // Deactivate student
         [HttpPost]
         [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> Deactivate(int id)
@@ -299,7 +221,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // POST: Student/Suspend/5
+        // Suspend student
         [HttpPost]
         [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> Suspend(int id)
@@ -322,7 +244,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // POST: Student/Delete/5
+        // Soft delete student
         [HttpPost]
         [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> Delete(int id)
@@ -345,7 +267,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // POST: Student/Restore/5
+        // Restore student
         [HttpPost]
         [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> Restore(int id)
@@ -368,7 +290,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // POST: Student/HardDelete/5
+        // Hard delete student (permanent)
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> HardDelete(int id)
@@ -390,5 +312,7 @@ namespace Moshrefy.Web.Controllers
                 return Json(new { success = false, message = $"Error: {ex.Message}" });
             }
         }
+
+        #endregion
     }
 }

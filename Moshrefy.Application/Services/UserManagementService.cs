@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Moshrefy.Application.DTOs.User;
+using Moshrefy.Application.DTOs.Common;
 using Moshrefy.Application.Interfaces.IServices;
 using Moshrefy.Domain.Enums;
 using Moshrefy.Domain.Exceptions;
@@ -16,6 +17,9 @@ namespace Moshrefy.Application.Services
         IMapper _mapper,
         ITenantContext _tenantContext) : IUserManagementService
     {
+        #region User Management
+
+        // Create user
         public async Task<UserResponseDTO> CreateUserAsync(CreateUserDTO createUserDTO)
         {
             if (createUserDTO == null)
@@ -304,6 +308,11 @@ namespace Moshrefy.Application.Services
             await _userManager.UpdateAsync(user);
         }
 
+        #endregion
+
+        #region Role Management
+
+        // Update user role
         public async Task UpdateUserRoleAsync(string userId, string newRole)
         {
             if (string.IsNullOrEmpty(userId))
@@ -359,6 +368,11 @@ namespace Moshrefy.Application.Services
             await _userManager.UpdateAsync(user);
         }
 
+        #endregion
+
+        #region DataTables
+
+        // Get total count
         public async Task<int> GetTotalCountAsync()
         {
             var centerId = _tenantContext.GetCurrentCenterId();
@@ -369,6 +383,112 @@ namespace Moshrefy.Application.Services
                 .Where(u => u.CenterId == centerId && !u.IsDeleted)
                 .CountAsync();
         }
+
+        // Get users for DataTables
+        public async Task<DataTableResponse<UserResponseDTO>> GetUsersDataTableAsync(DataTableRequest request)
+        {
+            var currentCenterId = _tenantContext.GetCurrentCenterId();
+            if (currentCenterId == null)
+                throw new BadRequestException("Admin must be assigned to a center.");
+
+            var query = _userManager.Users.Where(u => u.CenterId == currentCenterId);
+
+            // 1. Initial Filtering (Active/Deleted)
+            if (request.FilterDeleted == "deleted")
+            {
+                query = query.Where(u => u.IsDeleted);
+            }
+            else
+            {
+                query = query.Where(u => !u.IsDeleted);
+            }
+
+            // Role filtering
+            if (!string.IsNullOrEmpty(request.FilterRole) && request.FilterRole != "all")
+            {
+                var roleUsers = await _userManager.GetUsersInRoleAsync(request.FilterRole);
+                var roleUserIds = roleUsers.Select(u => u.Id).ToList();
+                query = query.Where(u => roleUserIds.Contains(u.Id));
+            }
+
+            // Active/Inactive Filter
+            if (!string.IsNullOrEmpty(request.FilterStatus) && request.FilterStatus != "all")
+            {
+                bool isActive = request.FilterStatus == "active";
+                query = query.Where(u => u.IsActive == isActive);
+            }
+
+            // Count total and filtered (Total is based on context before search but after high-level filters?)
+            // Usually TotalRecords = All records in the system (or filtered by deleted status).
+            // FilteredRecords = Records after search and specific filters.
+            
+            var totalQuery = _userManager.Users.Where(u => u.CenterId == currentCenterId);
+            if (request.FilterDeleted == "deleted") totalQuery = totalQuery.Where(u => u.IsDeleted);
+            else totalQuery = totalQuery.Where(u => !u.IsDeleted);
+            
+            var recordsTotal = await totalQuery.CountAsync();
+
+            // 3. Search
+            if (!string.IsNullOrEmpty(request.SearchValue))
+            {
+                var search = request.SearchValue.ToLower();
+                query = query.Where(u =>
+                    u.UserName.ToLower().Contains(search) ||
+                    u.Email.ToLower().Contains(search) ||
+                    u.PhoneNumber.Contains(search) ||
+                    u.Id.Contains(search) ||
+                    (u.CreatedByName != null && u.CreatedByName.ToLower().Contains(search))
+                );
+            }
+
+            var recordsFiltered = await query.CountAsync();
+
+            // 4. Sorting
+            if (!string.IsNullOrEmpty(request.SortColumnName) && !string.IsNullOrEmpty(request.SortDirection))
+            {
+                bool isAsc = request.SortDirection.ToLower() == "asc";
+                switch (request.SortColumnName.ToLower())
+                {
+                    case "username": query = isAsc ? query.OrderBy(u => u.UserName) : query.OrderByDescending(u => u.UserName); break;
+                    case "email": query = isAsc ? query.OrderBy(u => u.Email) : query.OrderByDescending(u => u.Email); break;
+                    case "phonenumber": query = isAsc ? query.OrderBy(u => u.PhoneNumber) : query.OrderByDescending(u => u.PhoneNumber); break;
+                    case "isactive": query = isAsc ? query.OrderBy(u => u.IsActive) : query.OrderByDescending(u => u.IsActive); break;
+                    case "createdbyname": query = isAsc ? query.OrderBy(u => u.CreatedByName) : query.OrderByDescending(u => u.CreatedByName); break;
+                    case "createdat": query = isAsc ? query.OrderBy(u => u.CreatedAt) : query.OrderByDescending(u => u.CreatedAt); break;
+                    default: query = query.OrderBy(u => u.UserName); break;
+                }
+            }
+            else
+            {
+                query = query.OrderByDescending(u => u.CreatedAt); // Default sort
+            }
+
+            // 5. Pagination
+            var data = await query
+                .Skip(request.Skip)
+                .Take(request.PageSize)
+                .ToListAsync();
+
+            var mappedData = _mapper.Map<List<UserResponseDTO>>(data);
+
+            // Populate Roles
+            foreach (var userDto in mappedData)
+            {
+                var user = data.First(u => u.Id == userDto.Id);
+                var roles = await _userManager.GetRolesAsync(user);
+                userDto.RoleName = roles.FirstOrDefault();
+            }
+
+            return new DataTableResponse<UserResponseDTO>
+            {
+                Draw = request.Draw,
+                RecordsTotal = recordsTotal,
+                RecordsFiltered = recordsFiltered,
+                Data = mappedData
+            };
+        }
+
+        #endregion
     }
 }
 

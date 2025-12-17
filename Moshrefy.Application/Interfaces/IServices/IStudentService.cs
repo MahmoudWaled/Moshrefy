@@ -23,5 +23,6 @@ namespace Moshrefy.Application.Interfaces.IServices
         Task DeactivateAsync(int id);
         Task SuspendAsync(int id);
         Task<int> GetTotalCountAsync();
+        Task<Moshrefy.Application.DTOs.Common.DataTableResponse<StudentResponseDTO>> GetStudentsDataTableAsync(Moshrefy.Application.DTOs.Common.DataTableRequest request);
     }
 }

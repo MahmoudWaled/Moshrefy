@@ -15,5 +15,6 @@ namespace Moshrefy.Application.DTOs.Teacher
         public bool IsActive { get; set; }
 
         public bool IsDeleted { get; set; }
+        public int CourseCount { get; set; }
     }
 }

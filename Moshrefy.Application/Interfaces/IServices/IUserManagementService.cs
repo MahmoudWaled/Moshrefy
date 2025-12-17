@@ -1,4 +1,5 @@
 ﻿using Moshrefy.Application.DTOs.User;
+using Moshrefy.Application.DTOs.Common;
 using Moshrefy.Domain.Paramter;
 
 namespace Moshrefy.Application.Interfaces.IServices
@@ -19,6 +20,7 @@ namespace Moshrefy.Application.Interfaces.IServices
         Task DeactivateUserAsync(string userId);
         Task SoftDeleteUserAsync(string userId);
         Task<int> GetTotalCountAsync();
+        Task<DataTableResponse<UserResponseDTO>> GetUsersDataTableAsync(DataTableRequest request);
     }
 
 }

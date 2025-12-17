@@ -18,6 +18,8 @@ namespace Moshrefy.Application.Interfaces.IServices
         Task RestoreAsync(int id);
         Task ActivateAsync(int id);
         Task DeactivateAsync(int id);
+
         Task<int> GetTotalCountAsync();
+        Task<Moshrefy.Application.DTOs.Common.DataTableResponse<CourseResponseDTO>> GetCoursesDataTableAsync(Moshrefy.Application.DTOs.Common.DataTableRequest request);
     }
 }

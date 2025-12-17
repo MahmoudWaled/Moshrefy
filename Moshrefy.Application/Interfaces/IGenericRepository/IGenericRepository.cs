@@ -16,6 +16,7 @@ namespace Moshrefy.Application.Interfaces.IGenericRepository
         void HardDeleteAsync(TEntity entity);
         Task<int> SaveChangesAsync();
         Task<int> CountAsync(Expression<Func<TEntity, bool>> predicate);
+        IQueryable<TEntity> GetQueryable();
     }
 }
 

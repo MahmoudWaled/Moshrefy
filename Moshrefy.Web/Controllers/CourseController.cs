@@ -6,12 +6,16 @@ using Moshrefy.Application.DTOs.Course;
 using Moshrefy.Application.Interfaces.IServices;
 using Moshrefy.Domain.Paramter;
 using Moshrefy.Web.Models.Course;
+using Moshrefy.Web.Extensions;
+using Moshrefy.Application.DTOs.Common;
 
 namespace Moshrefy.Web.Controllers
 {
     [Authorize(Policy = "Course.View")]
     public class CourseController : Controller
     {
+        #region Dependencies
+
         private readonly ICourseService _courseService;
         private readonly IAcademicYearService _academicYearService;
         private readonly ITeacherCourseService _teacherCourseService;
@@ -32,99 +36,26 @@ namespace Moshrefy.Web.Controllers
             _logger = logger;
         }
 
-        // GET: Course/Index
+        #endregion
+
+        #region Course Management
+
+        // List all courses
         [HttpGet]
         public IActionResult Index()
         {
             return View();
         }
 
-        // POST: Course/GetCoursesData (AJAX for DataTables)
+        // DataTables - Get courses data
         [HttpPost]
         public async Task<IActionResult> GetCoursesData()
         {
             try
             {
-                var draw = Request.Form["draw"].FirstOrDefault();
-                var start = Request.Form["start"].FirstOrDefault();
-                var length = Request.Form["length"].FirstOrDefault();
-                var searchValue = Request.Form["search[value]"].FirstOrDefault();
-
-                int pageSize = length != null ? Convert.ToInt32(length) : 25;
-                int skip = start != null ? Convert.ToInt32(start) : 0;
-                int pageNumber = (skip / pageSize) + 1;
-
-                var filterStatus = Request.Form["filterStatus"].FirstOrDefault();
-                var filterAcademicYear = Request.Form["filterAcademicYear"].FirstOrDefault();
-
-                // Get total count from database efficiently
-                int totalRecords = 0;
-                try
-                {
-                    totalRecords = await _courseService.GetTotalCountAsync();
-                }
-                catch (Exception)
-                {
-                    // No data, total is 0
-                }
-
-                // Fetch current page (service filters by CenterId at database level)
-                var paginationParams = new PaginationParamter
-                {
-                    PageNumber = pageNumber,
-                    PageSize = pageSize
-                };
-
-                List<CourseResponseDTO> coursesDTO;
-
-                try
-                {
-                    coursesDTO = await _courseService.GetAllAsync(paginationParams);
-                }
-                catch (Exception)
-                {
-                    // No data found, return empty list
-                    coursesDTO = new List<CourseResponseDTO>();
-                }
-
-                var coursesVM = _mapper.Map<List<CourseVM>>(coursesDTO);
-
-                // Apply UI filters (status, academicYear, search) on the current page
-                // Note: These are applied client-side on the page data
-                if (!string.IsNullOrEmpty(filterStatus))
-                {
-                    if (filterStatus == "active")
-                    {
-                        coursesVM = coursesVM.Where(c => c.IsActive).ToList();
-                    }
-                    else if (filterStatus == "inactive")
-                    {
-                        coursesVM = coursesVM.Where(c => !c.IsActive).ToList();
-                    }
-                }
-
-                if (!string.IsNullOrEmpty(filterAcademicYear) && int.TryParse(filterAcademicYear, out int academicYearId) && academicYearId > 0)
-                {
-                    coursesVM = coursesVM.Where(c => c.AcademicYearId == academicYearId).ToList();
-                }
-
-                if (!string.IsNullOrEmpty(searchValue))
-                {
-                    coursesVM = coursesVM.Where(c =>
-                        c.Name.Contains(searchValue, StringComparison.OrdinalIgnoreCase) ||
-                        (c.AcademicYearName != null && c.AcademicYearName.Contains(searchValue, StringComparison.OrdinalIgnoreCase))
-                    ).ToList();
-                }
-
-                var jsonData = new
-                {
-                    draw = draw,
-                    recordsTotal = totalRecords,
-                    recordsFiltered = totalRecords,
-                    data = coursesVM
-                };
-
-                return Ok(jsonData);
+                var request = Request.GetDataTableRequest();
+                var response = await _courseService.GetCoursesDataTableAsync(request);
+                return Ok(response);
             }
             catch (Exception ex)
             {
@@ -133,10 +64,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-
-
-
-        // GET: Course/Details/5
+        // View course details
         [HttpGet]
         public async Task<IActionResult> Details(int id)
         {
@@ -159,7 +87,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // GET: Course/Create
+        // Create course - GET
         [HttpGet]
         [Authorize(Policy = "Course.Add")]
         public async Task<IActionResult> Create()
@@ -181,7 +109,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // POST: Course/Create
+        // Create course - POST
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Policy = "Course.Add")]
@@ -209,7 +137,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // GET: Course/Edit/5
+        // Edit course - GET
         [HttpGet]
         [Authorize(Policy = "Course.Update")]
         public async Task<IActionResult> Edit(int id)
@@ -242,7 +170,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // POST: Course/Edit/5
+        // Edit course - POST
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Policy = "Course.Update")]
@@ -277,7 +205,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // POST: Course/Delete/5
+        // Delete course
         [HttpPost]
         [Authorize(Policy = "Course.Delete")]
         public async Task<IActionResult> Delete(int id)
@@ -300,7 +228,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // POST: Course/Activate/5
+        // Activate course
         [HttpPost]
         [Authorize(Policy = "Course.Update")]
         public async Task<IActionResult> Activate(int id)
@@ -323,7 +251,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // POST: Course/Deactivate/5
+        // Deactivate course
         [HttpPost]
         [Authorize(Policy = "Course.Update")]
         public async Task<IActionResult> Deactivate(int id)
@@ -346,28 +274,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // Helper method to get academic years for dropdown
-        private async Task<List<SelectListItem>> GetAcademicYearsForDropdown()
-        {
-            try
-            {
-                var academicYears = await _academicYearService.GetAllAcademicYearsAsync(new PaginationParamter { PageNumber = 1, PageSize = 100 });
-                return academicYears
-                    .Where(ay => ay.IsActive)
-                    .Select(ay => new SelectListItem
-                    {
-                        Value = ay.Id.ToString(),
-                        Text = ay.Name
-                    })
-                    .ToList();
-            }
-            catch
-            {
-                return new List<SelectListItem>();
-            }
-        }
-
-        // GET: Course/GetAssignedTeachers/5 (AJAX)
+        // Get assigned teachers (AJAX)
         [HttpGet]
         public async Task<IActionResult> GetAssignedTeachers(int id)
         {
@@ -391,5 +298,32 @@ namespace Moshrefy.Web.Controllers
                 return Json(new List<object>());
             }
         }
+
+        #endregion
+
+        #region Helper Methods
+
+        // Get academic years for dropdown
+        private async Task<List<SelectListItem>> GetAcademicYearsForDropdown()
+        {
+            try
+            {
+                var academicYears = await _academicYearService.GetAllAcademicYearsAsync(new PaginationParamter { PageNumber = 1, PageSize = 100 });
+                return academicYears
+                    .Where(ay => ay.IsActive)
+                    .Select(ay => new SelectListItem
+                    {
+                        Value = ay.Id.ToString(),
+                        Text = ay.Name
+                    })
+                    .ToList();
+            }
+            catch
+            {
+                return new List<SelectListItem>();
+            }
+        }
+
+        #endregion
     }
 }

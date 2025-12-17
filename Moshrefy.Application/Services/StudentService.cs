@@ -8,6 +8,7 @@ using Moshrefy.Domain.Enums;
 using Moshrefy.Domain.Exceptions;
 using Moshrefy.Domain.Identity;
 using Moshrefy.Domain.Paramter;
+using Microsoft.EntityFrameworkCore;
 
 namespace Moshrefy.Application.Services
 {
@@ -240,6 +241,79 @@ namespace Moshrefy.Application.Services
         {
             var centerId = GetCurrentCenterIdOrThrow();
             return await unitOfWork.Students.CountAsync(s => s.CenterId == centerId && !s.IsDeleted);
+        }
+
+        public async Task<Moshrefy.Application.DTOs.Common.DataTableResponse<StudentResponseDTO>> GetStudentsDataTableAsync(Moshrefy.Application.DTOs.Common.DataTableRequest request)
+        {
+            var centerId = GetCurrentCenterIdOrThrow();
+
+            // 1. Initial Query
+            var query = unitOfWork.Students.GetQueryable()
+                .Where(s => s.CenterId == centerId && !s.IsDeleted);
+
+            // 2. Count Total
+            var totalRecords = await unitOfWork.Students.CountAsync(s => s.CenterId == centerId && !s.IsDeleted);
+
+            // 3. Apply Filters
+            if (!string.IsNullOrEmpty(request.SearchValue))
+            {
+                var search = request.SearchValue.ToLower();
+                query = query.Where(s =>
+                    s.Name.ToLower().Contains(search) ||
+                    s.FirstPhone.ToLower().Contains(search) ||
+                    (s.NationalId != null && s.NationalId.ToLower().Contains(search))
+                );
+            }
+
+            // Status Filter
+            if (!string.IsNullOrEmpty(request.FilterStatus) && request.FilterStatus != "all")
+            {
+                if (Enum.TryParse<StudentStatus>(request.FilterStatus, true, out var status))
+                {
+                    query = query.Where(s => s.StudentStatus == status);
+                }
+            }
+
+            // Count Filtered
+            var filteredRecords = await query.CountAsync();
+
+            // 4. Sorting
+            if (!string.IsNullOrEmpty(request.SortColumnName) && !string.IsNullOrEmpty(request.SortDirection))
+            {
+                bool isAsc = request.SortDirection.ToLower() == "asc";
+                query = request.SortColumnName.ToLower() switch
+                {
+                    "name" => isAsc ? query.OrderBy(s => s.Name) : query.OrderByDescending(s => s.Name),
+                    "firstphone" => isAsc ? query.OrderBy(s => s.FirstPhone) : query.OrderByDescending(s => s.FirstPhone),
+                    // Age: Asc Age = Desc DOB
+                    "age" => isAsc ? query.OrderByDescending(s => s.DateOfBirth) : query.OrderBy(s => s.DateOfBirth),
+                    // Status
+                    "studentstatus" => isAsc ? query.OrderBy(s => s.StudentStatus) : query.OrderByDescending(s => s.StudentStatus),
+                    _ => query.OrderBy(s => s.Name)
+                };
+            }
+            else
+            {
+                query = query.OrderByDescending(s => s.CreatedAt);
+            }
+
+            // 5. Pagination
+            if (request.Length > 0)
+            {
+                query = query.Skip(request.Start).Take(request.Length);
+            }
+
+            // 6. Execute
+            var students = await query.ToListAsync();
+            var data = mapper.Map<List<StudentResponseDTO>>(students);
+
+            return new Moshrefy.Application.DTOs.Common.DataTableResponse<StudentResponseDTO>
+            {
+                Draw = request.Draw,
+                RecordsTotal = totalRecords,
+                RecordsFiltered = filteredRecords,
+                Data = data
+            };
         }
     }
 }

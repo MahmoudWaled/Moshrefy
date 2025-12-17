@@ -1,5 +1,6 @@
 ﻿using Moshrefy.Application.DTOs.Center;
 using Moshrefy.Application.DTOs.User;
+using Moshrefy.Application.DTOs.Common;
 using Moshrefy.Domain.Paramter;
 using Moshrefy.Application.DTOs.Statistics;
 
@@ -29,6 +30,10 @@ namespace Moshrefy.Application.Interfaces.IServices
 
         // -------- User Management (All Centers) --------
         Task<UserResponseDTO> CreateAdminForCenterAsync(CreateUserDTO createUserDTO);
+        
+        // DataTables
+        Task<DataTableResponse<CenterResponseDTO>> GetCentersDataTableAsync(DataTableRequest request);
+        Task<DataTableResponse<UserResponseDTO>> GetUsersDataTableAsync(DataTableRequest request);
         Task<UserResponseDTO> CreateCenterAdminAsync(int centerId, CreateUserDTO createUserDTO);
         Task<UserResponseDTO> CreateUserForCenterAsync(int centerId, CreateUserDTO createUserDTO);
         Task<List<UserResponseDTO>> GetAllUsersAsync(PaginationParamter paginationParamter);

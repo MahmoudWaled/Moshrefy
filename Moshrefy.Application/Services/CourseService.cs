@@ -7,6 +7,7 @@ using Moshrefy.Domain.Entities;
 using Moshrefy.Domain.Exceptions;
 using Moshrefy.Domain.Identity;
 using Moshrefy.Domain.Paramter;
+using Microsoft.EntityFrameworkCore;
 
 namespace Moshrefy.Application.Services
 {
@@ -231,6 +232,79 @@ namespace Moshrefy.Application.Services
         {
             var centerId = GetCurrentCenterIdOrThrow();
             return await _unitOfWork.Courses.CountAsync(c => c.CenterId == centerId && !c.IsDeleted);
+        }
+
+        public async Task<Moshrefy.Application.DTOs.Common.DataTableResponse<CourseResponseDTO>> GetCoursesDataTableAsync(Moshrefy.Application.DTOs.Common.DataTableRequest request)
+        {
+            var centerId = GetCurrentCenterIdOrThrow();
+
+            // 1. Initial Query
+            var query = _unitOfWork.Courses.GetQueryable()
+                .Where(c => c.CenterId == centerId && !c.IsDeleted);
+
+            // 2. Total Records (before filtering)
+            var totalRecords = await _unitOfWork.Courses.CountAsync(c => c.CenterId == centerId && !c.IsDeleted);
+
+            // 3. Apply Filters
+            if (!string.IsNullOrEmpty(request.SearchValue))
+            {
+                var search = request.SearchValue.ToLower();
+                query = query.Where(c =>
+                    c.Name.ToLower().Contains(search) ||
+                    (c.AcademicYear.Name != null && c.AcademicYear.Name.ToLower().Contains(search))
+                );
+            }
+
+            // Status Filter
+            if (!string.IsNullOrEmpty(request.FilterStatus) && request.FilterStatus != "all")
+            {
+                bool isActive = request.FilterStatus == "active";
+                query = query.Where(c => c.IsActive == isActive);
+            }
+
+            // Academic Year Filter
+            if (request.AcademicYearId.HasValue && request.AcademicYearId.Value > 0)
+            {
+                query = query.Where(c => c.AcademicYearId == request.AcademicYearId.Value);
+            }
+
+            // Count Filtered
+            var filteredRecords = await query.CountAsync();
+
+            // 4. Sorting
+            if (!string.IsNullOrEmpty(request.SortColumnName) && !string.IsNullOrEmpty(request.SortDirection))
+            {
+                bool isAsc = request.SortDirection.ToLower() == "asc";
+                query = request.SortColumnName.ToLower() switch
+                {
+                    "name" => isAsc ? query.OrderBy(c => c.Name) : query.OrderByDescending(c => c.Name),
+                    "academicyearname" => isAsc ? query.OrderBy(c => c.AcademicYear.Name) : query.OrderByDescending(c => c.AcademicYear.Name),
+                    "isactive" => isAsc ? query.OrderBy(c => c.IsActive) : query.OrderByDescending(c => c.IsActive),
+                    _ => query.OrderByDescending(c => c.CreatedAt)
+                };
+            }
+            else
+            {
+                query = query.OrderByDescending(c => c.CreatedAt);
+            }
+
+            // 5. Pagination
+            if (request.Length > 0)
+            {
+                query = query.Skip(request.Start).Take(request.Length);
+            }
+
+            // 6. Execute & Map
+            var courses = await query.Include(c => c.AcademicYear).ToListAsync();
+            var data = _mapper.Map<List<CourseResponseDTO>>(courses);
+
+            return new Moshrefy.Application.DTOs.Common.DataTableResponse<CourseResponseDTO>
+            {
+                Draw = request.Draw,
+                RecordsTotal = totalRecords,
+                RecordsFiltered = filteredRecords,
+                Data = data
+            };
         }
     }
 }

@@ -16,5 +16,6 @@ namespace Moshrefy.Application.DTOs.Center
         public string CreatedByName { get; set; } = default!;
         public DateTimeOffset? ModifiedAt { get; set; }
         public string? ModifiedByName { get; set; }
+        public string? AdminName { get; set; }
     }
 }

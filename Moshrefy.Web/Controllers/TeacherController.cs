@@ -6,12 +6,16 @@ using Moshrefy.Application.DTOs.TeacherCourse;
 using Moshrefy.Application.Interfaces.IServices;
 using Moshrefy.Domain.Paramter;
 using Moshrefy.Web.Models.Teacher;
+using Moshrefy.Web.Extensions;
+using Moshrefy.Application.DTOs.Common;
 
 namespace Moshrefy.Web.Controllers
 {
     [Authorize(Roles = "Admin,Manager,Employee")]
     public class TeacherController : Controller
     {
+        #region Dependencies
+
         private readonly ITeacherService _teacherService;
         private readonly ITeacherCourseService _teacherCourseService;
         private readonly ICourseService _courseService;
@@ -32,113 +36,26 @@ namespace Moshrefy.Web.Controllers
             _logger = logger;
         }
 
-        // GET: Teacher/Index
+        #endregion
+
+        #region Teacher Management
+
+        // List all teachers
         [HttpGet]
         public IActionResult Index()
         {
             return View();
         }
 
-        // POST: Teacher/GetTeachersData (AJAX for DataTables)
+        // DataTables - Get teachers data
         [HttpPost]
         public async Task<IActionResult> GetTeachersData()
         {
             try
             {
-                var draw = Request.Form["draw"].FirstOrDefault();
-                var start = Request.Form["start"].FirstOrDefault();
-                var length = Request.Form["length"].FirstOrDefault();
-                var searchValue = Request.Form["search[value]"].FirstOrDefault();
-
-                int pageSize = length != null ? Convert.ToInt32(length) : 25;
-                int skip = start != null ? Convert.ToInt32(start) : 0;
-                int pageNumber = (skip / pageSize) + 1;
-
-                var filterStatus = Request.Form["filterStatus"].FirstOrDefault();
-
-                // Get total count from database efficiently
-                int totalRecords = 0;
-                try
-                {
-                    totalRecords = await _teacherService.GetTotalCountAsync();
-                }
-                catch (Exception)
-                {
-                    // No data, total is 0
-                }
-
-                // Fetch current page (service filters by CenterId at database level)
-                var paginationParams = new PaginationParamter
-                {
-                    PageNumber = pageNumber,
-                    PageSize = pageSize
-                };
-
-                List<TeacherResponseDTO> teachersDTO;
-
-                try
-                {
-                    teachersDTO = await _teacherService.GetAllAsync(paginationParams);
-                }
-                catch (Exception)
-                {
-                    teachersDTO = new List<TeacherResponseDTO>();
-                }
-
-                var teachersVM = _mapper.Map<List<TeacherVM>>(teachersDTO);
-
-                // Populate course counts for each teacher
-                foreach (var teacher in teachersVM)
-                {
-                    var teacherCourses = await _teacherCourseService.GetByTeacherIdAsync(teacher.Id);
-                    teacher.CourseCount = teacherCourses.Count(tc => !tc.IsDeleted && !tc.CourseIsDeleted);
-                }
-
-                // Apply UI filters on the current page
-                if (!string.IsNullOrEmpty(filterStatus) && filterStatus != "all")
-                {
-                    var isActive = filterStatus == "Active";
-                    teachersVM = teachersVM.Where(t => t.IsActive == isActive).ToList();
-                }
-
-                if (!string.IsNullOrEmpty(searchValue))
-                {
-                    teachersVM = teachersVM.Where(t =>
-                        t.Name.Contains(searchValue, StringComparison.OrdinalIgnoreCase) ||
-                        t.Phone.Contains(searchValue, StringComparison.OrdinalIgnoreCase) ||
-                        t.Specialization.Contains(searchValue, StringComparison.OrdinalIgnoreCase) ||
-                        (t.Email != null && t.Email.Contains(searchValue, StringComparison.OrdinalIgnoreCase))
-                    ).ToList();
-                }
-
-                // Apply sorting
-                var sortColumn = Request.Form["order[0][column]"].FirstOrDefault();
-                var sortDirection = Request.Form["order[0][dir]"].FirstOrDefault();
-
-                if (!string.IsNullOrEmpty(sortColumn))
-                {
-                    int colIndex = int.Parse(sortColumn);
-                    bool isAsc = sortDirection == "asc";
-
-                    teachersVM = colIndex switch
-                    {
-                        1 => isAsc ? teachersVM.OrderBy(t => t.Name).ToList() : teachersVM.OrderByDescending(t => t.Name).ToList(),
-                        2 => isAsc ? teachersVM.OrderBy(t => t.Phone).ToList() : teachersVM.OrderByDescending(t => t.Phone).ToList(),
-                        3 => isAsc ? teachersVM.OrderBy(t => t.Specialization).ToList() : teachersVM.OrderByDescending(t => t.Specialization).ToList(),
-                        4 => isAsc ? teachersVM.OrderBy(t => t.IsActive).ToList() : teachersVM.OrderByDescending(t => t.IsActive).ToList(),
-                        _ => teachersVM.OrderBy(t => t.Name).ToList()
-                    };
-                }
-
-                var jsonData = new
-                {
-                    draw = draw,
-                    recordsTotal = totalRecords,
-                    recordsFiltered = totalRecords,
-                    data = teachersVM
-                };
-
-                return Ok(jsonData);
+                var request = Request.GetDataTableRequest();
+                var response = await _teacherService.GetTeachersDataTableAsync(request);
+                return Ok(response);
             }
             catch (Exception ex)
             {
@@ -147,8 +64,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-
-        // GET: Teacher/Details/5
+        // View teacher details
         [HttpGet]
         public async Task<IActionResult> Details(int id)
         {
@@ -171,7 +87,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // GET: Teacher/Create
+        // Create teacher - GET
         [HttpGet]
         [Authorize(Roles = "Admin,Manager")]
         public IActionResult Create()
@@ -179,7 +95,7 @@ namespace Moshrefy.Web.Controllers
             return View(new CreateTeacherVM());
         }
 
-        // POST: Teacher/Create
+        // Create teacher - POST
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin,Manager")]
@@ -205,7 +121,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // GET: Teacher/Edit/5
+        // Edit teacher - GET
         [HttpGet]
         [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> Edit(int id)
@@ -232,7 +148,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // POST: Teacher/Edit/5
+        // Edit teacher - POST
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin,Manager")]
@@ -265,7 +181,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // POST: Teacher/Activate/5
+        // Activate teacher
         [HttpPost]
         [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> Activate(int id)
@@ -288,7 +204,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // POST: Teacher/Deactivate/5
+        // Deactivate teacher
         [HttpPost]
         [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> Deactivate(int id)
@@ -311,7 +227,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // POST: Teacher/Delete/5
+        // Soft delete teacher
         [HttpPost]
         [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> Delete(int id)
@@ -334,7 +250,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // POST: Teacher/Restore/5
+        // Restore teacher
         [HttpPost]
         [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> Restore(int id)
@@ -353,11 +269,11 @@ namespace Moshrefy.Web.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error restoring teacher {id}");
-                return Json(new { success = false, message = $"Error: {ex.Message}" });
+                return Json(new { success = false,message = $"Error: {ex.Message}" });
             }
         }
 
-        // POST: Teacher/HardDelete/5
+        // Hard delete teacher (permanent)
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> HardDelete(int id)
@@ -380,9 +296,11 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // ============= COURSE ASSIGNMENT ACTIONS =============
+        #endregion
 
-        // GET: Teacher/ManageCourses/5
+        #region Course Assignment
+
+        // Manage courses page
         [HttpGet]
         [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> ManageCourses(int id)
@@ -406,7 +324,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // GET: Teacher/GetAssignedCourses/5 (AJAX)
+        // Get assigned courses (AJAX)
         [HttpGet]
         public async Task<IActionResult> GetAssignedCourses(int id)
         {
@@ -414,7 +332,7 @@ namespace Moshrefy.Web.Controllers
             {
                 var teacherCourses = await _teacherCourseService.GetByTeacherIdAsync(id);
                 var assignedCourses = teacherCourses
-                    .Where(tc => !tc.IsDeleted && !tc.CourseIsDeleted) // Filter out deleted assignments AND deleted courses
+                    .Where(tc => !tc.IsDeleted && !tc.CourseIsDeleted)
                     .Select(tc => new
                     {
                         teacherCourseId = tc.Id,
@@ -433,23 +351,19 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // GET: Teacher/GetAvailableCourses/5 (AJAX)
+        // Get available courses (AJAX)
         [HttpGet]
         public async Task<IActionResult> GetAvailableCourses(int id)
         {
             try
             {
-                // Get all active courses
                 var allCourses = await _courseService.GetActiveAsync(new PaginationParamter { PageSize = 1000 });
-                
-                // Get already assigned courses
                 var assignedCourses = await _teacherCourseService.GetByTeacherIdAsync(id);
                 var assignedCourseIds = assignedCourses
                     .Where(tc => !tc.IsDeleted)
                     .Select(tc => tc.CourseId)
                     .ToHashSet();
 
-                // Filter out already assigned
                 var availableCourses = allCourses
                     .Where(c => !assignedCourseIds.Contains(c.Id))
                     .Select(c => new
@@ -469,7 +383,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // POST: Teacher/AssignCourse
+        // Assign course to teacher
         [HttpPost]
         [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> AssignCourse(int teacherId, int courseId)
@@ -497,7 +411,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // POST: Teacher/UnassignCourse
+        // Unassign course from teacher
         [HttpPost]
         [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> UnassignCourse(int teacherCourseId)
@@ -520,7 +434,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // POST: Teacher/AssignMultipleCourses
+        // Assign multiple courses to teacher
         [HttpPost]
         [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> AssignMultipleCourses(int teacherId, int[] courseIds)
@@ -559,5 +473,7 @@ namespace Moshrefy.Web.Controllers
                 return Json(new { success = false, message = $"Error: {ex.Message}" });
             }
         }
+
+        #endregion
     }
 }

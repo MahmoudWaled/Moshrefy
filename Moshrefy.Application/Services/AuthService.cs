@@ -23,16 +23,48 @@ namespace Moshrefy.Application.Services
         IEmailService emailService,
         ILogger<AuthService> logger) : IAuthService
     {
+        #region Fields
+
         private readonly ILogger<AuthService> _logger = logger;
 
+        #endregion
 
+        #region Password Management
+
+        // Request password reset
+        public async Task RequestResetPasswordAsync(RequestResetPasswordDTO requestResetPasswordDTO)
+        {
+            var user = await userManager.FindByEmailAsync(requestResetPasswordDTO.Email);
+            if (user == null)
+            {
+                // Don't reveal that the user doesn't exist for security
+                return;
+            }
+
+            var token = await userManager.GeneratePasswordResetTokenAsync(user);
+            var encodedToken = HttpUtility.UrlEncode(token);
+            
+            var baseUrl = configuration["AppSettings:FrontendUrl"] ?? "https://localhost:5001";
+            var resetLink = $"{baseUrl}/Auth/ResetPassword?userId={user.Id}&token={encodedToken}";
+
+            try
+            {
+                await emailService.SendPasswordResetEmailAsync(user.Email!, user.UserName!, resetLink);
+                _logger.LogInformation("Password reset email sent successfully to {Email}", user.Email);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to send password reset email to {Email}", user.Email);
+            }
+        }
+
+        // Reset password
         public async Task<AuthResponseDTO> ResetPasswordAsync(ResetPasswordDTO resetPasswordDTO)
         {
             var user = await userManager.FindByIdAsync(resetPasswordDTO.UserId);
             if (user == null)
                 throw new NoDataFoundException("User not found.");
 
-            // Decode the token in case it comes URL encoded
             var decodedToken = HttpUtility.UrlDecode(resetPasswordDTO.Token);
             
             _logger.LogInformation("Attempting password reset for user {UserId}", resetPasswordDTO.UserId);
@@ -48,7 +80,7 @@ namespace Moshrefy.Application.Services
 
             _logger.LogInformation("Password reset successful for user {UserId}", resetPasswordDTO.UserId);
 
-            // After password reset, automatically sign in the user
+            // Automatically sign in the user after successful password reset
             await signInManager.SignInAsync(user, isPersistent: false);
 
             return new AuthResponseDTO
@@ -60,34 +92,7 @@ namespace Moshrefy.Application.Services
             };
         }
 
-        public async Task RequestResetPasswordAsync(RequestResetPasswordDTO requestResetPasswordDTO)
-        {
-            var user = await userManager.FindByEmailAsync(requestResetPasswordDTO.Email);
-            if (user == null)
-            {
-                // Don't reveal that the user doesn't exist for security
-                return;
-            }
-
-            var token = await userManager.GeneratePasswordResetTokenAsync(user);
-            var encodedToken = HttpUtility.UrlEncode(token);
-            
-            // Build reset link - adjust the base URL according to your frontend
-            var baseUrl = configuration["AppSettings:FrontendUrl"] ?? "https://localhost:5001";
-            var resetLink = $"{baseUrl}/Auth/ResetPassword?userId={user.Id}&token={encodedToken}";
-
-            try
-            {
-                await emailService.SendPasswordResetEmailAsync(user.Email!, user.UserName!, resetLink);
-                _logger.LogInformation("Password reset email sent successfully to {Email}", user.Email);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to send password reset email to {Email}", user.Email);
-                // Log the error but don't throw to prevent revealing if email exists
-            }
-        }
-
+        // Change password
         public async Task ChangePasswordAsync(ChangePasswordDTO changePasswordDTO, string userId)
         {
             var user = await userManager.FindByIdAsync(userId);
@@ -103,6 +108,11 @@ namespace Moshrefy.Application.Services
             }
         }
 
+        #endregion
+
+        #region Email Confirmation
+
+        // Confirm email
         public async Task<bool> ConfirmEmailAsync(string userId, string token)
         {
             var user = await userManager.FindByIdAsync(userId);
@@ -112,7 +122,6 @@ namespace Moshrefy.Application.Services
                 return false;
             }
 
-            // Decode the token in case it comes URL encoded
             var decodedToken = HttpUtility.UrlDecode(token);
             
             _logger.LogInformation("Attempting email confirmation for user {UserId}", userId);
@@ -132,6 +141,7 @@ namespace Moshrefy.Application.Services
             return result.Succeeded;
         }
 
+        // Resend confirmation email
         public async Task<bool> ResendConfirmationEmailAsync(string email)
         {
             var user = await userManager.FindByEmailAsync(email);
@@ -144,7 +154,6 @@ namespace Moshrefy.Application.Services
             var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
             var encodedToken = HttpUtility.UrlEncode(token);
             
-            // Build confirmation link - adjust the base URL according to your frontend
             var baseUrl = configuration["AppSettings:FrontendUrl"] ?? "https://localhost:5001";
             var confirmationLink = $"{baseUrl}/Auth/ConfirmEmail?userId={user.Id}&token={encodedToken}";
 
@@ -153,17 +162,11 @@ namespace Moshrefy.Application.Services
             return true;
         }
 
-        public async Task LogoutAsync()
-        {
-            await signInManager.SignOutAsync();
-        }
+        #endregion
 
-        public Task RevokeRefreshTokenAsync(string refreshToken, string userId)
-        {
-            throw new NotImplementedException("JWT refresh tokens are disabled. Cookie authentication is used.");
-        }
+        #region Cookie Authentication
 
-        // Cookie-based authentication methods (for MVC)
+        // Cookie login
         public async Task CookieLoginAsync(string userName, string password)
         {
             var user = await userManager.FindByNameAsync(userName);
@@ -173,7 +176,6 @@ namespace Moshrefy.Application.Services
             if (!user.IsActive || user.IsDeleted)
                 throw new UnauthorizedAccessException("User account is inactive or deleted.");
 
-            // Verify password first
             var passwordCheck = await userManager.CheckPasswordAsync(user, password);
             if (!passwordCheck)
             {
@@ -189,19 +191,28 @@ namespace Moshrefy.Application.Services
                 additionalClaims.Add(new Claim("CenterId", user.CenterId.Value.ToString()));
             }
 
-            // Sign in with custom claims
             await signInManager.SignInWithClaimsAsync(
                 user, 
                 isPersistent: false,
                 additionalClaims);
 
-            _logger.LogInformation("User {UserName} logged in successfully with CenterId: {CenterId}", 
+            _logger.LogInformation($"User {user.UserName} logged in successfully with CenterId: {user.CenterId}", 
                 userName, user.CenterId?.ToString() ?? "None");
         }
 
+        // Cookie logout
         public async Task CookieLogoutAsync()
         {
             await signInManager.SignOutAsync();
         }
+
+        // Standard logout
+        public async Task LogoutAsync()
+        {
+            await signInManager.SignOutAsync();
+        }
+
+        #endregion
+
     }
 }

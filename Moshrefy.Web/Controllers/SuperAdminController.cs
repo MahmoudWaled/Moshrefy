@@ -8,6 +8,8 @@ using Moshrefy.Domain.Enums;
 using Moshrefy.Domain.Paramter;
 using Moshrefy.Web.Models.Center;
 using Moshrefy.Web.Models.Statistics;
+using Moshrefy.Web.Extensions;
+using Moshrefy.Application.DTOs.Common;
 using System;
 
 namespace Moshrefy.Web.Controllers
@@ -15,6 +17,8 @@ namespace Moshrefy.Web.Controllers
     [Authorize(Roles = nameof(RolesNames.SuperAdmin))]
     public class SuperAdminController : Controller
     {
+        #region Dependencies
+
         private readonly ISuperAdminService _superAdminService;
         private readonly IMapper _mapper;
         private readonly ILogger<SuperAdminController> _logger;
@@ -25,6 +29,10 @@ namespace Moshrefy.Web.Controllers
             _mapper = mapper;
             _logger = logger;
         }
+
+        #endregion
+
+        #region Dashboard
 
         [HttpGet]
         public async Task<IActionResult> Index()
@@ -42,120 +50,34 @@ namespace Moshrefy.Web.Controllers
             return View(statsVM);
         }
 
+        #endregion
+
         #region Center Management
 
+        // List all centers
         [HttpGet]
         public IActionResult Centers()
         {
-            // Return empty view - data will be loaded via AJAX
             return View();
         }
 
-        // AJAX endpoint for DataTables server-side processing
+        // DataTables - Get centers data
         [HttpPost]
         public async Task<IActionResult> GetCentersData()
         {
             try
             {
-                // Parse DataTables parameters
-                var draw = Request.Form["draw"].FirstOrDefault();
-                var start = Request.Form["start"].FirstOrDefault();
-                var length = Request.Form["length"].FirstOrDefault();
-                var searchValue = Request.Form["search[value]"].FirstOrDefault();
-                var sortColumnIndex = Request.Form["order[0][column]"].FirstOrDefault();
-                var sortColumnName = Request.Form[$"columns[{sortColumnIndex}][name]"].FirstOrDefault();
-                var sortDirection = Request.Form["order[0][dir]"].FirstOrDefault();
-
-                // Parse pagination
-                int pageSize = length != null ? Convert.ToInt32(length) : 25;
-                int skip = start != null ? Convert.ToInt32(start) : 0;
-                int pageNumber = (skip / pageSize) + 1;
-
-                // Get custom filter parameters
-                var filterDeleted = Request.Form["filterDeleted"].FirstOrDefault();
-                var activeFilter = Request.Form["activeFilter"].FirstOrDefault();
-
-                var paginationParams = new PaginationParamter
+                var request = Request.GetDataTableRequest();
+                var response = await _superAdminService.GetCentersDataTableAsync(request);
+                var centersVM = _mapper.Map<List<CenterVM>>(response.Data);
+                
+                return Ok(new
                 {
-                    PageNumber = pageNumber,
-                    PageSize = pageSize
-                };
-
-                // Get data based on filter
-                List<CenterResponseDTO> centersDTO;
-                int totalRecords;
-                int filteredRecords;
-
-                if (filterDeleted == "deleted")
-                {
-                    // Show only deleted
-                    centersDTO = await _superAdminService.GetDeletedCentersAsync(paginationParams);
-                    totalRecords = await _superAdminService.GetDeletedCentersCountAsync();
-                    filteredRecords = totalRecords;
-                }
-                else if (filterDeleted == "active")
-                {
-                    // Hide deleted
-                    centersDTO = await _superAdminService.GetNonDeletedCentersAsync(paginationParams);
-                    totalRecords = await _superAdminService.GetNonDeletedCentersCountAsync();
-                    filteredRecords = totalRecords;
-                }
-                else
-                {
-                    // Show all
-                    centersDTO = await _superAdminService.GetAllCentersAsync(paginationParams);
-                    totalRecords = await _superAdminService.GetTotalCentersCountAsync();
-                    filteredRecords = totalRecords;
-                }
-
-                // Apply active/inactive filter if specified
-                if (!string.IsNullOrEmpty(activeFilter) && activeFilter != "all")
-                {
-                    if (activeFilter == "active")
-                    {
-                        centersDTO = centersDTO.Where(c => c.IsActive).ToList();
-                    }
-                    else if (activeFilter == "inactive")
-                    {
-                        centersDTO = centersDTO.Where(c => !c.IsActive).ToList();
-                    }
-                    filteredRecords = centersDTO.Count;
-                }
-
-                var centersVM = _mapper.Map<List<CenterVM>>(centersDTO);
-
-                // Apply search filter if provided
-                if (!string.IsNullOrEmpty(searchValue))
-                {
-                    centersVM = centersVM.Where(c =>
-                        c.Name.Contains(searchValue, StringComparison.OrdinalIgnoreCase) ||
-                        (c.Email != null && c.Email.Contains(searchValue, StringComparison.OrdinalIgnoreCase)) ||
-                        c.Phone.Contains(searchValue, StringComparison.OrdinalIgnoreCase) ||
-                        c.Address.Contains(searchValue, StringComparison.OrdinalIgnoreCase) ||
-                        c.Id.ToString().Contains(searchValue)
-                    ).ToList();
-
-                    filteredRecords = centersVM.Count;
-                }
-
-                // Apply sorting
-                if (!string.IsNullOrEmpty(sortColumnName) && !string.IsNullOrEmpty(sortDirection))
-                {
-                    centersVM = sortDirection.ToLower() == "asc" 
-                        ? SortCentersAscending(centersVM, sortColumnName)
-                        : SortCentersDescending(centersVM, sortColumnName);
-                }
-
-                // Return JSON response for DataTables
-                var jsonData = new
-                {
-                    draw = draw,
-                    recordsTotal = totalRecords,
-                    recordsFiltered = filteredRecords,
+                    draw = response.Draw,
+                    recordsTotal = response.RecordsTotal,
+                    recordsFiltered = response.RecordsFiltered,
                     data = centersVM
-                };
-
-                return Ok(jsonData);
+                });
             }
             catch (Exception ex)
             {
@@ -164,128 +86,37 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // Advanced Center Search page
+        // Advanced search page
         [HttpGet]
         public IActionResult AdvancedSearchCenters()
         {
             return View("SearchCenters");
         }
 
-        // AJAX endpoint for Advanced Center Search
+        // DataTables - Advanced center search
         [HttpPost]
         public async Task<IActionResult> SearchCentersData(string? centerName, string? email, string? createdByName, string? adminName)
         {
             try
             {
-                // Parse DataTables parameters
-                var draw = Request.Form["draw"].FirstOrDefault();
-                var start = Request.Form["start"].FirstOrDefault();
-                var length = Request.Form["length"].FirstOrDefault();
-                var searchValue = Request.Form["search[value]"].FirstOrDefault();
-                var sortColumnIndex = Request.Form["order[0][column]"].FirstOrDefault();
-                var sortColumnName = Request.Form[$"columns[{sortColumnIndex}][name]"].FirstOrDefault();
-                var sortDirection = Request.Form["order[0][dir]"].FirstOrDefault();
+                var request = Request.GetDataTableRequest();
+                
+                // Override with method parameters if provided
+                if (!string.IsNullOrEmpty(centerName)) request.CenterName = centerName;
+                if (!string.IsNullOrEmpty(email)) request.Email = email;
+                if (!string.IsNullOrEmpty(createdByName)) request.CreatedByName = createdByName;
+                if (!string.IsNullOrEmpty(adminName)) request.AdminName = adminName;
 
-                int pageSize = length != null ? Convert.ToInt32(length) : 25;
-                int skip = start != null ? Convert.ToInt32(start) : 0;
+                var response = await _superAdminService.GetCentersDataTableAsync(request);
+                var centersVM = _mapper.Map<List<CenterVM>>(response.Data);
 
-                // Get ALL non-deleted centers (no pagination during fetch)
-                var paginationParams = new PaginationParamter
+                return Ok(new
                 {
-                    PageNumber = null,
-                    PageSize = null
-                };
-
-                var centersDTO = await _superAdminService.GetNonDeletedCentersAsync(paginationParams);
-                var centersVM = _mapper.Map<List<CenterVM>>(centersDTO);
-
-                // Get admin names for each center
-                foreach (var center in centersVM)
-                {
-                    try
-                    {
-                        var adminUser = await _superAdminService.GetCenterAdminAsync(center.Id);
-                        center.AdminName = adminUser?.Name;
-                    }
-                    catch
-                    {
-                        center.AdminName = null;
-                    }
-                }
-
-                // Apply advanced filters
-                if (!string.IsNullOrWhiteSpace(centerName))
-                {
-                    centersVM = centersVM.Where(c =>
-                        c.Name.Contains(centerName, StringComparison.OrdinalIgnoreCase)
-                    ).ToList();
-                }
-
-                if (!string.IsNullOrWhiteSpace(email))
-                {
-                    centersVM = centersVM.Where(c =>
-                        c.Email != null && c.Email.Contains(email, StringComparison.OrdinalIgnoreCase)
-                    ).ToList();
-                }
-
-                if (!string.IsNullOrWhiteSpace(createdByName))
-                {
-                    centersVM = centersVM.Where(c =>
-                        c.CreatedByName != null && c.CreatedByName.Contains(createdByName, StringComparison.OrdinalIgnoreCase)
-                    ).ToList();
-                }
-
-                if (!string.IsNullOrWhiteSpace(adminName))
-                {
-                    centersVM = centersVM.Where(c =>
-                        c.AdminName != null && c.AdminName.Contains(adminName, StringComparison.OrdinalIgnoreCase)
-                    ).ToList();
-                }
-
-                // Apply DataTables quick search filter
-                if (!string.IsNullOrEmpty(searchValue))
-                {
-                    centersVM = centersVM.Where(c =>
-                        c.Name.Contains(searchValue, StringComparison.OrdinalIgnoreCase) ||
-                        (c.Email != null && c.Email.Contains(searchValue, StringComparison.OrdinalIgnoreCase)) ||
-                        c.Phone.Contains(searchValue, StringComparison.OrdinalIgnoreCase) ||
-                        c.Address.Contains(searchValue, StringComparison.OrdinalIgnoreCase) ||
-                        (c.CreatedByName != null && c.CreatedByName.Contains(searchValue, StringComparison.OrdinalIgnoreCase)) ||
-                        (c.AdminName != null && c.AdminName.Contains(adminName, StringComparison.OrdinalIgnoreCase))
-                    ).ToList();
-                }
-
-                int totalRecords = centersVM.Count;
-                int filteredRecords = centersVM.Count;
-
-                // Apply sorting
-                if (!string.IsNullOrEmpty(sortColumnName) && !string.IsNullOrEmpty(sortDirection))
-                {
-                    var isAsc = sortDirection.ToLower() == "asc";
-                    centersVM = sortColumnName switch
-                    {
-                        "Name" => isAsc ? centersVM.OrderBy(c => c.Name).ToList() : centersVM.OrderByDescending(c => c.Name).ToList(),
-                        "Email" => isAsc ? centersVM.OrderBy(c => c.Email).ToList() : centersVM.OrderByDescending(c => c.Email).ToList(),
-                        "Phone" => isAsc ? centersVM.OrderBy(c => c.Phone).ToList() : centersVM.OrderByDescending(c => c.Phone).ToList(),
-                        "Address" => isAsc ? centersVM.OrderBy(c => c.Address).ToList() : centersVM.OrderByDescending(c => c.Address).ToList(),
-                        "CreatedByName" => isAsc ? centersVM.OrderBy(c => c.CreatedByName).ToList() : centersVM.OrderByDescending(c => c.CreatedByName).ToList(),
-                        "AdminName" => isAsc ? centersVM.OrderBy(c => c.AdminName).ToList() : centersVM.OrderByDescending(c => c.AdminName).ToList(),
-                        _ => centersVM.OrderBy(c => c.Name).ToList()
-                    };
-                }
-
-                // Apply pagination to results (for DataTables display)
-                var paginatedResults = centersVM.Skip(skip).Take(pageSize).ToList();
-
-                var jsonData = new
-                {
-                    draw = draw,
-                    recordsTotal = totalRecords,
-                    recordsFiltered = filteredRecords,
-                    data = paginatedResults
-                };
-
-                return Ok(jsonData);
+                    draw = response.Draw,
+                    recordsTotal = response.RecordsTotal,
+                    recordsFiltered = response.RecordsFiltered,
+                    data = centersVM
+                });
             }
             catch (Exception ex)
             {
@@ -294,7 +125,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-
+        // View center details
         [HttpGet]
         public async Task<IActionResult> CenterDetails(int centerId)
         {
@@ -308,14 +139,14 @@ namespace Moshrefy.Web.Controllers
             return View(centerVM);
         }
 
-
-        // Create Center
+        // Create center - GET
         [HttpGet]
         public IActionResult CreateCenter()
         {
             return View();
         }
 
+        // Create center - POST
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateCenter(CreateCenterVM createCenterVM)
@@ -339,8 +170,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-
-        // Edit Center
+        // Edit center - GET
         [HttpGet]
         public async Task<IActionResult> EditCenter(int id)
         {
@@ -374,6 +204,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
+        // Edit center - POST
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditCenter(int id, UpdateCenterVM updateCenterVM)
@@ -402,57 +233,56 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
+        // Activate center
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ActivateCenter(int id)
+        {
+            if (id <= 0)
+            {
+                return Json(new { success = false, message = "Invalid center ID" });
+            }
 
-        // Activate Center
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> ActivateCenter(int id)
-    {
-        if (id <= 0)
-        {
-            return Json(new { success = false, message = "Invalid center ID" });
-        }
-
-        try
-        {
-            await _superAdminService.ActivateCenterAsync(id);
-            _logger.LogInformation($"Center with ID {id} activated by SuperAdmin.", id);
-            return Json(new { success = true, message = "Center activated successfully!" });
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Error activating center with ID {id}.", id);
-            return Json(new { success = false, message = $"Error activating center: {ex.Message}" });
-        }
-    }
-
-    // Deactivate Center
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> DeactivateCenter(int id)
-    {
-        if (id <= 0)
-        {
-            return Json(new { success = false, message = "Invalid center ID" });
+            try
+            {
+                await _superAdminService.ActivateCenterAsync(id);
+                _logger.LogInformation($"Center with ID {id} activated by SuperAdmin.", id);
+                return Json(new { success = true, message = "Center activated successfully!" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error activating center with ID {id}.", id);
+                return Json(new { success = false, message = $"Error activating center: {ex.Message}" });
+            }
         }
 
-        try
+        // Deactivate center
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeactivateCenter(int id)
         {
-            await _superAdminService.DeactivateCenterAsync(id);
-            _logger.LogInformation($"Center with ID {id} deactivated by SuperAdmin.", id);
-            return Json(new { success = true, message = "Center deactivated successfully!" });
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Error deactivating center with ID {id}.", id);
-            return Json(new { success = false, message = $"Error deactivating center: {ex.Message}" });
-        }
-    }
+            if (id <= 0)
+            {
+                return Json(new { success = false, message = "Invalid center ID" });
+            }
 
-    // Delete Center (Soft Delete)
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> SoftDeleteCenter(int id)
+            try
+            {
+                await _superAdminService.DeactivateCenterAsync(id);
+                _logger.LogInformation($"Center with ID {id} deactivated by SuperAdmin.", id);
+                return Json(new { success = true, message = "Center deactivated successfully!" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error deactivating center with ID {id}.", id);
+                return Json(new { success = false, message = $"Error deactivating center: {ex.Message}" });
+            }
+        }
+
+        // Soft delete center
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SoftDeleteCenter(int id)
         {
             if (id <= 0)
             {
@@ -468,7 +298,7 @@ namespace Moshrefy.Web.Controllers
                 await _superAdminService.SoftDeleteCenterAsync(id);
                 _logger.LogInformation($"Center with ID {id} soft deleted by SuperAdmin.", id);
                 
-                // Check if it's an AJAX request
+                // Check if AJAX request
                 if (Request.Headers["X-Requested-With"] == "XMLHttpRequest" || Request.ContentType?.Contains("application/json") == true || Request.Headers["Accept"].ToString().Contains("application/json"))
                 {
                     return Json(new { success = true, message = "Center moved to trash! You can restore it later." });
@@ -491,7 +321,7 @@ namespace Moshrefy.Web.Controllers
             return RedirectToAction(nameof(Centers));
         }
 
-        // Hard Delete Center (Permanent)
+        // Hard delete center (permanent)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> HardDeleteCenter(int id)
@@ -510,7 +340,7 @@ namespace Moshrefy.Web.Controllers
                 await _superAdminService.DeleteCenterAsync(id);
                 _logger.LogWarning($"Center with ID {id} permanently deleted by SuperAdmin.", id);
                 
-                // Check if it's an AJAX request
+                // Check if AJAX request
                 if (Request.Headers["X-Requested-With"] == "XMLHttpRequest" || Request.ContentType?.Contains("application/json") == true || Request.Headers["Accept"].ToString().Contains("application/json"))
                 {
                     return Json(new { success = true, message = "Center permanently deleted!" });
@@ -533,7 +363,7 @@ namespace Moshrefy.Web.Controllers
             return RedirectToAction(nameof(Centers));
         }
 
-        // Restore Center
+        // Restore center
         [HttpPost]
         public async Task<IActionResult> RestoreCenter(int id)
         {
@@ -555,39 +385,6 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // Helper methods for sorting
-        private List<CenterVM> SortCentersAscending(List<CenterVM> centers, string columnName)
-        {
-            return columnName?.ToLower() switch
-            {
-                "id" => centers.OrderBy(c => c.Id).ToList(),
-                "name" => centers.OrderBy(c => c.Name).ToList(),
-                "email" => centers.OrderBy(c => c.Email).ToList(),
-                "phone" => centers.OrderBy(c => c.Phone).ToList(),
-                "address" => centers.OrderBy(c => c.Address).ToList(),
-                "isactive" => centers.OrderBy(c => c.IsActive).ToList(),
-                "isdeleted" => centers.OrderBy(c => c.IsDeleted).ToList(),
-                "createdat" => centers.OrderBy(c => c.CreatedAt).ToList(),
-                _ => centers
-            };
-        }
-
-        private List<CenterVM> SortCentersDescending(List<CenterVM> centers, string columnName)
-        {
-            return columnName?.ToLower() switch
-            {
-                "id" => centers.OrderByDescending(c => c.Id).ToList(),
-                "name" => centers.OrderByDescending(c => c.Name).ToList(),
-                "email" => centers.OrderByDescending(c => c.Email).ToList(),
-                "phone" => centers.OrderByDescending(c => c.Phone).ToList(),
-                "address" => centers.OrderByDescending(c => c.Address).ToList(),
-                "isactive" => centers.OrderByDescending(c => c.IsActive).ToList(),
-                "isdeleted" => centers.OrderByDescending(c => c.IsDeleted).ToList(),
-                "createdat" => centers.OrderByDescending(c => c.CreatedAt).ToList(),
-                _ => centers
-            };
-        }
-
         #endregion
 
         #region User Management
@@ -599,123 +396,23 @@ namespace Moshrefy.Web.Controllers
             return View();
         }
 
-        // AJAX endpoint for DataTables server-side processing
+        // DataTables - Get users data
         [HttpPost]
         public async Task<IActionResult> GetUsersData()
         {
             try
             {
-                // Parse DataTables parameters
-                var draw = Request.Form["draw"].FirstOrDefault();
-                var start = Request.Form["start"].FirstOrDefault();
-                var length = Request.Form["length"].FirstOrDefault();
-                var searchValue = Request.Form["search[value]"].FirstOrDefault();
-                var sortColumnIndex = Request.Form["order[0][column]"].FirstOrDefault();
-                var sortColumnName = Request.Form[$"columns[{sortColumnIndex}][name]"].FirstOrDefault();
-                var sortDirection = Request.Form["order[0][dir]"].FirstOrDefault();
+                var request = Request.GetDataTableRequest();
+                var response = await _superAdminService.GetUsersDataTableAsync(request);
+                var usersVM = _mapper.Map<List<Models.User.UserVM>>(response.Data);
 
-                // Parse pagination
-                int pageSize = length != null ? Convert.ToInt32(length) : 25;
-                int skip = start != null ? Convert.ToInt32(start) : 0;
-                int pageNumber = (skip / pageSize) + 1;
-
-                // Get custom filter parameters
-                var filterDeleted = Request.Form["filterDeleted"].FirstOrDefault();
-                var filterRole = Request.Form["filterRole"].FirstOrDefault();
-
-                var paginationParams = new PaginationParamter
+                return Ok(new
                 {
-                    PageNumber = pageNumber,
-                    PageSize = pageSize
-                };
-
-                // Get data based on filters
-                List<Application.DTOs.User.UserResponseDTO> usersDTO;
-                int totalRecords;
-                int filteredRecords;
-
-                // Determine the appropriate count based on filters
-                if (!string.IsNullOrEmpty(filterRole) && filterRole != "all")
-                {
-                    usersDTO = await _superAdminService.GetUsersByRoleAsync(filterRole, paginationParams);
-                    // For role filtering, get count of users in that role (we don't have a dedicated count method, so we get approx from result)
-                    totalRecords = await _superAdminService.GetTotalUsersCountAsync();
-                }
-                else if (filterDeleted == "deleted")
-                {
-                    // Show only deleted
-                    usersDTO = await _superAdminService.GetDeletedUsersAsync(paginationParams);
-                    totalRecords = await _superAdminService.GetDeletedUsersCountAsync();
-                }
-                else
-                {
-                    // Default to non-deleted users
-                    usersDTO = await _superAdminService.GetAllUsersAsync(paginationParams);
-                    usersDTO = usersDTO.Where(u => !u.IsDeleted).ToList();
-                    totalRecords = await _superAdminService.GetTotalUsersCountAsync() - await _superAdminService.GetDeletedUsersCountAsync();
-                }
-
-                filteredRecords = totalRecords;
-
-                // Apply active/inactive status filter (for non-deleted items)
-                if (filterDeleted != "deleted")
-                {
-                    // Get custom filter from request (need to extract it first)
-                    var activeFilter = Request.Form["activeFilter"].FirstOrDefault();
-
-                    if (!string.IsNullOrEmpty(activeFilter) && activeFilter != "all")
-                    {
-                        if (activeFilter == "active")
-                        {
-                            usersDTO = usersDTO.Where(u => u.IsActive).ToList();
-                            totalRecords = await _superAdminService.GetActiveUsersCountAsync();
-                            filteredRecords = totalRecords;
-                        }
-                        else if (activeFilter == "inactive")
-                        {
-                            usersDTO = usersDTO.Where(u => !u.IsActive).ToList();
-                            totalRecords = await _superAdminService.GetInactiveUsersCountAsync();
-                            filteredRecords = totalRecords;
-                        }
-                    }
-                }
-
-                var usersVM = _mapper.Map<List<Models.User.UserVM>>(usersDTO);
-
-                // Apply search filter if provided
-                if (!string.IsNullOrEmpty(searchValue))
-                {
-                    usersVM = usersVM.Where(u =>
-                        u.Name.Contains(searchValue, StringComparison.OrdinalIgnoreCase) ||
-                        u.UserName.Contains(searchValue, StringComparison.OrdinalIgnoreCase) ||
-                        (u.Email != null && u.Email.Contains(searchValue, StringComparison.OrdinalIgnoreCase)) ||
-                        (u.PhoneNumber != null && u.PhoneNumber.Contains(searchValue, StringComparison.OrdinalIgnoreCase)) ||
-                        (u.CenterName != null && u.CenterName.Contains(searchValue, StringComparison.OrdinalIgnoreCase)) ||
-                        (u.RoleName != null && u.RoleName.Contains(searchValue, StringComparison.OrdinalIgnoreCase)) ||
-                        u.Id.Contains(searchValue)
-                    ).ToList();
-
-                    filteredRecords = usersVM.Count;
-                }
-
-                // Apply sorting
-                if (!string.IsNullOrEmpty(sortColumnName) && !string.IsNullOrEmpty(sortDirection))
-                {
-                    usersVM = sortDirection.ToLower() == "asc"
-                        ? SortUsersAscending(usersVM, sortColumnName)
-                        : SortUsersDescending(usersVM, sortColumnName);
-                }
-
-                // Return JSON response for DataTables
-                var jsonData = new
-                {
-                    draw = draw,
-                    recordsTotal = totalRecords,
-                    recordsFiltered = filteredRecords,
+                    draw = response.Draw,
+                    recordsTotal = response.RecordsTotal,
+                    recordsFiltered = response.RecordsFiltered,
                     data = usersVM
-                };
-
-                return Ok(jsonData);
+                });
             }
             catch (Exception ex)
             {
@@ -724,7 +421,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // Create Admin for Center
+        // Create center admin - GET
         [HttpGet]
         public async Task<IActionResult> CreateCenterAdmin()
         {
@@ -735,11 +432,12 @@ namespace Moshrefy.Web.Controllers
                     "Value", 
                     "Text"
                 ),
-                RoleName = RolesNames.Admin // Default to Admin role
+                RoleName = RolesNames.Admin
             };
             return View(createUserVM);
         }
 
+        // Create center admin - POST
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateCenterAdmin(Models.User.CreateUserVM createUserVM)
@@ -787,7 +485,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // Create User for Center
+        // Create user for center - GET
         [HttpGet]
         public async Task<IActionResult> CreateUserForCenter(int? centerId = null)
         {
@@ -813,13 +511,14 @@ namespace Moshrefy.Web.Controllers
                 }
                 catch
                 {
-                    // If center not found, continue without pre-selection
+                    // Continue without pre-selection
                 }
             }
 
             return View(createUserVM);
         }
 
+        // Create user for center - POST
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateUserForCenter(Models.User.CreateUserVM createUserVM, string? returnUrl = null)
@@ -852,14 +551,13 @@ namespace Moshrefy.Web.Controllers
                 await _superAdminService.CreateUserForCenterAsync(createUserVM.CenterId.Value, createUserDTO);
                 TempData["SuccessMessage"] = "User created successfully!";
 
-                // If there's a return URL or centerId in query, redirect to CenterUsers
+                // Redirect based on return URL or referrer
                 if (!string.IsNullOrEmpty(returnUrl) && returnUrl.Contains("CenterUsers"))
                 {
                     return Redirect(returnUrl);
                 }
                 else if (createUserVM.CenterId.HasValue)
                 {
-                    // Check if we came from CenterUsers page by checking the referrer
                     var referer = Request.Headers["Referer"].ToString();
                     if (referer.Contains("CenterUsers"))
                     {
@@ -883,7 +581,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // Restore User
+        // Restore user
         [HttpPost]
         public async Task<IActionResult> RestoreUser(string id)
         {
@@ -905,7 +603,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // Activate User
+        // Activate user
         [HttpPost]
         public async Task<IActionResult> ActivateUser(string id)
         {
@@ -927,7 +625,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // Deactivate User
+        // Deactivate user
         [HttpPost]
         public async Task<IActionResult> DeactivateUser(string id)
         {
@@ -949,7 +647,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // Soft Delete User
+        // Soft delete user
         [HttpPost]
         public async Task<IActionResult> SoftDeleteUser(string id)
         {
@@ -971,7 +669,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // Hard Delete User (Permanent)
+        // Hard delete user (permanent)
         [HttpPost]
         public async Task<IActionResult> HardDeleteUser(string id)
         {
@@ -993,7 +691,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // User Details
+        // View user details
         [HttpGet]
         public async Task<IActionResult> UserDetails(string id)
         {
@@ -1016,7 +714,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // Edit User
+        // Edit user - GET
         [HttpGet]
         public async Task<IActionResult> EditUser(string id)
         {
@@ -1045,9 +743,7 @@ namespace Moshrefy.Web.Controllers
                     )
                 };
 
-                // Store the user ID in ViewBag for the form
                 ViewBag.UserId = id;
-
                 return View(updateUserVM);
             }
             catch (Exception ex)
@@ -1058,6 +754,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
+        // Edit user - POST
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditUser(string id, Models.User.UpdateUserVM updateUserVM)
@@ -1101,94 +798,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // API endpoint to get centers for Select2 dropdown
-        [HttpGet]
-        public async Task<IActionResult> SearchCenters(string term)
-        {
-            try
-            {
-                var centers = await _superAdminService.GetNonDeletedCentersAsync(new PaginationParamter
-                {
-                    PageSize = 50,
-                    PageNumber = 1
-                });
-
-                var filteredCenters = centers
-                    .Where(c => string.IsNullOrEmpty(term) || 
-                                c.Name.Contains(term, StringComparison.OrdinalIgnoreCase))
-                    .Select(c => new
-                    {
-                        id = c.Id,
-                        text = $"{c.Name} - {c.Address}"
-                    })
-                    .ToList();
-
-                return Json(new { results = filteredCenters });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error searching centers");
-                return Json(new { results = new List<object>() });
-            }
-        }
-
-        // Helper method to get active centers for dropdown
-        private async Task<List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>> GetActiveCentersForDropdown()
-        {
-            var centers = await _superAdminService.GetNonDeletedCentersAsync(new PaginationParamter
-            {
-                PageSize = 200,
-                PageNumber = 1
-            });
-
-            return centers
-                .Where(c => c.IsActive)
-                .Select(c => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem
-                {
-                    Value = c.Id.ToString(),
-                    Text = $"{c.Name} - {c.Address}"
-                })
-                .ToList();
-        }
-
-        // Helper methods for sorting
-        private List<Models.User.UserVM> SortUsersAscending(List<Models.User.UserVM> users, string columnName)
-        {
-            return columnName?.ToLower() switch
-            {
-                "id" => users.OrderBy(u => u.Id).ToList(),
-                "name" => users.OrderBy(u => u.Name).ToList(),
-                "username" => users.OrderBy(u => u.UserName).ToList(),
-                "email" => users.OrderBy(u => u.Email).ToList(),
-                "phonenumber" => users.OrderBy(u => u.PhoneNumber).ToList(),
-                "centername" => users.OrderBy(u => u.CenterName).ToList(),
-                "rolename" => users.OrderBy(u => u.RoleName).ToList(),
-                "isactive" => users.OrderBy(u => u.IsActive).ToList(),
-                "isdeleted" => users.OrderBy(u => u.IsDeleted).ToList(),
-                "createdat" => users.OrderBy(u => u.CreatedAt).ToList(),
-                _ => users
-            };
-        }
-
-        private List<Models.User.UserVM> SortUsersDescending(List<Models.User.UserVM> users, string columnName)
-        {
-            return columnName?.ToLower() switch
-            {
-                "id" => users.OrderByDescending(u => u.Id).ToList(),
-                "name" => users.OrderByDescending(u => u.Name).ToList(),
-                "username" => users.OrderByDescending(u => u.UserName).ToList(),
-                "email" => users.OrderByDescending(u => u.Email).ToList(),
-                "phonenumber" => users.OrderByDescending(u => u.PhoneNumber).ToList(),
-                "centername" => users.OrderByDescending(u => u.CenterName).ToList(),
-                "rolename" => users.OrderByDescending(u => u.RoleName).ToList(),
-                "isactive" => users.OrderByDescending(u => u.IsActive).ToList(),
-                "isdeleted" => users.OrderByDescending(u => u.IsDeleted).ToList(),
-                "createdat" => users.OrderByDescending(u => u.CreatedAt).ToList(),
-                _ => users
-            };
-        }
-
-        // Search Users - Advanced search page
+        // Search users page
         [HttpGet]
         public IActionResult SearchUsers()
         {
@@ -1239,14 +849,14 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // Show inactive users page
+        // Inactive users page
         [HttpGet]
         public IActionResult InactiveUsers()
         {
             return View();
         }
 
-        // AJAX endpoint for Inactive Users DataTables
+        // DataTables - Get inactive users data
         [HttpPost]
         public async Task<IActionResult> GetInactiveUsersData()
         {
@@ -1261,7 +871,6 @@ namespace Moshrefy.Web.Controllers
                 var sortColumnName = Request.Form[$"columns[{sortColumnIndex}][name]"].FirstOrDefault();
                 var sortDirection = Request.Form["order[0][dir]"].FirstOrDefault();
 
-                // Parse pagination
                 int pageSize = length != null ? Convert.ToInt32(length) : 25;
                 int skip = start != null ? Convert.ToInt32(start) : 0;
                 int pageNumber = (skip / pageSize) + 1;
@@ -1272,16 +881,13 @@ namespace Moshrefy.Web.Controllers
                     PageSize = pageSize
                 };
 
-                // Get total count for pagination
                 int totalRecords = await _superAdminService.GetInactiveUsersCountAsync();
                 int filteredRecords = totalRecords;
 
-                // Get inactive users (paginated)
                 var usersDTO = await _superAdminService.GetInactiveUsersAsync(paginationParams);
-
                 var usersVM = _mapper.Map<List<Models.User.UserVM>>(usersDTO);
 
-                // Apply search filter if provided
+                // Apply search filter
                 if (!string.IsNullOrEmpty(searchValue))
                 {
                     usersVM = usersVM.Where(u =>
@@ -1305,16 +911,13 @@ namespace Moshrefy.Web.Controllers
                         : SortUsersDescending(usersVM, sortColumnName);
                 }
 
-                // Return JSON response for DataTables
-                var jsonData = new
+                return Ok(new
                 {
                     draw = draw,
                     recordsTotal = totalRecords,
                     recordsFiltered = filteredRecords,
                     data = usersVM
-                };
-
-                return Ok(jsonData);
+                });
             }
             catch (Exception ex)
             {
@@ -1323,7 +926,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // Update User Role - GET
+        // Update user role - GET
         [HttpGet]
         public async Task<IActionResult> UpdateUserRole(string id)
         {
@@ -1337,10 +940,8 @@ namespace Moshrefy.Web.Controllers
                 var userDTO = await _superAdminService.GetUserByIdAsync(id);
                 var userVM = _mapper.Map<Models.User.UserVM>(userDTO);
 
-                // Create view model for role update
                 var updateUserRoleVM = new Models.User.UpdateUserRoleVM();
                 
-                // Set current role if available
                 if (!string.IsNullOrEmpty(userVM.RoleName) && Enum.TryParse<RolesNames>(userVM.RoleName, out var currentRole))
                 {
                     updateUserRoleVM.Role = currentRole;
@@ -1360,7 +961,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // Update User Role - POST
+        // Update user role - POST
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateUserRole(string id, Models.User.UpdateUserRoleVM updateUserRoleVM)
@@ -1386,25 +987,19 @@ namespace Moshrefy.Web.Controllers
 
             try
             {
-                // Get user info before update
                 var userBeforeUpdate = await _superAdminService.GetUserByIdAsync(id);
-                
-                // Update the role
                 var updateUserRoleDTO = _mapper.Map<Application.DTOs.User.UpdateUserRoleDTO>(updateUserRoleVM);
                 await _superAdminService.UpdateUserRoleAsync(id, updateUserRoleDTO);
                 
-                // Check if the updated user is currently logged in
                 var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
                 
                 if (id == currentUserId)
                 {
-                    // User updated their own role - they need to be aware their session has been refreshed
-                    TempData["SuccessMessage"] = $"Your role has been updated from {userBeforeUpdate.RoleName} to {updateUserRoleDTO.Role}. The changes are now active. Please navigate to see your new permissions.";
+                    TempData["SuccessMessage"] = $"Your role has been updated from {userBeforeUpdate.RoleName} to {updateUserRoleDTO.Role}. The changes are now active.";
                 }
                 else
                 {
-                    // Updated another user's role
-                    TempData["SuccessMessage"] = $"User role updated successfully from {userBeforeUpdate.RoleName} to {updateUserRoleDTO.Role}! The changes will take effect immediately for the user.";
+                    TempData["SuccessMessage"] = $"User role updated successfully from {userBeforeUpdate.RoleName} to {updateUserRoleDTO.Role}!";
                 }
                 
                 return RedirectToAction(nameof(UserDetails), new { id = id });
@@ -1427,7 +1022,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // Center Users - Show all users for a specific center
+        // Center users page
         [HttpGet]
         public async Task<IActionResult> CenterUsers(int centerId)
         {
@@ -1438,11 +1033,9 @@ namespace Moshrefy.Web.Controllers
 
             try
             {
-                // Get center details
                 var centerDTO = await _superAdminService.GetCenterByIdAsync(centerId);
                 var centerVM = _mapper.Map<CenterVM>(centerDTO);
 
-                // Pass center info to view
                 ViewBag.CenterId = centerId;
                 ViewBag.CenterName = centerVM.Name;
                 ViewBag.CenterAddress = centerVM.Address;
@@ -1457,7 +1050,7 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
-        // AJAX endpoint for Center Users DataTables
+        // DataTables - Get center users data
         [HttpPost]
         public async Task<IActionResult> GetCenterUsersData(int centerId)
         {
@@ -1477,7 +1070,6 @@ namespace Moshrefy.Web.Controllers
                 var sortColumnName = Request.Form[$"columns[{sortColumnIndex}][name]"].FirstOrDefault();
                 var sortDirection = Request.Form["order[0][dir]"].FirstOrDefault();
 
-                // Parse pagination
                 int pageSize = length != null ? Convert.ToInt32(length) : 25;
                 int skip = start != null ? Convert.ToInt32(start) : 0;
                 int pageNumber = (skip / pageSize) + 1;
@@ -1488,16 +1080,13 @@ namespace Moshrefy.Web.Controllers
                     PageSize = pageSize
                 };
 
-                // Get total count for pagination (before pagination is applied)
                 int totalRecords = await _superAdminService.GetUsersByCenterIdCountAsync(centerId);
                 int filteredRecords = totalRecords;
 
-                // Get users for this center (paginated)
                 var usersDTO = await _superAdminService.GetUsersByCenterIdAsync(centerId, paginationParams);
-
                 var usersVM = _mapper.Map<List<Models.User.UserVM>>(usersDTO);
 
-                // Apply search filter if provided
+                // Apply search filter
                 if (!string.IsNullOrEmpty(searchValue))
                 {
                     usersVM = usersVM.Where(u =>
@@ -1520,22 +1109,111 @@ namespace Moshrefy.Web.Controllers
                         : SortUsersDescending(usersVM, sortColumnName);
                 }
 
-                // Return JSON response for DataTables
-                var jsonData = new
+                return Ok(new
                 {
                     draw = draw,
                     recordsTotal = totalRecords,
                     recordsFiltered = filteredRecords,
                     data = usersVM
-                };
-
-                return Ok(jsonData);
+                });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error loading center users data for center ID {centerId}");
                 return StatusCode(500, new { error = "Error loading data. Please try again." });
             }
+        }
+
+        #endregion
+
+        #region Helper Methods
+
+        // Search centers for Select2 dropdown
+        [HttpGet]
+        public async Task<IActionResult> SearchCenters(string term)
+        {
+            try
+            {
+                var centers = await _superAdminService.GetNonDeletedCentersAsync(new PaginationParamter
+                {
+                    PageSize = 50,
+                    PageNumber = 1
+                });
+
+                var filteredCenters = centers
+                    .Where(c => string.IsNullOrEmpty(term) || 
+                                c.Name.Contains(term, StringComparison.OrdinalIgnoreCase))
+                    .Select(c => new
+                    {
+                        id = c.Id,
+                        text = $"{c.Name} - {c.Address}"
+                    })
+                    .ToList();
+
+                return Json(new { results = filteredCenters });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error searching centers");
+                return Json(new { results = new List<object>() });
+            }
+        }
+
+        // Get active centers for dropdown
+        private async Task<List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>> GetActiveCentersForDropdown()
+        {
+            var centers = await _superAdminService.GetNonDeletedCentersAsync(new PaginationParamter
+            {
+                PageSize = 200,
+                PageNumber = 1
+            });
+
+            return centers
+                .Where(c => c.IsActive)
+                .Select(c => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = $"{c.Name} - {c.Address}"
+                })
+                .ToList();
+        }
+
+        // Sort users ascending
+        private List<Models.User.UserVM> SortUsersAscending(List<Models.User.UserVM> users, string columnName)
+        {
+            return columnName?.ToLower() switch
+            {
+                "id" => users.OrderBy(u => u.Id).ToList(),
+                "name" => users.OrderBy(u => u.Name).ToList(),
+                "username" => users.OrderBy(u => u.UserName).ToList(),
+                "email" => users.OrderBy(u => u.Email).ToList(),
+                "phonenumber" => users.OrderBy(u => u.PhoneNumber).ToList(),
+                "centername" => users.OrderBy(u => u.CenterName).ToList(),
+                "rolename" => users.OrderBy(u => u.RoleName).ToList(),
+                "isactive" => users.OrderBy(u => u.IsActive).ToList(),
+                "isdeleted" => users.OrderBy(u => u.IsDeleted).ToList(),
+                "createdat" => users.OrderBy(u => u.CreatedAt).ToList(),
+                _ => users
+            };
+        }
+
+        // Sort users descending
+        private List<Models.User.UserVM> SortUsersDescending(List<Models.User.UserVM> users, string columnName)
+        {
+            return columnName?.ToLower() switch
+            {
+                "id" => users.OrderByDescending(u => u.Id).ToList(),
+                "name" => users.OrderByDescending(u => u.Name).ToList(),
+                "username" => users.OrderByDescending(u => u.UserName).ToList(),
+                "email" => users.OrderByDescending(u => u.Email).ToList(),
+                "phonenumber" => users.OrderByDescending(u => u.PhoneNumber).ToList(),
+                "centername" => users.OrderByDescending(u => u.CenterName).ToList(),
+                "rolename" => users.OrderByDescending(u => u.RoleName).ToList(),
+                "isactive" => users.OrderByDescending(u => u.IsActive).ToList(),
+                "isdeleted" => users.OrderByDescending(u => u.IsDeleted).ToList(),
+                "createdat" => users.OrderByDescending(u => u.CreatedAt).ToList(),
+                _ => users
+            };
         }
 
         #endregion
