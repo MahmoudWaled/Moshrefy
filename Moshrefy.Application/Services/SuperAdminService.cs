@@ -257,6 +257,21 @@ namespace Moshrefy.Application.Services
             await _unitOfWork.SaveChangesAsync();
         }
 
+        public async Task<UserResponseDTO?> GetCenterAdminAsync(int centerId)
+        {
+            if (centerId <= 0)
+                throw new BadRequestException("Invalid center id.");
+
+            // Find the first user with Admin role in this center
+            var adminUsers = await _userManager.GetUsersInRoleAsync(RolesNames.Admin.ToString());
+            var centerAdmin = adminUsers.FirstOrDefault(u => u.CenterId == centerId && !u.IsDeleted);
+
+            if (centerAdmin == null)
+                return null;
+
+            return _mapper.Map<UserResponseDTO>(centerAdmin);
+        }
+
        
 
         #endregion Center Management

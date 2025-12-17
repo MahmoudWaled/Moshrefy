@@ -25,6 +25,7 @@ namespace Moshrefy.Application.Interfaces.IServices
         Task RestoreCenterAsync(int centerId);
         Task ActivateCenterAsync(int centerId);
         Task DeactivateCenterAsync(int centerId);
+        Task<UserResponseDTO?> GetCenterAdminAsync(int centerId);
 
         // -------- User Management (All Centers) --------
         Task<UserResponseDTO> CreateAdminForCenterAsync(CreateUserDTO createUserDTO);

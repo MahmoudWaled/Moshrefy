@@ -164,6 +164,137 @@ namespace Moshrefy.Web.Controllers
             }
         }
 
+        // Advanced Center Search page
+        [HttpGet]
+        public IActionResult AdvancedSearchCenters()
+        {
+            return View("SearchCenters");
+        }
+
+        // AJAX endpoint for Advanced Center Search
+        [HttpPost]
+        public async Task<IActionResult> SearchCentersData(string? centerName, string? email, string? createdByName, string? adminName)
+        {
+            try
+            {
+                // Parse DataTables parameters
+                var draw = Request.Form["draw"].FirstOrDefault();
+                var start = Request.Form["start"].FirstOrDefault();
+                var length = Request.Form["length"].FirstOrDefault();
+                var searchValue = Request.Form["search[value]"].FirstOrDefault();
+                var sortColumnIndex = Request.Form["order[0][column]"].FirstOrDefault();
+                var sortColumnName = Request.Form[$"columns[{sortColumnIndex}][name]"].FirstOrDefault();
+                var sortDirection = Request.Form["order[0][dir]"].FirstOrDefault();
+
+                int pageSize = length != null ? Convert.ToInt32(length) : 25;
+                int skip = start != null ? Convert.ToInt32(start) : 0;
+
+                // Get ALL non-deleted centers (no pagination during fetch)
+                var paginationParams = new PaginationParamter
+                {
+                    PageNumber = null,
+                    PageSize = null
+                };
+
+                var centersDTO = await _superAdminService.GetNonDeletedCentersAsync(paginationParams);
+                var centersVM = _mapper.Map<List<CenterVM>>(centersDTO);
+
+                // Get admin names for each center
+                foreach (var center in centersVM)
+                {
+                    try
+                    {
+                        var adminUser = await _superAdminService.GetCenterAdminAsync(center.Id);
+                        center.AdminName = adminUser?.Name;
+                    }
+                    catch
+                    {
+                        center.AdminName = null;
+                    }
+                }
+
+                // Apply advanced filters
+                if (!string.IsNullOrWhiteSpace(centerName))
+                {
+                    centersVM = centersVM.Where(c =>
+                        c.Name.Contains(centerName, StringComparison.OrdinalIgnoreCase)
+                    ).ToList();
+                }
+
+                if (!string.IsNullOrWhiteSpace(email))
+                {
+                    centersVM = centersVM.Where(c =>
+                        c.Email != null && c.Email.Contains(email, StringComparison.OrdinalIgnoreCase)
+                    ).ToList();
+                }
+
+                if (!string.IsNullOrWhiteSpace(createdByName))
+                {
+                    centersVM = centersVM.Where(c =>
+                        c.CreatedByName != null && c.CreatedByName.Contains(createdByName, StringComparison.OrdinalIgnoreCase)
+                    ).ToList();
+                }
+
+                if (!string.IsNullOrWhiteSpace(adminName))
+                {
+                    centersVM = centersVM.Where(c =>
+                        c.AdminName != null && c.AdminName.Contains(adminName, StringComparison.OrdinalIgnoreCase)
+                    ).ToList();
+                }
+
+                // Apply DataTables quick search filter
+                if (!string.IsNullOrEmpty(searchValue))
+                {
+                    centersVM = centersVM.Where(c =>
+                        c.Name.Contains(searchValue, StringComparison.OrdinalIgnoreCase) ||
+                        (c.Email != null && c.Email.Contains(searchValue, StringComparison.OrdinalIgnoreCase)) ||
+                        c.Phone.Contains(searchValue, StringComparison.OrdinalIgnoreCase) ||
+                        c.Address.Contains(searchValue, StringComparison.OrdinalIgnoreCase) ||
+                        (c.CreatedByName != null && c.CreatedByName.Contains(searchValue, StringComparison.OrdinalIgnoreCase)) ||
+                        (c.AdminName != null && c.AdminName.Contains(adminName, StringComparison.OrdinalIgnoreCase))
+                    ).ToList();
+                }
+
+                int totalRecords = centersVM.Count;
+                int filteredRecords = centersVM.Count;
+
+                // Apply sorting
+                if (!string.IsNullOrEmpty(sortColumnName) && !string.IsNullOrEmpty(sortDirection))
+                {
+                    var isAsc = sortDirection.ToLower() == "asc";
+                    centersVM = sortColumnName switch
+                    {
+                        "Name" => isAsc ? centersVM.OrderBy(c => c.Name).ToList() : centersVM.OrderByDescending(c => c.Name).ToList(),
+                        "Email" => isAsc ? centersVM.OrderBy(c => c.Email).ToList() : centersVM.OrderByDescending(c => c.Email).ToList(),
+                        "Phone" => isAsc ? centersVM.OrderBy(c => c.Phone).ToList() : centersVM.OrderByDescending(c => c.Phone).ToList(),
+                        "Address" => isAsc ? centersVM.OrderBy(c => c.Address).ToList() : centersVM.OrderByDescending(c => c.Address).ToList(),
+                        "CreatedByName" => isAsc ? centersVM.OrderBy(c => c.CreatedByName).ToList() : centersVM.OrderByDescending(c => c.CreatedByName).ToList(),
+                        "AdminName" => isAsc ? centersVM.OrderBy(c => c.AdminName).ToList() : centersVM.OrderByDescending(c => c.AdminName).ToList(),
+                        _ => centersVM.OrderBy(c => c.Name).ToList()
+                    };
+                }
+
+                // Apply pagination to results (for DataTables display)
+                var paginatedResults = centersVM.Skip(skip).Take(pageSize).ToList();
+
+                var jsonData = new
+                {
+                    draw = draw,
+                    recordsTotal = totalRecords,
+                    recordsFiltered = filteredRecords,
+                    data = paginatedResults
+                };
+
+                return Ok(jsonData);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error loading centers search data");
+                return StatusCode(500, new { error = "Error loading data. Please try again." });
+            }
+        }
+
+
         [HttpGet]
         public async Task<IActionResult> CenterDetails(int centerId)
         {

@@ -1,0 +1,363 @@
+@{
+    ViewData["Title"] = "Advanced Center Search";
+}
+
+<!-- Page Header -->
+<div class="page-header-modern">
+    <div class="row g-2 align-items-center">
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb-modern">
+                    <li class="breadcrumb-item">
+                        <a asp-controller="SuperAdmin" asp-action="Index"><i class="ti ti-home"></i> Dashboard</a>
+                        <i class="ti ti-chevron-right breadcrumb-separator ms-2"></i>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a asp-controller="SuperAdmin" asp-action="Centers">Centers</a>
+                        <i class="ti ti-chevron-right breadcrumb-separator ms-2"></i>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Advanced Search</li>
+                </ol>
+            </nav>
+            <h2 class="page-title"><i class="ti ti-search"></i> Advanced Center Search</h2>
+        </div>
+        <div class="col-auto ms-auto d-print-none">
+            <div class="btn-list">
+                <a asp-action="Centers" class="btn d-none d-sm-inline-block">
+                    <i class="ti ti-arrow-left icon"></i> Back to Centers
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@Html.AntiForgeryToken()
+
+<!-- Page body -->
+<div class="page-body">
+    <div class="container-xl">
+        <!-- Search Form Card -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="ti ti-filter me-2"></i>Search Filters</h3>
+                        <div class="ms-auto">
+                            <button type="button" class="btn btn-sm" id="clearFilters">
+                                <i class="ti ti-x icon"></i> Clear All
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <form id="searchForm">
+                            <div class="row g-3">
+                                <div class="col-md-6 col-lg-3">
+                                    <label class="form-label">Center Name</label>
+                                    <div class="input-icon">
+                                        <span class="input-icon-addon">
+                                            <i class="ti ti-building"></i>
+                                        </span>
+                                        <input type="text" class="form-control" id="searchCenterName" 
+                                               placeholder="Search by center name...">
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-lg-3">
+                                    <label class="form-label">Email</label>
+                                    <div class="input-icon">
+                                        <span class="input-icon-addon">
+                                            <i class="ti ti-mail"></i>
+                                        </span>
+                                        <input type="email" class="form-control" id="searchEmail" 
+                                               placeholder="Search by email...">
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-lg-3">
+                                    <label class="form-label">Created By</label>
+                                    <div class="input-icon">
+                                        <span class="input-icon-addon">
+                                            <i class="ti ti-user"></i>
+                                        </span>
+                                        <input type="text" class="form-control" id="searchCreatedBy" 
+                                               placeholder="Search by creator name...">
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-lg-3">
+                                    <label class="form-label">Admin Name</label>
+                                    <div class="input-icon">
+                                        <span class="input-icon-addon">
+                                            <i class="ti ti-user-star"></i>
+                                        </span>
+                                        <input type="text" class="form-control" id="searchAdminName" 
+                                               placeholder="Search by admin name...">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="ti ti-search icon"></i> Search
+                                    </button>
+                                    <span id="searchAlert" class="text-danger ms-3" style="display: none;">
+                                        <i class="ti ti-alert-circle"></i> Please enter at least one search filter.
+                                    </span>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Card -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="ti ti-list me-2"></i>Search Results</h3>
+                        <div class="ms-auto">
+                            <span id="resultCount" class="text-muted">Showing all centers</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-vcenter table-hover" id="searchResultsTable">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Center Name</th>
+                                        <th>Email</th>
+                                        <th>Phone</th>
+                                        <th>Address</th>
+                                        <th>Created By</th>
+                                        <th>Admin</th>
+                                        <th>Status</th>
+                                        <th class="w-1">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Data loaded via AJAX -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var token = $('input[name="__RequestVerificationToken"]').val();
+        var hasSearched = false;
+
+        $(document).ready(function() {
+            var table = $('#searchResultsTable').DataTable({
+                "processing": true,
+                "serverSide": true,
+                "deferLoading": 0, // Don't load data on init
+                "ajax": function(data, callback, settings) {
+                    if (!hasSearched) {
+                        callback({
+                            draw: data.draw,
+                            recordsTotal: 0,
+                            recordsFiltered: 0,
+                            data: []
+                        });
+                        return;
+                    }
+
+                    // Add custom params
+                    data.centerName = $('#searchCenterName').val();
+                    data.email = $('#searchEmail').val();
+                    data.createdByName = $('#searchCreatedBy').val();
+                    data.adminName = $('#searchAdminName').val();
+
+                    $.ajax({
+                        url: "@Url.Action("SearchCentersData", "SuperAdmin")",
+                        type: "POST",
+                        data: data,
+                        success: function(json) {
+                            callback(json);
+                        },
+                        error: function(xhr, error, code) {
+                            console.error('DataTables error:', error, code);
+                            TablerDialog.fire({
+                                icon: 'error',
+                                title: 'Error Loading Data',
+                                text: 'Please refresh the page and try again.',
+                                timer: 3000
+                            });
+                        }
+                    });
+                },
+                "columns": [
+                    {
+                        "data": null,
+                        "orderable": false,
+                        "searchable": false,
+                        "width": "50px",
+                        "className": "text-center",
+                        "render": function(data, type, row, meta) {
+                            return '<span class="text-muted">' + (meta.row + meta.settings._iDisplayStart + 1) + '</span>';
+                        }
+                    },
+                    { 
+                        "data": "name",
+                        "name": "Name",
+                        "render": function(data, type, row) {
+                            return '<div class="d-flex py-1 align-items-center">' +
+                                   '<i class="ti ti-building text-primary me-2"></i>' +
+                                   '<strong>' + data + '</strong>' +
+                                   '</div>';
+                        }
+                    },
+                    { 
+                        "data": "email",
+                        "name": "Email",
+                        "render": function(data) {
+                            if (data) {
+                                return '<i class="ti ti-mail text-info me-1"></i>' + data;
+                            }
+                            return '<span class="text-muted">N/A</span>';
+                        }
+                    },
+                    { 
+                        "data": "phone",
+                        "name": "Phone",
+                        "render": function(data) {
+                            if (data) {
+                                return '<i class="ti ti-phone text-success me-1"></i>' + data;
+                            }
+                            return '<span class="text-muted">N/A</span>';
+                        }
+                    },
+                    { 
+                        "data": "address",
+                        "name": "Address",
+                        "render": function(data) {
+                            if (data) {
+                                return '<small><i class="ti ti-map-pin text-warning me-1"></i>' + data + '</small>';
+                            }
+                            return '<span class="text-muted">N/A</span>';
+                        }
+                    },
+                    { 
+                        "data": "createdByName",
+                        "name": "CreatedByName",
+                        "render": function(data) {
+                            if (data) {
+                                return '<i class="ti ti-user text-secondary me-1"></i>' + data;
+                            }
+                            return '<span class="text-muted">N/A</span>';
+                        }
+                    },
+                    { 
+                        "data": "adminName",
+                        "name": "AdminName",
+                        "render": function(data) {
+                            if (data) {
+                                return '<i class="ti ti-user-star text-primary me-1"></i><strong>' + data + '</strong>';
+                            }
+                            return '<span class="text-muted">No Admin</span>';
+                        }
+                    },
+                    { 
+                        "data": "isActive",
+                        "name": "IsActive",
+                        "render": function(data, type, row) {
+                            if (row.isDeleted) {
+                                return '<span class="badge bg-danger text-white"><i class="ti ti-trash"></i> Deleted</span>';
+                            }
+                            if (data) {
+                                return '<span class="text-muted">Active</span>';
+                            } else {
+                                return '<span class="badge bg-state-inactive text-white"><i class="ti ti-x"></i> Inactive</span>';
+                            }
+                        }
+                    },
+                    {
+                        "data": null,
+                        "orderable": false,
+                        "render": function(data, type, row) {
+                            var actions = '<div class="btn-group btn-group-sm" role="group">';
+                            
+                            // View button
+                            actions += '<a href="@Url.Action("CenterDetails", "SuperAdmin")?centerId=' + row.id + '" class="btn btn-sm btn-action-icon action-view" title="View">' +
+                                      '<i class="ti ti-eye icon"></i>' +
+                                      '</a>';
+                            
+                            // Edit button
+                            actions += '<a href="@Url.Action("EditCenter", "SuperAdmin")?id=' + row.id + '" class="btn btn-sm btn-action-icon action-edit" title="Edit">' +
+                                      '<i class="ti ti-edit icon"></i>' +
+                                      '</a>';
+                            
+                            actions += '</div>';
+                            return actions;
+                        }
+                    }
+                ],
+                "order": [[1, "asc"]],
+                "pageLength": 25,
+                "language": {
+                    "search": "_INPUT_",
+                    "searchPlaceholder": "Quick search...",
+                    "lengthMenu": "_MENU_ entries",
+                    "info": "Showing _START_ to _END_ of _TOTAL_ centers",
+                    "infoEmpty": "No centers found",
+                    "infoFiltered": "(from _MAX_ total)",
+                    "zeroRecords": "No matching centers found",
+                    "paginate": {
+                        "first": "«",
+                        "last": "»",
+                        "next": "›",
+                        "previous": "‹"
+                    },
+                    "processing": '<div class="spinner-border text-primary" role="status"></div><span class="ms-2">Searching...</span>'
+                },
+                "drawCallback": function(settings) {
+                    var api = this.api();
+                    var info = api.page.info();
+                    if (hasSearched) {
+                        $('#resultCount').text('Found ' + info.recordsTotal + ' centers');
+                    } else {
+                        $('#resultCount').text('Enter search criteria and click Search');
+                    }
+                }
+            });
+
+            // Search form submission
+            $('#searchForm').on('submit', function(e) {
+                e.preventDefault();
+                
+                // Check if at least one filter has a value
+                var centerName = $('#searchCenterName').val().trim();
+                var email = $('#searchEmail').val().trim();
+                var createdByName = $('#searchCreatedBy').val().trim();
+                var adminName = $('#searchAdminName').val().trim();
+                
+                if (!centerName && !email && !createdByName && !adminName) {
+                    $('#searchAlert').show();
+                    return;
+                }
+                
+                $('#searchAlert').hide();
+                
+                hasSearched = true;
+                table.ajax.reload();
+            });
+
+            // Clear all filters
+            $('#clearFilters').on('click', function() {
+                $('#searchCenterName').val('');
+                $('#searchEmail').val('');
+                $('#searchCreatedBy').val('');
+                $('#searchAdminName').val('');
+                hasSearched = false;
+                table.clear().draw();
+                $('#resultCount').text('Enter search criteria and click Search');
+            });
+        });
+    </script>
+}
+
