@@ -9,11 +9,17 @@ using Moshrefy.Domain.Paramter;
 
 namespace Moshrefy.Application.Services
 {
-    public class ItemService(IUnitOfWork unitOfWork, IMapper mapper) : IItemService
+    public class ItemService(
+        IUnitOfWork unitOfWork, 
+        IMapper mapper,
+        ITenantContext tenantContext
+    ) : BaseService(tenantContext), IItemService
     {
         public async Task<ItemResponseDTO> CreateAsync(CreateItemDTO createItemDTO)
         {
+            var currentCenterId = GetCurrentCenterIdOrThrow();
             var item = mapper.Map<Item>(createItemDTO);
+            item.CenterId = currentCenterId;
             await unitOfWork.Items.AddAsync(item);
             await unitOfWork.SaveChangesAsync();
             return mapper.Map<ItemResponseDTO>(item);
@@ -25,41 +31,53 @@ namespace Moshrefy.Application.Services
             if (item == null)
                 throw new NotFoundException<int>(nameof(item), "item", id);
 
+            ValidateCenterAccess(item.CenterId, nameof(Item));
             return mapper.Map<ItemResponseDTO>(item);
         }
 
         public async Task<List<ItemResponseDTO>> GetAllAsync(PaginationParamter paginationParamter)
         {
-            var items = await unitOfWork.Items.GetAllAsync(paginationParamter);
-            return mapper.Map<List<ItemResponseDTO>>(items);
+            var currentCenterId = GetCurrentCenterIdOrThrow();
+            var items = await unitOfWork.Items.GetAllAsync(
+                i => i.CenterId == currentCenterId && !i.IsDeleted,
+                paginationParamter);
+            return mapper.Map<List<ItemResponseDTO>>(items.ToList());
         }
 
         public async Task<List<ItemResponseDTO>> GetByNameAsync(string name)
         {
-            var items = await unitOfWork.Items.GetAllAsync(new PaginationParamter());
-            var filtered = items.Where(i => i.Name.Contains(name)).ToList();
-            return mapper.Map<List<ItemResponseDTO>>(filtered);
+            var currentCenterId = GetCurrentCenterIdOrThrow();
+            var items = await unitOfWork.Items.GetAllAsync(
+                i => i.CenterId == currentCenterId && i.Name.Contains(name) && !i.IsDeleted,
+                new PaginationParamter { PageSize = 1000 });
+            return mapper.Map<List<ItemResponseDTO>>(items.ToList());
         }
 
         public async Task<List<ItemResponseDTO>> GetByStatusAsync(ItemStatus status)
         {
-            var items = await unitOfWork.Items.GetAllAsync(new PaginationParamter());
-            var filtered = items.Where(i => i.ItemStatus == status).ToList();
-            return mapper.Map<List<ItemResponseDTO>>(filtered);
+            var currentCenterId = GetCurrentCenterIdOrThrow();
+            var items = await unitOfWork.Items.GetAllAsync(
+                i => i.CenterId == currentCenterId && i.ItemStatus == status && !i.IsDeleted,
+                new PaginationParamter { PageSize = 1000 });
+            return mapper.Map<List<ItemResponseDTO>>(items.ToList());
         }
 
         public async Task<List<ItemResponseDTO>> GetAvailableItemsAsync(PaginationParamter paginationParamter)
         {
-            var items = await unitOfWork.Items.GetAllAsync(paginationParamter);
-            var availableItems = items.Where(i => i.ItemStatus == ItemStatus.Available).ToList();
-            return mapper.Map<List<ItemResponseDTO>>(availableItems);
+            var currentCenterId = GetCurrentCenterIdOrThrow();
+            var items = await unitOfWork.Items.GetAllAsync(
+                i => i.CenterId == currentCenterId && i.ItemStatus == ItemStatus.Available && !i.IsDeleted,
+                paginationParamter);
+            return mapper.Map<List<ItemResponseDTO>>(items.ToList());
         }
 
         public async Task<List<ItemResponseDTO>> GetReservedItemsAsync(PaginationParamter paginationParamter)
         {
-            var items = await unitOfWork.Items.GetAllAsync(paginationParamter);
-            var reservedItems = items.Where(i => i.ReservedByStudentId != null).ToList();
-            return mapper.Map<List<ItemResponseDTO>>(reservedItems);
+            var currentCenterId = GetCurrentCenterIdOrThrow();
+            var items = await unitOfWork.Items.GetAllAsync(
+                i => i.CenterId == currentCenterId && i.ReservedByStudentId != null && !i.IsDeleted,
+                paginationParamter);
+            return mapper.Map<List<ItemResponseDTO>>(items.ToList());
         }
 
         public async Task UpdateAsync(int id, UpdateItemDTO updateItemDTO)
@@ -68,6 +86,7 @@ namespace Moshrefy.Application.Services
             if (item == null)
                 throw new NotFoundException<int>(nameof(item), "item", id);
 
+            ValidateCenterAccess(item.CenterId, nameof(Item));
             mapper.Map(updateItemDTO, item);
             unitOfWork.Items.UpdateAsync(item);
             await unitOfWork.SaveChangesAsync();
@@ -79,6 +98,7 @@ namespace Moshrefy.Application.Services
             if (item == null)
                 throw new NotFoundException<int>(nameof(item), "item", id);
 
+            ValidateCenterAccess(item.CenterId, nameof(Item));
             unitOfWork.Items.DeleteAsync(item);
             await unitOfWork.SaveChangesAsync();
         }
@@ -89,6 +109,7 @@ namespace Moshrefy.Application.Services
             if (item == null)
                 throw new NotFoundException<int>(nameof(item), "item", id);
 
+            ValidateCenterAccess(item.CenterId, nameof(Item));
             item.IsDeleted = true;
             unitOfWork.Items.UpdateAsync(item);
             await unitOfWork.SaveChangesAsync();
@@ -100,6 +121,7 @@ namespace Moshrefy.Application.Services
             if (item == null)
                 throw new NotFoundException<int>(nameof(item), "item", id);
 
+            ValidateCenterAccess(item.CenterId, nameof(Item));
             item.IsDeleted = false;
             unitOfWork.Items.UpdateAsync(item);
             await unitOfWork.SaveChangesAsync();
@@ -111,6 +133,7 @@ namespace Moshrefy.Application.Services
             if (item == null)
                 throw new NotFoundException<int>(nameof(item), "item", itemId);
 
+            ValidateCenterAccess(item.CenterId, nameof(Item));
             item.ReservedByStudentId = studentId;
             unitOfWork.Items.UpdateAsync(item);
             await unitOfWork.SaveChangesAsync();
@@ -122,6 +145,7 @@ namespace Moshrefy.Application.Services
             if (item == null)
                 throw new NotFoundException<int>(nameof(item), "item", itemId);
 
+            ValidateCenterAccess(item.CenterId, nameof(Item));
             item.ReservedByStudentId = null;
             unitOfWork.Items.UpdateAsync(item);
             await unitOfWork.SaveChangesAsync();
@@ -133,6 +157,7 @@ namespace Moshrefy.Application.Services
             if (item == null)
                 throw new NotFoundException<int>(nameof(item), "item", id);
 
+            ValidateCenterAccess(item.CenterId, nameof(Item));
             item.ItemStatus = status;
             unitOfWork.Items.UpdateAsync(item);
             await unitOfWork.SaveChangesAsync();

@@ -52,6 +52,18 @@ namespace Moshrefy.Web.Controllers
 
                 var filterStatus = Request.Form["filterStatus"].FirstOrDefault();
 
+                // Get total count from database efficiently
+                int totalRecords = 0;
+                try
+                {
+                    totalRecords = await _academicYearService.GetTotalCountAsync();
+                }
+                catch (Exception)
+                {
+                    // No data, total is 0
+                }
+
+                // Fetch current page (service filters by CenterId at database level)
                 var paginationParams = new PaginationParamter
                 {
                     PageNumber = pageNumber,
@@ -72,7 +84,7 @@ namespace Moshrefy.Web.Controllers
 
                 var academicYearsVM = _mapper.Map<List<AcademicYearVM>>(academicYearsDTO);
 
-                // Apply status filter
+                // Apply UI filters on the current page
                 if (!string.IsNullOrEmpty(filterStatus))
                 {
                     if (filterStatus == "active")
@@ -85,7 +97,6 @@ namespace Moshrefy.Web.Controllers
                     }
                 }
 
-                // Apply search
                 if (!string.IsNullOrEmpty(searchValue))
                 {
                     academicYearsVM = academicYearsVM.Where(ay =>
@@ -97,8 +108,8 @@ namespace Moshrefy.Web.Controllers
                 var jsonData = new
                 {
                     draw = draw,
-                    recordsTotal = academicYearsVM.Count,
-                    recordsFiltered = academicYearsVM.Count,
+                    recordsTotal = totalRecords,
+                    recordsFiltered = totalRecords,
                     data = academicYearsVM
                 };
 
@@ -110,6 +121,9 @@ namespace Moshrefy.Web.Controllers
                 return StatusCode(500, new { error = "Error loading data. Please try again." });
             }
         }
+
+
+
 
         // GET: AcademicYear/Details/5
         [HttpGet]

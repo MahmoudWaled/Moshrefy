@@ -358,5 +358,17 @@ namespace Moshrefy.Application.Services
 
             await _userManager.UpdateAsync(user);
         }
+
+        public async Task<int> GetTotalCountAsync()
+        {
+            var centerId = _tenantContext.GetCurrentCenterId();
+            if (centerId == null)
+                throw new BadRequestException("Admin must be assigned to a center.");
+
+            return await _userManager.Users
+                .Where(u => u.CenterId == centerId && !u.IsDeleted)
+                .CountAsync();
+        }
     }
 }
+

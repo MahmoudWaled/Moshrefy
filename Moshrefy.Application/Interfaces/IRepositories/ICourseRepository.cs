@@ -12,3 +12,4 @@ namespace Moshrefy.Application.Interfaces.IRepositories
 
     }
 }
+

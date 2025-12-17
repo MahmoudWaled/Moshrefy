@@ -57,6 +57,18 @@ namespace Moshrefy.Web.Controllers
                 var filterStatus = Request.Form["filterStatus"].FirstOrDefault();
                 var filterAcademicYear = Request.Form["filterAcademicYear"].FirstOrDefault();
 
+                // Get total count from database efficiently
+                int totalRecords = 0;
+                try
+                {
+                    totalRecords = await _courseService.GetTotalCountAsync();
+                }
+                catch (Exception)
+                {
+                    // No data, total is 0
+                }
+
+                // Fetch current page (service filters by CenterId at database level)
                 var paginationParams = new PaginationParamter
                 {
                     PageNumber = pageNumber,
@@ -77,7 +89,8 @@ namespace Moshrefy.Web.Controllers
 
                 var coursesVM = _mapper.Map<List<CourseVM>>(coursesDTO);
 
-                // Apply status filter
+                // Apply UI filters (status, academicYear, search) on the current page
+                // Note: These are applied client-side on the page data
                 if (!string.IsNullOrEmpty(filterStatus))
                 {
                     if (filterStatus == "active")
@@ -90,13 +103,11 @@ namespace Moshrefy.Web.Controllers
                     }
                 }
 
-                // Apply academic year filter
                 if (!string.IsNullOrEmpty(filterAcademicYear) && int.TryParse(filterAcademicYear, out int academicYearId) && academicYearId > 0)
                 {
                     coursesVM = coursesVM.Where(c => c.AcademicYearId == academicYearId).ToList();
                 }
 
-                // Apply search
                 if (!string.IsNullOrEmpty(searchValue))
                 {
                     coursesVM = coursesVM.Where(c =>
@@ -108,8 +119,8 @@ namespace Moshrefy.Web.Controllers
                 var jsonData = new
                 {
                     draw = draw,
-                    recordsTotal = coursesVM.Count,
-                    recordsFiltered = coursesVM.Count,
+                    recordsTotal = totalRecords,
+                    recordsFiltered = totalRecords,
                     data = coursesVM
                 };
 
@@ -121,6 +132,9 @@ namespace Moshrefy.Web.Controllers
                 return StatusCode(500, new { error = "Error loading data. Please try again." });
             }
         }
+
+
+
 
         // GET: Course/Details/5
         [HttpGet]

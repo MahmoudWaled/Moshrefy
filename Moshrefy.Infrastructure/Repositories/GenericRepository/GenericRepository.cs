@@ -3,6 +3,7 @@ using Moshrefy.Application.Interfaces.IGenericRepository;
 using Moshrefy.Domain.Paramter;
 using Moshrefy.Domain.SoftDeletable;
 using Moshrefy.infrastructure.Data;
+using System.Linq.Expressions;
 
 namespace Moshrefy.infrastructure.Repositories.GenericRepository
 {
@@ -13,9 +14,20 @@ namespace Moshrefy.infrastructure.Repositories.GenericRepository
             var pageNumber = paginationParamter.PageNumber ?? 1;
             var pageSize = paginationParamter.PageSize ?? 25;
 
-            // Allow any page size for server-side processing
-            // The caller (controller/service) should validate reasonable limits
             return await appDbContext.Set<TEntity>()
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>> predicate, PaginationParamter paginationParamter)
+        {
+            var pageNumber = paginationParamter.PageNumber ?? 1;
+            var pageSize = paginationParamter.PageSize ?? 25;
+
+            // Apply filter BEFORE pagination at database level
+            return await appDbContext.Set<TEntity>()
+                .Where(predicate)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
@@ -59,6 +71,11 @@ namespace Moshrefy.infrastructure.Repositories.GenericRepository
             return await appDbContext.SaveChangesAsync();
         }
 
-
+        public async Task<int> CountAsync(Expression<Func<TEntity, bool>> predicate)
+        {
+            return await appDbContext.Set<TEntity>().CountAsync(predicate);
+        }
     }
 }
+
+

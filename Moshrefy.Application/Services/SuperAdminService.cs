@@ -495,6 +495,34 @@ namespace Moshrefy.Application.Services
             return _mapper.Map<List<UserResponseDTO>>(users);
         }
 
+        public async Task<int> GetUsersByCenterIdCountAsync(int centerId)
+        {
+            if (centerId <= 0)
+                throw new BadRequestException("Invalid center id.");
+
+            return await _userManager.Users.CountAsync(u => u.CenterId == centerId);
+        }
+
+        public async Task<int> GetTotalUsersCountAsync()
+        {
+            return await _userManager.Users.CountAsync();
+        }
+
+        public async Task<int> GetActiveUsersCountAsync()
+        {
+            return await _userManager.Users.CountAsync(u => u.IsActive && !u.IsDeleted);
+        }
+
+        public async Task<int> GetInactiveUsersCountAsync()
+        {
+            return await _userManager.Users.CountAsync(u => !u.IsActive && !u.IsDeleted);
+        }
+
+        public async Task<int> GetDeletedUsersCountAsync()
+        {
+            return await _userManager.Users.CountAsync(u => u.IsDeleted);
+        }
+
         public async Task<List<UserResponseDTO>> GetUsersByRoleAsync(string roleName, PaginationParamter paginationParamter)
         {
             if (string.IsNullOrEmpty(roleName))

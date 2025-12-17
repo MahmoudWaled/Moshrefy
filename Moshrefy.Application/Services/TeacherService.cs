@@ -42,9 +42,16 @@ namespace Moshrefy.Application.Services
 
         public async Task<List<TeacherResponseDTO>> GetAllAsync(PaginationParamter paginationParamter)
         {
-            var teachers = await unitOfWork.Teachers.GetAllAsync(paginationParamter);
-            return mapper.Map<List<TeacherResponseDTO>>(teachers);
+            var currentCenterId = GetCurrentCenterIdOrThrow();
+            
+            // Filter at database level BEFORE pagination
+            var teachers = await unitOfWork.Teachers.GetAllAsync(
+                t => t.CenterId == currentCenterId && !t.IsDeleted,
+                paginationParamter);
+            
+            return mapper.Map<List<TeacherResponseDTO>>(teachers.ToList());
         }
+
 
         public async Task<List<TeacherResponseDTO>> GetByNameAsync(string name)
         {
@@ -184,6 +191,12 @@ namespace Moshrefy.Application.Services
             
             unitOfWork.Teachers.UpdateAsync(teacher);
             await unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task<int> GetTotalCountAsync()
+        {
+            var centerId = GetCurrentCenterIdOrThrow();
+            return await unitOfWork.Teachers.CountAsync(t => t.CenterId == centerId && !t.IsDeleted);
         }
     }
 }

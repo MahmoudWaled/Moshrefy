@@ -52,13 +52,26 @@ namespace Moshrefy.Web.Controllers
 
                 int pageSize = length != null ? Convert.ToInt32(length) : 25;
                 int skip = start != null ? Convert.ToInt32(start) : 0;
+                int pageNumber = (skip / pageSize) + 1;
 
                 var filterStatus = Request.Form["filterStatus"].FirstOrDefault();
 
+                // Get total count from database efficiently
+                int totalRecords = 0;
+                try
+                {
+                    totalRecords = await _teacherService.GetTotalCountAsync();
+                }
+                catch (Exception)
+                {
+                    // No data, total is 0
+                }
+
+                // Fetch current page (service filters by CenterId at database level)
                 var paginationParams = new PaginationParamter
                 {
-                    PageNumber = 1,
-                    PageSize = 1000
+                    PageNumber = pageNumber,
+                    PageSize = pageSize
                 };
 
                 List<TeacherResponseDTO> teachersDTO;
@@ -81,17 +94,13 @@ namespace Moshrefy.Web.Controllers
                     teacher.CourseCount = teacherCourses.Count(tc => !tc.IsDeleted && !tc.CourseIsDeleted);
                 }
 
-                // Always filter out deleted teachers (only SuperAdmin can manage deleted)
-                teachersVM = teachersVM.Where(t => !t.IsDeleted).ToList();
-
-                // Apply status filter
+                // Apply UI filters on the current page
                 if (!string.IsNullOrEmpty(filterStatus) && filterStatus != "all")
                 {
                     var isActive = filterStatus == "Active";
                     teachersVM = teachersVM.Where(t => t.IsActive == isActive).ToList();
                 }
 
-                // Apply search
                 if (!string.IsNullOrEmpty(searchValue))
                 {
                     teachersVM = teachersVM.Where(t =>
@@ -121,17 +130,12 @@ namespace Moshrefy.Web.Controllers
                     };
                 }
 
-                var totalRecords = teachersVM.Count;
-
-                // Apply pagination
-                var pagedData = teachersVM.Skip(skip).Take(pageSize).ToList();
-
                 var jsonData = new
                 {
                     draw = draw,
                     recordsTotal = totalRecords,
                     recordsFiltered = totalRecords,
-                    data = pagedData
+                    data = teachersVM
                 };
 
                 return Ok(jsonData);
@@ -142,6 +146,7 @@ namespace Moshrefy.Web.Controllers
                 return StatusCode(500, new { error = "Error loading data. Please try again." });
             }
         }
+
 
         // GET: Teacher/Details/5
         [HttpGet]

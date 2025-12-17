@@ -11,3 +11,4 @@ namespace Moshrefy.Application.Interfaces.IRepositories
         public Task<IEnumerable<Teacher>> GetActiveTeachersAsync();
     }
 }
+

@@ -12,6 +12,6 @@ namespace Moshrefy.Application.Interfaces.IServices
         Task<List<AcademicYearResponseDTO>> GetAllAcademicYearsAsync(PaginationParamter paginationParamter);
         Task<AcademicYearResponseDTO> GetAcademicYearByIdAsync(int id);
         Task<List<AcademicYearResponseDTO>> GetAcademicYearsByNameAsync(string name);
-
+        Task<int> GetTotalCountAsync();
     }
 }

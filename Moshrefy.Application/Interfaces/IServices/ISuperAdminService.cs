@@ -35,6 +35,11 @@ namespace Moshrefy.Application.Interfaces.IServices
         Task<List<UserResponseDTO>> GetInactiveUsersAsync(PaginationParamter paginationParamter);
         Task<List<UserResponseDTO>> GetDeletedUsersAsync(PaginationParamter paginationParamter);
         Task<List<UserResponseDTO>> GetUsersByCenterIdAsync(int centerId, PaginationParamter paginationParamter);
+        Task<int> GetUsersByCenterIdCountAsync(int centerId);
+        Task<int> GetTotalUsersCountAsync();
+        Task<int> GetActiveUsersCountAsync();
+        Task<int> GetInactiveUsersCountAsync();
+        Task<int> GetDeletedUsersCountAsync();
         Task<List<UserResponseDTO>> GetUsersByRoleAsync(string roleName, PaginationParamter paginationParamter);
         Task<UserResponseDTO> GetUserByIdAsync(string userId);
         Task<UserResponseDTO> GetUserByEmailAsync(string email);

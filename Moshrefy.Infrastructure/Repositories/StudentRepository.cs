@@ -5,6 +5,7 @@ using Moshrefy.Domain.Enums;
 using Moshrefy.Domain.Paramter;
 using Moshrefy.infrastructure.Data;
 using Moshrefy.infrastructure.Repositories.GenericRepository;
+using System.Linq.Expressions;
 
 namespace Moshrefy.infrastructure.Repositories
 {
@@ -35,6 +36,24 @@ namespace Moshrefy.infrastructure.Repositories
             return await appDbContext.Set<Student>()
                 .Include(s => s.Enrollments)
                     .ThenInclude(e => e.Course)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
+        // Predicate overload with includes for proper server-side filtering
+        public new async Task<IEnumerable<Student>> GetAllAsync(Expression<Func<Student, bool>> predicate, PaginationParamter paginationParamter)
+        {
+            var pageNumber = paginationParamter.PageNumber ?? 1;
+            var pageSize = paginationParamter.PageSize ?? 40;
+
+            if (pageSize > 40)
+                pageSize = 40;
+
+            return await appDbContext.Set<Student>()
+                .Include(s => s.Enrollments)
+                    .ThenInclude(e => e.Course)
+                .Where(predicate)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();

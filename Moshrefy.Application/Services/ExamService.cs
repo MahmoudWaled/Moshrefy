@@ -9,11 +9,17 @@ using Moshrefy.Domain.Paramter;
 
 namespace Moshrefy.Application.Services
 {
-    public class ExamService(IUnitOfWork unitOfWork, IMapper mapper) : IExamService
+    public class ExamService(
+        IUnitOfWork unitOfWork, 
+        IMapper mapper,
+        ITenantContext tenantContext
+    ) : BaseService(tenantContext), IExamService
     {
         public async Task<ExamResponseDTO> CreateAsync(CreateExamDTO createExamDTO)
         {
+            var currentCenterId = GetCurrentCenterIdOrThrow();
             var exam = mapper.Map<Exam>(createExamDTO);
+            exam.CenterId = currentCenterId;
             await unitOfWork.Exams.AddAsync(exam);
             await unitOfWork.SaveChangesAsync();
             return mapper.Map<ExamResponseDTO>(exam);
@@ -25,53 +31,69 @@ namespace Moshrefy.Application.Services
             if (exam == null)
                 throw new NotFoundException<int>(nameof(exam), "exam", id);
 
+            ValidateCenterAccess(exam.CenterId, nameof(Exam));
             return mapper.Map<ExamResponseDTO>(exam);
         }
 
         public async Task<List<ExamResponseDTO>> GetAllAsync(PaginationParamter paginationParamter)
         {
-            var exams = await unitOfWork.Exams.GetAllAsync(paginationParamter);
-            return mapper.Map<List<ExamResponseDTO>>(exams);
+            var currentCenterId = GetCurrentCenterIdOrThrow();
+            var exams = await unitOfWork.Exams.GetAllAsync(
+                e => e.CenterId == currentCenterId && !e.IsDeleted,
+                paginationParamter);
+            return mapper.Map<List<ExamResponseDTO>>(exams.ToList());
         }
 
         public async Task<List<ExamResponseDTO>> GetByNameAsync(string name)
         {
             var exams = await unitOfWork.Exams.GetByName(name);
-            return mapper.Map<List<ExamResponseDTO>>(exams);
+            var currentCenterId = GetCurrentCenterIdOrThrow();
+            var filtered = exams.Where(e => e.CenterId == currentCenterId && !e.IsDeleted).ToList();
+            return mapper.Map<List<ExamResponseDTO>>(filtered);
         }
 
         public async Task<List<ExamResponseDTO>> GetByDateAsync(DateTime date)
         {
             var exams = await unitOfWork.Exams.GetByDate(date);
-            return mapper.Map<List<ExamResponseDTO>>(exams);
+            var currentCenterId = GetCurrentCenterIdOrThrow();
+            var filtered = exams.Where(e => e.CenterId == currentCenterId && !e.IsDeleted).ToList();
+            return mapper.Map<List<ExamResponseDTO>>(filtered);
         }
 
         public async Task<List<ExamResponseDTO>> GetByCourseIdAsync(int courseId)
         {
-            var exams = await unitOfWork.Exams.GetAllAsync(new PaginationParamter());
-            var filteredExams = exams.Where(e => e.CourseId == courseId).ToList();
-            return mapper.Map<List<ExamResponseDTO>>(filteredExams);
+            var currentCenterId = GetCurrentCenterIdOrThrow();
+            var exams = await unitOfWork.Exams.GetAllAsync(
+                e => e.CenterId == currentCenterId && e.CourseId == courseId && !e.IsDeleted,
+                new PaginationParamter { PageSize = 1000 });
+            return mapper.Map<List<ExamResponseDTO>>(exams.ToList());
         }
 
         public async Task<List<ExamResponseDTO>> GetByClassroomIdAsync(int classroomId)
         {
-            var exams = await unitOfWork.Exams.GetAllAsync(new PaginationParamter());
-            var filteredExams = exams.Where(e => e.ClassroomId == classroomId).ToList();
-            return mapper.Map<List<ExamResponseDTO>>(filteredExams);
+            var currentCenterId = GetCurrentCenterIdOrThrow();
+            var exams = await unitOfWork.Exams.GetAllAsync(
+                e => e.CenterId == currentCenterId && e.ClassroomId == classroomId && !e.IsDeleted,
+                new PaginationParamter { PageSize = 1000 });
+            return mapper.Map<List<ExamResponseDTO>>(exams.ToList());
         }
 
         public async Task<List<ExamResponseDTO>> GetByTeacherIdAsync(int teacherId)
         {
-            var exams = await unitOfWork.Exams.GetAllAsync(new PaginationParamter());
-            var filteredExams = exams.Where(e => e.TeacherCourse != null && e.TeacherCourse.TeacherId == teacherId).ToList();
-            return mapper.Map<List<ExamResponseDTO>>(filteredExams);
+            var currentCenterId = GetCurrentCenterIdOrThrow();
+            var exams = await unitOfWork.Exams.GetAllAsync(
+                e => e.CenterId == currentCenterId && e.TeacherCourse != null && e.TeacherCourse.TeacherId == teacherId && !e.IsDeleted,
+                new PaginationParamter { PageSize = 1000 });
+            return mapper.Map<List<ExamResponseDTO>>(exams.ToList());
         }
 
         public async Task<List<ExamResponseDTO>> GetByStatusAsync(ExamStatus status)
         {
-            var exams = await unitOfWork.Exams.GetAllAsync(new PaginationParamter());
-            var filteredExams = exams.Where(e => e.ExamStatus == status).ToList();
-            return mapper.Map<List<ExamResponseDTO>>(filteredExams);
+            var currentCenterId = GetCurrentCenterIdOrThrow();
+            var exams = await unitOfWork.Exams.GetAllAsync(
+                e => e.CenterId == currentCenterId && e.ExamStatus == status && !e.IsDeleted,
+                new PaginationParamter { PageSize = 1000 });
+            return mapper.Map<List<ExamResponseDTO>>(exams.ToList());
         }
 
         public async Task UpdateAsync(int id, UpdateExamDTO updateExamDTO)
@@ -80,6 +102,7 @@ namespace Moshrefy.Application.Services
             if (exam == null)
                 throw new NotFoundException<int>(nameof(exam), "exam", id);
 
+            ValidateCenterAccess(exam.CenterId, nameof(Exam));
             mapper.Map(updateExamDTO, exam);
             unitOfWork.Exams.UpdateAsync(exam);
             await unitOfWork.SaveChangesAsync();
@@ -91,6 +114,7 @@ namespace Moshrefy.Application.Services
             if (exam == null)
                 throw new NotFoundException<int>(nameof(exam), "exam", id);
 
+            ValidateCenterAccess(exam.CenterId, nameof(Exam));
             unitOfWork.Exams.DeleteAsync(exam);
             await unitOfWork.SaveChangesAsync();
         }
@@ -101,6 +125,7 @@ namespace Moshrefy.Application.Services
             if (exam == null)
                 throw new NotFoundException<int>(nameof(exam), "exam", id);
 
+            ValidateCenterAccess(exam.CenterId, nameof(Exam));
             exam.IsDeleted = true;
             unitOfWork.Exams.UpdateAsync(exam);
             await unitOfWork.SaveChangesAsync();
@@ -112,6 +137,7 @@ namespace Moshrefy.Application.Services
             if (exam == null)
                 throw new NotFoundException<int>(nameof(exam), "exam", id);
 
+            ValidateCenterAccess(exam.CenterId, nameof(Exam));
             exam.IsDeleted = false;
             unitOfWork.Exams.UpdateAsync(exam);
             await unitOfWork.SaveChangesAsync();
@@ -123,6 +149,7 @@ namespace Moshrefy.Application.Services
             if (exam == null)
                 throw new NotFoundException<int>(nameof(exam), "exam", id);
 
+            ValidateCenterAccess(exam.CenterId, nameof(Exam));
             exam.ExamStatus = status;
             unitOfWork.Exams.UpdateAsync(exam);
             await unitOfWork.SaveChangesAsync();

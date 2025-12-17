@@ -9,11 +9,17 @@ using Moshrefy.Domain.Paramter;
 
 namespace Moshrefy.Application.Services
 {
-    public class SessionService(IUnitOfWork unitOfWork, IMapper mapper) : ISessionService
+    public class SessionService(
+        IUnitOfWork unitOfWork, 
+        IMapper mapper,
+        ITenantContext tenantContext
+    ) : BaseService(tenantContext), ISessionService
     {
         public async Task<SessionResponseDTO> CreateAsync(CreateSessionDTO createSessionDTO)
         {
+            var currentCenterId = GetCurrentCenterIdOrThrow();
             var session = mapper.Map<Session>(createSessionDTO);
+            session.CenterId = currentCenterId;
             await unitOfWork.Sessions.AddAsync(session);
             await unitOfWork.SaveChangesAsync();
             return mapper.Map<SessionResponseDTO>(session);
@@ -25,85 +31,113 @@ namespace Moshrefy.Application.Services
             if (session == null)
                 throw new NotFoundException<int>(nameof(session), "session", id);
 
+            ValidateCenterAccess(session.CenterId, nameof(Session));
             return mapper.Map<SessionResponseDTO>(session);
         }
 
         public async Task<List<SessionResponseDTO>> GetAllAsync(PaginationParamter paginationParamter)
         {
-            var sessions = await unitOfWork.Sessions.GetAllAsync(paginationParamter);
-            return mapper.Map<List<SessionResponseDTO>>(sessions);
+            var currentCenterId = GetCurrentCenterIdOrThrow();
+            var sessions = await unitOfWork.Sessions.GetAllAsync(
+                s => s.CenterId == currentCenterId && !s.IsDeleted,
+                paginationParamter);
+            return mapper.Map<List<SessionResponseDTO>>(sessions.ToList());
         }
 
         public async Task<List<SessionResponseDTO>> GetByDateRangeAsync(DateTime startDate, DateTime endDate)
         {
             var sessions = await unitOfWork.Sessions.GetByDateRangeAsync(startDate, endDate);
-            return mapper.Map<List<SessionResponseDTO>>(sessions);
+            var currentCenterId = GetCurrentCenterIdOrThrow();
+            var filtered = sessions.Where(s => s.CenterId == currentCenterId && !s.IsDeleted).ToList();
+            return mapper.Map<List<SessionResponseDTO>>(filtered);
         }
 
         public async Task<List<SessionResponseDTO>> GetBySpecificDateAsync(DateTime date)
         {
             var sessions = await unitOfWork.Sessions.GetBySpecificDateAsync(date);
-            return mapper.Map<List<SessionResponseDTO>>(sessions);
+            var currentCenterId = GetCurrentCenterIdOrThrow();
+            var filtered = sessions.Where(s => s.CenterId == currentCenterId && !s.IsDeleted).ToList();
+            return mapper.Map<List<SessionResponseDTO>>(filtered);
         }
 
         public async Task<List<SessionResponseDTO>> GetByCourseNameAsync(string courseName)
         {
             var sessions = await unitOfWork.Sessions.GetByCourseNameAsync(courseName);
-            return mapper.Map<List<SessionResponseDTO>>(sessions);
+            var currentCenterId = GetCurrentCenterIdOrThrow();
+            var filtered = sessions.Where(s => s.CenterId == currentCenterId && !s.IsDeleted).ToList();
+            return mapper.Map<List<SessionResponseDTO>>(filtered);
         }
 
         public async Task<List<SessionResponseDTO>> GetByTeacherIdAsync(int teacherId)
         {
             var sessions = await unitOfWork.Sessions.GetByTeacherIdAsync(teacherId);
-            return mapper.Map<List<SessionResponseDTO>>(sessions);
+            var currentCenterId = GetCurrentCenterIdOrThrow();
+            var filtered = sessions.Where(s => s.CenterId == currentCenterId && !s.IsDeleted).ToList();
+            return mapper.Map<List<SessionResponseDTO>>(filtered);
         }
 
         public async Task<List<SessionResponseDTO>> GetByTeacherNameAsync(string teacherName)
         {
             var sessions = await unitOfWork.Sessions.GetByTeacherNameAsync(teacherName);
-            return mapper.Map<List<SessionResponseDTO>>(sessions);
+            var currentCenterId = GetCurrentCenterIdOrThrow();
+            var filtered = sessions.Where(s => s.CenterId == currentCenterId && !s.IsDeleted).ToList();
+            return mapper.Map<List<SessionResponseDTO>>(filtered);
         }
 
         public async Task<List<SessionResponseDTO>> GetByClassroomIdAsync(int classroomId)
         {
             var sessions = await unitOfWork.Sessions.GetByClassroomIdAsync(classroomId);
-            return mapper.Map<List<SessionResponseDTO>>(sessions);
+            var currentCenterId = GetCurrentCenterIdOrThrow();
+            var filtered = sessions.Where(s => s.CenterId == currentCenterId && !s.IsDeleted).ToList();
+            return mapper.Map<List<SessionResponseDTO>>(filtered);
         }
 
         public async Task<List<SessionResponseDTO>> GetByStatusAsync(SessionStatus status)
         {
             var sessions = await unitOfWork.Sessions.GetByStatusAsync(status);
-            return mapper.Map<List<SessionResponseDTO>>(sessions);
+            var currentCenterId = GetCurrentCenterIdOrThrow();
+            var filtered = sessions.Where(s => s.CenterId == currentCenterId && !s.IsDeleted).ToList();
+            return mapper.Map<List<SessionResponseDTO>>(filtered);
         }
 
         public async Task<List<SessionResponseDTO>> GetUpcomingSessionsAsync()
         {
             var sessions = await unitOfWork.Sessions.GetUpcomingSessionsAsync();
-            return mapper.Map<List<SessionResponseDTO>>(sessions);
+            var currentCenterId = GetCurrentCenterIdOrThrow();
+            var filtered = sessions.Where(s => s.CenterId == currentCenterId && !s.IsDeleted).ToList();
+            return mapper.Map<List<SessionResponseDTO>>(filtered);
         }
 
         public async Task<List<SessionResponseDTO>> GetPastSessionsAsync(int daysBack)
         {
             var sessions = await unitOfWork.Sessions.GetPastSessionsAsync(daysBack);
-            return mapper.Map<List<SessionResponseDTO>>(sessions);
+            var currentCenterId = GetCurrentCenterIdOrThrow();
+            var filtered = sessions.Where(s => s.CenterId == currentCenterId && !s.IsDeleted).ToList();
+            return mapper.Map<List<SessionResponseDTO>>(filtered);
         }
 
         public async Task<List<SessionResponseDTO>> GetByDayOfWeekAsync(DayOfWeek day)
         {
             var sessions = await unitOfWork.Sessions.GetByDayOfWeekAsync(day);
-            return mapper.Map<List<SessionResponseDTO>>(sessions);
+            var currentCenterId = GetCurrentCenterIdOrThrow();
+            var filtered = sessions.Where(s => s.CenterId == currentCenterId && !s.IsDeleted).ToList();
+            return mapper.Map<List<SessionResponseDTO>>(filtered);
         }
 
         public async Task<List<SessionResponseDTO>> GetUnpaidSessionsAsync()
         {
             var sessions = await unitOfWork.Sessions.GetUnpaidSessionsAsync();
-            return mapper.Map<List<SessionResponseDTO>>(sessions);
+            var currentCenterId = GetCurrentCenterIdOrThrow();
+            var filtered = sessions.Where(s => s.CenterId == currentCenterId && !s.IsDeleted).ToList();
+            return mapper.Map<List<SessionResponseDTO>>(filtered);
         }
 
         public async Task<List<SessionResponseDTO>> GetByAcademicYearAsync(string academicYear)
         {
             var sessions = await unitOfWork.Sessions.GetByAcademicYearAsync(academicYear);
-            return mapper.Map<List<SessionResponseDTO>>(sessions);
+            var currentCenterId = GetCurrentCenterIdOrThrow();
+            var filtered = sessions.Where(s => s.CenterId == currentCenterId && !s.IsDeleted).ToList();
+            return mapper.Map<List<SessionResponseDTO>>(filtered);
         }
 
         public async Task UpdateAsync(int id, UpdateSessionDTO updateSessionDTO)
@@ -112,6 +146,7 @@ namespace Moshrefy.Application.Services
             if (session == null)
                 throw new NotFoundException<int>(nameof(session), "session", id);
 
+            ValidateCenterAccess(session.CenterId, nameof(Session));
             mapper.Map(updateSessionDTO, session);
             unitOfWork.Sessions.UpdateAsync(session);
             await unitOfWork.SaveChangesAsync();
@@ -123,6 +158,7 @@ namespace Moshrefy.Application.Services
             if (session == null)
                 throw new NotFoundException<int>(nameof(session), "session", id);
 
+            ValidateCenterAccess(session.CenterId, nameof(Session));
             unitOfWork.Sessions.DeleteAsync(session);
             await unitOfWork.SaveChangesAsync();
         }
@@ -133,6 +169,7 @@ namespace Moshrefy.Application.Services
             if (session == null)
                 throw new NotFoundException<int>(nameof(session), "session", id);
 
+            ValidateCenterAccess(session.CenterId, nameof(Session));
             session.IsDeleted = true;
             unitOfWork.Sessions.UpdateAsync(session);
             await unitOfWork.SaveChangesAsync();
@@ -144,6 +181,7 @@ namespace Moshrefy.Application.Services
             if (session == null)
                 throw new NotFoundException<int>(nameof(session), "session", id);
 
+            ValidateCenterAccess(session.CenterId, nameof(Session));
             session.IsDeleted = false;
             unitOfWork.Sessions.UpdateAsync(session);
             await unitOfWork.SaveChangesAsync();
@@ -155,6 +193,7 @@ namespace Moshrefy.Application.Services
             if (session == null)
                 throw new NotFoundException<int>(nameof(session), "session", id);
 
+            ValidateCenterAccess(session.CenterId, nameof(Session));
             session.IsPaid = true;
             unitOfWork.Sessions.UpdateAsync(session);
             await unitOfWork.SaveChangesAsync();
@@ -166,6 +205,7 @@ namespace Moshrefy.Application.Services
             if (session == null)
                 throw new NotFoundException<int>(nameof(session), "session", id);
 
+            ValidateCenterAccess(session.CenterId, nameof(Session));
             session.IsPaid = false;
             unitOfWork.Sessions.UpdateAsync(session);
             await unitOfWork.SaveChangesAsync();
@@ -177,6 +217,7 @@ namespace Moshrefy.Application.Services
             if (session == null)
                 throw new NotFoundException<int>(nameof(session), "session", id);
 
+            ValidateCenterAccess(session.CenterId, nameof(Session));
             session.SessionStatus = status;
             unitOfWork.Sessions.UpdateAsync(session);
             await unitOfWork.SaveChangesAsync();

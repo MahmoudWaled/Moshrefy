@@ -97,17 +97,17 @@ namespace Moshrefy.Application.Services
 
             var currentCenterId = GetCurrentCenterIdOrThrow();
 
-            var allAcademicYears = await _unitOfWork.AcademicYears.GetAllAsync(paginationParamter);
+            // Filter at database level BEFORE pagination
+            var academicYears = await _unitOfWork.AcademicYears.GetAllAsync(
+                ay => ay.CenterId == currentCenterId && !ay.IsDeleted,
+                paginationParamter);
 
-            var filteredAcademicYears = allAcademicYears
-                .Where(ay => ay.CenterId == currentCenterId && !ay.IsDeleted)
-                .ToList();
-
-            if (filteredAcademicYears.Count == 0)
+            if (!academicYears.Any())
                 throw new NoDataFoundException("No academic years found.");
 
-            return _mapper.Map<List<AcademicYearResponseDTO>>(filteredAcademicYears);
+            return _mapper.Map<List<AcademicYearResponseDTO>>(academicYears.ToList());
         }
+
 
         public async Task UpdateAcademicYearAsync(int id, UpdateAcademicYearDTO updateAcademicYearDTO)
         {
@@ -132,6 +132,12 @@ namespace Moshrefy.Application.Services
 
             _unitOfWork.AcademicYears.UpdateAsync(academicYear);
             await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task<int> GetTotalCountAsync()
+        {
+            var centerId = GetCurrentCenterIdOrThrow();
+            return await _unitOfWork.AcademicYears.CountAsync(ay => ay.CenterId == centerId && !ay.IsDeleted);
         }
     }
 }

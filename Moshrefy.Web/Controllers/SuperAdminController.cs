@@ -503,24 +503,28 @@ namespace Moshrefy.Web.Controllers
                 int totalRecords;
                 int filteredRecords;
 
-                // Apply role filter first if specified
+                // Determine the appropriate count based on filters
                 if (!string.IsNullOrEmpty(filterRole) && filterRole != "all")
                 {
                     usersDTO = await _superAdminService.GetUsersByRoleAsync(filterRole, paginationParams);
+                    // For role filtering, get count of users in that role (we don't have a dedicated count method, so we get approx from result)
+                    totalRecords = await _superAdminService.GetTotalUsersCountAsync();
                 }
                 else if (filterDeleted == "deleted")
                 {
                     // Show only deleted
                     usersDTO = await _superAdminService.GetDeletedUsersAsync(paginationParams);
+                    totalRecords = await _superAdminService.GetDeletedUsersCountAsync();
                 }
                 else
                 {
-                    // Default to fetching all users and filtering in memory for non-deleted
-                    // Ideally we should have GetNonDeletedUsersAsync, but we'll filter GetAllUsersAsync to be safe
-                    // unless 'active' implies GetActiveUsersAsync (which might only be IsActive=true)
+                    // Default to non-deleted users
                     usersDTO = await _superAdminService.GetAllUsersAsync(paginationParams);
                     usersDTO = usersDTO.Where(u => !u.IsDeleted).ToList();
+                    totalRecords = await _superAdminService.GetTotalUsersCountAsync() - await _superAdminService.GetDeletedUsersCountAsync();
                 }
+
+                filteredRecords = totalRecords;
 
                 // Apply active/inactive status filter (for non-deleted items)
                 if (filterDeleted != "deleted")
@@ -533,16 +537,17 @@ namespace Moshrefy.Web.Controllers
                         if (activeFilter == "active")
                         {
                             usersDTO = usersDTO.Where(u => u.IsActive).ToList();
+                            totalRecords = await _superAdminService.GetActiveUsersCountAsync();
+                            filteredRecords = totalRecords;
                         }
                         else if (activeFilter == "inactive")
                         {
                             usersDTO = usersDTO.Where(u => !u.IsActive).ToList();
+                            totalRecords = await _superAdminService.GetInactiveUsersCountAsync();
+                            filteredRecords = totalRecords;
                         }
                     }
                 }
-
-                totalRecords = usersDTO.Count;
-                filteredRecords = totalRecords;
 
                 var usersVM = _mapper.Map<List<Models.User.UserVM>>(usersDTO);
 
@@ -1136,10 +1141,12 @@ namespace Moshrefy.Web.Controllers
                     PageSize = pageSize
                 };
 
-                // Get inactive users
-                var usersDTO = await _superAdminService.GetInactiveUsersAsync(paginationParams);
-                int totalRecords = usersDTO.Count;
+                // Get total count for pagination
+                int totalRecords = await _superAdminService.GetInactiveUsersCountAsync();
                 int filteredRecords = totalRecords;
+
+                // Get inactive users (paginated)
+                var usersDTO = await _superAdminService.GetInactiveUsersAsync(paginationParams);
 
                 var usersVM = _mapper.Map<List<Models.User.UserVM>>(usersDTO);
 
@@ -1350,10 +1357,12 @@ namespace Moshrefy.Web.Controllers
                     PageSize = pageSize
                 };
 
-                // Get users for this center
-                var usersDTO = await _superAdminService.GetUsersByCenterIdAsync(centerId, paginationParams);
-                int totalRecords = usersDTO.Count;
+                // Get total count for pagination (before pagination is applied)
+                int totalRecords = await _superAdminService.GetUsersByCenterIdCountAsync(centerId);
                 int filteredRecords = totalRecords;
+
+                // Get users for this center (paginated)
+                var usersDTO = await _superAdminService.GetUsersByCenterIdAsync(centerId, paginationParams);
 
                 var usersVM = _mapper.Map<List<Models.User.UserVM>>(usersDTO);
 

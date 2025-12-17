@@ -8,11 +8,17 @@ using Moshrefy.Domain.Paramter;
 
 namespace Moshrefy.Application.Services
 {
-    public class InvoiceService(IUnitOfWork unitOfWork, IMapper mapper) : IInvoiceService
+    public class InvoiceService(
+        IUnitOfWork unitOfWork, 
+        IMapper mapper,
+        ITenantContext tenantContext
+    ) : BaseService(tenantContext), IInvoiceService
     {
         public async Task<InvoiceResponseDTO> CreateAsync(CreateInvoiceDTO createInvoiceDTO)
         {
+            var currentCenterId = GetCurrentCenterIdOrThrow();
             var invoice = mapper.Map<Invoice>(createInvoiceDTO);
+            invoice.CenterId = currentCenterId;
             await unitOfWork.Invoices.AddAsync(invoice);
             await unitOfWork.SaveChangesAsync();
             return mapper.Map<InvoiceResponseDTO>(invoice);
@@ -24,27 +30,35 @@ namespace Moshrefy.Application.Services
             if (invoice == null)
                 throw new NotFoundException<int>(nameof(invoice), "invoice", id);
 
+            ValidateCenterAccess(invoice.CenterId, nameof(Invoice));
             return mapper.Map<InvoiceResponseDTO>(invoice);
         }
 
         public async Task<List<InvoiceResponseDTO>> GetAllAsync(PaginationParamter paginationParamter)
         {
-            var invoices = await unitOfWork.Invoices.GetAllAsync(paginationParamter);
-            return mapper.Map<List<InvoiceResponseDTO>>(invoices);
+            var currentCenterId = GetCurrentCenterIdOrThrow();
+            var invoices = await unitOfWork.Invoices.GetAllAsync(
+                i => i.CenterId == currentCenterId && !i.IsDeleted,
+                paginationParamter);
+            return mapper.Map<List<InvoiceResponseDTO>>(invoices.ToList());
         }
 
         public async Task<List<InvoiceResponseDTO>> GetPaidInvoicesAsync(PaginationParamter paginationParamter)
         {
-            var invoices = await unitOfWork.Invoices.GetAllAsync(paginationParamter);
-            var paidInvoices = invoices.Where(i => i.IsPaid).ToList();
-            return mapper.Map<List<InvoiceResponseDTO>>(paidInvoices);
+            var currentCenterId = GetCurrentCenterIdOrThrow();
+            var invoices = await unitOfWork.Invoices.GetAllAsync(
+                i => i.CenterId == currentCenterId && i.IsPaid && !i.IsDeleted,
+                paginationParamter);
+            return mapper.Map<List<InvoiceResponseDTO>>(invoices.ToList());
         }
 
         public async Task<List<InvoiceResponseDTO>> GetUnpaidInvoicesAsync(PaginationParamter paginationParamter)
         {
-            var invoices = await unitOfWork.Invoices.GetAllAsync(paginationParamter);
-            var unpaidInvoices = invoices.Where(i => !i.IsPaid).ToList();
-            return mapper.Map<List<InvoiceResponseDTO>>(unpaidInvoices);
+            var currentCenterId = GetCurrentCenterIdOrThrow();
+            var invoices = await unitOfWork.Invoices.GetAllAsync(
+                i => i.CenterId == currentCenterId && !i.IsPaid && !i.IsDeleted,
+                paginationParamter);
+            return mapper.Map<List<InvoiceResponseDTO>>(invoices.ToList());
         }
 
         public async Task UpdateAsync(int id, UpdateInvoiceDTO updateInvoiceDTO)
@@ -53,6 +67,7 @@ namespace Moshrefy.Application.Services
             if (invoice == null)
                 throw new NotFoundException<int>(nameof(invoice), "invoice", id);
 
+            ValidateCenterAccess(invoice.CenterId, nameof(Invoice));
             mapper.Map(updateInvoiceDTO, invoice);
             unitOfWork.Invoices.UpdateAsync(invoice);
             await unitOfWork.SaveChangesAsync();
@@ -64,6 +79,7 @@ namespace Moshrefy.Application.Services
             if (invoice == null)
                 throw new NotFoundException<int>(nameof(invoice), "invoice", id);
 
+            ValidateCenterAccess(invoice.CenterId, nameof(Invoice));
             unitOfWork.Invoices.DeleteAsync(invoice);
             await unitOfWork.SaveChangesAsync();
         }
@@ -74,6 +90,7 @@ namespace Moshrefy.Application.Services
             if (invoice == null)
                 throw new NotFoundException<int>(nameof(invoice), "invoice", id);
 
+            ValidateCenterAccess(invoice.CenterId, nameof(Invoice));
             invoice.IsDeleted = true;
             unitOfWork.Invoices.UpdateAsync(invoice);
             await unitOfWork.SaveChangesAsync();
@@ -85,6 +102,7 @@ namespace Moshrefy.Application.Services
             if (invoice == null)
                 throw new NotFoundException<int>(nameof(invoice), "invoice", id);
 
+            ValidateCenterAccess(invoice.CenterId, nameof(Invoice));
             invoice.IsDeleted = false;
             unitOfWork.Invoices.UpdateAsync(invoice);
             await unitOfWork.SaveChangesAsync();
@@ -96,6 +114,7 @@ namespace Moshrefy.Application.Services
             if (invoice == null)
                 throw new NotFoundException<int>(nameof(invoice), "invoice", id);
 
+            ValidateCenterAccess(invoice.CenterId, nameof(Invoice));
             invoice.IsPaid = true;
             unitOfWork.Invoices.UpdateAsync(invoice);
             await unitOfWork.SaveChangesAsync();
@@ -107,6 +126,7 @@ namespace Moshrefy.Application.Services
             if (invoice == null)
                 throw new NotFoundException<int>(nameof(invoice), "invoice", id);
 
+            ValidateCenterAccess(invoice.CenterId, nameof(Invoice));
             invoice.IsPaid = false;
             unitOfWork.Invoices.UpdateAsync(invoice);
             await unitOfWork.SaveChangesAsync();

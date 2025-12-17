@@ -8,11 +8,17 @@ using Moshrefy.Domain.Paramter;
 
 namespace Moshrefy.Application.Services
 {
-    public class ClassroomService(IUnitOfWork unitOfWork, IMapper mapper) : IClassroomService
+    public class ClassroomService(
+        IUnitOfWork unitOfWork, 
+        IMapper mapper,
+        ITenantContext tenantContext
+    ) : BaseService(tenantContext), IClassroomService
     {
         public async Task<ClassroomResponseDTO> CreateAsync(CreateClassroomDTO createClassroomDTO)
         {
+            var currentCenterId = GetCurrentCenterIdOrThrow();
             var classroom = mapper.Map<Classroom>(createClassroomDTO);
+            classroom.CenterId = currentCenterId;
             await unitOfWork.Classrooms.AddAsync(classroom);
             await unitOfWork.SaveChangesAsync();
             return mapper.Map<ClassroomResponseDTO>(classroom);
@@ -24,33 +30,43 @@ namespace Moshrefy.Application.Services
             if (classroom == null)
                 throw new NotFoundException<int>(nameof(classroom), "classroom", id);
 
+            ValidateCenterAccess(classroom.CenterId, nameof(Classroom));
             return mapper.Map<ClassroomResponseDTO>(classroom);
         }
 
         public async Task<List<ClassroomResponseDTO>> GetAllAsync(PaginationParamter paginationParamter)
         {
-            var classrooms = await unitOfWork.Classrooms.GetAllAsync(paginationParamter);
-            return mapper.Map<List<ClassroomResponseDTO>>(classrooms);
+            var currentCenterId = GetCurrentCenterIdOrThrow();
+            var classrooms = await unitOfWork.Classrooms.GetAllAsync(
+                c => c.CenterId == currentCenterId && !c.IsDeleted,
+                paginationParamter);
+            return mapper.Map<List<ClassroomResponseDTO>>(classrooms.ToList());
         }
 
         public async Task<List<ClassroomResponseDTO>> GetByNameAsync(string name)
         {
             var classrooms = await unitOfWork.Classrooms.GetByName(name);
-            return mapper.Map<List<ClassroomResponseDTO>>(classrooms);
+            var currentCenterId = GetCurrentCenterIdOrThrow();
+            var filtered = classrooms.Where(c => c.CenterId == currentCenterId && !c.IsDeleted).ToList();
+            return mapper.Map<List<ClassroomResponseDTO>>(filtered);
         }
 
         public async Task<List<ClassroomResponseDTO>> GetActiveAsync(PaginationParamter paginationParamter)
         {
-            var classrooms = await unitOfWork.Classrooms.GetAllAsync(paginationParamter);
-            var activeClassrooms = classrooms.Where(c => c.IsActive).ToList();
-            return mapper.Map<List<ClassroomResponseDTO>>(activeClassrooms);
+            var currentCenterId = GetCurrentCenterIdOrThrow();
+            var classrooms = await unitOfWork.Classrooms.GetAllAsync(
+                c => c.CenterId == currentCenterId && c.IsActive && !c.IsDeleted,
+                paginationParamter);
+            return mapper.Map<List<ClassroomResponseDTO>>(classrooms.ToList());
         }
 
         public async Task<List<ClassroomResponseDTO>> GetInactiveAsync(PaginationParamter paginationParamter)
         {
-            var classrooms = await unitOfWork.Classrooms.GetAllAsync(paginationParamter);
-            var inactiveClassrooms = classrooms.Where(c => !c.IsActive).ToList();
-            return mapper.Map<List<ClassroomResponseDTO>>(inactiveClassrooms);
+            var currentCenterId = GetCurrentCenterIdOrThrow();
+            var classrooms = await unitOfWork.Classrooms.GetAllAsync(
+                c => c.CenterId == currentCenterId && !c.IsActive && !c.IsDeleted,
+                paginationParamter);
+            return mapper.Map<List<ClassroomResponseDTO>>(classrooms.ToList());
         }
 
         public async Task UpdateAsync(int id, UpdateClassroomDTO updateClassroomDTO)
@@ -59,6 +75,7 @@ namespace Moshrefy.Application.Services
             if (classroom == null)
                 throw new NotFoundException<int>(nameof(classroom), "classroom", id);
 
+            ValidateCenterAccess(classroom.CenterId, nameof(Classroom));
             mapper.Map(updateClassroomDTO, classroom);
             unitOfWork.Classrooms.UpdateAsync(classroom);
             await unitOfWork.SaveChangesAsync();
@@ -70,6 +87,7 @@ namespace Moshrefy.Application.Services
             if (classroom == null)
                 throw new NotFoundException<int>(nameof(classroom), "classroom", id);
 
+            ValidateCenterAccess(classroom.CenterId, nameof(Classroom));
             unitOfWork.Classrooms.DeleteAsync(classroom);
             await unitOfWork.SaveChangesAsync();
         }
@@ -80,6 +98,7 @@ namespace Moshrefy.Application.Services
             if (classroom == null)
                 throw new NotFoundException<int>(nameof(classroom), "classroom", id);
 
+            ValidateCenterAccess(classroom.CenterId, nameof(Classroom));
             classroom.IsActive = true;
             unitOfWork.Classrooms.UpdateAsync(classroom);
             await unitOfWork.SaveChangesAsync();
@@ -91,6 +110,7 @@ namespace Moshrefy.Application.Services
             if (classroom == null)
                 throw new NotFoundException<int>(nameof(classroom), "classroom", id);
 
+            ValidateCenterAccess(classroom.CenterId, nameof(Classroom));
             classroom.IsActive = false;
             unitOfWork.Classrooms.UpdateAsync(classroom);
             await unitOfWork.SaveChangesAsync();
@@ -102,6 +122,7 @@ namespace Moshrefy.Application.Services
             if (classroom == null)
                 throw new NotFoundException<int>(nameof(classroom), "classroom", id);
 
+            ValidateCenterAccess(classroom.CenterId, nameof(Classroom));
             classroom.IsDeleted = true;
             unitOfWork.Classrooms.UpdateAsync(classroom);
             await unitOfWork.SaveChangesAsync();
@@ -113,6 +134,7 @@ namespace Moshrefy.Application.Services
             if (classroom == null)
                 throw new NotFoundException<int>(nameof(classroom), "classroom", id);
 
+            ValidateCenterAccess(classroom.CenterId, nameof(Classroom));
             classroom.IsDeleted = false;
             unitOfWork.Classrooms.UpdateAsync(classroom);
             await unitOfWork.SaveChangesAsync();

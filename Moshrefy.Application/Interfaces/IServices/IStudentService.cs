@@ -22,5 +22,6 @@ namespace Moshrefy.Application.Interfaces.IServices
         Task ActivateAsync(int id);
         Task DeactivateAsync(int id);
         Task SuspendAsync(int id);
+        Task<int> GetTotalCountAsync();
     }
 }

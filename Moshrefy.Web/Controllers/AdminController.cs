@@ -60,6 +60,18 @@ namespace Moshrefy.Web.Controllers
                 var filterStatus = Request.Form["filterStatus"].FirstOrDefault();
                 var filterRole = Request.Form["filterRole"].FirstOrDefault();
 
+                // Get total count from database efficiently
+                int totalRecords = 0;
+                try
+                {
+                    totalRecords = await _userManagementService.GetTotalCountAsync();
+                }
+                catch (Exception)
+                {
+                    // No data, total is 0
+                }
+
+                // Fetch current page (service applies CenterId filtering at database level)
                 var paginationParams = new PaginationParamter
                 {
                     PageNumber = pageNumber,
@@ -83,7 +95,7 @@ namespace Moshrefy.Web.Controllers
 
                 var usersVM = _mapper.Map<List<UserVM>>(usersDTO);
 
-                // Apply search
+                // Apply UI filters on the current page
                 if (!string.IsNullOrEmpty(searchValue))
                 {
                     usersVM = usersVM.Where(u =>
@@ -94,7 +106,6 @@ namespace Moshrefy.Web.Controllers
                     ).ToList();
                 }
 
-                // Apply Role Filter
                 if (!string.IsNullOrEmpty(filterRole) && filterRole != "all")
                 {
                     usersVM = usersVM.Where(u => u.RoleName.Equals(filterRole, StringComparison.OrdinalIgnoreCase)).ToList();
@@ -103,8 +114,8 @@ namespace Moshrefy.Web.Controllers
                 var jsonData = new
                 {
                     draw = draw,
-                    recordsTotal = usersVM.Count,
-                    recordsFiltered = usersVM.Count,
+                    recordsTotal = totalRecords,
+                    recordsFiltered = totalRecords,
                     data = usersVM
                 };
 
@@ -116,6 +127,9 @@ namespace Moshrefy.Web.Controllers
                 return StatusCode(500, new { error = "Error loading data. Please try again." });
             }
         }
+
+
+
 
         // Create User
         [HttpGet]

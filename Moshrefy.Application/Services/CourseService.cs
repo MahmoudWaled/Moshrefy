@@ -56,17 +56,17 @@ namespace Moshrefy.Application.Services
 
             var currentCenterId = GetCurrentCenterIdOrThrow();
 
-            var allCourses = await _unitOfWork.Courses.GetAllAsync(paginationParamter);
+            // Filter at database level BEFORE pagination
+            var courses = await _unitOfWork.Courses.GetAllAsync(
+                c => c.CenterId == currentCenterId && !c.IsDeleted,
+                paginationParamter);
 
-            var filteredCourses = allCourses
-                .Where(c => c.CenterId == currentCenterId && !c.IsDeleted)
-                .ToList();
-
-            if (filteredCourses.Count == 0)
+            if (!courses.Any())
                 throw new NoDataFoundException("No courses found.");
 
-            return _mapper.Map<List<CourseResponseDTO>>(filteredCourses);
+            return _mapper.Map<List<CourseResponseDTO>>(courses.ToList());
         }
+
 
         public async Task<List<CourseResponseDTO>> GetByNameAsync(string name)
         {
@@ -226,5 +226,12 @@ namespace Moshrefy.Application.Services
             _unitOfWork.Courses.UpdateAsync(course);
             await _unitOfWork.SaveChangesAsync();
         }
+
+        public async Task<int> GetTotalCountAsync()
+        {
+            var centerId = GetCurrentCenterIdOrThrow();
+            return await _unitOfWork.Courses.CountAsync(c => c.CenterId == centerId && !c.IsDeleted);
+        }
     }
 }
+

@@ -50,10 +50,22 @@ namespace Moshrefy.Web.Controllers
 
                 var filterStatus = Request.Form["filterStatus"].FirstOrDefault();
 
+                // Get total count from database efficiently
+                int totalRecords = 0;
+                try
+                {
+                    totalRecords = await _studentService.GetTotalCountAsync();
+                }
+                catch (Exception)
+                {
+                    // No data, total is 0
+                }
+
+                // Fetch current page (service filters by CenterId at database level)
                 var paginationParams = new PaginationParamter
                 {
-                    PageNumber = 1,
-                    PageSize = 1000 // Get all for client-side filtering
+                    PageNumber = pageNumber,
+                    PageSize = pageSize
                 };
 
                 List<StudentResponseDTO> studentsDTO;
@@ -69,10 +81,7 @@ namespace Moshrefy.Web.Controllers
 
                 var studentsVM = _mapper.Map<List<StudentVM>>(studentsDTO);
 
-                // Always filter out deleted students (only SuperAdmin can manage deleted)
-                studentsVM = studentsVM.Where(s => !s.IsDeleted).ToList();
-
-                // Apply status filter
+                // Apply UI filters on the current page
                 if (!string.IsNullOrEmpty(filterStatus) && filterStatus != "all")
                 {
                     if (Enum.TryParse<StudentStatus>(filterStatus, true, out var status))
@@ -81,7 +90,6 @@ namespace Moshrefy.Web.Controllers
                     }
                 }
 
-                // Apply search
                 if (!string.IsNullOrEmpty(searchValue))
                 {
                     studentsVM = studentsVM.Where(s =>
@@ -110,21 +118,17 @@ namespace Moshrefy.Web.Controllers
                     };
                 }
 
-                var totalRecords = studentsVM.Count;
-
-                // Apply pagination
-                var pagedData = studentsVM.Skip(skip).Take(pageSize).ToList();
-
                 var jsonData = new
                 {
                     draw = draw,
                     recordsTotal = totalRecords,
                     recordsFiltered = totalRecords,
-                    data = pagedData
+                    data = studentsVM
                 };
 
                 return Ok(jsonData);
             }
+
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error loading students data");

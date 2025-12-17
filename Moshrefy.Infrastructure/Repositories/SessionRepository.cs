@@ -2,15 +2,37 @@ using Microsoft.EntityFrameworkCore;
 using Moshrefy.Application.Interfaces.IRepositories;
 using Moshrefy.Domain.Entities;
 using Moshrefy.Domain.Enums;
+using Moshrefy.Domain.Paramter;
 using Moshrefy.infrastructure.Data;
 using Moshrefy.infrastructure.Repositories.GenericRepository;
+using System.Linq.Expressions;
 
 namespace Moshrefy.infrastructure.Repositories
 {
     public class SessionRepository(AppDbContext appDbContext) : GenericRepository<Session, int>(appDbContext), ISessionRepository
     {
+        // Predicate overload for proper server-side filtering
+        public new async Task<IEnumerable<Session>> GetAllAsync(Expression<Func<Session, bool>> predicate, PaginationParamter paginationParamter)
+        {
+            var pageNumber = paginationParamter.PageNumber ?? 1;
+            var pageSize = paginationParamter.PageSize ?? 25;
+
+            return await appDbContext.Set<Session>()
+                .Include(s => s.TeacherCourse)
+                    .ThenInclude(tc => tc.Teacher)
+                .Include(s => s.TeacherCourse)
+                    .ThenInclude(tc => tc.Course)
+                .Include(s => s.Classroom)
+                .Include(s => s.AcademicYear)
+                .Where(predicate)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
         public async Task<IEnumerable<Session>> GetByAcademicYearAsync(string academicYear)
         {
+
             return await appDbContext.Set<Session>()
                 .Where(s => s.AcademicYear.Name.Contains(academicYear))
                 .ToListAsync();

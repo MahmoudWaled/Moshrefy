@@ -8,17 +8,26 @@ using Moshrefy.Domain.Paramter;
 
 namespace Moshrefy.Application.Services
 {
-    public class EnrollmentService(IUnitOfWork unitOfWork, IMapper mapper) : IEnrollmentService
+    public class EnrollmentService(
+        IUnitOfWork unitOfWork, 
+        IMapper mapper,
+        ITenantContext tenantContext
+    ) : BaseService(tenantContext), IEnrollmentService
     {
         public async Task<EnrollmentResponseDTO> CreateAsync(CreateEnrollmentDTO createEnrollmentDTO)
         {
-            var existing = await unitOfWork.Enrollments.GetAllAsync(new PaginationParamter());
-            if (existing.Any(e => e.StudentId == createEnrollmentDTO.StudentId && e.CourseId == createEnrollmentDTO.CourseId))
+            var currentCenterId = GetCurrentCenterIdOrThrow();
+            
+            var existing = await unitOfWork.Enrollments.GetAllAsync(
+                e => e.CenterId == currentCenterId && e.StudentId == createEnrollmentDTO.StudentId && e.CourseId == createEnrollmentDTO.CourseId && !e.IsDeleted,
+                new PaginationParamter { PageSize = 1 });
+            if (existing.Any())
             {
                 throw new BadRequestException("Student is already enrolled in this course.");
             }
 
             var enrollment = mapper.Map<Enrollment>(createEnrollmentDTO);
+            enrollment.CenterId = currentCenterId;
             await unitOfWork.Enrollments.AddAsync(enrollment);
             await unitOfWork.SaveChangesAsync();
             return mapper.Map<EnrollmentResponseDTO>(enrollment);
@@ -30,41 +39,53 @@ namespace Moshrefy.Application.Services
             if (enrollment == null)
                 throw new NotFoundException<int>(nameof(enrollment), "enrollment", id);
 
+            ValidateCenterAccess(enrollment.CenterId, nameof(Enrollment));
             return mapper.Map<EnrollmentResponseDTO>(enrollment);
         }
 
         public async Task<List<EnrollmentResponseDTO>> GetAllAsync(PaginationParamter paginationParamter)
         {
-            var enrollments = await unitOfWork.Enrollments.GetAllAsync(paginationParamter);
-            return mapper.Map<List<EnrollmentResponseDTO>>(enrollments);
+            var currentCenterId = GetCurrentCenterIdOrThrow();
+            var enrollments = await unitOfWork.Enrollments.GetAllAsync(
+                e => e.CenterId == currentCenterId && !e.IsDeleted,
+                paginationParamter);
+            return mapper.Map<List<EnrollmentResponseDTO>>(enrollments.ToList());
         }
 
         public async Task<List<EnrollmentResponseDTO>> GetByStudentIdAsync(int studentId)
         {
-            var enrollments = await unitOfWork.Enrollments.GetAllAsync(new PaginationParamter());
-            var filtered = enrollments.Where(e => e.StudentId == studentId).ToList();
-            return mapper.Map<List<EnrollmentResponseDTO>>(filtered);
+            var currentCenterId = GetCurrentCenterIdOrThrow();
+            var enrollments = await unitOfWork.Enrollments.GetAllAsync(
+                e => e.CenterId == currentCenterId && e.StudentId == studentId && !e.IsDeleted,
+                new PaginationParamter { PageSize = 1000 });
+            return mapper.Map<List<EnrollmentResponseDTO>>(enrollments.ToList());
         }
 
         public async Task<List<EnrollmentResponseDTO>> GetByCourseIdAsync(int courseId)
         {
-            var enrollments = await unitOfWork.Enrollments.GetAllAsync(new PaginationParamter());
-            var filtered = enrollments.Where(e => e.CourseId == courseId).ToList();
-            return mapper.Map<List<EnrollmentResponseDTO>>(filtered);
+            var currentCenterId = GetCurrentCenterIdOrThrow();
+            var enrollments = await unitOfWork.Enrollments.GetAllAsync(
+                e => e.CenterId == currentCenterId && e.CourseId == courseId && !e.IsDeleted,
+                new PaginationParamter { PageSize = 1000 });
+            return mapper.Map<List<EnrollmentResponseDTO>>(enrollments.ToList());
         }
 
         public async Task<List<EnrollmentResponseDTO>> GetActiveAsync(PaginationParamter paginationParamter)
         {
-            var enrollments = await unitOfWork.Enrollments.GetAllAsync(paginationParamter);
-            var active = enrollments.Where(e => e.IsActive).ToList();
-            return mapper.Map<List<EnrollmentResponseDTO>>(active);
+            var currentCenterId = GetCurrentCenterIdOrThrow();
+            var enrollments = await unitOfWork.Enrollments.GetAllAsync(
+                e => e.CenterId == currentCenterId && e.IsActive && !e.IsDeleted,
+                paginationParamter);
+            return mapper.Map<List<EnrollmentResponseDTO>>(enrollments.ToList());
         }
 
         public async Task<List<EnrollmentResponseDTO>> GetInactiveAsync(PaginationParamter paginationParamter)
         {
-            var enrollments = await unitOfWork.Enrollments.GetAllAsync(paginationParamter);
-            var inactive = enrollments.Where(e => !e.IsActive).ToList();
-            return mapper.Map<List<EnrollmentResponseDTO>>(inactive);
+            var currentCenterId = GetCurrentCenterIdOrThrow();
+            var enrollments = await unitOfWork.Enrollments.GetAllAsync(
+                e => e.CenterId == currentCenterId && !e.IsActive && !e.IsDeleted,
+                paginationParamter);
+            return mapper.Map<List<EnrollmentResponseDTO>>(enrollments.ToList());
         }
 
         public async Task UpdateAsync(int id, UpdateEnrollmentDTO updateEnrollmentDTO)
@@ -73,6 +94,7 @@ namespace Moshrefy.Application.Services
             if (enrollment == null)
                 throw new NotFoundException<int>(nameof(enrollment), "enrollment", id);
 
+            ValidateCenterAccess(enrollment.CenterId, nameof(Enrollment));
             mapper.Map(updateEnrollmentDTO, enrollment);
             unitOfWork.Enrollments.UpdateAsync(enrollment);
             await unitOfWork.SaveChangesAsync();
@@ -84,6 +106,7 @@ namespace Moshrefy.Application.Services
             if (enrollment == null)
                 throw new NotFoundException<int>(nameof(enrollment), "enrollment", id);
 
+            ValidateCenterAccess(enrollment.CenterId, nameof(Enrollment));
             unitOfWork.Enrollments.DeleteAsync(enrollment);
             await unitOfWork.SaveChangesAsync();
         }
@@ -94,6 +117,7 @@ namespace Moshrefy.Application.Services
             if (enrollment == null)
                 throw new NotFoundException<int>(nameof(enrollment), "enrollment", id);
 
+            ValidateCenterAccess(enrollment.CenterId, nameof(Enrollment));
             enrollment.IsDeleted = true;
             unitOfWork.Enrollments.UpdateAsync(enrollment);
             await unitOfWork.SaveChangesAsync();
@@ -105,6 +129,7 @@ namespace Moshrefy.Application.Services
             if (enrollment == null)
                 throw new NotFoundException<int>(nameof(enrollment), "enrollment", id);
 
+            ValidateCenterAccess(enrollment.CenterId, nameof(Enrollment));
             enrollment.IsDeleted = false;
             unitOfWork.Enrollments.UpdateAsync(enrollment);
             await unitOfWork.SaveChangesAsync();
@@ -116,6 +141,7 @@ namespace Moshrefy.Application.Services
             if (enrollment == null)
                 throw new NotFoundException<int>(nameof(enrollment), "enrollment", id);
 
+            ValidateCenterAccess(enrollment.CenterId, nameof(Enrollment));
             enrollment.IsActive = true;
             unitOfWork.Enrollments.UpdateAsync(enrollment);
             await unitOfWork.SaveChangesAsync();
@@ -127,6 +153,7 @@ namespace Moshrefy.Application.Services
             if (enrollment == null)
                 throw new NotFoundException<int>(nameof(enrollment), "enrollment", id);
 
+            ValidateCenterAccess(enrollment.CenterId, nameof(Enrollment));
             enrollment.IsActive = false;
             unitOfWork.Enrollments.UpdateAsync(enrollment);
             await unitOfWork.SaveChangesAsync();
@@ -134,8 +161,11 @@ namespace Moshrefy.Application.Services
 
         public async Task<bool> IsStudentEnrolledInCourseAsync(int studentId, int courseId)
         {
-            var enrollments = await unitOfWork.Enrollments.GetAllAsync(new PaginationParamter());
-            return enrollments.Any(e => e.StudentId == studentId && e.CourseId == courseId && !e.IsDeleted);
+            var currentCenterId = GetCurrentCenterIdOrThrow();
+            var enrollments = await unitOfWork.Enrollments.GetAllAsync(
+                e => e.CenterId == currentCenterId && e.StudentId == studentId && e.CourseId == courseId && !e.IsDeleted,
+                new PaginationParamter { PageSize = 1 });
+            return enrollments.Any();
         }
     }
 }
