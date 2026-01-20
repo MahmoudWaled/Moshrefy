@@ -1,8 +1,9 @@
-﻿using Moshrefy.Domain.SoftDeletable;
+﻿using Moshrefy.Domain.Interfaces;
+using Moshrefy.Domain.SoftDeletable;
 
 namespace Moshrefy.Domain.Entities
 {
-    public class Enrollment : BaseEntity, ISoftDeletable
+    public class Enrollment : BaseEntity, ISoftDeletable, IActivatable
     {
         public bool IsActive { get; set; } = true;
         public bool IsDeleted { get; set; } = false;

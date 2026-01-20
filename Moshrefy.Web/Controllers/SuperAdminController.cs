@@ -22,12 +22,13 @@ namespace Moshrefy.Web.Controllers
         private readonly ISuperAdminService _superAdminService;
         private readonly IMapper _mapper;
         private readonly ILogger<SuperAdminController> _logger;
-
-        public SuperAdminController(ISuperAdminService superAdminService, IMapper mapper ,ILogger<SuperAdminController> logger )
+        private readonly ICenterService _centerService;
+        public SuperAdminController(ISuperAdminService superAdminService, IMapper mapper ,ILogger<SuperAdminController> logger , ICenterService centerService )
         {
             _superAdminService = superAdminService;
             _mapper = mapper;
             _logger = logger;
+            _centerService = centerService;
         }
 
         #endregion
@@ -67,21 +68,14 @@ namespace Moshrefy.Web.Controllers
         {
             try
             {
-                var request = Request.GetDataTableRequest();
-                var response = await _superAdminService.GetCentersDataTableAsync(request);
-                var centersVM = _mapper.Map<List<CenterVM>>(response.Data);
+                var centers = await _centerService.GetNonDeletedAsync(new PaginationParamter { PageSize = 100 });
+                var centersVM = _mapper.Map<List<CenterVM>>(centers);
                 
-                return Ok(new
-                {
-                    draw = response.Draw,
-                    recordsTotal = response.RecordsTotal,
-                    recordsFiltered = response.RecordsFiltered,
-                    data = centersVM
-                });
+                return Ok(new { data = centersVM });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error loading centers data for DataTables");
+                _logger.LogError(ex, "Error loading centers data");
                 return StatusCode(500, new { error = "Error loading data. Please try again." });
             }
         }
@@ -94,36 +88,36 @@ namespace Moshrefy.Web.Controllers
         }
 
         // DataTables - Advanced center search
-        [HttpPost]
-        public async Task<IActionResult> SearchCentersData(string? centerName, string? email, string? createdByName, string? adminName)
-        {
-            try
-            {
-                var request = Request.GetDataTableRequest();
+        //[HttpPost]
+        //public async Task<IActionResult> SearchCentersData(string? centerName, string? email, string? createdByName, string? adminName)
+        //{
+        //    try
+        //    {
+        //        var request = Request.GetDataTableRequest();
                 
-                // Override with method parameters if provided
-                if (!string.IsNullOrEmpty(centerName)) request.CenterName = centerName;
-                if (!string.IsNullOrEmpty(email)) request.Email = email;
-                if (!string.IsNullOrEmpty(createdByName)) request.CreatedByName = createdByName;
-                if (!string.IsNullOrEmpty(adminName)) request.AdminName = adminName;
+        //        // Override with method parameters if provided
+        //        if (!string.IsNullOrEmpty(centerName)) request.CenterName = centerName;
+        //        if (!string.IsNullOrEmpty(email)) request.Email = email;
+        //        if (!string.IsNullOrEmpty(createdByName)) request.CreatedByName = createdByName;
+        //        if (!string.IsNullOrEmpty(adminName)) request.AdminName = adminName;
+                
+        //        var response = await _superAdminService.GetCentersDataTableAsync(request);
+        //        var centersVM = _mapper.Map<List<CenterVM>>(response.Data);
 
-                var response = await _superAdminService.GetCentersDataTableAsync(request);
-                var centersVM = _mapper.Map<List<CenterVM>>(response.Data);
-
-                return Ok(new
-                {
-                    draw = response.Draw,
-                    recordsTotal = response.RecordsTotal,
-                    recordsFiltered = response.RecordsFiltered,
-                    data = centersVM
-                });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error loading centers search data");
-                return StatusCode(500, new { error = "Error loading data. Please try again." });
-            }
-        }
+        //        return Ok(new
+        //        {
+        //            draw = response.Draw,
+        //            recordsTotal = response.RecordsTotal,
+        //            recordsFiltered = response.RecordsFiltered,
+        //            data = centersVM
+        //        });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "Error loading centers search data");
+        //        return StatusCode(500, new { error = "Error loading data. Please try again." });
+        //    }
+        //}
 
         // View center details
         [HttpGet]
@@ -134,7 +128,7 @@ namespace Moshrefy.Web.Controllers
                 return NotFound();
             }
 
-            var centerDTO = await _superAdminService.GetCenterByIdAsync(centerId);
+            var centerDTO = await _centerService.GetByIdAsync(centerId);
             var centerVM = _mapper.Map<CenterVM>(centerDTO);
             return View(centerVM);
         }
@@ -159,7 +153,7 @@ namespace Moshrefy.Web.Controllers
             try
             {
                 var createCenterDTO = _mapper.Map<CreateCenterDTO>(createCenterVM);
-                await _superAdminService.CreateCenterAsync(createCenterDTO);
+                await _centerService.CreateAsync(createCenterDTO);
                 TempData["SuccessMessage"] = "Center created successfully!";
                 return RedirectToAction(nameof(Centers));
             }
@@ -181,7 +175,7 @@ namespace Moshrefy.Web.Controllers
 
             try
             {
-                var centerDTO = await _superAdminService.GetCenterByIdAsync(id);
+                var centerDTO = await _centerService.GetByIdAsync(id);
                 var centerVM = _mapper.Map<CenterVM>(centerDTO);
                 
                 var updateCenterVM = new UpdateCenterVM
@@ -222,7 +216,7 @@ namespace Moshrefy.Web.Controllers
             try
             {
                 var updateCenterDTO = _mapper.Map<Application.DTOs.Center.UpdateCenterDTO>(updateCenterVM);
-                await _superAdminService.UpdateCenterAsync(id, updateCenterDTO);
+                await _centerService.UpdateAsync(id, updateCenterDTO);
                 TempData["SuccessMessage"] = "Center updated successfully!";
                 return RedirectToAction(nameof(CenterDetails), new { centerId = id });
             }
@@ -245,7 +239,7 @@ namespace Moshrefy.Web.Controllers
 
             try
             {
-                await _superAdminService.ActivateCenterAsync(id);
+                await _centerService.ActivateAsync(id);
                 _logger.LogInformation($"Center with ID {id} activated by SuperAdmin.", id);
                 return Json(new { success = true, message = "Center activated successfully!" });
             }
@@ -268,7 +262,7 @@ namespace Moshrefy.Web.Controllers
 
             try
             {
-                await _superAdminService.DeactivateCenterAsync(id);
+                await _centerService.DeactivateAsync(id);
                 _logger.LogInformation($"Center with ID {id} deactivated by SuperAdmin.", id);
                 return Json(new { success = true, message = "Center deactivated successfully!" });
             }
@@ -295,7 +289,7 @@ namespace Moshrefy.Web.Controllers
 
             try
             {
-                await _superAdminService.SoftDeleteCenterAsync(id);
+                await _centerService.SoftDeleteAsync(id);
                 _logger.LogInformation($"Center with ID {id} soft deleted by SuperAdmin.", id);
                 
                 // Check if AJAX request
@@ -337,7 +331,7 @@ namespace Moshrefy.Web.Controllers
 
             try
             {
-                await _superAdminService.DeleteCenterAsync(id);
+                await _centerService.HardDeleteAsync(id);
                 _logger.LogWarning($"Center with ID {id} permanently deleted by SuperAdmin.", id);
                 
                 // Check if AJAX request
@@ -374,7 +368,7 @@ namespace Moshrefy.Web.Controllers
 
             try
             {
-                await _superAdminService.RestoreCenterAsync(id);
+                await _centerService.RestoreAsync(id);
                 _logger.LogInformation($"Center with ID {id} restored by SuperAdmin.", id);
                 return Json(new { success = true, message = "Center restored successfully!" });
             }
@@ -505,7 +499,7 @@ namespace Moshrefy.Web.Controllers
             {
                 try
                 {
-                    var centerDTO = await _superAdminService.GetCenterByIdAsync(centerId.Value);
+                    var centerDTO = await _centerService.GetByIdAsync(centerId.Value);
                     ViewBag.CenterName = centerDTO.Name;
                     ViewBag.PreSelectedCenter = true;
                 }
@@ -1033,7 +1027,7 @@ namespace Moshrefy.Web.Controllers
 
             try
             {
-                var centerDTO = await _superAdminService.GetCenterByIdAsync(centerId);
+                var centerDTO = await _centerService.GetByIdAsync(centerId);
                 var centerVM = _mapper.Map<CenterVM>(centerDTO);
 
                 ViewBag.CenterId = centerId;
@@ -1134,7 +1128,7 @@ namespace Moshrefy.Web.Controllers
         {
             try
             {
-                var centers = await _superAdminService.GetNonDeletedCentersAsync(new PaginationParamter
+                var centers = await _centerService.GetNonDeletedAsync(new PaginationParamter
                 {
                     PageSize = 50,
                     PageNumber = 1
@@ -1162,7 +1156,7 @@ namespace Moshrefy.Web.Controllers
         // Get active centers for dropdown
         private async Task<List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>> GetActiveCentersForDropdown()
         {
-            var centers = await _superAdminService.GetNonDeletedCentersAsync(new PaginationParamter
+            var centers = await _centerService.GetNonDeletedAsync(new PaginationParamter
             {
                 PageSize = 200,
                 PageNumber = 1

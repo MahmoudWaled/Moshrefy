@@ -96,7 +96,7 @@ namespace Moshrefy.Application.Services
 
             ValidateCenterAccess(teacherItem.CenterId, nameof(TeacherItem));
             mapper.Map(updateTeacherItemDTO, teacherItem);
-            unitOfWork.TeacherItems.UpdateAsync(teacherItem);
+            unitOfWork.TeacherItems.Update(teacherItem);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -107,7 +107,7 @@ namespace Moshrefy.Application.Services
                 throw new NotFoundException<int>(nameof(teacherItem), "teacherItem", id);
 
             ValidateCenterAccess(teacherItem.CenterId, nameof(TeacherItem));
-            unitOfWork.TeacherItems.DeleteAsync(teacherItem);
+            unitOfWork.TeacherItems.SoftDelete(teacherItem);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -119,7 +119,7 @@ namespace Moshrefy.Application.Services
 
             ValidateCenterAccess(teacherItem.CenterId, nameof(TeacherItem));
             teacherItem.IsDeleted = true;
-            unitOfWork.TeacherItems.UpdateAsync(teacherItem);
+            unitOfWork.TeacherItems.Update(teacherItem);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -131,7 +131,7 @@ namespace Moshrefy.Application.Services
 
             ValidateCenterAccess(teacherItem.CenterId, nameof(TeacherItem));
             teacherItem.IsDeleted = false;
-            unitOfWork.TeacherItems.UpdateAsync(teacherItem);
+            unitOfWork.TeacherItems.Update(teacherItem);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -143,7 +143,7 @@ namespace Moshrefy.Application.Services
 
             ValidateCenterAccess(teacherItem.CenterId, nameof(TeacherItem));
             teacherItem.IsActive = true;
-            unitOfWork.TeacherItems.UpdateAsync(teacherItem);
+            unitOfWork.TeacherItems.Update(teacherItem);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -155,7 +155,7 @@ namespace Moshrefy.Application.Services
 
             ValidateCenterAccess(teacherItem.CenterId, nameof(TeacherItem));
             teacherItem.IsActive = false;
-            unitOfWork.TeacherItems.UpdateAsync(teacherItem);
+            unitOfWork.TeacherItems.Update(teacherItem);
             await unitOfWork.SaveChangesAsync();
         }
 

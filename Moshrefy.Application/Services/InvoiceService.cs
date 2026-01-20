@@ -69,7 +69,7 @@ namespace Moshrefy.Application.Services
 
             ValidateCenterAccess(invoice.CenterId, nameof(Invoice));
             mapper.Map(updateInvoiceDTO, invoice);
-            unitOfWork.Invoices.UpdateAsync(invoice);
+            unitOfWork.Invoices.Update(invoice);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -80,7 +80,7 @@ namespace Moshrefy.Application.Services
                 throw new NotFoundException<int>(nameof(invoice), "invoice", id);
 
             ValidateCenterAccess(invoice.CenterId, nameof(Invoice));
-            unitOfWork.Invoices.DeleteAsync(invoice);
+            unitOfWork.Invoices.SoftDelete(invoice);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -92,7 +92,7 @@ namespace Moshrefy.Application.Services
 
             ValidateCenterAccess(invoice.CenterId, nameof(Invoice));
             invoice.IsDeleted = true;
-            unitOfWork.Invoices.UpdateAsync(invoice);
+            unitOfWork.Invoices.Update(invoice);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -104,7 +104,7 @@ namespace Moshrefy.Application.Services
 
             ValidateCenterAccess(invoice.CenterId, nameof(Invoice));
             invoice.IsDeleted = false;
-            unitOfWork.Invoices.UpdateAsync(invoice);
+            unitOfWork.Invoices.Update(invoice);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -116,7 +116,7 @@ namespace Moshrefy.Application.Services
 
             ValidateCenterAccess(invoice.CenterId, nameof(Invoice));
             invoice.IsPaid = true;
-            unitOfWork.Invoices.UpdateAsync(invoice);
+            unitOfWork.Invoices.Update(invoice);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -128,7 +128,7 @@ namespace Moshrefy.Application.Services
 
             ValidateCenterAccess(invoice.CenterId, nameof(Invoice));
             invoice.IsPaid = false;
-            unitOfWork.Invoices.UpdateAsync(invoice);
+            unitOfWork.Invoices.Update(invoice);
             await unitOfWork.SaveChangesAsync();
         }
     }

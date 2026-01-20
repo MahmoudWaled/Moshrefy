@@ -1,0 +1,322 @@
+@model Moshrefy.Web.Models.Enrollment.EnrollmentVM
+@{
+    ViewData["Title"] = "Enrollment Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Page Header -->
+<div class="page-header-modern">
+    <div class="row g-2 align-items-center">
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb-modern">
+                    <li class="breadcrumb-item">
+                        <a asp-controller="Enrollment" asp-action="Index"><i class="ti ti-users"></i> Enrollments</a>
+                        <i class="ti ti-chevron-right breadcrumb-separator ms-2"></i>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Details</li>
+                </ol>
+            </nav>
+            <h2 class="page-title"><i class="ti ti-eye"></i> Enrollment Details</h2>
+        </div>
+        <div class="col-auto ms-auto">
+            <button type="button" onclick="goBack()" class="btn">
+                <i class="ti ti-arrow-left"></i> Back
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Page body -->
+<div class="page-body">
+  <div class="container-xl">
+    <div class="row">
+      <!-- Main Content -->
+      <div class="col-lg-8">
+        <!-- Status Banner -->
+        <div class="card mb-3 @(Model.IsActive ? "border-success" : "border-secondary")">
+          <div class="card-body py-3">
+            <div class="d-flex align-items-center">
+              @if (Model.IsActive)
+              {
+                <span class="avatar bg-state-active text-white me-3">
+                  <i class="ti ti-check"></i>
+                </span>
+                <div>
+                  <h3 class="mb-0 text-success">Active Enrollment</h3>
+                  <small class="text-muted">This enrollment is currently active</small>
+                </div>
+              }
+              else
+              {
+                <span class="avatar bg-state-inactive text-white me-3">
+                  <i class="ti ti-x"></i>
+                </span>
+                <div>
+                  <h3 class="mb-0 text-muted">Inactive Enrollment</h3>
+                  <small class="text-muted">This enrollment is inactive</small>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Details Card -->
+        <div class="card mb-3">
+          <div class="card-header">
+            <div class="d-flex align-items-center">
+              <span class="avatar bg-primary text-white me-3">
+                <i class="ti ti-info-circle"></i>
+              </span>
+              <h3 class="card-title mb-0">Enrollment Information</h3>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label text-muted small mb-1">
+                  <i class="ti ti-user me-1"></i> Student
+                </label>
+                <div class="h5 mb-0">
+                  <a href="/Student/Details/@Model.StudentId" class="text-decoration-none">
+                    <span class="badge bg-azure text-white"><i class="ti ti-user me-1"></i>@Model.StudentName</span>
+                  </a>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label text-muted small mb-1">
+                  <i class="ti ti-book me-1"></i> Course
+                </label>
+                <div class="h5 mb-0">
+                  <a href="/Course/Details/@Model.CourseId" class="text-decoration-none">@Model.CourseName</a>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label text-muted small mb-1">
+                  <i class="ti ti-calendar me-1"></i> Academic Year
+                </label>
+                <div class="h5 mb-0">@(Model.AcademicYearName ?? "N/A")</div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label text-muted small mb-1">
+                  <i class="ti ti-toggle-left me-1"></i> Status
+                </label>
+                <div>
+                  @if (Model.IsActive)
+                  {
+                    <span class="badge bg-state-active py-2 px-3">
+                      <i class="ti ti-check me-1"></i> Active
+                    </span>
+                  }
+                  else
+                  {
+                    <span class="badge bg-state-inactive py-2 px-3">
+                      <i class="ti ti-x me-1"></i> Inactive
+                    </span>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Audit Trail Card -->
+        @if (!string.IsNullOrEmpty(Model.CreatedByName))
+        {
+          <div class="card">
+            <div class="card-header">
+              <div class="d-flex align-items-center">
+                <span class="avatar bg-secondary text-white me-3">
+                  <i class="ti ti-history"></i>
+                </span>
+                <h3 class="card-title mb-0">Audit Trail</h3>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <div class="d-flex align-items-start">
+                    <div class="avatar avatar-sm bg-green-lt text-green me-3">
+                      <i class="ti ti-plus"></i>
+                    </div>
+                    <div>
+                      <div class="text-muted small">Created By</div>
+                      <div class="fw-medium">@Model.CreatedByName</div>
+                      <div class="text-muted small">@Model.CreatedAt.ToString("MMM dd, yyyy 'at' hh:mm tt")</div>
+                    </div>
+                  </div>
+                </div>
+                @if (Model.ModifiedAt.HasValue)
+                {
+                  <div class="col-md-6">
+                    <div class="d-flex align-items-start">
+                      <div class="avatar avatar-sm bg-yellow-lt text-yellow me-3">
+                        <i class="ti ti-edit"></i>
+                      </div>
+                      <div>
+                        <div class="text-muted small">Last Modified By</div>
+                        <div class="fw-medium">@Model.ModifiedByName</div>
+                        <div class="text-muted small">@Model.ModifiedAt.Value.ToString("MMM dd, yyyy 'at' hh:mm tt")</div>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Sidebar -->
+      <div class="col-lg-4">
+        @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+        {
+          <!-- Actions Card -->
+          <div class="card mb-3">
+            <div class="card-header">
+              <h3 class="card-title"><i class="ti ti-settings me-2"></i>Actions</h3>
+            </div>
+            <div class="card-body">
+              <div class="d-grid gap-2">
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-action-edit">
+                  <i class="ti ti-edit me-2"></i> Edit Enrollment
+                </a>
+                @if (Model.IsActive)
+                {
+                  <button onclick="deactivateEnrollment(@Model.Id)" class="btn btn-warning">
+                    <i class="ti ti-ban me-2"></i> Deactivate
+                  </button>
+                }
+                else
+                {
+                  <button onclick="activateEnrollment(@Model.Id)" class="btn btn-success">
+                    <i class="ti ti-check me-2"></i> Activate
+                  </button>
+                }
+                @if (User.IsInRole("Admin"))
+                {
+                  <hr class="my-2">
+                  <button onclick="deleteEnrollment(@Model.Id)" class="btn btn-outline-danger">
+                    <i class="ti ti-trash me-2"></i> Delete Enrollment
+                  </button>
+                }
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>
+
+@section Scripts {
+    <script>
+        function goBack() {
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = '@Url.Action("Index", "Enrollment")';
+            }
+        }
+
+        function deleteEnrollment(id) {
+            TablerDialog.fire({
+                title: 'Delete Enrollment?',
+                html: 'This will permanently delete this enrollment.<br><br>Type <strong>Delete</strong> to confirm:',
+                icon: 'warning',
+                input: 'text',
+                inputPlaceholder: 'Type Delete here',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="ti ti-trash"></i> Delete',
+                cancelButtonText: 'Cancel',
+                inputValidator: (value) => {
+                    if (value !== 'Delete') {
+                        return 'Please type "Delete" to confirm';
+                    }
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post('@Url.Action("Delete")', { id: id })
+                        .done(function(response) {
+                            if (response.success) {
+                                TablerDialog.fire({
+                                    icon: 'success',
+                                    title: 'Deleted!',
+                                    text: response.message,
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                }).then(() => window.location.href = '@Url.Action("Index")');
+                            } else {
+                                TablerDialog.fire('Error', response.message, 'error');
+                            }
+                        })
+                        .fail(function() {
+                            TablerDialog.fire('Error', 'An error occurred while deleting.', 'error');
+                        });
+                }
+            });
+        }
+
+        function activateEnrollment(id) {
+            TablerDialog.fire({
+                title: 'Activate Enrollment?',
+                text: 'This will activate this enrollment.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="ti ti-check"></i> Activate',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post('@Url.Action("Activate")', { id: id })
+                        .done(function(response) {
+                            if (response.success) {
+                                TablerDialog.fire({
+                                    icon: 'success',
+                                    title: 'Activated!',
+                                    text: response.message,
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                }).then(() => location.reload());
+                            } else {
+                                TablerDialog.fire('Error', response.message, 'error');
+                            }
+                        });
+                }
+            });
+        }
+
+        function deactivateEnrollment(id) {
+            TablerDialog.fire({
+                title: 'Deactivate Enrollment?',
+                text: 'This will deactivate this enrollment.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ffc107',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="ti ti-ban"></i> Deactivate',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post('@Url.Action("Deactivate")', { id: id })
+                        .done(function(response) {
+                            if (response.success) {
+                                TablerDialog.fire({
+                                    icon: 'success',
+                                    title: 'Deactivated!',
+                                    text: response.message,
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                }).then(() => location.reload());
+                            } else {
+                                TablerDialog.fire('Error', response.message, 'error');
+                            }
+                        });
+                }
+            });
+        }
+    </script>
+}

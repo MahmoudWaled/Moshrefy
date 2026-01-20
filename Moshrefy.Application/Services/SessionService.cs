@@ -148,7 +148,7 @@ namespace Moshrefy.Application.Services
 
             ValidateCenterAccess(session.CenterId, nameof(Session));
             mapper.Map(updateSessionDTO, session);
-            unitOfWork.Sessions.UpdateAsync(session);
+            unitOfWork.Sessions.Update(session);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -159,7 +159,7 @@ namespace Moshrefy.Application.Services
                 throw new NotFoundException<int>(nameof(session), "session", id);
 
             ValidateCenterAccess(session.CenterId, nameof(Session));
-            unitOfWork.Sessions.DeleteAsync(session);
+            unitOfWork.Sessions.SoftDelete(session);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -171,7 +171,7 @@ namespace Moshrefy.Application.Services
 
             ValidateCenterAccess(session.CenterId, nameof(Session));
             session.IsDeleted = true;
-            unitOfWork.Sessions.UpdateAsync(session);
+            unitOfWork.Sessions.Update(session);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -183,7 +183,7 @@ namespace Moshrefy.Application.Services
 
             ValidateCenterAccess(session.CenterId, nameof(Session));
             session.IsDeleted = false;
-            unitOfWork.Sessions.UpdateAsync(session);
+            unitOfWork.Sessions.Update(session);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -195,7 +195,7 @@ namespace Moshrefy.Application.Services
 
             ValidateCenterAccess(session.CenterId, nameof(Session));
             session.IsPaid = true;
-            unitOfWork.Sessions.UpdateAsync(session);
+            unitOfWork.Sessions.Update(session);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -207,7 +207,7 @@ namespace Moshrefy.Application.Services
 
             ValidateCenterAccess(session.CenterId, nameof(Session));
             session.IsPaid = false;
-            unitOfWork.Sessions.UpdateAsync(session);
+            unitOfWork.Sessions.Update(session);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -219,7 +219,7 @@ namespace Moshrefy.Application.Services
 
             ValidateCenterAccess(session.CenterId, nameof(Session));
             session.SessionStatus = status;
-            unitOfWork.Sessions.UpdateAsync(session);
+            unitOfWork.Sessions.Update(session);
             await unitOfWork.SaveChangesAsync();
         }
     }

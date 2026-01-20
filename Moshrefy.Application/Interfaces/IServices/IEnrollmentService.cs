@@ -19,5 +19,8 @@ namespace Moshrefy.Application.Interfaces.IServices
         Task ActivateAsync(int id);
         Task DeactivateAsync(int id);
         Task<bool> IsStudentEnrolledInCourseAsync(int studentId, int courseId);
+        Task<(int successCount, int duplicateCount)> BulkEnrollStudentInCoursesAsync(int studentId, List<int> courseIds);
+        Task<(int successCount, int duplicateCount)> BulkEnrollStudentsInCourseAsync(int courseId, List<int> studentIds);
+        
     }
 }

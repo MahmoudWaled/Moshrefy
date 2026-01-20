@@ -88,12 +88,11 @@ namespace Moshrefy.Application.Services
             // Exclude soft-deleted users
             var query = _userManager.Users.Where(u => u.CenterId == currentCenterId && !u.IsDeleted);
 
-            if (paginationParamter.PageSize != null && paginationParamter.PageNumber != null)
-            {
+         
                 query = query
-                    .Skip((paginationParamter.PageNumber.Value - 1) * paginationParamter.PageSize.Value)
-                    .Take(paginationParamter.PageSize.Value);
-            }
+                    .Skip((paginationParamter.PageNumber - 1) * paginationParamter.PageSize)
+                    .Take(paginationParamter.PageSize);
+            
 
             var users = await query.ToListAsync();
             return _mapper.Map<List<UserResponseDTO>>(users);
@@ -109,12 +108,11 @@ namespace Moshrefy.Application.Services
             var query = _userManager.Users
                 .Where(u => u.CenterId == currentCenterId && u.IsActive && !u.IsDeleted);
 
-            if (paginationParamter.PageSize != null && paginationParamter.PageNumber != null)
-            {
+          
                 query = query
-                    .Skip((paginationParamter.PageNumber.Value - 1) * paginationParamter.PageSize.Value)
-                    .Take(paginationParamter.PageSize.Value);
-            }
+                    .Skip((paginationParamter.PageNumber - 1) * paginationParamter.PageSize)
+                    .Take(paginationParamter.PageSize);
+            
 
             var users = await query.ToListAsync();
             return _mapper.Map<List<UserResponseDTO>>(users);
@@ -130,12 +128,11 @@ namespace Moshrefy.Application.Services
             var query = _userManager.Users
                 .Where(u => u.CenterId == currentCenterId && !u.IsActive && !u.IsDeleted);
 
-            if (paginationParamter.PageSize != null && paginationParamter.PageNumber != null)
-            {
+          
                 query = query
-                    .Skip((paginationParamter.PageNumber.Value - 1) * paginationParamter.PageSize.Value)
-                    .Take(paginationParamter.PageSize.Value);
-            }
+                    .Skip((paginationParamter.PageNumber - 1) * paginationParamter.PageSize)
+                    .Take(paginationParamter.PageSize);
+            
 
             var users = await query.ToListAsync();
             return _mapper.Map<List<UserResponseDTO>>(users);
@@ -159,12 +156,11 @@ namespace Moshrefy.Application.Services
             var filteredUsers = usersInRole.Where(u => u.CenterId == currentCenterId).ToList();
 
             var paginatedUsers = filteredUsers.AsEnumerable();
-            if (paginationParamter.PageSize != null && paginationParamter.PageNumber != null)
-            {
+           
                 paginatedUsers = paginatedUsers
-                    .Skip((paginationParamter.PageNumber.Value - 1) * paginationParamter.PageSize.Value)
-                    .Take(paginationParamter.PageSize.Value);
-            }
+                    .Skip((paginationParamter.PageNumber - 1) * paginationParamter.PageSize)
+                    .Take(paginationParamter.PageSize);
+            
 
             return _mapper.Map<List<UserResponseDTO>>(paginatedUsers.ToList());
         }

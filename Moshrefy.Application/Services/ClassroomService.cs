@@ -77,7 +77,7 @@ namespace Moshrefy.Application.Services
 
             ValidateCenterAccess(classroom.CenterId, nameof(Classroom));
             mapper.Map(updateClassroomDTO, classroom);
-            unitOfWork.Classrooms.UpdateAsync(classroom);
+            unitOfWork.Classrooms.Update(classroom);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -88,7 +88,7 @@ namespace Moshrefy.Application.Services
                 throw new NotFoundException<int>(nameof(classroom), "classroom", id);
 
             ValidateCenterAccess(classroom.CenterId, nameof(Classroom));
-            unitOfWork.Classrooms.DeleteAsync(classroom);
+            unitOfWork.Classrooms.SoftDelete(classroom);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -100,7 +100,7 @@ namespace Moshrefy.Application.Services
 
             ValidateCenterAccess(classroom.CenterId, nameof(Classroom));
             classroom.IsActive = true;
-            unitOfWork.Classrooms.UpdateAsync(classroom);
+            unitOfWork.Classrooms.Update(classroom);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -112,7 +112,7 @@ namespace Moshrefy.Application.Services
 
             ValidateCenterAccess(classroom.CenterId, nameof(Classroom));
             classroom.IsActive = false;
-            unitOfWork.Classrooms.UpdateAsync(classroom);
+            unitOfWork.Classrooms.Update(classroom);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -124,7 +124,7 @@ namespace Moshrefy.Application.Services
 
             ValidateCenterAccess(classroom.CenterId, nameof(Classroom));
             classroom.IsDeleted = true;
-            unitOfWork.Classrooms.UpdateAsync(classroom);
+            unitOfWork.Classrooms.Update(classroom);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -136,7 +136,7 @@ namespace Moshrefy.Application.Services
 
             ValidateCenterAccess(classroom.CenterId, nameof(Classroom));
             classroom.IsDeleted = false;
-            unitOfWork.Classrooms.UpdateAsync(classroom);
+            unitOfWork.Classrooms.Update(classroom);
             await unitOfWork.SaveChangesAsync();
         }
     }

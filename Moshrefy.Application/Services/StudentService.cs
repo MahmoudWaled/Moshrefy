@@ -121,7 +121,7 @@ namespace Moshrefy.Application.Services
             student.ModifiedByName = currentUser!.UserName ?? string.Empty;
             student.ModifiedAt = DateTimeOffset.UtcNow;
             
-            unitOfWork.Students.UpdateAsync(student);
+            unitOfWork.Students.Update(student);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -133,7 +133,7 @@ namespace Moshrefy.Application.Services
 
             ValidateCenterAccess(student.CenterId, nameof(Student));
 
-            unitOfWork.Students.DeleteAsync(student);
+            unitOfWork.Students.SoftDelete(student);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -153,7 +153,7 @@ namespace Moshrefy.Application.Services
             student.ModifiedByName = currentUser!.UserName ?? string.Empty;
             student.ModifiedAt = DateTimeOffset.UtcNow;
             
-            unitOfWork.Students.UpdateAsync(student);
+            unitOfWork.Students.Update(student);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -173,7 +173,7 @@ namespace Moshrefy.Application.Services
             student.ModifiedByName = currentUser!.UserName ?? string.Empty;
             student.ModifiedAt = DateTimeOffset.UtcNow;
             
-            unitOfWork.Students.UpdateAsync(student);
+            unitOfWork.Students.Update(student);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -193,7 +193,7 @@ namespace Moshrefy.Application.Services
             student.ModifiedByName = currentUser!.UserName ?? string.Empty;
             student.ModifiedAt = DateTimeOffset.UtcNow;
             
-            unitOfWork.Students.UpdateAsync(student);
+            unitOfWork.Students.Update(student);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -213,7 +213,7 @@ namespace Moshrefy.Application.Services
             student.ModifiedByName = currentUser!.UserName ?? string.Empty;
             student.ModifiedAt = DateTimeOffset.UtcNow;
             
-            unitOfWork.Students.UpdateAsync(student);
+            unitOfWork.Students.Update(student);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -233,7 +233,7 @@ namespace Moshrefy.Application.Services
             student.ModifiedByName = currentUser!.UserName ?? string.Empty;
             student.ModifiedAt = DateTimeOffset.UtcNow;
             
-            unitOfWork.Students.UpdateAsync(student);
+            unitOfWork.Students.Update(student);
             await unitOfWork.SaveChangesAsync();
         }
 

@@ -1,9 +1,11 @@
 ﻿using Moshrefy.Domain.Identity;
+using Moshrefy.Domain.Interfaces;
+using Moshrefy.Domain.SoftDeletable;       
 using System.ComponentModel.DataAnnotations;
 
 namespace Moshrefy.Domain.Entities
 {
-    public class Center
+    public class Center : IAuditable, ISoftDeletable, IActivatable
     {
 
         public int Id { get; set; }

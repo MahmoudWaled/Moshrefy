@@ -106,7 +106,7 @@ namespace Moshrefy.Application.Services
 
             ValidateCenterAccess(payment.CenterId, nameof(Payment));
             mapper.Map(updatePaymentDTO, payment);
-            unitOfWork.Payments.UpdateAsync(payment);
+            unitOfWork.Payments.Update(payment);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -117,7 +117,7 @@ namespace Moshrefy.Application.Services
                 throw new NotFoundException<int>(nameof(payment), "payment", id);
 
             ValidateCenterAccess(payment.CenterId, nameof(Payment));
-            unitOfWork.Payments.DeleteAsync(payment);
+            unitOfWork.Payments.SoftDelete(payment);
             await unitOfWork.SaveChangesAsync();
         }
     }

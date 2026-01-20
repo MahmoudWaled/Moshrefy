@@ -9,30 +9,12 @@ namespace Moshrefy.Application.Interfaces.IServices
     // Service for SuperAdmin to manage all centers and users across the system.
     public interface ISuperAdminService
     {
-        // -------- Center Management -------- 
-        Task<CenterResponseDTO> CreateCenterAsync(CreateCenterDTO createCenterDTO);
-        Task<List<CenterResponseDTO>> GetAllCentersAsync(PaginationParamter paginationParamter);
-        Task<int> GetTotalCentersCountAsync();
-        Task<List<CenterResponseDTO>> GetNonDeletedCentersAsync(PaginationParamter paginationParamter);
-        Task<int> GetNonDeletedCentersCountAsync();
-        Task<List<CenterResponseDTO>> GetActiveCentersAsync(PaginationParamter paginationParamter);
-        Task<List<CenterResponseDTO>> GetInactiveCentersAsync(PaginationParamter paginationParamter);
-        Task<List<CenterResponseDTO>> GetDeletedCentersAsync(PaginationParamter paginationParamter);
-        Task<int> GetDeletedCentersCountAsync();
-        Task<CenterResponseDTO> GetCenterByIdAsync(int centerId);
-        Task UpdateCenterAsync(int centerId, UpdateCenterDTO updateCenterDTO);
-        Task SoftDeleteCenterAsync(int centerId);
-        Task DeleteCenterAsync(int centerId);
-        Task RestoreCenterAsync(int centerId);
-        Task ActivateCenterAsync(int centerId);
-        Task DeactivateCenterAsync(int centerId);
-        Task<UserResponseDTO?> GetCenterAdminAsync(int centerId);
-
         // -------- User Management (All Centers) --------
         Task<UserResponseDTO> CreateAdminForCenterAsync(CreateUserDTO createUserDTO);
-        
+        Task<UserResponseDTO?> GetCenterAdminAsync(int centerId);
+
         // DataTables
-        Task<DataTableResponse<CenterResponseDTO>> GetCentersDataTableAsync(DataTableRequest request);
+        //Task<DataTableResponse<CenterResponseDTO>> GetCentersDataTableAsync(DataTableRequest request);
         Task<DataTableResponse<UserResponseDTO>> GetUsersDataTableAsync(DataTableRequest request);
         Task<UserResponseDTO> CreateCenterAdminAsync(int centerId, CreateUserDTO createUserDTO);
         Task<UserResponseDTO> CreateUserForCenterAsync(int centerId, CreateUserDTO createUserDTO);

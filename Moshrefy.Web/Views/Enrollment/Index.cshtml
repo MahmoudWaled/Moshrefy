@@ -1,0 +1,285 @@
+@{
+    ViewData["Title"] = "Enrollments";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Page Header -->
+<div class="page-header-modern">
+    <div class="row g-2 align-items-center">
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb-modern">
+                    <li class="breadcrumb-item active" aria-current="page">
+                        <i class="ti ti-users"></i> Enrollments
+                    </li>
+                </ol>
+            </nav>
+            <h2 class="page-title"><i class="ti ti-users"></i> Manage Enrollments</h2>
+        </div>
+        <div class="col-auto ms-auto">
+            @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+            {
+                <a asp-action="Create" class="btn btn-success">
+                    <i class="ti ti-plus"></i> New Enrollment
+                </a>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Page body -->
+<div class="page-body">
+  <div class="container-xl">
+    <div class="card">
+      <div class="card-header">
+        <div class="row align-items-center">
+          <div class="col">
+            <h3 class="card-title"><i class="ti ti-list me-2"></i>All Enrollments</h3>
+          </div>
+          <div class="col-auto ms-auto">
+            <!-- Status Filter Buttons -->
+            <div class="btn-group" role="group">
+              <button type="button" class="btn btn-outline-primary active" data-filter-status="all">
+                All
+              </button>
+              <button type="button" class="btn btn-outline-success" data-filter-status="active">
+                Active
+              </button>
+              <button type="button" class="btn btn-outline-secondary" data-filter-status="inactive">
+                Inactive
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <div class="table-responsive">
+          <table id="enrollmentsTable" class="table table-vcenter card-table table-striped">
+            <thead>
+              <tr>
+                <th style="width: 5%">#</th>
+                <th style="width: 20%">Student</th>
+                <th style="width: 20%">Course</th>
+                <th style="width: 15%">Academic Year</th>
+                <th style="width: 12%">Enrolled Date</th>
+                <th style="width: 10%" class="text-center">Status</th>
+                <th style="width: 18%" class="text-center">Actions</th>
+              </tr>
+            </thead>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Initialize DataTable
+            var table = $('#enrollmentsTable').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: '@Url.Action("GetEnrollmentsData")',
+                    type: 'POST',
+                    data: function(d) {
+                        d.filterStatus = currentStatusFilter;
+                    }
+                },
+                columns: [
+                    {
+                        data: null,
+                        orderable: false,
+                        render: function(data, type, row, meta) {
+                            return meta.row + meta.settings._iDisplayStart + 1;
+                        }
+                    },
+                    {
+                        data: 'studentName',
+                        orderable: true,
+                        render: function(d, t, row) {
+                            return '<a href="/Student/Details/' + row.studentId + '" class="badge bg-azure text-white"><i class="ti ti-user me-1"></i>' + d + '</a>';
+                        }
+                    },
+                    { data: 'courseName', orderable: true },
+                    { data: 'academicYearName', orderable: true, defaultContent: '<span class="text-muted">N/A</span>' },
+                    {
+                        data: 'createdAt',
+                        orderable: true,
+                        render: function(d) {
+                            if (!d) return '<span class="text-muted">N/A</span>';
+                            var date = new Date(d);
+                            return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+                        }
+                    },
+                    {
+                        data: 'isActive',
+                        orderable: true,
+                        className: 'text-center',
+                        render: function(d) {
+                            return d ? '<span class="badge bg-state-active"><i class="ti ti-check"></i> Active</span>' : '<span class="badge bg-state-inactive text-white"><i class="ti ti-x"></i> Inactive</span>';
+                        }
+                    },
+                    {
+                        data: null, orderable: false,
+                        className: 'text-center',
+                        render: function(d, t, row) {
+                            var actions = '<div class="btn-group btn-group-sm">';
+                            @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                            {
+                                @:if (row.isActive) { actions += '<button onclick="deactivateEnrollment(' + row.id + ')" class="btn btn-action-icon action-deactivate" title="Deactivate"><i class="ti ti-ban"></i></button>'; }
+                                @:else { actions += '<button onclick="activateEnrollment(' + row.id + ')" class="btn btn-action-icon action-activate" title="Activate"><i class="ti ti-check"></i></button>'; }
+                            }
+                            @if (User.IsInRole("Admin"))
+                            {
+                                @:actions += '<button onclick="deleteEnrollment(' + row.id + ')" class="btn btn-action-icon action-delete" title="Delete"><i class="ti ti-trash"></i></button>';
+                            }
+                            return actions + '</div>';
+                        }
+                    }
+                ],
+                order: [[1, 'asc']],
+                language: {
+                    search: '_INPUT_',
+                    searchPlaceholder: 'Search enrollments...',
+                    lengthMenu: '_MENU_ entries',
+                    info: 'Showing _START_ to _END_ of _TOTAL_ enrollments',
+                    infoEmpty: 'No enrollments found',
+                    infoFiltered: '(from _MAX_ total)',
+                    zeroRecords: 'No matching enrollments found',
+                    paginate: { first: '«', last: '»', next: '›', previous: '‹' },
+                    processing: '<div class="spinner-border text-primary" role="status"></div><span class="ms-2">Loading...</span>'
+                }
+            });
+
+            // Status filter button click handler
+            var currentStatusFilter = 'all';
+            $('[data-filter-status]').click(function() {
+                currentStatusFilter = $(this).data('filter-status');
+                $('[data-filter-status]').removeClass('active btn-primary btn-success btn-secondary').addClass('btn-outline-primary btn-outline-success btn-outline-secondary');
+                $(this).removeClass('btn-outline-primary btn-outline-success btn-outline-secondary');
+                
+                if (currentStatusFilter === 'all') {
+                    $(this).addClass('active btn-primary');
+                } else if (currentStatusFilter === 'active') {
+                    $(this).addClass('btn-success');
+                } else {
+                    $(this).addClass('btn-secondary');
+                }
+                
+                table.ajax.reload();
+            });
+        });
+
+        // Delete enrollment with "type Delete" confirmation
+        function deleteEnrollment(id) {
+            TablerDialog.fire({
+                title: 'Delete Enrollment?',
+                html: 'This will permanently delete this enrollment.<br><br>Type <strong>Delete</strong> to confirm:',
+                icon: 'warning',
+                input: 'text',
+                inputPlaceholder: 'Type Delete here',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="ti ti-trash"></i> Delete',
+                cancelButtonText: 'Cancel',
+                inputValidator: (value) => {
+                    if (value !== 'Delete') {
+                        return 'Please type "Delete" to confirm';
+                    }
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post('@Url.Action("Delete")', { id: id })
+                        .done(function(response) {
+                            if (response.success) {
+                                TablerDialog.fire({
+                                    icon: 'success',
+                                    title: 'Deleted!',
+                                    text: response.message,
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                }).then(() => $('#enrollmentsTable').DataTable().ajax.reload());
+                            } else {
+                                TablerDialog.fire('Error', response.message, 'error');
+                            }
+                        })
+                        .fail(function() {
+                            TablerDialog.fire('Error', 'An error occurred while deleting.', 'error');
+                        });
+                }
+            });
+        }
+
+        // Activate enrollment
+        function activateEnrollment(id) {
+            TablerDialog.fire({
+                title: 'Activate Enrollment?',
+                text: 'This will activate this enrollment.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="ti ti-check"></i> Activate',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post('@Url.Action("Activate")', { id: id })
+                        .done(function(response) {
+                            if (response.success) {
+                                TablerDialog.fire({
+                                    icon: 'success',
+                                    title: 'Activated!',
+                                    text: response.message,
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                }).then(() => $('#enrollmentsTable').DataTable().ajax.reload());
+                            } else {
+                                TablerDialog.fire('Error', response.message, 'error');
+                            }
+                        })
+                        .fail(function() {
+                            TablerDialog.fire('Error', 'An error occurred.', 'error');
+                        });
+                }
+            });
+        }
+
+        // Deactivate enrollment
+        function deactivateEnrollment(id) {
+            TablerDialog.fire({
+                title: 'Deactivate Enrollment?',
+                text: 'This will deactivate this enrollment.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ffc107',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="ti ti-ban"></i> Deactivate',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post('@Url.Action("Deactivate")', { id: id })
+                        .done(function(response) {
+                            if (response.success) {
+                                TablerDialog.fire({
+                                    icon: 'success',
+                                    title: 'Deactivated!',
+                                    text: response.message,
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                }).then(() => $('#enrollmentsTable').DataTable().ajax.reload());
+                            } else {
+                                TablerDialog.fire('Error', response.message, 'error');
+                            }
+                        })
+                        .fail(function() {
+                            TablerDialog.fire('Error', 'An error occurred.', 'error');
+                        });
+                }
+            });
+        }
+    </script>
+}

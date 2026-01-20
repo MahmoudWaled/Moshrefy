@@ -17,15 +17,18 @@ namespace Moshrefy.Web.Controllers
         #region Dependencies
 
         private readonly IStudentService _studentService;
+        private readonly IEnrollmentService _enrollmentService;
         private readonly IMapper _mapper;
         private readonly ILogger<StudentController> _logger;
 
         public StudentController(
             IStudentService studentService,
+            IEnrollmentService enrollmentService,
             IMapper mapper,
             ILogger<StudentController> logger)
         {
             _studentService = studentService;
+            _enrollmentService = enrollmentService;
             _mapper = mapper;
             _logger = logger;
         }
@@ -70,6 +73,11 @@ namespace Moshrefy.Web.Controllers
             try
             {
                 var studentDTO = await _studentService.GetByIdAsync(id);
+                if (studentDTO == null || studentDTO.IsDeleted)
+                {
+                    return NotFound();
+                }
+                
                 var studentVM = _mapper.Map<StudentVM>(studentDTO);
                 return View(studentVM);
             }
@@ -310,6 +318,34 @@ namespace Moshrefy.Web.Controllers
             {
                 _logger.LogError(ex, $"Error permanently deleting student {id}");
                 return Json(new { success = false, message = $"Error: {ex.Message}" });
+            }
+        }
+
+        // GET: Student/GetEnrollments/5 (AJAX)
+        // Get enrollments for a student
+        [HttpGet]
+        public async Task<IActionResult> GetEnrollments(int id)
+        {
+            try
+            {
+                var enrollments = await _enrollmentService.GetByStudentIdAsync(id);
+                var result = enrollments
+                    .Where(e => !e.IsDeleted && !e.CourseIsDeleted)
+                    .Select(e => new
+                    {
+                        enrollmentId = e.Id,
+                        courseId = e.CourseId,
+                        courseName = e.CourseName,
+                        academicYearName = e.AcademicYearName,
+                        isActive = e.IsActive
+                    })
+                    .ToList();
+                return Json(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error loading enrollments for student {id}");
+                return Json(new List<object>());
             }
         }
 

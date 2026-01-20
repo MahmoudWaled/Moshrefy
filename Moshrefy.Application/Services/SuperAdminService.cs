@@ -23,400 +23,155 @@ namespace Moshrefy.Application.Services
         ITenantContext _tenantContext) : ISuperAdminService
     {
 
-
-        #region Center Management
-        public async Task<CenterResponseDTO> CreateCenterAsync(CreateCenterDTO createCenterDTO)
-        {
-            if (createCenterDTO == null)
-                throw new BadRequestException("CreateCenterDTO cannot be null.");
-
-            var center = _mapper.Map<Center>(createCenterDTO);
-
-            var currentUser = await _userManager.FindByIdAsync(_tenantContext.GetCurrentUserId());
-            center.CreatedById = currentUser!.Id;
-            center.CreatedByName = currentUser!.UserName ?? string.Empty;
-            center.IsActive = true;
-            center.IsDeleted = false;
-
-            await _unitOfWork.Centers.AddAsync(center);
-            await _unitOfWork.SaveChangesAsync();
-
-            return _mapper.Map<CenterResponseDTO>(center);
-        }
-
-        public async Task<List<CenterResponseDTO>> GetAllCentersAsync(PaginationParamter paginationParamter)
-        {
-            var centers = await _unitOfWork.Centers.GetAllAsync(paginationParamter);
-            return _mapper.Map<List<CenterResponseDTO>>(centers);
-        }
-
-        public async Task<int> GetTotalCentersCountAsync()
-        {
-            return await _unitOfWork.Centers.GetTotalCountAsync();
-        }
-
-        public async Task<List<CenterResponseDTO>> GetNonDeletedCentersAsync(PaginationParamter paginationParamter)
-        {
-            var centers = await _unitOfWork.Centers.GetNonDeletedCentersAsync(paginationParamter);
-            return _mapper.Map<List<CenterResponseDTO>>(centers);
-        }
-
-        public async Task<int> GetNonDeletedCentersCountAsync()
-        {
-            return await _unitOfWork.Centers.GetNonDeletedCountAsync();
-        }
-
-        public async Task<List<CenterResponseDTO>> GetActiveCentersAsync(PaginationParamter paginationParamter)
-        {
-            var activeCenters = await _unitOfWork.Centers.GetActiveCentersAsync(paginationParamter);
-            return _mapper.Map<List<CenterResponseDTO>>(activeCenters);
-        }
-
-        public async Task<List<CenterResponseDTO>> GetInactiveCentersAsync(PaginationParamter paginationParamter)
-        {
-            var inactiveCenters = await _unitOfWork.Centers.GetInactiveCentersAsync(paginationParamter);
-            return _mapper.Map<List<CenterResponseDTO>>(inactiveCenters);
-        }
-
-        public async Task<List<CenterResponseDTO>> GetDeletedCentersAsync(PaginationParamter paginationParamter)
-        {
-            var deletedCenters = await _unitOfWork.Centers.GetDeletedCentersAsync(paginationParamter);
-            return _mapper.Map<List<CenterResponseDTO>>(deletedCenters);
-        }
-
-        public async Task<int> GetDeletedCentersCountAsync()
-        {
-            return await _unitOfWork.Centers.GetDeletedCountAsync();
-        }
-
-        public async Task<CenterResponseDTO> GetCenterByIdAsync(int centerId)
-        {
-            if (centerId <= 0)
-                throw new BadRequestException("Invalid center id.");
-
-            var center = await _unitOfWork.Centers.GetByIdAsync(centerId);
-
-            if (center == null)
-                throw new NotFoundException<int>(nameof(Center), "id", centerId);
-
-            return _mapper.Map<CenterResponseDTO>(center);
-        }
-
-        public async Task UpdateCenterAsync(int centerId, UpdateCenterDTO updateCenterDTO)
-        {
-            if (centerId <= 0)
-                throw new BadRequestException("Invalid center id.");
-
-            if (updateCenterDTO == null)
-                throw new BadRequestException("UpdateCenterDTO cannot be null.");
-
-            var center = await _unitOfWork.Centers.GetByIdAsync(centerId);
-
-            if (center == null)
-                throw new NotFoundException<int>(nameof(Center), "id", centerId);
-
-            _mapper.Map(updateCenterDTO, center);
-
-            var currentUser = await _userManager.FindByIdAsync(_tenantContext.GetCurrentUserId());
-            center.ModifiedById = currentUser?.Id;
-            center.ModifiedByName = currentUser?.UserName;
-            center.ModifiedAt = DateTimeOffset.UtcNow;
-
-            _unitOfWork.Centers.UpdateAsync(center);
-            await _unitOfWork.SaveChangesAsync();
-        }
-
-        public async Task SoftDeleteCenterAsync(int centerId)
-        {
-            if (centerId <= 0)
-                throw new BadRequestException("Invalid center id.");
-
-            var center = await _unitOfWork.Centers.GetByIdAsync(centerId);
-
-            if (center == null)
-                throw new NotFoundException<int>(nameof(Center), "id", centerId);
-
-            if (center.IsDeleted)
-                throw new ConflictException("Center is already deleted.");
-
-            // Get current user info
-            var currentUser = await _userManager.FindByIdAsync(_tenantContext.GetCurrentUserId());
-
-            // Set audit fields
-            center.IsDeleted = true;
-            center.IsActive = false;
-            center.ModifiedById = currentUser?.Id;
-            center.ModifiedByName = currentUser?.UserName;
-            center.ModifiedAt = DateTimeOffset.UtcNow;
-
-            _unitOfWork.Centers.UpdateAsync(center);
-            await _unitOfWork.SaveChangesAsync();
-        }
-
-        public async Task DeleteCenterAsync(int centerId)
-        {
-            if (centerId <= 0)
-                throw new BadRequestException("Invalid center id.");
-
-            var center = await _unitOfWork.Centers.GetByIdAsync(centerId);
-
-            if (center == null)
-                throw new NotFoundException<int>(nameof(Center), "id", centerId);
-
-            _unitOfWork.Centers.DeleteAsync(center);
-            await _unitOfWork.SaveChangesAsync();
-        }
-
-        public async Task RestoreCenterAsync(int centerId)
-        {
-            if (centerId <= 0)
-                throw new BadRequestException("Invalid center id.");
-
-            var center = await _unitOfWork.Centers.GetByIdAsync(centerId);
-
-            if (center == null)
-                throw new NotFoundException<int>(nameof(Center), "id", centerId);
-
-            if (!center.IsDeleted)
-                throw new ConflictException("Center is not deleted.");
-
-            // Get current user info
-            var currentUser = await _userManager.FindByIdAsync(_tenantContext.GetCurrentUserId());
-
-            // Restore center
-            center.IsDeleted = false;
-            center.IsActive = true;
-
-            // Set audit fields
-            center.ModifiedById = currentUser?.Id;
-            center.ModifiedByName = currentUser?.UserName;
-            center.ModifiedAt = DateTimeOffset.UtcNow;
-
-            _unitOfWork.Centers.UpdateAsync(center);
-            await _unitOfWork.SaveChangesAsync();
-        }
-
-        public async Task ActivateCenterAsync(int centerId)
-        {
-            if (centerId <= 0)
-                throw new BadRequestException("Invalid center id.");
-
-            var center = await _unitOfWork.Centers.GetByIdAsync(centerId);
-
-            if (center == null)
-                throw new NotFoundException<int>(nameof(Center), "id", centerId);
-
-            if (center.IsActive)
-                throw new ConflictException("Center is already active.");
-
-            // Get current user info
-            var currentUser = await _userManager.FindByIdAsync(_tenantContext.GetCurrentUserId());
-
-            // Activate center
-            center.IsActive = true;
-
-            // Set audit fields
-            center.ModifiedById = currentUser?.Id;
-            center.ModifiedByName = currentUser?.UserName;
-            center.ModifiedAt = DateTimeOffset.UtcNow;
-
-            _unitOfWork.Centers.UpdateAsync(center);
-            await _unitOfWork.SaveChangesAsync();
-        }
-
-        public async Task DeactivateCenterAsync(int centerId)
-        {
-            if (centerId <= 0)
-                throw new BadRequestException("Invalid center id.");
-
-            var center = await _unitOfWork.Centers.GetByIdAsync(centerId);
-
-            if (center == null)
-                throw new NotFoundException<int>(nameof(Center), "id", centerId);
-
-            if (!center.IsActive)
-                throw new ConflictException("Center is already inactive.");
-
-            // Get current user info
-            var currentUser = await _userManager.FindByIdAsync(_tenantContext.GetCurrentUserId());
-
-            // Deactivate center
-            center.IsActive = false;
-
-            // Set audit fields
-            center.ModifiedById = currentUser?.Id;
-            center.ModifiedByName = currentUser?.UserName;
-            center.ModifiedAt = DateTimeOffset.UtcNow;
-
-            _unitOfWork.Centers.UpdateAsync(center);
-            await _unitOfWork.SaveChangesAsync();
-        }
-
-        public async Task<UserResponseDTO?> GetCenterAdminAsync(int centerId)
-        {
-            if (centerId <= 0)
-                throw new BadRequestException("Invalid center id.");
-
-            // Find the first user with Admin role in this center
-            var adminUsers = await _userManager.GetUsersInRoleAsync(RolesNames.Admin.ToString());
-            var centerAdmin = adminUsers.FirstOrDefault(u => u.CenterId == centerId && !u.IsDeleted);
-
-            if (centerAdmin == null)
-                return null;
-
-            return _mapper.Map<UserResponseDTO>(centerAdmin);
-        }
-
-        public async Task<DataTableResponse<CenterResponseDTO>> GetCentersDataTableAsync(DataTableRequest request)
-        {
-            var paginationParams = new PaginationParamter
-            {
-                PageNumber = request.PageNumber,
-                PageSize = request.PageSize
-            };
-
-            List<CenterResponseDTO> centersDTO;
-            int totalRecords;
-            int filteredRecords;
-
-            // 1. Initial Data Fetch based on custom filters (Active/Deleted/All)
-            if (request.FilterDeleted == "deleted")
-            {
-                centersDTO = await GetDeletedCentersAsync(paginationParams);
-                totalRecords = await GetDeletedCentersCountAsync();
-                filteredRecords = totalRecords;
-            }
-            else if (request.FilterDeleted == "active") // This seems to map to "NonDeleted" in controller logic
-            {
-                centersDTO = await GetNonDeletedCentersAsync(paginationParams);
-                totalRecords = await GetNonDeletedCentersCountAsync();
-                filteredRecords = totalRecords;
-            }
-            else
-            {
-                // Show all
-                centersDTO = await GetAllCentersAsync(paginationParams);
-                totalRecords = await GetTotalCentersCountAsync();
-                filteredRecords = totalRecords;
-            }
-
-            // 2. Apply Custom Active/Inactive Filter (InMemory for now, as per controller logic)
-            if (!string.IsNullOrEmpty(request.ActiveFilter) && request.ActiveFilter != "all")
-            {
-                if (request.ActiveFilter == "active")
-                {
-                    centersDTO = centersDTO.Where(c => c.IsActive).ToList();
-                }
-                else if (request.ActiveFilter == "inactive")
-                {
-                    centersDTO = centersDTO.Where(c => !c.IsActive).ToList();
-                }
-                filteredRecords = centersDTO.Count;
-            }
-
-            var centersVM = centersDTO; // Working with DTOs directly
-
-            // 3. Apply Search (InMemory)
-            if (!string.IsNullOrEmpty(request.SearchValue))
-            {
-                var searchValue = request.SearchValue;
-                centersVM = centersVM.Where(c =>
-                    c.Name.Contains(searchValue, StringComparison.OrdinalIgnoreCase) ||
-                    (c.Email != null && c.Email.Contains(searchValue, StringComparison.OrdinalIgnoreCase)) ||
-                    c.Phone.Contains(searchValue, StringComparison.OrdinalIgnoreCase) ||
-                    c.Address.Contains(searchValue, StringComparison.OrdinalIgnoreCase) ||
-                    c.Id.ToString().Contains(searchValue)
-                ).ToList();
-
-                filteredRecords = centersVM.Count;
-            }
-
-            // 4. Advanced Search
-            if (!string.IsNullOrWhiteSpace(request.CenterName))
-            {
-                centersVM = centersVM.Where(c => c.Name.Contains(request.CenterName, StringComparison.OrdinalIgnoreCase)).ToList();
-            }
-            if (!string.IsNullOrWhiteSpace(request.Email))
-            {
-                centersVM = centersVM.Where(c => c.Email != null && c.Email.Contains(request.Email, StringComparison.OrdinalIgnoreCase)).ToList();
-            }
-             if (!string.IsNullOrWhiteSpace(request.CreatedByName))
-            {
-                centersVM = centersVM.Where(c => c.CreatedByName != null && c.CreatedByName.Contains(request.CreatedByName, StringComparison.OrdinalIgnoreCase)).ToList();
-            }
-
-             // Note: AdminName logic requires extra fetching, which is expensive. 
-             // The controller logic fetched it for ALL items in advanced search, but here we might want to optimize.
-             // For now, mirroring controller logic but applying it only if needed or after filtering.
-             // However, to sort/filter by AdminName, we need it populated.
-             if (!string.IsNullOrWhiteSpace(request.AdminName) || request.SortColumnName == "AdminName" || !string.IsNullOrEmpty(request.SearchValue))
-             {
-                 foreach (var center in centersVM)
-                 {
-                     try
-                     {
-                        var adminUser = await GetCenterAdminAsync(center.Id);
-                        center.AdminName = adminUser?.Name;
-                     }
-                     catch
-                     {
-                         center.AdminName = null;
-                     }
-                 }
-
-                 if (!string.IsNullOrWhiteSpace(request.AdminName))
-                 {
-                     centersVM = centersVM.Where(c => c.AdminName != null && c.AdminName.Contains(request.AdminName, StringComparison.OrdinalIgnoreCase)).ToList();
-                 }
+        //public async Task<DataTableResponse<CenterResponseDTO>> GetCentersDataTableAsync(DataTableRequest request)
+        //{
+        //    var paginationParams = new PaginationParamter
+        //    {
+        //        PageNumber = request.PageNumber,
+        //        PageSize = request.PageSize
+        //    };
+
+        //    List<CenterResponseDTO> centersDTO;
+        //    int totalRecords;
+        //    int filteredRecords;
+
+        //    // 1. Initial Data Fetch based on custom filters (Active/Deleted/All)
+        //    if (request.FilterDeleted == "deleted")
+        //    {
+        //        centersDTO = await GetDeletedCentersAsync(paginationParams);
+        //        totalRecords = await GetDeletedCentersCountAsync();
+        //        filteredRecords = totalRecords;
+        //    }
+        //    else if (request.FilterDeleted == "active") // This seems to map to "NonDeleted" in controller logic
+        //    {
+        //        centersDTO = await GetNonDeletedCentersAsync(paginationParams);
+        //        totalRecords = await GetNonDeletedCentersCountAsync();
+        //        filteredRecords = totalRecords;
+        //    }
+        //    else
+        //    {
+        //        // Show all
+        //        centersDTO = await GetAllCentersAsync(paginationParams);
+        //        totalRecords = await GetTotalCentersCountAsync();
+        //        filteredRecords = totalRecords;
+        //    }
+
+        //    // 2. Apply Custom Active/Inactive Filter (InMemory for now, as per controller logic)
+        //    if (!string.IsNullOrEmpty(request.ActiveFilter) && request.ActiveFilter != "all")
+        //    {
+        //        if (request.ActiveFilter == "active")
+        //        {
+        //            centersDTO = centersDTO.Where(c => c.IsActive).ToList();
+        //        }
+        //        else if (request.ActiveFilter == "inactive")
+        //        {
+        //            centersDTO = centersDTO.Where(c => !c.IsActive).ToList();
+        //        }
+        //        filteredRecords = centersDTO.Count;
+        //    }
+
+        //    var centersVM = centersDTO; // Working with DTOs directly
+
+        //    // 3. Apply Search (InMemory)
+        //    if (!string.IsNullOrEmpty(request.SearchValue))
+        //    {
+        //        var searchValue = request.SearchValue;
+        //        centersVM = centersVM.Where(c =>
+        //            c.Name.Contains(searchValue, StringComparison.OrdinalIgnoreCase) ||
+        //            (c.Email != null && c.Email.Contains(searchValue, StringComparison.OrdinalIgnoreCase)) ||
+        //            c.Phone.Contains(searchValue, StringComparison.OrdinalIgnoreCase) ||
+        //            c.Address.Contains(searchValue, StringComparison.OrdinalIgnoreCase) ||
+        //            c.Id.ToString().Contains(searchValue)
+        //        ).ToList();
+
+        //        filteredRecords = centersVM.Count;
+        //    }
+
+        //    // 4. Advanced Search
+        //    if (!string.IsNullOrWhiteSpace(request.CenterName))
+        //    {
+        //        centersVM = centersVM.Where(c => c.Name.Contains(request.CenterName, StringComparison.OrdinalIgnoreCase)).ToList();
+        //    }
+        //    if (!string.IsNullOrWhiteSpace(request.Email))
+        //    {
+        //        centersVM = centersVM.Where(c => c.Email != null && c.Email.Contains(request.Email, StringComparison.OrdinalIgnoreCase)).ToList();
+        //    }
+        //     if (!string.IsNullOrWhiteSpace(request.CreatedByName))
+        //    {
+        //        centersVM = centersVM.Where(c => c.CreatedByName != null && c.CreatedByName.Contains(request.CreatedByName, StringComparison.OrdinalIgnoreCase)).ToList();
+        //    }
+
+        //     // Note: AdminName logic requires extra fetching, which is expensive. 
+        //     // The controller logic fetched it for ALL items in advanced search, but here we might want to optimize.
+        //     // For now, mirroring controller logic but applying it only if needed or after filtering.
+        //     // However, to sort/filter by AdminName, we need it populated.
+        //     if (!string.IsNullOrWhiteSpace(request.AdminName) || request.SortColumnName == "AdminName" || !string.IsNullOrEmpty(request.SearchValue))
+        //     {
+        //         foreach (var center in centersVM)
+        //         {
+        //             try
+        //             {
+        //                var adminUser = await GetCenterAdminAsync(center.Id);
+        //                center.AdminName = adminUser?.Name;
+        //             }
+        //             catch
+        //             {
+        //                 center.AdminName = null;
+        //             }
+        //         }
+
+        //         if (!string.IsNullOrWhiteSpace(request.AdminName))
+        //         {
+        //             centersVM = centersVM.Where(c => c.AdminName != null && c.AdminName.Contains(request.AdminName, StringComparison.OrdinalIgnoreCase)).ToList();
+        //         }
                  
-                 // Re-apply global search if it involves AdminName (as done in controller)
-                 if (!string.IsNullOrEmpty(request.SearchValue))
-                 {
-                     // This is tricky because we already filtered by other fields. 
-                     // Ideally AdminName search should be part of the main search block, but we didn't have the data then.
-                     // Because this is InMemory pagination (partially), we can't easily go back to DB.
-                     // Controller logic was also mixing DB pagination with InMemory filtering which is risky for large datasets.
-                     // We will keep it as is for refactoring parity.
-                 }
-             }
+        //         // Re-apply global search if it involves AdminName (as done in controller)
+        //         if (!string.IsNullOrEmpty(request.SearchValue))
+        //         {
+        //             // This is tricky because we already filtered by other fields. 
+        //             // Ideally AdminName search should be part of the main search block, but we didn't have the data then.
+        //             // Because this is InMemory pagination (partially), we can't easily go back to DB.
+        //             // Controller logic was also mixing DB pagination with InMemory filtering which is risky for large datasets.
+        //             // We will keep it as is for refactoring parity.
+        //         }
+        //     }
 
-            // Update filtered count after advanced filters
-            filteredRecords = centersVM.Count;
+        //    // Update filtered count after advanced filters
+        //    filteredRecords = centersVM.Count;
 
-            // 5. Apply Sorting
-            if (!string.IsNullOrEmpty(request.SortColumnName) && !string.IsNullOrEmpty(request.SortDirection))
-            {
-                 var isAsc = request.SortDirection.ToLower() == "asc";
-                 centersVM = request.SortColumnName.ToLower() switch
-                 {
-                     "id" => isAsc ? centersVM.OrderBy(c => c.Id).ToList() : centersVM.OrderByDescending(c => c.Id).ToList(),
-                     "name" => isAsc ? centersVM.OrderBy(c => c.Name).ToList() : centersVM.OrderByDescending(c => c.Name).ToList(),
-                     "email" => isAsc ? centersVM.OrderBy(c => c.Email).ToList() : centersVM.OrderByDescending(c => c.Email).ToList(),
-                     "phone" => isAsc ? centersVM.OrderBy(c => c.Phone).ToList() : centersVM.OrderByDescending(c => c.Phone).ToList(),
-                     "address" => isAsc ? centersVM.OrderBy(c => c.Address).ToList() : centersVM.OrderByDescending(c => c.Address).ToList(),
-                     "isactive" => isAsc ? centersVM.OrderBy(c => c.IsActive).ToList() : centersVM.OrderByDescending(c => c.IsActive).ToList(),
-                     "createdbyname" => isAsc ? centersVM.OrderBy(c => c.CreatedByName).ToList() : centersVM.OrderByDescending(c => c.CreatedByName).ToList(),
-                     "adminname" => isAsc ? centersVM.OrderBy(c => c.AdminName).ToList() : centersVM.OrderByDescending(c => c.AdminName).ToList(),
-                     "createdat" => isAsc ? centersVM.OrderBy(c => c.CreatedAt).ToList() : centersVM.OrderByDescending(c => c.CreatedAt).ToList(),
-                     _ => centersVM.OrderBy(c => c.Name).ToList()
-                 };
-            }
+        //    // 5. Apply Sorting
+        //    if (!string.IsNullOrEmpty(request.SortColumnName) && !string.IsNullOrEmpty(request.SortDirection))
+        //    {
+        //         var isAsc = request.SortDirection.ToLower() == "asc";
+        //         centersVM = request.SortColumnName.ToLower() switch
+        //         {
+        //             "id" => isAsc ? centersVM.OrderBy(c => c.Id).ToList() : centersVM.OrderByDescending(c => c.Id).ToList(),
+        //             "name" => isAsc ? centersVM.OrderBy(c => c.Name).ToList() : centersVM.OrderByDescending(c => c.Name).ToList(),
+        //             "email" => isAsc ? centersVM.OrderBy(c => c.Email).ToList() : centersVM.OrderByDescending(c => c.Email).ToList(),
+        //             "phone" => isAsc ? centersVM.OrderBy(c => c.Phone).ToList() : centersVM.OrderByDescending(c => c.Phone).ToList(),
+        //             "address" => isAsc ? centersVM.OrderBy(c => c.Address).ToList() : centersVM.OrderByDescending(c => c.Address).ToList(),
+        //             "isactive" => isAsc ? centersVM.OrderBy(c => c.IsActive).ToList() : centersVM.OrderByDescending(c => c.IsActive).ToList(),
+        //             "createdbyname" => isAsc ? centersVM.OrderBy(c => c.CreatedByName).ToList() : centersVM.OrderByDescending(c => c.CreatedByName).ToList(),
+        //             "adminname" => isAsc ? centersVM.OrderBy(c => c.AdminName).ToList() : centersVM.OrderByDescending(c => c.AdminName).ToList(),
+        //             "createdat" => isAsc ? centersVM.OrderBy(c => c.CreatedAt).ToList() : centersVM.OrderByDescending(c => c.CreatedAt).ToList(),
+        //             _ => centersVM.OrderBy(c => c.Name).ToList()
+        //         };
+        //    }
 
-            // Note: The controller logic for `AdvancedSearchCenters` fetched *ALL* centers then paginated in memory.
-            // The `GetCentersData` (normal table) fetched *PAGINATED* from DB then filtered in memory (which is buggy if filters reduce count).
-            // For this refactor, I am preserving the behavior where we return the processing result.
-            // However, since we return a subset, if we did in-memory filtering on a page, we might return less than PageSize.
-            // Correct approach implies standardizing this, but avoiding logic change risk.
+        //    // Note: The controller logic for `AdvancedSearchCenters` fetched *ALL* centers then paginated in memory.
+        //    // The `GetCentersData` (normal table) fetched *PAGINATED* from DB then filtered in memory (which is buggy if filters reduce count).
+        //    // For this refactor, I am preserving the behavior where we return the processing result.
+        //    // However, since we return a subset, if we did in-memory filtering on a page, we might return less than PageSize.
+        //    // Correct approach implies standardizing this, but avoiding logic change risk.
             
-            return new DataTableResponse<CenterResponseDTO>
-            {
-                Draw = request.Draw,
-                RecordsTotal = totalRecords,
-                RecordsFiltered = filteredRecords,
-                Data = centersVM
-            };
-        }
-        #endregion
+        //    return new DataTableResponse<CenterResponseDTO>
+        //    {
+        //        Draw = request.Draw,
+        //        RecordsTotal = totalRecords,
+        //        RecordsFiltered = filteredRecords,
+        //        Data = centersVM
+        //    };
+        //}
 
         #region User DataTables
 
@@ -652,6 +407,21 @@ namespace Moshrefy.Application.Services
             return _mapper.Map<UserResponseDTO>(createdUser ?? user);
         }
 
+        public async Task<UserResponseDTO?> GetCenterAdminAsync(int centerId)
+        {
+            if (centerId <= 0)
+                throw new BadRequestException("Invalid center id.");
+
+            // Find the first user with Admin role in this center
+            var adminUsers = await _userManager.GetUsersInRoleAsync(RolesNames.Admin.ToString());
+            var centerAdmin = adminUsers.FirstOrDefault(u => u.CenterId == centerId && !u.IsDeleted);
+
+            if (centerAdmin == null)
+                return null;
+
+            return _mapper.Map<UserResponseDTO>(centerAdmin);
+        }
+
         public async Task<UserResponseDTO> CreateUserForCenterAsync(int centerId, CreateUserDTO createUserDTO)
         {
             if (centerId <= 0)
@@ -726,14 +496,11 @@ namespace Moshrefy.Application.Services
         public async Task<List<UserResponseDTO>> GetAllUsersAsync(PaginationParamter paginationParamter)
         {
             IQueryable<ApplicationUser> query = _userManager.Users.Include(u => u.Center);
-
-            if (paginationParamter.PageSize != null && paginationParamter.PageNumber != null)
-            {
+           
                 query = query
-                    .Skip((paginationParamter.PageNumber.Value - 1) * paginationParamter.PageSize.Value)
-                    .Take(paginationParamter.PageSize.Value);
-            }
-
+                    .Skip((paginationParamter.PageNumber - 1) * paginationParamter.PageSize)
+                    .Take(paginationParamter.PageSize);
+            
             var users = await query.ToListAsync();
             return _mapper.Map<List<UserResponseDTO>>(users);
         }
@@ -745,12 +512,10 @@ namespace Moshrefy.Application.Services
 
             IQueryable<ApplicationUser> query = _userManager.Users.Include(u => u.Center).Where(u => u.CenterId == centerId);
 
-            if (paginationParamter.PageSize != null && paginationParamter.PageNumber != null)
-            {
                 query = query
-                    .Skip((paginationParamter.PageNumber.Value - 1) * paginationParamter.PageSize.Value)
-                    .Take(paginationParamter.PageSize.Value);
-            }
+                    .Skip((paginationParamter.PageNumber - 1) * paginationParamter.PageSize)
+                    .Take(paginationParamter.PageSize);
+            
 
             var users = await query.ToListAsync();
             return _mapper.Map<List<UserResponseDTO>>(users);
@@ -795,12 +560,10 @@ namespace Moshrefy.Application.Services
             var usersInRole = await _userManager.GetUsersInRoleAsync(parsedRole.ToString());
 
             var paginatedUsers = usersInRole.AsEnumerable();
-            if (paginationParamter.PageSize != null && paginationParamter.PageNumber != null)
-            {
+           
                 paginatedUsers = paginatedUsers
-                    .Skip((paginationParamter.PageNumber.Value - 1) * paginationParamter.PageSize.Value)
-                    .Take(paginationParamter.PageSize.Value);
-            }
+                    .Skip((paginationParamter.PageNumber - 1) * paginationParamter.PageSize)
+                    .Take(paginationParamter.PageSize);
 
             return _mapper.Map<List<UserResponseDTO>>(paginatedUsers.ToList());
         }
@@ -1056,12 +819,9 @@ namespace Moshrefy.Application.Services
         {
             var query = _userManager.Users.Include(u => u.Center).Where(u => u.IsDeleted);
 
-            if (paginationParamter.PageSize != null && paginationParamter.PageNumber != null)
-            {
                 query = query
-                    .Skip((paginationParamter.PageNumber.Value - 1) * paginationParamter.PageSize.Value)
-                    .Take(paginationParamter.PageSize.Value);
-            }
+                    .Skip((paginationParamter.PageNumber - 1) * paginationParamter.PageSize)
+                    .Take(paginationParamter.PageSize);
 
             var users = await query.ToListAsync();
             return _mapper.Map<List<UserResponseDTO>>(users);
@@ -1071,12 +831,9 @@ namespace Moshrefy.Application.Services
         {
             IQueryable<ApplicationUser> query = _userManager.Users.Include(u => u.Center).Where(u => !u.IsActive && !u.IsDeleted);
 
-            if (paginationParamter.PageSize != null && paginationParamter.PageNumber != null)
-            {
                 query = query
-                    .Skip((paginationParamter.PageNumber.Value - 1) * paginationParamter.PageSize.Value)
-                    .Take(paginationParamter.PageSize.Value);
-            }
+                    .Skip((paginationParamter.PageNumber - 1) * paginationParamter.PageSize)
+                    .Take(paginationParamter.PageSize);
 
             var users = await query.ToListAsync();
             return _mapper.Map<List<UserResponseDTO>>(users);
@@ -1086,12 +843,9 @@ namespace Moshrefy.Application.Services
         {
             IQueryable<ApplicationUser> query = _userManager.Users.Include(u => u.Center).Where(u => u.IsActive && !u.IsDeleted);
 
-            if (paginationParamter.PageSize != null && paginationParamter.PageNumber != null)
-            {
                 query = query
-                    .Skip((paginationParamter.PageNumber.Value - 1) * paginationParamter.PageSize.Value)
-                    .Take(paginationParamter.PageSize.Value);
-            }
+                    .Skip((paginationParamter.PageNumber - 1) * paginationParamter.PageSize)
+                    .Take(paginationParamter.PageSize);
 
             var users = await query.ToListAsync();
             return _mapper.Map<List<UserResponseDTO>>(users);
@@ -1314,7 +1068,7 @@ namespace Moshrefy.Application.Services
                 throw new NotFoundException<int>(nameof(teacher), "teacher", teacherId);
 
             teacher.IsDeleted = false;
-            _unitOfWork.Teachers.UpdateAsync(teacher);
+            _unitOfWork.Teachers.Update(teacher);
             await _unitOfWork.SaveChangesAsync();
         }
 
@@ -1329,7 +1083,7 @@ namespace Moshrefy.Application.Services
                 throw new NotFoundException<int>(nameof(course), "course", courseId);
 
             course.IsDeleted = false;
-            _unitOfWork.Courses.UpdateAsync(course);
+            _unitOfWork.Courses.Update(course);
             await _unitOfWork.SaveChangesAsync();
         }
 
@@ -1344,7 +1098,7 @@ namespace Moshrefy.Application.Services
                 throw new NotFoundException<int>(nameof(classroom), "classroom", classroomId);
 
             classroom.IsDeleted = false;
-            _unitOfWork.Classrooms.UpdateAsync(classroom);
+            _unitOfWork.Classrooms.Update(classroom);
             await _unitOfWork.SaveChangesAsync();
         }
 
@@ -1359,7 +1113,7 @@ namespace Moshrefy.Application.Services
                 throw new NotFoundException<int>(nameof(session), "session", sessionId);
 
             session.IsDeleted = false;
-            _unitOfWork.Sessions.UpdateAsync(session);
+            _unitOfWork.Sessions.Update(session);
             await _unitOfWork.SaveChangesAsync();
         }
 
@@ -1374,7 +1128,7 @@ namespace Moshrefy.Application.Services
                 throw new NotFoundException<int>(nameof(exam), "exam", examId);
 
             exam.IsDeleted = false;
-            _unitOfWork.Exams.UpdateAsync(exam);
+            _unitOfWork.Exams.Update(exam);
             await _unitOfWork.SaveChangesAsync();
         }
 
@@ -1389,7 +1143,7 @@ namespace Moshrefy.Application.Services
                 throw new NotFoundException<int>(nameof(examResult), "examResult", examResultId);
 
             examResult.IsDeleted = false;
-            _unitOfWork.ExamResults.UpdateAsync(examResult);
+            _unitOfWork.ExamResults.Update(examResult);
             await _unitOfWork.SaveChangesAsync();
         }
 
@@ -1404,7 +1158,7 @@ namespace Moshrefy.Application.Services
                 throw new NotFoundException<int>(nameof(invoice), "invoice", invoiceId);
 
             invoice.IsDeleted = false;
-            _unitOfWork.Invoices.UpdateAsync(invoice);
+            _unitOfWork.Invoices.Update(invoice);
             await _unitOfWork.SaveChangesAsync();
         }
 
@@ -1419,7 +1173,7 @@ namespace Moshrefy.Application.Services
                 throw new NotFoundException<int>(nameof(item), "item", itemId);
 
             item.IsDeleted = false;
-            _unitOfWork.Items.UpdateAsync(item);
+            _unitOfWork.Items.Update(item);
             await _unitOfWork.SaveChangesAsync();
         }
 
@@ -1434,7 +1188,7 @@ namespace Moshrefy.Application.Services
                 throw new NotFoundException<int>(nameof(teacherCourse), "teacherCourse", teacherCourseId);
 
             teacherCourse.IsDeleted = false;
-            _unitOfWork.TeacherCourses.UpdateAsync(teacherCourse);
+            _unitOfWork.TeacherCourses.Update(teacherCourse);
             await _unitOfWork.SaveChangesAsync();
         }
 
@@ -1449,7 +1203,7 @@ namespace Moshrefy.Application.Services
                 throw new NotFoundException<int>(nameof(teacherItem), "teacherItem", teacherItemId);
 
             teacherItem.IsDeleted = false;
-            _unitOfWork.TeacherItems.UpdateAsync(teacherItem);
+            _unitOfWork.TeacherItems.Update(teacherItem);
             await _unitOfWork.SaveChangesAsync();
         }
 
@@ -1464,7 +1218,7 @@ namespace Moshrefy.Application.Services
                 throw new NotFoundException<int>(nameof(enrollment), "enrollment", enrollmentId);
 
             enrollment.IsDeleted = false;
-            _unitOfWork.Enrollments.UpdateAsync(enrollment);
+            _unitOfWork.Enrollments.Update(enrollment);
             await _unitOfWork.SaveChangesAsync();
         }
 
@@ -1479,7 +1233,7 @@ namespace Moshrefy.Application.Services
                 throw new NotFoundException<int>(nameof(student), "student", studentId);
 
             student.IsDeleted = false;
-            _unitOfWork.Students.UpdateAsync(student);
+            _unitOfWork.Students.Update(student);
             await _unitOfWork.SaveChangesAsync();
         }
 

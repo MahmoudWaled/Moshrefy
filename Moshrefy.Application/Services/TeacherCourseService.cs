@@ -42,7 +42,7 @@ namespace Moshrefy.Application.Services
                 existingAssignment.ModifiedByName = currentUserForRestore!.UserName ?? string.Empty;
                 existingAssignment.ModifiedAt = DateTimeOffset.UtcNow;
                 
-                unitOfWork.TeacherCourses.UpdateAsync(existingAssignment);
+                unitOfWork.TeacherCourses.Update(existingAssignment);
                 await unitOfWork.SaveChangesAsync();
                 return mapper.Map<TeacherCourseResponseDTO>(existingAssignment);
             }
@@ -124,7 +124,7 @@ namespace Moshrefy.Application.Services
             teacherCourse.ModifiedByName = currentUser!.UserName ?? string.Empty;
             teacherCourse.ModifiedAt = DateTimeOffset.UtcNow;
             
-            unitOfWork.TeacherCourses.UpdateAsync(teacherCourse);
+            unitOfWork.TeacherCourses.Update(teacherCourse);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -136,7 +136,7 @@ namespace Moshrefy.Application.Services
 
             ValidateCenterAccess(teacherCourse.CenterId, nameof(TeacherCourse));
 
-            unitOfWork.TeacherCourses.DeleteAsync(teacherCourse);
+            unitOfWork.TeacherCourses.SoftDelete(teacherCourse);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -155,7 +155,7 @@ namespace Moshrefy.Application.Services
             teacherCourse.ModifiedByName = currentUser!.UserName ?? string.Empty;
             teacherCourse.ModifiedAt = DateTimeOffset.UtcNow;
             
-            unitOfWork.TeacherCourses.UpdateAsync(teacherCourse);
+            unitOfWork.TeacherCourses.Update(teacherCourse);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -174,7 +174,7 @@ namespace Moshrefy.Application.Services
             teacherCourse.ModifiedByName = currentUser!.UserName ?? string.Empty;
             teacherCourse.ModifiedAt = DateTimeOffset.UtcNow;
             
-            unitOfWork.TeacherCourses.UpdateAsync(teacherCourse);
+            unitOfWork.TeacherCourses.Update(teacherCourse);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -193,7 +193,7 @@ namespace Moshrefy.Application.Services
             teacherCourse.ModifiedByName = currentUser!.UserName ?? string.Empty;
             teacherCourse.ModifiedAt = DateTimeOffset.UtcNow;
             
-            unitOfWork.TeacherCourses.UpdateAsync(teacherCourse);
+            unitOfWork.TeacherCourses.Update(teacherCourse);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -212,7 +212,7 @@ namespace Moshrefy.Application.Services
             teacherCourse.ModifiedByName = currentUser!.UserName ?? string.Empty;
             teacherCourse.ModifiedAt = DateTimeOffset.UtcNow;
             
-            unitOfWork.TeacherCourses.UpdateAsync(teacherCourse);
+            unitOfWork.TeacherCourses.Update(teacherCourse);
             await unitOfWork.SaveChangesAsync();
         }
 

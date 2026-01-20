@@ -144,7 +144,7 @@ namespace Moshrefy.Application.Services
             course.ModifiedByName = currentUser!.UserName ?? string.Empty;
             course.ModifiedAt = DateTime.UtcNow;
 
-            _unitOfWork.Courses.UpdateAsync(course);
+            _unitOfWork.Courses.Update(course);
             await _unitOfWork.SaveChangesAsync();
         }
 
@@ -159,7 +159,7 @@ namespace Moshrefy.Application.Services
 
             ValidateCenterAccess(course.CenterId, nameof(Course));
 
-            _unitOfWork.Courses.DeleteAsync(course);
+            _unitOfWork.Courses.SoftDelete(course);
             await _unitOfWork.SaveChangesAsync();
         }
 
@@ -175,7 +175,7 @@ namespace Moshrefy.Application.Services
             ValidateCenterAccess(course.CenterId, nameof(Course));
 
             course.IsActive = true;
-            _unitOfWork.Courses.UpdateAsync(course);
+            _unitOfWork.Courses.Update(course);
             await _unitOfWork.SaveChangesAsync();
         }
 
@@ -191,7 +191,7 @@ namespace Moshrefy.Application.Services
             ValidateCenterAccess(course.CenterId, nameof(Course));
 
             course.IsActive = false;
-            _unitOfWork.Courses.UpdateAsync(course);
+            _unitOfWork.Courses.Update(course);
             await _unitOfWork.SaveChangesAsync();
         }
 
@@ -208,7 +208,7 @@ namespace Moshrefy.Application.Services
 
             course.IsDeleted = true;
             course.IsActive = false;
-            _unitOfWork.Courses.UpdateAsync(course);
+            _unitOfWork.Courses.Update(course);
             await _unitOfWork.SaveChangesAsync();
         }
 
@@ -224,7 +224,7 @@ namespace Moshrefy.Application.Services
             ValidateCenterAccess(course.CenterId, nameof(Course));
 
             course.IsDeleted = false;
-            _unitOfWork.Courses.UpdateAsync(course);
+            _unitOfWork.Courses.Update(course);
             await _unitOfWork.SaveChangesAsync();
         }
 

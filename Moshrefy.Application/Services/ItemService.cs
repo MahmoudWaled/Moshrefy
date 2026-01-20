@@ -88,7 +88,7 @@ namespace Moshrefy.Application.Services
 
             ValidateCenterAccess(item.CenterId, nameof(Item));
             mapper.Map(updateItemDTO, item);
-            unitOfWork.Items.UpdateAsync(item);
+            unitOfWork.Items.Update(item);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -99,7 +99,7 @@ namespace Moshrefy.Application.Services
                 throw new NotFoundException<int>(nameof(item), "item", id);
 
             ValidateCenterAccess(item.CenterId, nameof(Item));
-            unitOfWork.Items.DeleteAsync(item);
+            unitOfWork.Items.SoftDelete(item);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -111,7 +111,7 @@ namespace Moshrefy.Application.Services
 
             ValidateCenterAccess(item.CenterId, nameof(Item));
             item.IsDeleted = true;
-            unitOfWork.Items.UpdateAsync(item);
+            unitOfWork.Items.Update(item);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -123,7 +123,7 @@ namespace Moshrefy.Application.Services
 
             ValidateCenterAccess(item.CenterId, nameof(Item));
             item.IsDeleted = false;
-            unitOfWork.Items.UpdateAsync(item);
+            unitOfWork.Items.Update(item);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -135,7 +135,7 @@ namespace Moshrefy.Application.Services
 
             ValidateCenterAccess(item.CenterId, nameof(Item));
             item.ReservedByStudentId = studentId;
-            unitOfWork.Items.UpdateAsync(item);
+            unitOfWork.Items.Update(item);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -147,7 +147,7 @@ namespace Moshrefy.Application.Services
 
             ValidateCenterAccess(item.CenterId, nameof(Item));
             item.ReservedByStudentId = null;
-            unitOfWork.Items.UpdateAsync(item);
+            unitOfWork.Items.Update(item);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -159,7 +159,7 @@ namespace Moshrefy.Application.Services
 
             ValidateCenterAccess(item.CenterId, nameof(Item));
             item.ItemStatus = status;
-            unitOfWork.Items.UpdateAsync(item);
+            unitOfWork.Items.Update(item);
             await unitOfWork.SaveChangesAsync();
         }
     }

@@ -13,13 +13,11 @@ namespace Moshrefy.infrastructure.Repositories
         // Predicate overload for proper server-side filtering
         public new async Task<IEnumerable<AcademicYear>> GetAllAsync(Expression<Func<AcademicYear, bool>> predicate, PaginationParamter paginationParamter)
         {
-            var pageNumber = paginationParamter.PageNumber ?? 1;
-            var pageSize = paginationParamter.PageSize ?? 25;
-
+            
             return await appDbContext.Set<AcademicYear>()
                 .Where(predicate)
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
+                .Skip((paginationParamter.PageNumber - 1) * paginationParamter.PageSize)
+                .Take(paginationParamter.PageSize)
                 .ToListAsync();
         }
 

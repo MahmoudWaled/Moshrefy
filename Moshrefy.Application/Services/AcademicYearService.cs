@@ -114,7 +114,7 @@ namespace Moshrefy.Application.Services
             academicYear.ModifiedByName = currentUser!.UserName ?? string.Empty;
             academicYear.ModifiedAt = DateTime.UtcNow;
 
-            _unitOfWork.AcademicYears.UpdateAsync(academicYear);
+            _unitOfWork.AcademicYears.Update(academicYear);
             await _unitOfWork.SaveChangesAsync();
         }
 
@@ -137,7 +137,7 @@ namespace Moshrefy.Application.Services
             academicYear.ModifiedByName = currentUser!.UserName ?? string.Empty;
             academicYear.ModifiedAt = DateTime.UtcNow;
 
-            _unitOfWork.AcademicYears.UpdateAsync(academicYear);
+            _unitOfWork.AcademicYears.Update(academicYear);
             await _unitOfWork.SaveChangesAsync();
         }
 

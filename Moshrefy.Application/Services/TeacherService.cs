@@ -98,7 +98,7 @@ namespace Moshrefy.Application.Services
             teacher.ModifiedByName = currentUser!.UserName ?? string.Empty;
             teacher.ModifiedAt = DateTimeOffset.UtcNow;
             
-            unitOfWork.Teachers.UpdateAsync(teacher);
+            unitOfWork.Teachers.Update(teacher);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -110,7 +110,7 @@ namespace Moshrefy.Application.Services
 
             ValidateCenterAccess(teacher.CenterId, nameof(Teacher));
 
-            unitOfWork.Teachers.DeleteAsync(teacher);
+            unitOfWork.Teachers.SoftDelete(teacher);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -130,7 +130,7 @@ namespace Moshrefy.Application.Services
             teacher.ModifiedByName = currentUser!.UserName ?? string.Empty;
             teacher.ModifiedAt = DateTimeOffset.UtcNow;
             
-            unitOfWork.Teachers.UpdateAsync(teacher);
+            unitOfWork.Teachers.Update(teacher);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -150,7 +150,7 @@ namespace Moshrefy.Application.Services
             teacher.ModifiedByName = currentUser!.UserName ?? string.Empty;
             teacher.ModifiedAt = DateTimeOffset.UtcNow;
             
-            unitOfWork.Teachers.UpdateAsync(teacher);
+            unitOfWork.Teachers.Update(teacher);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -170,7 +170,7 @@ namespace Moshrefy.Application.Services
             teacher.ModifiedByName = currentUser!.UserName ?? string.Empty;
             teacher.ModifiedAt = DateTimeOffset.UtcNow;
             
-            unitOfWork.Teachers.UpdateAsync(teacher);
+            unitOfWork.Teachers.Update(teacher);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -190,7 +190,7 @@ namespace Moshrefy.Application.Services
             teacher.ModifiedByName = currentUser!.UserName ?? string.Empty;
             teacher.ModifiedAt = DateTimeOffset.UtcNow;
             
-            unitOfWork.Teachers.UpdateAsync(teacher);
+            unitOfWork.Teachers.Update(teacher);
             await unitOfWork.SaveChangesAsync();
         }
 

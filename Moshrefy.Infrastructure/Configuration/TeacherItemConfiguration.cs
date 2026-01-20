@@ -10,7 +10,11 @@ namespace Moshrefy.infrastructure.Configuration
         {
             builder.ToTable("TeacherItems");
 
-            builder.HasIndex(ti => new { ti.TeacherId, ti.ItemId }).IsUnique();
+            // Unique constraint: Only one assignment per Teacher + Item + Center (for non-deleted records)
+            builder.HasIndex(ti => new { ti.TeacherId, ti.ItemId, ti.CenterId })
+                .IsUnique()
+                .HasFilter("[IsDeleted] = 0")
+                .HasDatabaseName("IX_TeacherItem_Unique_Teacher_Item_Center");
 
             builder.HasOne(ti => ti.Teacher)
                    .WithMany(t => t.TeacherItems)

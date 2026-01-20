@@ -1,9 +1,10 @@
 ﻿using Moshrefy.Domain.Identity;
+using Moshrefy.Domain.Interfaces;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Moshrefy.Domain.Entities
 {
-    public abstract class BaseEntity
+    public abstract class BaseEntity : IAuditable
     {
         public int Id { get; set; }
 

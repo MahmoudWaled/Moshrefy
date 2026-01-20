@@ -126,6 +126,38 @@
             </div>
           </div>
         </div>
+
+        @* Enrolled Students Card *@
+        <div class="card mb-3">
+          <div class="card-header">
+            <div class="row align-items-center">
+              <div class="col">
+                <div class="d-flex align-items-center">
+                  <span class="avatar bg-azure text-white me-3">
+                    <i class="ti ti-users"></i>
+                  </span>
+                  <h3 class="card-title mb-0">Enrolled Students</h3>
+                </div>
+              </div>
+              @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+              {
+                <div class="col-auto">
+                  <button type="button" class="btn btn-success btn-sm" onclick="openBulkAddStudents()">
+                    <i class="ti ti-plus me-1"></i> Add Students
+                  </button>
+                </div>
+              }
+            </div>
+          </div>
+          <div class="card-body">
+            <div id="enrolledStudentsList">
+              <div class="text-center py-3">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="text-muted mt-2">Loading students...</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Sidebar -->
@@ -140,6 +172,12 @@
               <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-action-edit">
                 <i class="ti ti-edit me-2"></i> Edit Course
               </a>
+              @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+              {
+                <a asp-controller="TeacherCourse" asp-action="Create" asp-route-courseId="@Model.Id" class="btn btn-primary">
+                  <i class="ti ti-user-plus me-2"></i> Assign Teacher
+                </a>
+              }
               @if (Model.IsActive)
               {
                 <button class="btn btn-state-deactive" onclick="deactivateCourse()">
@@ -244,6 +282,43 @@
                 }
             })
             .then((r) => { if (r.isConfirmed) { $.post('@Url.Action("Delete")', { id: @Model.Id }).done((res) => { if (res.success) { TablerDialog.fire({ icon: 'success', title: 'Deleted!', text: res.message, timer: 2000, showConfirmButton: false }).then(() => window.location.href = '@Url.Action("Index")'); } else { TablerDialog.fire('Error', res.message, 'error'); } }).fail(() => TablerDialog.fire('Error', 'An error occurred', 'error')); } });
+        }
+
+        // Load enrolled students
+        $(document).ready(function() {
+            loadEnrolledStudents();
+        });
+
+        function loadEnrolledStudents() {
+            $.get('/Course/GetEnrolledStudents/@Model.Id', function(data) {
+                if (data.length === 0) {
+                    $('#enrolledStudentsList').html('<p class="text-muted mb-0">No students enrolled yet.</p>');
+                } else {
+                    let html = '<div class="list-group list-group-flush">';
+                    data.forEach(function(enrollment) {
+                        const statusBadge = enrollment.isActive ? '<span class="badge bg-state-active ms-2">Active</span>' : '<span class="badge bg-state-inactive ms-2">Inactive</span>';
+                        html += `<a href="/Student/Details/${enrollment.studentId}" class="list-group-item list-group-item-action"><div class="d-flex align-items-center"><span class="avatar bg-azure text-white me-3"><i class="ti ti-user"></i></span><div class="flex-fill"><strong>${enrollment.studentName}</strong></div>${statusBadge}</div></a>`;
+                    });
+                    html += '</div>';
+                    $('#enrolledStudentsList').html(html);
+                }
+            });
+        }
+
+        // Open bulk add students modal
+        function openBulkAddStudents() {
+            $.get('/Enrollment/GetAvailableStudentsForCourse/@Model.Id', function(data) {
+                if (data.length === 0) {
+                    TablerDialog.fire('Info', 'No available students to enroll.', 'info');
+                    return;
+                }
+                let studentsHtml = '<div class="mb-3"><input type="text" class="form-control" id="studentSearch" placeholder="Search students..."></div><div id="studentsList" style="max-height: 400px; overflow-y: auto;">';
+                data.forEach(function(student) {
+                    studentsHtml += `<div class="form-check student-item"><input class="form-check-input student-check" type="checkbox" value="${student.id}" id="student${student.id}"><label class="form-check-label" for="student${student.id}">${student.name}</label></div>`;
+                });
+                studentsHtml += '</div>';
+                TablerDialog.fire({ title: 'Add Students to Course', html: studentsHtml, width: '500px', showCancelButton: true, confirmButtonText: '<i class="ti ti-check"></i> Enroll', didOpen: () => { $('#studentSearch').on('input', function() { const search = $(this).val().toLowerCase(); $('.student-item').each(function() { const text = $(this).text().toLowerCase(); $(this).toggle(text.includes(search)); }); }); }, preConfirm: () => { const selected = $('.student-check:checked').map(function() { return parseInt($(this).val()); }).get(); if (selected.length === 0) { TablerDialog.showValidationMessage('Please select at least one student'); return false; } return selected; } }).then((result) => { if (result.isConfirmed) { $.ajax({ url: '/Enrollment/BulkEnrollStudentsInCourse', type: 'POST', contentType: 'application/json', data: JSON.stringify({ courseId: @Model.Id, studentIds: result.value }), success: function(res) { if (res.success) { TablerDialog.fire({ icon: 'success', title: 'Success!', text: res.message, timer: 2000, showConfirmButton: false }).then(() => loadEnrolledStudents()); } else { TablerDialog.fire('Error', res.message, 'error'); } }, error: function() { TablerDialog.fire('Error', 'An error occurred.', 'error'); } }); } });
+            });
         }
     </script>
 }

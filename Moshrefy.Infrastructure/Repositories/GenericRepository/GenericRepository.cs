@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Moshrefy.Application.Interfaces.IGenericRepository;
+using Moshrefy.Domain.Interfaces;
 using Moshrefy.Domain.Paramter;
 using Moshrefy.Domain.SoftDeletable;
 using Moshrefy.infrastructure.Data;
@@ -9,27 +10,22 @@ namespace Moshrefy.infrastructure.Repositories.GenericRepository
 {
     public class GenericRepository<TEntity, TKey>(AppDbContext appDbContext) : IGenericRepository<TEntity, TKey> where TEntity : class where TKey : IEquatable<TKey>
     {
+
         public async Task<IEnumerable<TEntity>> GetAllAsync(PaginationParamter paginationParamter)
         {
-            var pageNumber = paginationParamter.PageNumber ?? 1;
-            var pageSize = paginationParamter.PageSize ?? 25;
-
             return await appDbContext.Set<TEntity>()
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
+                .Skip((paginationParamter.PageNumber - 1) * paginationParamter.PageSize)
+                .Take(paginationParamter.PageSize)
                 .ToListAsync();
         }
 
+        // with predicate overload
         public async Task<IEnumerable<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>> predicate, PaginationParamter paginationParamter)
         {
-            var pageNumber = paginationParamter.PageNumber ?? 1;
-            var pageSize = paginationParamter.PageSize ?? 25;
-
-            // Apply filter BEFORE pagination at database level
             return await appDbContext.Set<TEntity>()
                 .Where(predicate)
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
+                .Skip((paginationParamter.PageNumber - 1) * paginationParamter.PageSize)
+                .Take(paginationParamter.PageSize)
                 .ToListAsync();
         }
 
@@ -41,29 +37,63 @@ namespace Moshrefy.infrastructure.Repositories.GenericRepository
         {
             await appDbContext.Set<TEntity>().AddAsync(entity);
         }
-        public void UpdateAsync(TEntity entity)
+        public void Update(TEntity entity)
         {
             appDbContext.Set<TEntity>().Update(entity);
         }
 
-        public void DeleteAsync(TEntity entity)
+        public void SoftDelete(TEntity entity)
         {
             if (entity is ISoftDeletable softDeletable)
             {
                 softDeletable.IsDeleted = true;
+                
+                // Also deactivate if entity has IsActive property
+                if (entity is IActivatable activatable)
+                {
+                    activatable.IsActive = false;
+                }
+                
                 appDbContext.Set<TEntity>().Update(entity);
-            }
-            else
-            {
-
-                appDbContext.Set<TEntity>().Remove(entity);
-
             }
         }
 
-        public void HardDeleteAsync(TEntity entity)
+        public void HardDelete(TEntity entity)
         {
             appDbContext.Set<TEntity>().Remove(entity);
+        }
+
+        public void Restore(TEntity entity)
+        {
+            if (entity is ISoftDeletable softDeletable)
+            {
+                softDeletable.IsDeleted = false;
+                
+                // Also reactivate if entity has IsActive property
+                if (entity is IActivatable activatable)
+                {
+                    activatable.IsActive = true;
+                }
+                
+                appDbContext.Set<TEntity>().Update(entity);
+            }
+        }
+        public void Activate(TEntity entity)
+        {
+            if (entity is IActivatable activatable)
+            {
+                activatable.IsActive = true;
+                appDbContext.Set<TEntity>().Update(entity);
+            }
+        }
+
+        public void Deactivate(TEntity entity)
+        {
+            if (entity is IActivatable activatable)
+            {
+                activatable.IsActive = false;
+                appDbContext.Set<TEntity>().Update(entity);
+            }
         }
 
         public async Task<int> SaveChangesAsync()

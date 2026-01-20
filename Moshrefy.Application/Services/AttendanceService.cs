@@ -88,7 +88,7 @@ namespace Moshrefy.Application.Services
 
             ValidateCenterAccess(attendance.CenterId, nameof(Attendance));
             mapper.Map(updateAttendanceDTO, attendance);
-            unitOfWork.Attendances.UpdateAsync(attendance);
+            unitOfWork.Attendances.Update(attendance);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -99,7 +99,7 @@ namespace Moshrefy.Application.Services
                 throw new NotFoundException<int>(nameof(attendance), "attendance", id);
 
             ValidateCenterAccess(attendance.CenterId, nameof(Attendance));
-            unitOfWork.Attendances.DeleteAsync(attendance);
+            unitOfWork.Attendances.SoftDelete(attendance);
             await unitOfWork.SaveChangesAsync();
         }
     }

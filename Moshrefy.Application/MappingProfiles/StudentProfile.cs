@@ -14,7 +14,9 @@ namespace Moshrefy.Application.MappingProfiles
 
             CreateMap<Student, StudentResponseDTO>()
                 .ForMember(dest => dest.EnrolledCoursesCount,
-                    opt => opt.MapFrom(src => src.Enrollments != null ? src.Enrollments.Count : 0));
+                    opt => opt.MapFrom(src => src.Enrollments != null
+                        ? src.Enrollments.Count(e => !e.IsDeleted && (e.Course == null || !e.Course.IsDeleted))
+                        : 0));
         }
     }
 }

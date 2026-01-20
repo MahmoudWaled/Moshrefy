@@ -104,7 +104,7 @@ namespace Moshrefy.Application.Services
 
             ValidateCenterAccess(exam.CenterId, nameof(Exam));
             mapper.Map(updateExamDTO, exam);
-            unitOfWork.Exams.UpdateAsync(exam);
+            unitOfWork.Exams.Update(exam);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -115,7 +115,7 @@ namespace Moshrefy.Application.Services
                 throw new NotFoundException<int>(nameof(exam), "exam", id);
 
             ValidateCenterAccess(exam.CenterId, nameof(Exam));
-            unitOfWork.Exams.DeleteAsync(exam);
+            unitOfWork.Exams.SoftDelete(exam);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -127,7 +127,7 @@ namespace Moshrefy.Application.Services
 
             ValidateCenterAccess(exam.CenterId, nameof(Exam));
             exam.IsDeleted = true;
-            unitOfWork.Exams.UpdateAsync(exam);
+            unitOfWork.Exams.Update(exam);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -139,7 +139,7 @@ namespace Moshrefy.Application.Services
 
             ValidateCenterAccess(exam.CenterId, nameof(Exam));
             exam.IsDeleted = false;
-            unitOfWork.Exams.UpdateAsync(exam);
+            unitOfWork.Exams.Update(exam);
             await unitOfWork.SaveChangesAsync();
         }
 
@@ -151,7 +151,7 @@ namespace Moshrefy.Application.Services
 
             ValidateCenterAccess(exam.CenterId, nameof(Exam));
             exam.ExamStatus = status;
-            unitOfWork.Exams.UpdateAsync(exam);
+            unitOfWork.Exams.Update(exam);
             await unitOfWork.SaveChangesAsync();
         }
     }

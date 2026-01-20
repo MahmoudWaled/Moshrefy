@@ -1,16 +1,20 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Moshrefy.Application.Interfaces.IServices;
 using Moshrefy.Domain.Entities;
 using Moshrefy.Domain.Identity;
+using Moshrefy.Domain.Interfaces;
 using System.Reflection;
+using System.Security.Claims;
 
 namespace Moshrefy.infrastructure.Data
 {
-    public class AppDbContext : IdentityDbContext<ApplicationUser>
+    public class AppDbContext(
+        DbContextOptions<AppDbContext> options,
+        IHttpContextAccessor _httpContextAccessor) : IdentityDbContext<ApplicationUser>(options)
     {
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
-
         DbSet<AcademicYear> AcademicYears { get; set; }
         DbSet<Attendance> Attendances { get; set; }
         DbSet<Center> Centers { get; set; }
@@ -43,6 +47,30 @@ namespace Moshrefy.infrastructure.Data
 
             builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
+        }
+
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            var userId = _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userName = _httpContextAccessor.HttpContext?.User?.Identity?.Name;
+
+            foreach (var entry in ChangeTracker.Entries<IAuditable>())
+            {
+                if (entry.State == EntityState.Added)
+                {
+                    entry.Entity.CreatedById = userId;
+                    entry.Entity.CreatedByName = userName;
+                    entry.Entity.CreatedAt = DateTimeOffset.UtcNow;
+                }
+                else if (entry.State == EntityState.Modified)
+                {
+                    entry.Entity.ModifiedById = userId;
+                    entry.Entity.ModifiedByName = userName;
+                    entry.Entity.ModifiedAt = DateTimeOffset.UtcNow;
+                }
+            }
+
+            return await base.SaveChangesAsync(cancellationToken);
         }
     }
 }

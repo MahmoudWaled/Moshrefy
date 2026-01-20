@@ -13,27 +13,21 @@ namespace Moshrefy.infrastructure.Repositories
         // Override to include AcademicYear navigation property
         public new async Task<IEnumerable<Course>> GetAllAsync(PaginationParamter paginationParamter)
         {
-            var pageNumber = paginationParamter.PageNumber ?? 1;
-            var pageSize = paginationParamter.PageSize ?? 25;
-
             return await appDbContext.Set<Course>()
                 .Include(c => c.AcademicYear)
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
+                .Skip((paginationParamter.PageNumber - 1) * paginationParamter.PageSize)
+                .Take(paginationParamter.PageSize)
                 .ToListAsync();
         }
 
         // Override to include AcademicYear navigation property with filtering
         public new async Task<IEnumerable<Course>> GetAllAsync(Expression<Func<Course, bool>> predicate, PaginationParamter paginationParamter)
         {
-            var pageNumber = paginationParamter.PageNumber ?? 1;
-            var pageSize = paginationParamter.PageSize ?? 25;
-
             return await appDbContext.Set<Course>()
                 .Include(c => c.AcademicYear)
                 .Where(predicate)
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
+                .Skip((paginationParamter.PageNumber - 1) * paginationParamter.PageSize)
+                .Take(paginationParamter.PageSize)
                 .ToListAsync();
         }
 

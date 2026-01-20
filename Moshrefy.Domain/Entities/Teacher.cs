@@ -1,9 +1,10 @@
-﻿using Moshrefy.Domain.SoftDeletable;
+﻿using Moshrefy.Domain.Interfaces;
+using Moshrefy.Domain.SoftDeletable;
 using System.ComponentModel.DataAnnotations;
 
 namespace Moshrefy.Domain.Entities
 {
-    public class Teacher : BaseEntity, ISoftDeletable
+    public class Teacher : BaseEntity, ISoftDeletable, IActivatable
     {
         [Required]
         [MaxLength(100)]

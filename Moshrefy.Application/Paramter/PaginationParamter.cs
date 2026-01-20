@@ -2,14 +2,24 @@
 {
     public class PaginationParamter
     {
-        private const int MaxPageSize = 200;  // Increased from 40 to allow showing 100 records per page
-        private int? pageSize;
-        public int? PageSize
-        {
-            get { return pageSize; }
-            set { pageSize = value > MaxPageSize ? MaxPageSize : value; }
-        }
-        public int? PageNumber { get; set; } = 1;
+        private const int MaxPageSize = 100;
+        private const int DefaultPageSize = 30;
+        private const int DefaultPageNumber = 1;
 
+        private int pageSize = DefaultPageSize;
+        private int pageNumber = DefaultPageNumber;
+
+        public int PageSize
+        {
+            get => pageSize;
+            set => pageSize = value > MaxPageSize ? MaxPageSize : (value < 1 ? DefaultPageSize : value);
+        }
+
+        public int PageNumber
+        {
+            get => pageNumber;
+            set => pageNumber = value < 1 ? DefaultPageNumber : value;
+        }
     }
 }
+

@@ -19,6 +19,7 @@ namespace Moshrefy.Web.Controllers
         private readonly ICourseService _courseService;
         private readonly IAcademicYearService _academicYearService;
         private readonly ITeacherCourseService _teacherCourseService;
+        private readonly IEnrollmentService _enrollmentService;
         private readonly IMapper _mapper;
         private readonly ILogger<CourseController> _logger;
 
@@ -26,12 +27,14 @@ namespace Moshrefy.Web.Controllers
             ICourseService courseService,
             IAcademicYearService academicYearService,
             ITeacherCourseService teacherCourseService,
+            IEnrollmentService enrollmentService,
             IMapper _mapper,
             ILogger<CourseController> logger)
         {
             _courseService = courseService;
             _academicYearService = academicYearService;
             _teacherCourseService = teacherCourseService;
+            _enrollmentService = enrollmentService;
             this._mapper = _mapper;
             _logger = logger;
         }
@@ -76,6 +79,11 @@ namespace Moshrefy.Web.Controllers
             try
             {
                 var courseDTO = await _courseService.GetByIdAsync(id);
+                if (courseDTO == null || courseDTO.IsDeleted)
+                {
+                    return NotFound();
+                }
+                
                 var courseVM = _mapper.Map<CourseVM>(courseDTO);
                 return View(courseVM);
             }
@@ -321,6 +329,32 @@ namespace Moshrefy.Web.Controllers
             catch
             {
                 return new List<SelectListItem>();
+            }
+        }
+
+        // GET: Course/GetEnrolledStudents/5 (AJAX)
+        // Get enrolled students for a course
+        [HttpGet]
+        public async Task<IActionResult> GetEnrolledStudents(int id)
+        {
+            try
+            {
+                var enrollments = await _enrollmentService.GetByCourseIdAsync(id);
+                var result = enrollments
+                    .Where(e => !e.IsDeleted && !e.StudentIsDeleted)
+                    .Select(e => new
+                    {
+                        studentId = e.StudentId,
+                        studentName = e.StudentName,
+                        isActive = e.IsActive
+                    })
+                    .ToList();
+                return Json(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error loading enrolled students for course {id}");
+                return Json(new List<object>());
             }
         }
 

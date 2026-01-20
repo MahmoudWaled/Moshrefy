@@ -20,7 +20,11 @@ namespace Moshrefy.infrastructure.Configuration
                      .HasForeignKey(e => e.CourseId)
                      .OnDelete(DeleteBehavior.Restrict);
 
-            builder.HasIndex(e => new { e.StudentId, e.CourseId }).IsUnique();
+            // Unique constraint: Only one enrollment per Student + Course + Center (for non-deleted records)
+            builder.HasIndex(e => new { e.StudentId, e.CourseId, e.CenterId })
+                .IsUnique()
+                .HasFilter("[IsDeleted] = 0")
+                .HasDatabaseName("IX_Enrollment_Unique_Student_Course_Center");
 
 
 

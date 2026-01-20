@@ -14,9 +14,6 @@ namespace Moshrefy.infrastructure.Repositories
         // Predicate overload for proper server-side filtering
         public new async Task<IEnumerable<Session>> GetAllAsync(Expression<Func<Session, bool>> predicate, PaginationParamter paginationParamter)
         {
-            var pageNumber = paginationParamter.PageNumber ?? 1;
-            var pageSize = paginationParamter.PageSize ?? 25;
-
             return await appDbContext.Set<Session>()
                 .Include(s => s.TeacherCourse)
                     .ThenInclude(tc => tc.Teacher)
@@ -25,8 +22,8 @@ namespace Moshrefy.infrastructure.Repositories
                 .Include(s => s.Classroom)
                 .Include(s => s.AcademicYear)
                 .Where(predicate)
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
+                .Skip((paginationParamter.PageNumber - 1) * paginationParamter.PageSize)
+                .Take(paginationParamter.PageSize)
                 .ToListAsync();
         }
 

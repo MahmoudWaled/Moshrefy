@@ -11,6 +11,7 @@ namespace Moshrefy.Web.MappingProfiles
             CreateMap<CreateEnrollmentVM, CreateEnrollmentDTO>().ReverseMap();
             CreateMap<UpdateEnrollmentVM, UpdateEnrollmentDTO>().ReverseMap();
             CreateMap<EnrollmentVM, EnrollmentResponseDTO>().ReverseMap();
+            CreateMap<EnrollmentResponseDTO, UpdateEnrollmentVM>();
         }
     }
 }

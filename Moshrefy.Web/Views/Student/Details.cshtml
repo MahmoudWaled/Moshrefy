@@ -201,6 +201,38 @@
               </div>
             </div>
         }
+
+        @* Enrolled Courses Card *@
+        <div class="card mb-3">
+          <div class="card-header">
+            <div class="row align-items-center">
+              <div class="col">
+                <div class="d-flex align-items-center">
+                  <span class="avatar bg-primary text-white me-3">
+                    <i class="ti ti-book"></i>
+                  </span>
+                  <h3 class="card-title mb-0">Enrolled Courses</h3>
+                </div>
+              </div>
+              @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+              {
+                <div class="col-auto">
+                  <button type="button" class="btn btn-success btn-sm" onclick="openBulkEnrollModal()">
+                    <i class="ti ti-plus me-1"></i> Add Enrollment
+                  </button>
+                </div>
+              }
+            </div>
+          </div>
+          <div class="card-body">
+            <div id="enrolledCoursesContainer">
+              <div class="text-center py-3">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="text-muted mt-2">Loading courses...</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Sidebar -->
@@ -358,6 +390,194 @@
                 }
             })
             .then((r) => { if (r.isConfirmed) { $.post('@Url.Action("HardDelete")', { id: @Model.Id }).done((res) => { if (res.success) { TablerDialog.fire({ icon: 'success', title: 'Deleted!', text: res.message, timer: 2000, showConfirmButton: false }).then(() => window.location.href = '@Url.Action("Index")'); } else { TablerDialog.fire('Error', res.message, 'error'); } }).fail(() => TablerDialog.fire('Error', 'An error occurred', 'error')); } });
+        }
+
+        // Load enrolled courses
+        $(document).ready(function() {
+            loadEnrolledCourses();
+        });
+
+        function loadEnrolledCourses() {
+            $.get('/Student/GetEnrollments/@Model.Id', function(data) {
+                if (data.length === 0) {
+                    $('#enrolledCoursesContainer').html('<p class="text-muted mb-0">No courses enrolled yet.</p>');
+                } else {
+                    let html = '<div class="list-group list-group-flush">';
+                    data.forEach(function(enrollment) {
+                        const statusBadge = enrollment.isActive ? '<span class="badge bg-state-active ms-2">Active</span>' : '<span class="badge bg-state-inactive ms-2">Inactive</span>';
+                        
+                        // Build action buttons
+                        let actionButtons = '<div class="btn-group btn-group-sm ms-auto">';
+                        @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                        {
+                            @:if (enrollment.isActive) {
+                            @:    actionButtons += `<button onclick="deactivateEnrollmentInList(${enrollment.enrollmentId})" class="btn btn-sm btn-action-icon action-deactivate" title="Deactivate"><i class="ti ti-ban"></i></button>`;
+                            @:} else {
+                            @:    actionButtons += `<button onclick="activateEnrollmentInList(${enrollment.enrollmentId})" class="btn btn-sm btn-action-icon action-activate" title="Activate"><i class="ti ti-check"></i></button>`;
+                            @:}
+                        }
+                        @if (User.IsInRole("Admin"))
+                        {
+                            @:actionButtons += `<button onclick="deleteEnrollmentInList(${enrollment.enrollmentId})" class="btn btn-sm btn-action-icon action-delete" title="Delete"><i class="ti ti-trash"></i></button>`;
+                        }
+                        actionButtons += '</div>';
+                        
+                        html += `<div class="list-group-item list-group-item-action"><div class="d-flex align-items-center"><a href="/Course/Details/${enrollment.courseId}" class="d-flex align-items-center text-decoration-none flex-fill"><span class="avatar bg-primary text-white me-3"><i class="ti ti-book"></i></span><div class="flex-fill"><strong>${enrollment.courseName}</strong><div class="text-muted small">${enrollment.academicYearName || 'N/A'}</div></div></a>${statusBadge}${actionButtons}</div></div>`;
+                    });
+                    html += '</div>';
+                    $('#enrolledCoursesContainer').html(html);
+                }
+            });
+        }
+
+        // Open bulk enrollment modal
+        function openBulkEnrollModal() {
+            $.get('/Enrollment/GetAvailableCoursesForStudent/@Model.Id', function(data) {
+                if (data.length === 0) {
+                    TablerDialog.fire('Info', 'No available courses to enroll in.', 'info');
+                    return;
+                }
+                
+                // Flatten all courses from all years with year info
+                let allCourses = [];
+                data.forEach(function(yearGroup) {
+                    yearGroup.courses.forEach(function(course) {
+                        allCourses.push({
+                            id: course.id,
+                            name: course.name,
+                            yearName: yearGroup.academicYearName,
+                            yearId: yearGroup.academicYearId
+                        });
+                    });
+                });
+                
+                let coursesHtml = '<div class="mb-3"><input type="text" class="form-control" id="courseSearchModal" placeholder="Search courses..."></div><div id="coursesListModal" style="max-height: 400px; overflow-y: auto;">';
+                allCourses.forEach(function(course) {
+                    coursesHtml += `<div class="form-check course-item-modal"><input class="form-check-input course-check" type="checkbox" value="${course.id}" id="modalCourse${course.id}"><label class="form-check-label" for="modalCourse${course.id}"><strong>${course.name}</strong><br><small class="text-muted">${course.yearName}</small></label></div>`;
+                });
+                coursesHtml += '</div>';
+                
+                TablerDialog.fire({
+                    title: 'Enroll in Courses',
+                    html: coursesHtml,
+                    width: '500px',
+                    showCancelButton: true,
+                    confirmButtonText: '<i class="ti ti-check"></i> Enroll',
+                    didOpen: () => {
+                        $('#courseSearchModal').on('input', function() {
+                            const search = $(this).val().toLowerCase();
+                            $('.course-item-modal').each(function() {
+                                const text = $(this).text().toLowerCase();
+                                $(this).toggle(text.includes(search));
+                            });
+                        });
+                    },
+                    preConfirm: () => {
+                        const selected = $('.course-check:checked').map(function() { return parseInt($(this).val()); }).get();
+                        if (selected.length === 0) {
+                            TablerDialog.showValidationMessage('Please select at least one course');
+                            return false;
+                        }
+                        return selected;
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '/Enrollment/BulkEnrollStudentInCourses',
+                            type: 'POST',
+                            contentType: 'application/json',
+                            data: JSON.stringify({ studentId: @Model.Id, courseIds: result.value }),
+                            success: function(res) {
+                                if (res.success) {
+                                    TablerDialog.fire({ icon: 'success', title: 'Success!', text: res.message, timer: 2000, showConfirmButton: false }).then(() => loadEnrolledCourses());
+                                } else {
+                                    TablerDialog.fire('Error', res.message, 'error');
+                                }
+                            },
+                            error: function() {
+                                TablerDialog.fire('Error', 'An error occurred.', 'error');
+                            }
+                        });
+                    }
+                });
+            });
+        }
+
+        // Enrollment action functions
+        function activateEnrollmentInList(enrollmentId) {
+            TablerDialog.fire({
+                title: 'Activate Enrollment?',
+                text: 'This will activate this enrollment.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                confirmButtonText: '<i class="ti ti-check"></i> Activate'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post('/Enrollment/Activate', { id: enrollmentId })
+                        .done(function(res) {
+                            if (res.success) {
+                                TablerDialog.fire({ icon: 'success', title: 'Activated!', text: res.message, timer: 2000, showConfirmButton: false }).then(() => loadEnrolledCourses());
+                            } else {
+                                TablerDialog.fire('Error', res.message, 'error');
+                            }
+                        })
+                        .fail(() => TablerDialog.fire('Error', 'An error occurred.', 'error'));
+                }
+            });
+        }
+
+        function deactivateEnrollmentInList(enrollmentId) {
+            TablerDialog.fire({
+                title: 'Deactivate Enrollment?',
+                text: 'This will deactivate this enrollment.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ffc107',
+                confirmButtonText: '<i class="ti ti-ban"></i> Deactivate'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post('/Enrollment/Deactivate', { id: enrollmentId })
+                        .done(function(res) {
+                            if (res.success) {
+                                TablerDialog.fire({ icon: 'success', title: 'Deactivated!', text: res.message, timer: 2000, showConfirmButton: false }).then(() => loadEnrolledCourses());
+                            } else {
+                                TablerDialog.fire('Error', res.message, 'error');
+                            }
+                        })
+                        .fail(() => TablerDialog.fire('Error', 'An error occurred.', 'error'));
+                }
+            });
+        }
+
+        function deleteEnrollmentInList(enrollmentId) {
+            TablerDialog.fire({
+                title: 'Delete Enrollment?',
+                html: 'This will permanently delete this enrollment.<br><br>Type <strong>Delete</strong> to confirm:',
+                icon: 'warning',
+                input: 'text',
+                inputPlaceholder: 'Type Delete here',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                confirmButtonText: '<i class="ti ti-trash"></i> Delete',
+                inputValidator: (value) => {
+                    if (value !== 'Delete') {
+                        return 'Please type "Delete" to confirm';
+                    }
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post('/Enrollment/Delete', { id: enrollmentId })
+                        .done(function(res) {
+                            if (res.success) {
+                                TablerDialog.fire({ icon: 'success', title: 'Deleted!', text: res.message, timer: 2000, showConfirmButton: false }).then(() => loadEnrolledCourses());
+                            } else {
+                                TablerDialog.fire('Error', res.message, 'error');
+                            }
+                        })
+                        .fail(() => TablerDialog.fire('Error', 'An error occurred.', 'error'));
+                }
+            });
         }
     </script>
 }

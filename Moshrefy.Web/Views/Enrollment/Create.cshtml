@@ -1,0 +1,351 @@
+@model Moshrefy.Web.Models.Enrollment.CreateEnrollmentVM
+@{
+    ViewData["Title"] = "New Enrollment";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Page Header -->
+<div class="page-header-modern">
+    <div class="row g-2 align-items-center">
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb-modern">
+                    <li class="breadcrumb-item">
+                        <a asp-controller="Enrollment" asp-action="Index"><i class="ti ti-users"></i> Enrollments</a>
+                        <i class="ti ti-chevron-right breadcrumb-separator ms-2"></i>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">New Enrollment</li>
+                </ol>
+            </nav>
+            <h2 class="page-title"><i class="ti ti-plus"></i> Create Enrollment</h2>
+        </div>
+        <div class="col-auto ms-auto">
+            <a asp-action="Index" class="btn">
+                <i class="ti ti-arrow-left"></i> Back to List
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Page body -->
+<div class="page-body">
+  <div class="container-xl">
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title"><i class="ti ti-plus me-2"></i>Enrollment Information</h3>
+          </div>
+          <div class="card-body">
+            <!-- Mode Selector -->
+            <div class="alert alert-info mb-4">
+              <h4 class="alert-title"><i class="ti ti-info-circle me-2"></i>Choose Enrollment Mode:</h4>
+              <div class="btn-group w-100 mt-2" role="group">
+                <button type="button" class="btn btn-primary active" id="modeCourseToStudents" onclick="switchMode('courseToStudents')">
+                  <i class="ti ti-book me-2"></i>Select Course → Enroll Multiple Students
+                </button>
+                <button type="button" class="btn btn-outline-primary" id="modeStudentToCourses" onclick="switchMode('studentToCourses')">
+                  <i class="ti ti-user me-2"></i>Select Student → Enroll in Multiple Courses
+                </button>
+              </div>
+            </div>
+
+            <!-- Mode 1: Select ONE course, then MULTIPLE students -->
+            <div id="courseToStudentsMode">
+              <div class="row mb-3">
+                <div class="col-12">
+                  <label class="form-label required">Select Course</label>
+                  <select id="courseSelect" class="form-select" required>
+                    <option value="">-- Select a course --</option>
+                    @foreach (var course in ViewBag.Courses)
+                    {
+                      <option value="@course.Value">@course.Text</option>
+                    }
+                  </select>
+                </div>
+              </div>
+
+              <div class="row mb-3" id="studentsSelectionContainer" style="display: none;">
+                <div class="col-12">
+                  <label class="form-label required">Select Students to Enroll</label>
+                  <div class="mb-2">
+                    <input type="text" id="studentSearch" class="form-control" placeholder="Search students...">
+                  </div>
+                  <div id="studentsList" style="max-height: 400px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 4px; padding: 10px;">
+                    <!-- Populated via AJAX -->
+                  </div>
+                </div>
+              </div>
+
+              <div class="row" id="enrollButtonContainer1" style="display: none;">
+                <div class="col-12">
+                  <button type="button" class="btn btn-success w-100" onclick="submitBulkEnrollment('courseToStudents')">
+                    <i class="ti ti-check me-2"></i>Enroll Selected Students
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Mode 2: Select ONE student, then MULTIPLE courses (grouped by year) -->
+            <div id="studentToCoursesMode" style="display: none;">
+              <div class="row mb-3">
+                <div class="col-12">
+                  <label class="form-label required">Select Student</label>
+                  <select id="studentSelect" class="form-select" required>
+                    <option value="">-- Select a student --</option>
+                    @foreach (var student in ViewBag.Students)
+                    {
+                      <option value="@student.Value">@student.Text</option>
+                    }
+                  </select>
+                </div>
+              </div>
+
+              <div class="row mb-3" id="coursesGroupedContainer" style="display: none;">
+                <div class="col-12">
+                  <label class="form-label required">Select Courses to Enroll In</label>
+                  <div id="coursesGroupedByYear" class="accordion">
+                    <!-- Populated via AJAX with academic year groups -->
+                  </div>
+                  <small class="form-hint mt-2 d-block">Check individual courses or click the year header checkbox to select all courses in that academic year</small>
+                </div>
+              </div>
+
+              <div class="row" id="enrollButtonContainer2" style="display: none;">
+                <div class="col-12">
+                  <button type="button" class="btn btn-success w-100" onclick="submitBulkEnrollment('studentToCourses')">
+                    <i class="ti ti-check me-2"></i>Enroll in Selected Courses
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+@section Scripts {
+    <script>
+        let currentMode = 'courseToStudents';
+
+        // Switch between modes
+        function switchMode(mode) {
+            currentMode = mode;
+            
+            if (mode === 'courseToStudents') {
+                $('#modeCourseToStudents').removeClass('btn-outline-primary').addClass('btn-primary active');
+                $('#modeStudentToCourses').removeClass('btn-primary active').addClass('btn-outline-primary');
+                $('#courseToStudentsMode').show();
+                $('#studentToCoursesMode').hide();
+            } else {
+                $('#modeStudentToCourses').removeClass('btn-outline-primary').addClass('btn-primary active');
+                $('#modeCourseToStudents').removeClass('btn-primary active').addClass('btn-outline-primary');
+                $('#studentToCoursesMode').show();
+                $('#courseToStudentsMode').hide();
+            }
+
+            // Reset selections
+            $('#courseSelect').val('');
+            $('#studentSelect').val('');
+            $('#studentsSelectionContainer').hide();
+            $('#coursesGroupedContainer').hide();
+            $('#enrollButtonContainer1').hide();
+            $('#enrollButtonContainer2').hide();
+            $('#studentsList').empty();
+            $('#studentSearch').val('');
+            $('#coursesGroupedByYear').empty();
+        }
+
+        // When course is selected, load available students
+        $('#courseSelect').change(function() {
+            const courseId = $(this).val();
+            if (!courseId) {
+                $('#studentsSelectionContainer').hide();
+                $('#enrollButtonContainer1').hide();
+                return;
+            }
+
+            $.get('/Enrollment/GetAvailableStudentsForCourse/' + courseId, function(students) {
+                $('#studentsList').empty();
+                
+                if (students.length === 0) {
+                    $('#studentsList').html('<div class="alert alert-warning mb-0">No available students</div>');
+                    $('#enrollButtonContainer1').hide();
+                } else {
+                    students.forEach(function(student) {
+                        const checkbox = `
+                            <div class="form-check student-item">
+                                <input class="form-check-input student-checkbox" type="checkbox" value="${student.id}" id="student${student.id}">
+                                <label class="form-check-label" for="student${student.id}">
+                                    ${student.name}
+                                </label>
+                            </div>
+                        `;
+                        $('#studentsList').append(checkbox);
+                    });
+                    $('#enrollButtonContainer1').show();
+                }
+                
+                $('#studentsSelectionContainer').show();
+            });
+        });
+
+        // Search filter for students
+        $('#studentSearch').on('input', function() {
+            const search = $(this).val().toLowerCase();
+            $('.student-item').each(function() {
+                const text = $(this).text().toLowerCase();
+                $(this).toggle(text.includes(search));
+            });
+        });
+
+        // When student is selected, load available courses grouped by academic year
+        $('#studentSelect').change(function() {
+            const studentId = $(this).val();
+            if (!studentId) {
+                $('#coursesGroupedContainer').hide();
+                $('#enrollButtonContainer2').hide();
+                return;
+            }
+
+            $.get('/Enrollment/GetAvailableCoursesForStudent/' + studentId, function(data) {
+                $('#coursesGroupedByYear').empty();
+                
+                if (data.length === 0) {
+                    $('#coursesGroupedByYear').append('<div class="alert alert-warning">No available courses for this student</div>');
+                    $('#enrollButtonContainer2').hide();
+                } else {
+                    // Build accordion with academic year groups
+                    data.forEach(function(yearGroup, index) {
+                        const yearId = `year${yearGroup.academicYearId}`;
+                        const accordionItem = `
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="heading${yearId}">
+                                    <button class="accordion-button ${index === 0 ? '' : 'collapsed'}" type="button" 
+                                            data-bs-toggle="collapse" data-bs-target="#collapse${yearId}" 
+                                            aria-expanded="${index === 0 ? 'true' : 'false'}">
+                                        <div class="form-check me-2" onclick="event.stopPropagation();">
+                                            <input class="form-check-input year-checkbox" type="checkbox" 
+                                                   id="yearCheck${yearId}" data-year-id="${yearGroup.academicYearId}"
+                                                   onchange="toggleYearCourses('${yearId}')">
+                                        </div>
+                                        <strong>${yearGroup.academicYearName}</strong>
+                                        <span class="badge bg-secondary ms-2">${yearGroup.courses.length} courses</span>
+                                    </button>
+                                </h2>
+                                <div id="collapse${yearId}" class="accordion-collapse collapse ${index === 0 ? 'show' : ''}" 
+                                     data-bs-parent="#coursesGroupedByYear">
+                                    <div class="accordion-body">
+                                        ${yearGroup.courses.map(course => `
+                                            <div class="form-check">
+                                                <input class="form-check-input course-checkbox" type="checkbox" 
+                                                       value="${course.id}" id="course${course.id}" data-year="${yearId}">
+                                                <label class="form-check-label" for="course${course.id}">
+                                                    ${course.name}
+                                                </label>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        $('#coursesGroupedByYear').append(accordionItem);
+                    });
+                    $('#enrollButtonContainer2').show();
+                }
+                
+                $('#coursesGroupedContainer').show();
+            });
+        });
+
+        // Toggle all courses in a year when year checkbox is clicked
+        function toggleYearCourses(yearId) {
+            const yearCheckbox = $(`#yearCheck${yearId}`);
+            const isChecked = yearCheckbox.is(':checked');
+            
+            $(`[data-year="${yearId}"]`).prop('checked', isChecked);
+        }
+
+        // Submit bulk enrollment
+        function submitBulkEnrollment(mode) {
+            let data = {};
+            
+            if (mode === 'courseToStudents') {
+                const courseId = $('#courseSelect').val();
+                const selectedStudents = $('.student-checkbox:checked').map(function() {
+                    return parseInt($(this).val());
+                }).get();
+                
+                if (!courseId || selectedStudents.length === 0) {
+                    TablerDialog.fire('Error', 'Please select a course and at least one student', 'error');
+                    return;
+                }
+                
+                data = {
+                    courseId: parseInt(courseId),
+                    studentIds: selectedStudents
+                };
+            } else {
+                const studentId = $('#studentSelect').val();
+                const selectedCourses = $('.course-checkbox:checked').map(function() {
+                    return parseInt($(this).val());
+                }).get();
+                
+                if (!studentId || selectedCourses.length === 0) {
+                    TablerDialog.fire('Error', 'Please select a student and at least one course', 'error');
+                    return;
+                }
+                
+                data = {
+                    studentId: parseInt(studentId),
+                    courseIds: selectedCourses
+                };
+            }
+
+            // Determine endpoint
+            const endpoint = mode === 'courseToStudents' 
+                ? '@Url.Action("BulkEnrollStudentsInCourse")' 
+                : '@Url.Action("BulkEnrollStudentInCourses")';
+
+            console.log('Submitting enrollment:', { mode, endpoint, data });
+
+            // Submit
+            $.ajax({
+                url: endpoint,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function(response) {
+                    console.log('Response received:', response);
+                    if (response.success) {
+                        TablerDialog.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            text: response.message,
+                            timer: 2000,
+                            showConfirmButton: false
+                        }).then(() => window.location.href = '@Url.Action("Index")');
+                    } else {
+                        console.error('Enrollment failed:', response);
+                        TablerDialog.fire('Error', response.message || 'Enrollment failed', 'error');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX Error:', { xhr, status, error, responseText: xhr.responseText });
+                    let errorMessage = 'An error occurred while processing the enrollment';
+                    
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
+                    } else if (xhr.responseText) {
+                        errorMessage += ': ' + xhr.responseText.substring(0, 100);
+                    }
+                    
+                    TablerDialog.fire('Error', errorMessage, 'error');
+                }
+            });
+        }
+    </script>
+}
