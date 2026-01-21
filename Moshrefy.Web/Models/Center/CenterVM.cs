@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace Moshrefy.Web.Models.Center
 {
     public class CenterVM
@@ -14,8 +16,9 @@ namespace Moshrefy.Web.Models.Center
 
         public string Phone { get; set; } = default!;
 
+        [Display (Name = "Status")]
         public bool IsActive { get; set; }
-
+        [Display(Name = "State")]
         public bool IsDeleted { get; set; }
 
         // Audit fields

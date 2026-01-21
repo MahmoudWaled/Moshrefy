@@ -76,5 +76,20 @@ namespace Moshrefy.infrastructure.Repositories
                 .Where(c => c.IsDeleted)
                 .CountAsync();
         }
+
+        public async Task<(IEnumerable<Center> Items, int TotalCount)> GetNonDeletedCentersPagedAsync(PaginationParamter paginationParamter)
+        {
+            var query = appDbContext.Set<Center>().Where(c => !c.IsDeleted);
+
+            var totalCount = await query.CountAsync();
+
+            var items = await query
+                .OrderByDescending(c => c.ModifiedAt)
+                .Skip((paginationParamter.PageNumber - 1) * paginationParamter.PageSize)
+                .Take(paginationParamter.PageSize)
+                .ToListAsync();
+
+            return (items, totalCount);
+        }
     }
 }

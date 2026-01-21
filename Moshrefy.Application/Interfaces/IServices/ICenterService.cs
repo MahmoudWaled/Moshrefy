@@ -1,4 +1,5 @@
 using Moshrefy.Application.DTOs.Center;
+using Moshrefy.Application.DTOs.Common;
 using Moshrefy.Domain.Paramter;
 
 namespace Moshrefy.Application.Interfaces.IServices
@@ -22,5 +23,6 @@ namespace Moshrefy.Application.Interfaces.IServices
         Task<int> GetTotalCountAsync();
         Task<int> GetNonDeletedCountAsync();
         Task<int> GetDeletedCountAsync();
+        Task<PaginatedResult<CenterResponseDTO>> GetNonDeletedPagedAsync(PaginationParamter paginationParamter);
     }
 }

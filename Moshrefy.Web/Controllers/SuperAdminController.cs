@@ -11,6 +11,8 @@ using Moshrefy.Web.Models.Statistics;
 using Moshrefy.Web.Extensions;
 using Moshrefy.Application.DTOs.Common;
 using System;
+using System.Threading.Tasks;
+using Moshrefy.Domain.Entities;
 
 namespace Moshrefy.Web.Controllers
 {
@@ -57,69 +59,26 @@ namespace Moshrefy.Web.Controllers
 
         // List all centers
         [HttpGet]
-        public IActionResult Centers()
+        public async Task<IActionResult> Centers([FromQuery] PaginationParamter pagination)
         {
-            return View();
+            var paginatedCenters = await _centerService.GetNonDeletedPagedAsync(pagination);
+            var paginatedVM = new PaginatedResult<CenterVM>(
+                _mapper.Map<List<CenterVM>>(paginatedCenters.Items),
+                paginatedCenters.TotalCount,
+                paginatedCenters.PageNumber,
+                paginatedCenters.PageSize
+            );
+            return View(paginatedVM);
         }
 
-        // DataTables - Get centers data
-        [HttpPost]
-        public async Task<IActionResult> GetCentersData()
-        {
-            try
-            {
-                var centers = await _centerService.GetNonDeletedAsync(new PaginationParamter { PageSize = 100 });
-                var centersVM = _mapper.Map<List<CenterVM>>(centers);
-                
-                return Ok(new { data = centersVM });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error loading centers data");
-                return StatusCode(500, new { error = "Error loading data. Please try again." });
-            }
-        }
-
-        // Advanced search page
+       
         [HttpGet]
         public IActionResult AdvancedSearchCenters()
         {
             return View("SearchCenters");
         }
 
-        // DataTables - Advanced center search
-        //[HttpPost]
-        //public async Task<IActionResult> SearchCentersData(string? centerName, string? email, string? createdByName, string? adminName)
-        //{
-        //    try
-        //    {
-        //        var request = Request.GetDataTableRequest();
-                
-        //        // Override with method parameters if provided
-        //        if (!string.IsNullOrEmpty(centerName)) request.CenterName = centerName;
-        //        if (!string.IsNullOrEmpty(email)) request.Email = email;
-        //        if (!string.IsNullOrEmpty(createdByName)) request.CreatedByName = createdByName;
-        //        if (!string.IsNullOrEmpty(adminName)) request.AdminName = adminName;
-                
-        //        var response = await _superAdminService.GetCentersDataTableAsync(request);
-        //        var centersVM = _mapper.Map<List<CenterVM>>(response.Data);
-
-        //        return Ok(new
-        //        {
-        //            draw = response.Draw,
-        //            recordsTotal = response.RecordsTotal,
-        //            recordsFiltered = response.RecordsFiltered,
-        //            data = centersVM
-        //        });
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "Error loading centers search data");
-        //        return StatusCode(500, new { error = "Error loading data. Please try again." });
-        //    }
-        //}
-
-        // View center details
+       
         [HttpGet]
         public async Task<IActionResult> CenterDetails(int centerId)
         {

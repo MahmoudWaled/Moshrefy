@@ -6,7 +6,7 @@ namespace Moshrefy.Application.Interfaces.IRepositories
 {
     public interface ICenterRepository : IGenericRepository<Center, int>
     {
-        Task<IEnumerable<Center>> GetNonDeletedCentersAsync(PaginationParamter paginationParamter);
+        Task<(IEnumerable<Center> Items, int TotalCount)> GetNonDeletedCentersPagedAsync(PaginationParamter paginationParamter);
         Task<int> GetTotalCountAsync();
         Task<int> GetNonDeletedCountAsync();
         Task<int> GetDeletedCountAsync();

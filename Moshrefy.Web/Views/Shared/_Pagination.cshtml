@@ -1,0 +1,105 @@
+@model Moshrefy.Web.Models.Common.PaginationVM
+
+@if (Model.TotalCount > 0)
+{
+    <div class="card-footer d-flex align-items-center flex-wrap gap-2">
+        <!-- Page Size Dropdown -->
+        @if (Model.ShowPageSizeDropdown)
+        {
+            <div class="d-flex align-items-center gap-2">
+                <label class="form-label m-0 text-muted">Show</label>
+                <select class="form-select form-select-sm" style="width: auto;" 
+                        onchange="window.location.href='@Url.Action(Model.ActionName, Model.ControllerName)?PageNumber=1&PageSize=' + this.value">
+                    @foreach (var size in Model.PageSizeOptions)
+                    {
+                        if (Model.PageSize == size)
+                        {
+                            <option value="@size" selected>@size</option>
+                        }
+                        else
+                        {
+                            <option value="@size">@size</option>
+                        }
+                    }
+                </select>
+                <label class="form-label m-0 text-muted">entries</label>
+            </div>
+        }
+
+        <!-- Info Text -->
+        <p class="m-0 text-muted">
+            Showing <span>@(((Model.PageNumber - 1) * Model.PageSize) + 1)</span> to
+            <span>@(Math.Min(Model.PageNumber * Model.PageSize, Model.TotalCount))</span> of
+            <span>@Model.TotalCount</span> @Model.ItemName
+        </p>
+
+        <!-- Pagination Links -->
+        <ul class="pagination m-0 ms-auto">
+            <li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
+                <a class="page-link" 
+                   asp-action="@Model.ActionName" 
+                   asp-controller="@Model.ControllerName"
+                   asp-route-PageNumber="@(Model.PageNumber - 1)"
+                   asp-route-PageSize="@Model.PageSize" tabindex="-1">
+                    <i class="ti ti-chevron-left"></i> Prev
+                </a>
+            </li>
+
+            @{
+                var startPage = Math.Max(1, Model.PageNumber - 2);
+                var endPage = Math.Min(Model.TotalPages, Model.PageNumber + 2);
+            }
+
+            @if (startPage > 1)
+            {
+                <li class="page-item">
+                    <a class="page-link" 
+                       asp-action="@Model.ActionName" 
+                       asp-controller="@Model.ControllerName"
+                       asp-route-PageNumber="1"
+                       asp-route-PageSize="@Model.PageSize">1</a>
+                </li>
+                @if (startPage > 2)
+                {
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                }
+            }
+
+            @for (int i = startPage; i <= endPage; i++)
+            {
+                <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                    <a class="page-link" 
+                       asp-action="@Model.ActionName" 
+                       asp-controller="@Model.ControllerName"
+                       asp-route-PageNumber="@i"
+                       asp-route-PageSize="@Model.PageSize">@i</a>
+                </li>
+            }
+
+            @if (endPage < Model.TotalPages)
+            {
+                @if (endPage < Model.TotalPages - 1)
+                {
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                }
+                <li class="page-item">
+                    <a class="page-link" 
+                       asp-action="@Model.ActionName" 
+                       asp-controller="@Model.ControllerName"
+                       asp-route-PageNumber="@Model.TotalPages"
+                       asp-route-PageSize="@Model.PageSize">@Model.TotalPages</a>
+                </li>
+            }
+
+            <li class="page-item @(Model.HasNextPage ? "" : "disabled")">
+                <a class="page-link" 
+                   asp-action="@Model.ActionName" 
+                   asp-controller="@Model.ControllerName"
+                   asp-route-PageNumber="@(Model.PageNumber + 1)"
+                   asp-route-PageSize="@Model.PageSize">
+                    Next <i class="ti ti-chevron-right"></i>
+                </a>
+            </li>
+        </ul>
+    </div>
+}

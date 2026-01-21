@@ -951,9 +951,9 @@ namespace Moshrefy.Application.Services
             // Centers
             var totalCenters = await _unitOfWork.Centers.GetTotalCountAsync();
             var nonDeletedCenters = await _unitOfWork.Centers.GetNonDeletedCountAsync();
-            var nonDeletedCentersList = await _unitOfWork.Centers.GetNonDeletedCentersAsync(
+            var nonDeletedCentersList = await _unitOfWork.Centers.GetNonDeletedCentersPagedAsync(
                 new PaginationParamter { PageSize = 200 });
-            var activeCenters = nonDeletedCentersList.Count(c => c.IsActive);
+            var activeCenters = nonDeletedCentersList.Items.Count(c => c.IsActive);
 
             // Users
             var totalUsers = await _userManager.Users.CountAsync();

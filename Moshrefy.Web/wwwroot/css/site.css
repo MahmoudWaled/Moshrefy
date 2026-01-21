@@ -104,7 +104,16 @@ body.modal-open {
 }
 
 /* ========================================
-   3. ACTION BUTTONS
+    Tables Styling (tbody)
+   ======================================== */
+tr ,td {
+    padding-top: 0.25rem  !important;
+    padding-bottom: 0.25rem !important;
+}
+
+
+/* ========================================
+    ACTION BUTTONS
    ======================================== */
 .btn-action-create,
 .btn.btn-action-create {
@@ -413,7 +422,7 @@ table.dataTable tbody tr .btn-action-delete {
 /* Role badges in DataTables */
 table.dataTable tbody tr .badge {
   font-size: 0.75rem;
-  padding: 0.25em 0.6em;
+/*  padding: 0.25em 0.6em;*/
 }
 
 /* ========================================

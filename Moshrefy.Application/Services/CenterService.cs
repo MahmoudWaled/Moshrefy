@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Moshrefy.Application.DTOs.Center;
+using Moshrefy.Application.DTOs.Common;
 using Moshrefy.Application.Interfaces.IRepositories;
 using Moshrefy.Application.Interfaces.IServices;
 using Moshrefy.Application.Interfaces.IUnitOfWork;
@@ -51,7 +52,7 @@ namespace Moshrefy.Application.Services
 
         public async Task<List<CenterResponseDTO>> GetNonDeletedAsync(PaginationParamter paginationParamter)
         {
-            var centers = await unitOfWork.Centers.GetNonDeletedCentersAsync(paginationParamter);
+            var centers = await unitOfWork.Centers.GetNonDeletedCentersPagedAsync(paginationParamter);
             return mapper.Map<List<CenterResponseDTO>>(centers);
         }
 
@@ -187,6 +188,19 @@ namespace Moshrefy.Application.Services
         public async Task<int> GetDeletedCountAsync()
         {
             return await unitOfWork.Centers.GetDeletedCountAsync();
+        }
+
+        public async Task<PaginatedResult<CenterResponseDTO>> GetNonDeletedPagedAsync(PaginationParamter paginationParamter)
+        {
+            var (centers, totalCount) = await unitOfWork.Centers.GetNonDeletedCentersPagedAsync(paginationParamter);
+            var centersDto = mapper.Map<List<CenterResponseDTO>>(centers);
+
+            return new PaginatedResult<CenterResponseDTO>(
+                centersDto,
+                totalCount,
+                paginationParamter.PageNumber,
+                paginationParamter.PageSize
+            );
         }
     }
 }

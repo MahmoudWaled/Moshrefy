@@ -1,3 +1,5 @@
+@model PaginatedResult<CenterVM>
+
 @{
     ViewData["Title"] = "Centers Management";
 }
@@ -38,405 +40,104 @@
 
 <!-- Page body -->
 <div class="page-body">
-  <div class="container-xl">
-    <div class="row row-deck row-cards">
-      <div class="col-12">
-        <div class="card">
-          <div class="card-header">
-            <h3 class="card-title" id="cardTitle">All Centers</h3>
-            <div class="ms-auto">
-              <div class="btn-group" role="group">
-                <button type="button" class="btn btn-sm" id="filterAll">
-                  <i class="ti ti-list icon"></i> All
-                </button>
-                <button type="button" class="btn btn-sm" id="filterActive">
-                  Active
-                </button>
-                <button type="button" class="btn btn-sm" id="filterInactive">
-                  Inactive
-                </button>
-                <button type="button" class="btn btn-sm btn-action-delete" id="filterDeleted">
-                  <i class="ti ti-trash icon"></i> Deleted
-                </button>
-              </div>
+    <div class="container-xl">
+        <div class="row row-deck row-cards">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title" id="cardTitle">All Centers</h3>
+                        <div class="ms-auto d-flex align-items-center gap-3">
+                            <!-- Page Size Dropdown -->
+                            <div class="d-flex align-items-center gap-2">
+                                <label class="form-label m-0 text-muted">Show</label>
+                                <select class="form-select form-select-sm" style="width: auto;" id="pageSizeSelect"
+                                        onchange="window.location.href='@Url.Action("Centers", "SuperAdmin")?PageNumber=1&PageSize=' + this.value">
+                                    @foreach (var size in new[] { 10, 20, 30, 50, 100 })
+                                    {
+                                        if (Model.PageSize == size)
+                                        {
+                                            <option value="@size" selected>@size</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@size">@size</option>
+                                        }
+                                    }
+                                </select>
+                                <label class="form-label m-0 text-muted">entries</label>
+                            </div>
+
+                            <!-- Filter Buttons -->
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-sm" id="filterAll">
+                                    <i class="ti ti-list icon"></i> All
+                                </button>
+                                <button type="button" class="btn btn-sm" id="filterActive">
+                                    Active
+                                </button>
+                                <button type="button" class="btn btn-sm" id="filterInactive">
+                                    Inactive
+                                </button>
+                                <button type="button" class="btn btn-sm btn-action-delete" id="filterDeleted">
+                                    <i class="ti ti-trash icon"></i> Deleted
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-vcenter table-hover" id="centersTable">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>@Html.DisplayNameFor(Model => Model.Items.First().Name)</th>
+                                        <th>@Html.DisplayNameFor(Model => Model.Items.First().Address)</th>
+                                        <th>@Html.DisplayNameFor(Model => Model.Items.First().IsActive)</th>
+                                        <th>@Html.DisplayNameFor(Model => Model.Items.First().IsDeleted)</th>
+                                        <th>@Html.DisplayNameFor(Model => Model.Items.First().CreatedAt)</th>
+                                        <th class="w-1">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        var rowNumber = ((Model.PageNumber - 1) * Model.PageSize) + 1;
+                                    }
+                                    @foreach (var center in Model.Items)
+                                    {
+                                        <tr>
+                                            <td>@(rowNumber++)</td>
+                                            <td>@center.Name</td>
+                                            <td>@center.Address</td>
+                                            <td class="@(center.IsActive ? "" : "badge bg-state-inactive")">
+                                                @(center.IsActive ? "Active" : "Inactive")
+                                            </td>
+                                            <td>@(center.IsDeleted ? "Deleted" : "")</td>
+                                            <td>@center.CreatedAt.ToString("yyyy-MM-dd")</td>
+                                            <td>
+                                                <a asp-action="CenterDetails" asp-route-centerId="@center.Id" class="btn btn-sm">View</a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Pagination and PageSize dropdown show option -->
+                    @await Html.PartialAsync("_Pagination", new Moshrefy.Web.Models.Common.PaginationVM
+                    {
+                        PageNumber = Model.PageNumber,
+                        PageSize = Model.PageSize,
+                        TotalCount = Model.TotalCount,
+                        ActionName = "Centers",
+                        ControllerName = "SuperAdmin",
+                        ItemName = "centers",
+                        ShowPageSizeDropdown = false
+                    })
+                </div>
             </div>
-          </div>
-          <div class="card-body">
-            <div class="table-responsive">
-              <table class="table table-vcenter table-hover" id="centersTable">
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Name</th>
-                    <th>Location</th>
-                    <th>Status</th>
-                    <th>State</th>
-                    <th>Created Date</th>
-                    <th class="w-1">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <!-- Data loaded via AJAX -->
-                </tbody>
-              </table>
-            </div>
-          </div>
         </div>
-      </div>
     </div>
-  </div>
 </div>
 
-@section Scripts {
- 
-  <script>
-    var token = $('input[name="__RequestVerificationToken"]').val();
 
-    $(document).ready(function() {
-      var table = $('#centersTable').DataTable({
-        "processing": true,
-        "serverSide": true,
-        "ajax": {
-          "url": "@Url.Action("GetCentersData", "SuperAdmin")",
-          "type": "POST",
-          "data": function(d) {
-            d.activeFilter = $('#centersTable').data('activeFilter') || 'all';
-            d.filterDeleted = $('#centersTable').data('filterDeleted') || 'active';
-          },
-          "error": function(xhr, error, code) {
-            console.error('DataTables error:', error, code);
-            TablerDialog.fire({
-              icon: 'error',
-              title: 'Error Loading Data',
-              text: 'Please refresh the page and try again.',
-              timer: 3000
-            });
-          }
-        },
-        "columns": [
-          {
-            "data": null,
-            "orderable": false,
-            "searchable": false,
-            "width": "50px",
-            "className": "text-center",
-            "render": function(data, type, row, meta) {
-              return '<span class="text-muted">' + (meta.row + meta.settings._iDisplayStart + 1) + '</span>';
-            }
-          },
-          { 
-            "data": "name",
-            "name": "Name",
-            "render": function(data, type, row) {
-              return '<div class="d-flex py-1 align-items-center">' +
-                     '<div class="flex-fill">' +
-                     '<div class="font-weight-medium">' + data + '</div>' +
-                     '</div>' +
-                     '</div>';
-            }
-          },
-          { 
-            "data": "address",
-            "name": "Address"
-          },
-          { 
-            "data": "isActive",
-            "name": "IsActive",
-            "render": function(data, type, row) {
-              if (row.isDeleted) {
-                return '<span class="text-muted">Inactive</span>';
-              }
-              if (data) {
-                return '<span class="text-muted">Active</span>';
-              } else {
-                return '<span class="badge bg-state-inactive text-white"><i class="ti ti-x"></i> Inactive</span>';
-              }
-            }
-          },
-          { 
-            "data": "isDeleted",
-            "name": "State",
-            "visible": false, // Hidden by default
-            "render": function(data, type, row) {
-              if (data) {
-                return '<span class="badge bg-danger text-white"><i class="ti ti-trash"></i> Deleted</span>';
-              }
-              return '<span class="text-muted">Normal</span>';
-            }
-          },
-          { 
-            "data": "createdAt",
-            "name": "CreatedAt",
-            "render": function(data, type, row) {
-              if (data) {
-                var date = new Date(data);
-                return '<small class="text-muted"><i class="ti ti-clock me-1"></i>' + date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) + '</small>';
-              }
-              return '<span class="text-muted">N/A</span>';
-            }
-          },
-          {
-            "data": null,
-            "orderable": false,
-            "render": function(data, type, row) {
-              var actions = '<div class="btn-group btn-group-sm" role="group">';
-              
-              if (row.isDeleted) {
-                // Restore button for deleted centers
-                actions += '<a href="javascript:void(0)" onclick="restoreCenter(' + row.id + ')" class="btn btn-sm btn-action-icon action-restore" title="Restore">' +
-                          '<i class="ti ti-restore icon"></i>' +
-                          '</a>';
-                // Permanent delete button
-                actions += '<a href="javascript:void(0)" onclick="permanentDeleteCenter(' + row.id + ')" class="btn btn-sm btn-action-icon action-delete" title="Permanent Delete">' +
-                          '<i class="ti ti-trash-x icon"></i>' +
-                          '</a>';
-              } else {
-                // View button
-                actions += '<a href="@Url.Action("CenterDetails", "SuperAdmin")?centerId=' + row.id + '" class="btn btn-sm btn-action-icon action-view" title="View">' +
-                          '<i class="ti ti-eye icon"></i>' +
-                          '</a>';
-                
-                // Edit button
-                actions += '<a href="@Url.Action("EditCenter", "SuperAdmin")?id=' + row.id + '" class="btn btn-sm btn-action-icon action-edit" title="Edit">' +
-                          '<i class="ti ti-edit icon"></i>' +
-                          '</a>';
-                
-                // Delete button
-                actions += '<a href="javascript:void(0)" onclick="deleteCenter(' + row.id + ')" class="btn btn-sm btn-action-icon action-delete" title="Delete">' +
-                          '<i class="ti ti-trash icon"></i>' +
-                          '</a>';
-              }
-              
-              actions += '</div>';
-              return actions;
-            }
-          }
-
-        ],
-        "order": [[6, "desc"]], // Adjusted order index due to new column
-        "pageLength": 10,
-        "language": {
-          "search": "_INPUT_",
-          "searchPlaceholder": "Search centers...",
-          "lengthMenu": "_MENU_ entries",
-          "info": "Showing _START_ to _END_ of _TOTAL_ centers",
-          "infoEmpty": "No centers found",
-          "infoFiltered": "(from _MAX_ total)",
-          "zeroRecords": "No matching centers found",
-          "paginate": {
-            "first": "«",
-            "last": "»",
-            "next": "›",
-            "previous": "‹"
-          },
-          "processing": '<div class="spinner-border text-primary" role="status"></div><span class="ms-2">Loading...</span>'
-        }
-      });
-
-      // Helper to toggle State column visibility
-      function toggleStateColumn(show) {
-          var stateColumn = table.column('State:name');
-          stateColumn.visible(show);
-      }
-
-      // Filter buttons - Active/Inactive status filter
-      $('#filterAll').click(function() {
-        $('#centersTable').data('activeFilter', 'all');
-        $('#centersTable').data('filterDeleted', 'active'); // Show non-deleted
-        toggleStateColumn(false);
-        table.ajax.reload();
-        $('.btn-group .btn').removeClass('active');
-        $(this).addClass('active');
-        $('#cardTitle').text('All Centers');
-      });
-
-      $('#filterActive').click(function() {
-        $('#centersTable').data('activeFilter', 'active');
-        $('#centersTable').data('filterDeleted', 'active');
-        toggleStateColumn(false);
-        table.ajax.reload();
-        $('.btn-group .btn').removeClass('active');
-        $(this).addClass('active');
-        $('#cardTitle').text('Active Centers');
-      });
-
-      $('#filterInactive').click(function() {
-        $('#centersTable').data('activeFilter', 'inactive');
-        $('#centersTable').data('filterDeleted', 'active');
-        toggleStateColumn(false);
-        table.ajax.reload();
-        $('.btn-group .btn').removeClass('active');
-        $(this).addClass('active');
-        $('#cardTitle').text('Inactive Centers');
-      });
-
-      // Deleted centers filter
-      $('#filterDeleted').click(function() {
-        $('#centersTable').data('activeFilter', 'all');
-        $('#centersTable').data('filterDeleted', 'deleted');
-        toggleStateColumn(true);
-        table.ajax.reload();
-        $('.btn-group .btn').removeClass('active');
-        $(this).addClass('active');
-        $('#cardTitle').text('Deleted Centers');
-      });
-
-      // Set default filter
-      $('#centersTable').data('activeFilter', 'all');
-      $('#centersTable').data('filterDeleted', 'active');
-      $('#filterAll').addClass('active');
-    });
-
-    function deleteCenter(id) {
-      TablerDialog.fire({
-        title: 'Move to Trash?',
-        html: 'This center will be moved to trash.<br>You can restore it later from the Deleted tab.<br><br>Type <strong>Delete</strong> to confirm:',
-        icon: 'warning',
-        input: 'text',
-        inputPlaceholder: 'Type Delete here',
-        showCancelButton: true,
-        confirmButtonColor: '#ffc107',
-        cancelButtonColor: '#6c757d',
-        confirmButtonText: '<i class="ti ti-trash"></i> Move to Trash',
-        cancelButtonText: 'Cancel',
-        inputValidator: function(value) {
-          if (value !== 'Delete') {
-            return 'Please type "Delete" to confirm';
-          }
-        }
-      }).then(function(result) {
-        if (result.isConfirmed) {
-          $.ajax({
-            url: '@Url.Action("SoftDeleteCenter", "SuperAdmin")',
-            type: 'POST',
-            data: { id: id, __RequestVerificationToken: token },
-            success: function(result) {
-              if (result.success) {
-                $('#centersTable').DataTable().ajax.reload();
-                TablerDialog.fire({
-                  icon: 'success',
-                  title: 'Moved to Trash!',
-                  text: result.message || 'Center moved to trash successfully. You can restore it from the Deleted tab.',
-                  timer: 2500,
-                  showConfirmButton: false
-                });
-              } else {
-                TablerDialog.fire({
-                  icon: 'error',
-                  title: 'Error',
-                  text: 'Error: ' + result.message
-                });
-              }
-            },
-            error: function() {
-              TablerDialog.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Error moving center to trash'
-              });
-            }
-          });
-        }
-      });
-    }
-
-    function restoreCenter(id) {
-      TablerDialog.fire({
-        title: 'Restore Center?',
-        text: 'Are you sure you want to restore this center?',
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#28a745',
-        cancelButtonColor: '#6c757d',
-        confirmButtonText: '<i class="ti ti-restore"></i> Yes, Restore',
-        cancelButtonText: 'Cancel'
-      }).then(function(result) {
-        if (result.isConfirmed) {
-          $.ajax({
-            url: '@Url.Action("RestoreCenter", "SuperAdmin")',
-            type: 'POST',
-            data: { id: id, __RequestVerificationToken: token },
-            success: function(result) {
-              if (result.success) {
-                $('#centersTable').DataTable().ajax.reload();
-                TablerDialog.fire({
-                  icon: 'success',
-                  title: 'Restored!',
-                  text: result.message || 'Center restored successfully',
-                  timer: 2000,
-                  showConfirmButton: false
-                });
-              } else {
-                TablerDialog.fire({
-                  icon: 'error',
-                  title: 'Error',
-                  text: 'Error restoring center: ' + result.message
-                });
-              }
-            },
-            error: function() {
-              TablerDialog.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Error restoring center'
-              });
-            }
-          });
-        }
-      });
-    }
-
-    function permanentDeleteCenter(id) {
-      TablerDialog.fire({
-        title: 'PERMANENT DELETE',
-        html: '<div class="alert alert-danger mb-2"><strong>DANGER!</strong> This cannot be undone!</div>Type <code>DELETE</code> to confirm:',
-        input: 'text',
-        inputPlaceholder: 'Type Delete',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#dc3545',
-        cancelButtonColor: '#6c757d',
-        confirmButtonText: '<i class="ti ti-trash-x"></i> PERMANENTLY DELETE',
-        cancelButtonText: 'Cancel',
-        preConfirm: function(value) {
-          if (value !== 'Delete') {
-            TablerDialog.showValidationMessage('You must type Delete to confirm');
-          }
-        }
-      }).then(function(result) {
-        if (result.isConfirmed) {
-          $.ajax({
-            url: '@Url.Action("HardDeleteCenter", "SuperAdmin")',
-            type: 'POST',
-            data: { id: id, __RequestVerificationToken: token },
-            success: function(result) {
-              if (result.success) {
-                $('#centersTable').DataTable().ajax.reload();
-                TablerDialog.fire({
-                  icon: 'success',
-                  title: 'Deleted!',
-                  text: result.message || 'Center permanently deleted',
-                  timer: 2000,
-                  showConfirmButton: false
-                });
-              } else {
-                TablerDialog.fire({
-                  icon: 'error',
-                  title: 'Error',
-                  text: 'Error deleting center: ' + result.message
-                });
-              }
-            },
-            error: function() {
-              TablerDialog.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Error deleting center'
-              });
-            }
-          });
-        }
-      });
-    }
-  </script>
-}
