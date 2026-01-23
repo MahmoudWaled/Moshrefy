@@ -4,122 +4,170 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<!-- Page Header -->
-<div class="page-header-modern">
-    <div class="row g-2 align-items-center">
-        <div class="col">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb-modern">
-                    <li class="breadcrumb-item">
-                        <a asp-controller="SuperAdmin" asp-action="Index"><i class="ti ti-home"></i> Dashboard</a>
-                        <i class="ti ti-chevron-right breadcrumb-separator ms-2"></i>
-                    </li>
-                    <li class="breadcrumb-item">
-                        <a asp-controller="SuperAdmin" asp-action="Centers">Centers</a>
-                        <i class="ti ti-chevron-right breadcrumb-separator ms-2"></i>
-                    </li>
-                    <li class="breadcrumb-item active" aria-current="page">Create</li>
-                </ol>
-            </nav>
-            <h2 class="page-title"><i class="ti ti-building-plus"></i> Create New Center</h2>
+<div class="bg-white p-4 mb-4 shadow-sm border-bottom">
+    <div class="container-fluid">
+        <div class="row align-items-center">
+
+            <div class="col-md-8">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-2" style="--bs-breadcrumb-divider: '›';">
+                        <li class="breadcrumb-item">
+                            <a asp-controller="SuperAdmin" asp-action="Index" class="text-decoration-none text-muted small">
+                                <i class="bi bi-house-door me-1"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a asp-controller="SuperAdmin" asp-action="Centers" class="text-decoration-none text-muted small">
+                                Centers
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item active small fw-medium text-primary" aria-current="page">
+                            Create
+                        </li>
+                    </ol>
+                </nav>
+                <div class="d-flex align-items-center">
+                    <h2 class="h4 fw-bold text-dark mb-0 me-3">
+                        Create New Center
+                    </h2>
+                </div>
+            </div>
+
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <div class="d-flex gap-2 justify-content-md-end">
+                    <button type="button" onclick="goBack()" class="btn btn-outline-secondary btn-sm px-3 shadow-sm">
+                        <i class="bi bi-chevron-left me-1"></i> Back
+                    </button>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
+
+@Html.AntiForgeryToken()
 
 <!-- Page body -->
 <div class="page-body">
-  <div class="container-xl">
-    <div class="card">
-      <div class="card-header">
-        <h3 class="card-title"><i class="ti ti-building me-2"></i>Center Information</h3>
-      </div>
-      <form asp-action="CreateCenter" method="post" id="createCenterForm">
-        <div class="card-body">
-          <div class="row">
-            <div class="col-md-6">
-              <div class="mb-3">
-                <label class="form-label" asp-for="Name"><i class="ti ti-building text-primary me-1"></i>@Html.DisplayNameFor(m => m.Name)</label>
-                <div class="input-group">
-                  <span class="input-group-text"><i class="ti ti-building"></i></span>
-                  <input asp-for="Name" class="form-control" placeholder="Enter center name" />
-                </div>
-                <span asp-validation-for="Name" class="text-danger"></span>
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label" asp-for="Phone"><i class="ti ti-phone text-success me-1"></i>@Html.DisplayNameFor(m => m.Phone)</label>
-                <div class="input-group">
-                  <span class="input-group-text"><i class="ti ti-phone"></i></span>
-                  <input asp-for="Phone" class="form-control" placeholder="Enter phone number" />
-                </div>
-                <span asp-validation-for="Phone" class="text-danger"></span>
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label" asp-for="Address"><i class="ti ti-map-pin text-danger me-1"></i>@Html.DisplayNameFor(m => m.Address)</label>
-                <div class="input-group">
-                  <span class="input-group-text"><i class="ti ti-map-pin"></i></span>
-                  <input asp-for="Address" class="form-control" placeholder="Enter address" />
-                </div>
-                <span asp-validation-for="Address" class="text-danger"></span>
-              </div>
-            </div>
-
-            <div class="col-md-6">
-              <div class="mb-3">
-                <label class="form-label" asp-for="Email"><i class="ti ti-mail text-info me-1"></i>@Html.DisplayNameFor(m => m.Email)</label>
-                <div class="input-group">
-                  <span class="input-group-text"><i class="ti ti-mail"></i></span>
-                  <input asp-for="Email" class="form-control" placeholder="Enter email address" />
-                </div>
-                <span asp-validation-for="Email" class="text-danger"></span>
-                <small class="form-hint">Optional</small>
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label" asp-for="Description"><i class="ti ti-file-text text-secondary me-1"></i>@Html.DisplayNameFor(m => m.Description)</label>
-                <div class="input-group">
-                  <span class="input-group-text"><i class="ti ti-file-text"></i></span>
-                  <textarea asp-for="Description" class="form-control" rows="5" placeholder="Enter description (optional)"></textarea>
-                </div>
-                <span asp-validation-for="Description" class="text-danger"></span>
-                <small class="form-hint">Optional</small>
-              </div>
-            </div>
-          </div>
+    <div class="card border-0 shadow-sm mb-5">
+        <div class="card-header bg-transparent border-bottom py-3 mt-2">
+            <h3 class="card-title h5 mb-0 fw-bold">
+                <i class="bi bi-info-circle text-primary me-2"></i>Center Information
+            </h3>
         </div>
 
-        <div class="card-footer text-end">
-          <button type="button" onclick="goBack()" class="btn btn-secondary me-2">
-            <i class="ti ti-x"></i> Cancel
-          </button>
-          <button type="button" id="createCenterBtn" class="btn btn-action-create" onclick="validateAndCreate()">
-            <i class="ti ti-device-floppy"></i> Create Center
-          </button>
-        </div>
-      </form>
+        <form asp-action="CreateCenter" method="post" id="createCenterForm">
+            <div class="card-body p-5">
+                <div class="row g-4 px-3">
+                    <div class="col-md-6">
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold mb-2" asp-for="Name">
+                                @Html.DisplayNameFor(m => m.Name) <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group border rounded">
+                                <span class="input-group-text bg-light border-0"><i class="bi bi-building text-secondary"></i></span>
+                                <input asp-for="Name" class="form-control border-0" placeholder="Enter center name" />
+                            </div>
+                            <span asp-validation-for="Name" class="text-danger small mt-1 d-block"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold mb-2" asp-for="Phone">
+                                @Html.DisplayNameFor(m => m.Phone) <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group border rounded ">
+                                <span class="input-group-text bg-light border-0"><i class="bi bi-telephone text-secondary"></i></span>
+                                <input asp-for="Phone" class="form-control border-0" placeholder="Enter phone number" />
+                            </div>
+                            <span asp-validation-for="Phone" class="text-danger small mt-1 d-block"></span>
+                        </div>
+
+                        <div class="mb-0">
+                            <label class="form-label fw-semibold mb-2" asp-for="Address">
+                                @Html.DisplayNameFor(m => m.Address) <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group border rounded">
+                                <span class="input-group-text bg-light border-0"><i class="bi bi-geo-alt text-secondary"></i></span>
+                                <input asp-for="Address" class="form-control border-0" placeholder="Enter address" />
+                            </div>
+                            <span asp-validation-for="Address" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold mb-2" asp-for="Email">
+                                @Html.DisplayNameFor(m => m.Email)
+                            </label>
+                            <div class="input-group border rounded">
+                                <span class="input-group-text bg-light border-0"><i class="bi bi-envelope text-secondary"></i></span>
+                                <input asp-for="Email" class="form-control border-0" placeholder="Enter email address" />
+                            </div>
+                            <span asp-validation-for="Email" class="text-danger small mt-1 d-block"></span>
+                        </div>
+
+                        <div class="mb-0">
+                            <label class="form-label fw-semibold mb-2" asp-for="Description">
+                                @Html.DisplayNameFor(m => m.Description)
+                            </label>
+                            <div class="input-group border rounded">
+                                <span class="input-group-text bg-light border-0 align-items-start pt-2"><i class="bi bi-card-text text-secondary"></i></span>
+                                <textarea asp-for="Description" class="form-control border-0" rows="5" placeholder="Enter description (optional)"></textarea>
+                            </div>
+                            <span asp-validation-for="Description" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-footer bg-light border-top p-4 text-end">
+                <button type="button" onclick="goBack()" class="btn btn-light border px-4 me-2 fw-medium">
+                    <i class="bi bi-x-lg me-1"></i> Cancel
+                </button>
+                <button type="button" id="createCenterBtn" class="btn btn-success px-4 fw-medium shadow-sm" onclick="validateAndCreate()">
+                    <i class="bi bi-check-circle me-1"></i> Create Center
+                </button>
+            </div>
+        </form>
     </div>
-  </div>
 </div>
 
+<!-- Toasts -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="liveToast" class="toast align-items-center text-white border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body" id="toastMessage"></div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+
+<!-- Modals -->
+@await Html.PartialAsync("_Modals")
+
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
     <script>
-        function goBack() {
-            if (window.history.length > 1) {
-                window.history.back();
-            } else {
-                window.location.href = '@Url.Action("Centers", "SuperAdmin")';
-            }
-        }
-        
         function validateAndCreate() {
-            var form = $('#createCenterForm');
-            form.validate();
+            const form = $('#createCenterForm');
+
+            // Validate form using jQuery Validation Unobtrusive
             if (form.valid()) {
-                var name = $('#Name').val();
-                TablerDialog.fire({ title: 'Create Center?', html: 'Center: <strong>' + name + '</strong><br>Will be created and set active.', icon: 'question', showCancelButton: true, confirmButtonColor: '#28a745', confirmButtonText: '<i class="ti ti-check"></i> Yes, Create' })
-                .then((r) => { if (r.isConfirmed) { $('#createCenterBtn').prop('disabled', true).html('<i class="ti ti-loader"></i> Creating...'); form.submit(); } });
+                setupModal({
+                    title: 'Create Center?',
+                    body: `Confirm creating center: <strong>${$('#Name').val()}</strong>?`,
+                    btnClass: 'btn-success',
+                    btnText: 'Yes, Create',
+                    onConfirm: function() {
+                        // Disable button and show loader on confirm
+                        $(this).prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span>');
+                        form.submit();
+                    }
+                });
+            } else {
+                showAlert("Please correct the validation errors.", false);
             }
         }
     </script>

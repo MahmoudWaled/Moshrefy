@@ -46,8 +46,7 @@
     </div>
 </div>
 
-@Html.AntiForgeryToken()
-
+ 
 <!-- Page body -->
 <div class="row">
     <!-- Main Content -->
@@ -261,89 +260,73 @@
 
 
 <!-- Modals -->
-<div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold" id="mTitle"></h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body py-3">
-                <p id="mBody" class="mb-3 text-muted"></p>
-                <div id="inputSection" class="d-none">
-                    <label class="small fw-bold mb-1">Type <span class="text-danger">Delete</span> to confirm:</label>
-                    <input type="text" id="mInput" class="form-control">
-                </div>
-            </div>
-            <div class="modal-footer border-0 pt-0">
-                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" id="mBtn" class="btn shadow-sm text-white">Submit</button>
-            </div>
-        </div>
-    </div>
-</div>
+@await Html.PartialAsync("_Modals")
 
 <!-- Toasts -->
-<div class="toast-container position-fixed bottom-0 end-0 p-3">
-    <div id="liveToast" class="toast align-items-center text-white border-0" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="d-flex">
-            <div class="toast-body" id="toastMessage"></div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-        </div>
-    </div>
-</div>
+@await Html.PartialAsync("_Toast")
+
 
 @section Scripts {
     <script>
-                const token = $('input[name="__RequestVerificationToken"]').val();
-                let currentUrl = "";
+        // Get Anti-Forgery Token
+        const token = $('input[name="__RequestVerificationToken"]').val();
 
-                function openModal(title, body, btnClass, url, needInput = false) {
-                    currentUrl = url;
-                    $('#mTitle').text(title);
-                    $('#mBody').html(body);
-                    $('#mBtn').attr('class', 'btn shadow-sm text-white ' + btnClass);
-                    $('#inputSection').toggleClass('d-none', !needInput);
-                    $('#mBtn').prop('disabled', needInput);
-                    $('#mInput').val('');
-                    new bootstrap.Modal('#confirmModal').show();
-                }
+        // 1. Unified Action Handler for AJAX Requests
+        function handleCenterAction(title, actionUrl, isDelete = false) {
+            setupModal({
+                title: title,
+                body: `Are you sure you want to proceed with this action on <strong>@Model.Name</strong>?`,
+                btnClass: isDelete ? 'btn-danger' : 'btn-primary',
+                btnText: isDelete ? 'Confirm Delete' : 'Confirm Action',
+                showInput: isDelete, // Requires typing "delete" for safety
+                onConfirm: function () {
+                    const confirmBtn = $(this);
+                    confirmBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Processing...');
 
-                // Buttons Actions
-                function activateCenter()   { openModal('Activate?', 'Are you sure you want to activate  <strong>@Model.Name</strong>?', 'btn-success', '@Url.Action("ActivateCenter")'); }
-                function deactivateCenter() { openModal('Deactivate?', 'Are you sure you want to Deactivate  <strong>@Model.Name</strong>?', 'btn-warning', '@Url.Action("DeactivateCenter")'); }
-                function softDeleteCenter() { openModal('Move to Trash?', 'Move to trash?', 'btn-warning', '@Url.Action("SoftDeleteCenter")', true); }
-                function hardDeleteCenter() { openModal('PERMANENT DELETE', 'Delete forever?', 'btn-danger', '@Url.Action("HardDeleteCenter")', true); }
-                function RestoreCenter()     { openModal('Restore Center?', 'Restore this center from trash?', 'btn-info', '@Url.Action("RestoreCenter")'); }
-                // Validation & Execution
-                $('#mInput').on('input', function() { $('#mBtn').prop('disabled', $(this).val().toLowerCase() !== 'delete'); });
+                    $.post(actionUrl, { id: '@Model.Id', __RequestVerificationToken: token }, (res) => {
+                        if (res.success) {
+                            showAlert(res.message || "Operation completed successfully.");
 
-                        $('#mBtn').click(function() {
-            $.post(currentUrl, { id: @Model.Id, __RequestVerificationToken: token }, (res) => {
-                if (res.success) {
-                    showAlert(res.message || "Operation successful!");
-                    setTimeout(() => {
-                        window.location.href = (currentUrl.includes('Delete') ? '@Url.Action("Centers")' : window.location.href);
-                    }, 1000);
-                } else {
-                    showAlert(res.message || "Error occurred", false);
+                            // Redirect if deleted, otherwise reload current page
+                            setTimeout(() => {
+                                window.location.href = (actionUrl.toLowerCase().includes('delete')
+                                    ? '@Url.Action("Centers", "SuperAdmin")'
+                                    : window.location.href);
+                            }, 1000);
+                        } else {
+                            showAlert(res.message || "An error occurred.", false);
+                            confirmBtn.prop('disabled', false).text('Confirm Action');
+                        }
+                    }).fail(() => {
+                        showAlert("Server connection error.", false);
+                        confirmBtn.prop('disabled', false).text('Confirm Action');
+                    });
                 }
             });
-        });
-
-                function goBack() { window.history.length > 1 ? window.history.back() : window.location.href = '@Url.Action("Centers")'; }
-
-                function showAlert(message, isSuccess = true) {
-            const toastEl = document.getElementById('liveToast');
-            const toast = new bootstrap.Toast(toastEl);
-
-            toastEl.classList.remove('bg-success', 'bg-danger');
-            toastEl.classList.add(isSuccess ? 'bg-success' : 'bg-danger');
-
-            document.getElementById('toastMessage').innerText = message;
-            toast.show();
         }
 
+        // 2. Specific Button Callbacks (Cleaner Mapping)
+        function activateCenter()   { handleCenterAction('Activate Center', '@Url.Action("ActivateCenter")'); }
+        function deactivateCenter() { handleCenterAction('Deactivate Center', '@Url.Action("DeactivateCenter")'); }
+        function RestoreCenter()    { handleCenterAction('Restore Center', '@Url.Action("RestoreCenter")'); }
+        function softDeleteCenter() { handleCenterAction('Move to Trash', '@Url.Action("SoftDeleteCenter")', true); }
+        function hardDeleteCenter() { handleCenterAction('Permanent Delete', '@Url.Action("HardDeleteCenter")', true); }
 
+        // 3. Monitor Delete Input (Uses the generic logic from site.js)
+        $(document).on('input', '#mInput', function () {
+            $('#mBtn').prop('disabled', $(this).val().toLowerCase() !== 'delete');
+        });
+
+        // 4. Back Navigation
+        function goBack() {
+            window.history.length > 1 ? window.history.back() : window.location.href = '@Url.Action("Centers", "SuperAdmin")';
+        }
+                $(document).ready(function () {
+            // Check for success message after redirect
+            const msg = '@TempData["SuccessMessage"]';
+            if (msg) {
+                showAlert(msg, true);
+            }
+        });
     </script>
 }

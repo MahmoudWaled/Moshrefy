@@ -10,7 +10,8 @@ namespace Moshrefy.Application.Interfaces.IRepositories
         Task<(IEnumerable<Center> centers, int TotalCount)> GetActivePagedAsync(PaginationParameter paginationParamter);
         Task<(IEnumerable<Center> centers, int TotalCount)> GetInactivePagedAsync(PaginationParameter paginationParamter);
         Task<(IEnumerable<Center> centers, int TotalCount)> GetDeletedPagedAsync(PaginationParameter paginationParamter);
-        Task<IEnumerable<Center>> GetByName(string centerName);
+        Task<IEnumerable<Center>> GetByNameAsync(string centerName);
+        Task<Center?> GetByEmailAsync(string email);
         Task<int> GetTotalCountAsync();
         Task<int> GetNonDeletedCountAsync();
         Task<int> GetDeletedCountAsync();

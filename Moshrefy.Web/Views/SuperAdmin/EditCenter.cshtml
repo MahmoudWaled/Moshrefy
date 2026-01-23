@@ -3,197 +3,179 @@
     ViewData["Title"] = "Edit Center";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<!-- page header -->
+<div class="bg-white p-4 mb-4 shadow-sm border-bottom">
+    <div class="container-fluid">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-2" style="--bs-breadcrumb-divider: '›';">
+                        <li class="breadcrumb-item">
+                            <a asp-controller="SuperAdmin" asp-action="Index" class="text-decoration-none text-muted small">
+                                <i class="bi bi-house-door me-1"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a asp-controller="SuperAdmin" asp-action="Centers" class="text-decoration-none text-muted small">
+                                Centers
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item active small fw-medium text-primary" aria-current="page">
+                            Edit
+                        </li>
+                    </ol>
+                </nav>
+                <div class="d-flex align-items-center">
+                    <h2 class="h4 fw-bold text-dark mb-0 me-3">
+                        Edit Center: @Model.Name
+                    </h2>
+                </div>
+            </div>
 
-<!-- Page Header -->
-<div class="page-header-modern">
-    <div class="row g-2 align-items-center">
-        <div class="col">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb-modern">
-                    <li class="breadcrumb-item">
-                        <a asp-controller="SuperAdmin" asp-action="Index"><i class="ti ti-home"></i> Dashboard</a>
-                        <i class="ti ti-chevron-right breadcrumb-separator ms-2"></i>
-                    </li>
-                    <li class="breadcrumb-item">
-                        <a asp-controller="SuperAdmin" asp-action="Centers">Centers</a>
-                        <i class="ti ti-chevron-right breadcrumb-separator ms-2"></i>
-                    </li>
-                    <li class="breadcrumb-item active" aria-current="page">Edit</li>
-                </ol>
-            </nav>
-            <h2 class="page-title"><i class="ti ti-edit"></i> Edit Center</h2>
-        </div>
-        <div class="col-auto ms-auto">
-            <button type="button" onclick="goBack()" class="btn">
-                <i class="ti ti-arrow-left"></i> Back
-            </button>
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <div class="d-flex gap-2 justify-content-md-end">
+                    <button type="button" onclick="goBack()" class="btn btn-outline-secondary btn-sm px-3 shadow-sm">
+                        <i class="bi bi-chevron-left me-1"></i> Back
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- Page body -->
+@Html.AntiForgeryToken()
+
+<!-- page body -->
 <div class="page-body">
-  <div class="container-xl">
-    <form asp-action="EditCenter" asp-route-id="@ViewBag.CenterId" method="post" id="editCenterForm">
-      <div class="row">
-        <!-- Main Form Column -->
-        <div class="col-lg-8">
-          <!-- Basic Information Card -->
-          <div class="card mb-3">
-            <div class="card-header">
-              <div class="d-flex align-items-center">
-                <span class="avatar bg-primary text-white me-3">
-                  <i class="ti ti-building"></i>
-                </span>
-                <div>
-                  <h3 class="card-title mb-0">Basic Information</h3>
-                  <small class="text-muted">Update center details</small>
-                </div>
-              </div>
-            </div>
-            <div class="card-body">
-              <div class="row">
-                <div class="col-md-12 mb-3">
-                  <label class="form-label required" asp-for="Name">Center Name</label>
-                  <div class="input-group">
-                    <span class="input-group-text"><i class="ti ti-building"></i></span>
-                    <input asp-for="Name" class="form-control" placeholder="Enter center name" />
-                  </div>
-                  <span asp-validation-for="Name" class="text-danger small"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                  <label class="form-label required" asp-for="Phone">Phone Number</label>
-                  <div class="input-group">
-                    <span class="input-group-text"><i class="ti ti-phone"></i></span>
-                    <input asp-for="Phone" class="form-control" placeholder="Enter phone number" />
-                  </div>
-                  <span asp-validation-for="Phone" class="text-danger small"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                  <label class="form-label" asp-for="Email">Email Address</label>
-                  <div class="input-group">
-                    <span class="input-group-text"><i class="ti ti-mail"></i></span>
-                    <input asp-for="Email" type="email" class="form-control" placeholder="email@example.com" />
-                  </div>
-                  <span asp-validation-for="Email" class="text-danger small"></span>
-                </div>
-              </div>
-            </div>
-          </div>
+    <div class="container-xl">
+        <form asp-action="EditCenter" asp-route-id="@ViewBag.CenterId" method="post" id="editCenterForm">
+            <input type="hidden" asp-for="IsActive" />
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-transparent border-bottom py-3">
+                            <h3 class="card-title h5 mb-0 fw-bold">
+                                <i class="bi bi-info-circle text-primary me-2"></i>Center Information
+                            </h3>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="row g-4">
+                                <div class="col-md-12">
+                                    <label class="form-label fw-semibold mb-2" asp-for="Name">
+                                        @Html.DisplayNameFor(m => m.Name) <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group border rounded shadow-sm">
+                                        <span class="input-group-text bg-light border-0"><i class="bi bi-building text-secondary"></i></span>
+                                        <input asp-for="Name" class="form-control border-0" placeholder="Enter center name" />
+                                    </div>
+                                    <span asp-validation-for="Name" class="text-danger small mt-1 d-block"></span>
+                                </div>
 
-          <!-- Location & Description Card -->
-          <div class="card mb-3">
-            <div class="card-header">
-              <div class="d-flex align-items-center">
-                <span class="avatar bg-info text-white me-3">
-                  <i class="ti ti-map-pin"></i>
-                </span>
-                <div>
-                  <h3 class="card-title mb-0">Location & Description</h3>
-                  <small class="text-muted">Additional details</small>
-                </div>
-              </div>
-            </div>
-            <div class="card-body">
-              <div class="mb-3">
-                <label class="form-label required" asp-for="Address">Address</label>
-                <div class="input-group">
-                  <span class="input-group-text"><i class="ti ti-map-pin"></i></span>
-                  <input asp-for="Address" class="form-control" placeholder="Enter full address" />
-                </div>
-                <span asp-validation-for="Address" class="text-danger small"></span>
-              </div>
-              <div class="mb-3">
-                <label class="form-label" asp-for="Description">Description</label>
-                <textarea asp-for="Description" class="form-control" rows="4" placeholder="Enter center description (optional)"></textarea>
-                <span asp-validation-for="Description" class="text-danger small"></span>
-              </div>
-            </div>
-          </div>
-        </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold mb-2" asp-for="Phone">
+                                        @Html.DisplayNameFor(m => m.Phone) <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group border rounded shadow-sm">
+                                        <span class="input-group-text bg-light border-0"><i class="bi bi-telephone text-secondary"></i></span>
+                                        <input asp-for="Phone" class="form-control border-0" placeholder="Enter phone number" />
+                                    </div>
+                                    <span asp-validation-for="Phone" class="text-danger small mt-1 d-block"></span>
+                                </div>
 
-        <!-- Sidebar Column -->
-        <div class="col-lg-4">
-          <!-- Status Card -->
-          <div class="card mb-3">
-            <div class="card-header">
-              <div class="d-flex align-items-center">
-                <span class="avatar bg-success text-white me-3">
-                  <i class="ti ti-toggle-right"></i>
-                </span>
-                <h3 class="card-title mb-0">Status</h3>
-              </div>
-            </div>
-            <div class="card-body">
-              <label class="form-selectgroup-item flex-fill d-block">
-                <div class="form-check form-switch">
-                  <input type="checkbox" asp-for="IsActive" class="form-check-input">
-                  <span class="form-check-label">
-                    <strong>Center Active</strong>
-                    <div class="text-muted small">Active centers are visible and operational</div>
-                  </span>
-                </div>
-              </label>
-            </div>
-          </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold mb-2" asp-for="Email">
+                                        @Html.DisplayNameFor(m => m.Email)
+                                    </label>
+                                    <div class="input-group border rounded shadow-sm">
+                                        <span class="input-group-text bg-light border-0"><i class="bi bi-envelope text-secondary"></i></span>
+                                        <input asp-for="Email" class="form-control border-0" placeholder="Enter email address" />
+                                    </div>
+                                    <span asp-validation-for="Email" class="text-danger small mt-1 d-block"></span>
+                                </div>
 
-          <!-- Action Buttons -->
-          <div class="card">
-            <div class="card-body">
-              <div class="d-grid gap-2">
-                <button type="button" onclick="goBack()" class="btn btn-outline-secondary">
-                  <i class="ti ti-x"></i> Cancel
-                </button>
-                <button type="button" id="updateCenterBtn" class="btn btn-action-edit" onclick="validateAndUpdate()">
-                  <i class="ti ti-device-floppy"></i> Save Changes
-                </button>
-              </div>
+                                <div class="col-md-12">
+                                    <label class="form-label fw-semibold mb-2" asp-for="Address">
+                                        @Html.DisplayNameFor(m => m.Address) <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group border rounded shadow-sm">
+                                        <span class="input-group-text bg-light border-0"><i class="bi bi-geo-alt text-secondary"></i></span>
+                                        <input asp-for="Address" class="form-control border-0" placeholder="Enter full address" />
+                                    </div>
+                                    <span asp-validation-for="Address" class="text-danger small mt-1 d-block"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm mb-3">
+                        <div class="card-header bg-transparent py-3">
+                            <h3 class="card-title h6 mb-0 fw-bold">
+                                <i class="bi bi-card-text text-primary me-2"></i>Notes
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <label class="form-label fw-semibold mb-2" asp-for="Description">Description</label>
+                            <textarea asp-for="Description" class="form-control bg-light border-0 shadow-sm" rows="6" placeholder="Additional details (optional)"></textarea>
+                            <span asp-validation-for="Description" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                    </div>
+
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-3">
+                            <div class="d-grid gap-2">
+                                <button type="button" id="updateCenterBtn" class="btn btn-warning text-dark fw-bold py-2 shadow-sm" onclick="validateAndUpdate()">
+                                    <i class="bi bi-save me-1"></i> Save Changes
+                                </button>
+                                <button type="button" onclick="goBack()" class="btn btn-light border py-2 fw-medium">
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-      </div>
-    </form>
-  </div>
+        </form>
+    </div>
 </div>
 
+    @await Html.PartialAsync("_Modals")
+    @await Html.PartialAsync("_Toast")
+
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
     <script>
         function goBack() {
-            if (window.history.length > 1) {
-                window.history.back();
-            } else {
-                window.location.href = '@Url.Action("Centers", "SuperAdmin")';
-            }
+            window.history.length > 1 ? window.history.back() : window.location.href = '@Url.Action("Centers", "SuperAdmin")';
         }
-        
+
         function validateAndUpdate() {
-            var form = $('#editCenterForm');
-            form.validate();
+            const form = $('#editCenterForm');
+
+            // Using unified validation logic
             if (form.valid()) {
-                var name = $('#Name').val();
-                TablerDialog.fire({ 
-                    title: 'Update Center?', 
-                    html: 'Save changes to <strong>' + name + '</strong>?', 
-                    icon: 'question', 
-                    showCancelButton: true, 
-                    confirmButtonColor: '#f39c12', 
-                    confirmButtonText: '<i class="ti ti-device-floppy"></i> Yes, Update' 
-                })
-                .then((r) => { 
-                    if (r.isConfirmed) { 
-                        $('#updateCenterBtn').prop('disabled', true).html('<i class="ti ti-loader"></i> Saving...'); 
-                        form.submit(); 
-                    } 
+                setupModal({
+                    title: 'Save Changes?',
+                    body: `Are you sure you want to update <strong>${$('#Name').val()}</strong>?`,
+                    btnClass: 'btn-warning text-dark',
+                    btnText: 'Yes, Update',
+                    onConfirm: function() {
+                        $(this).prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Saving...');
+                        form.submit();
+                    }
                 });
+            } else {
+                showAlert("Please correct the highlighted errors.", false);
             }
         }
+
+        // Auto-show success message if redirected with TempData
+        $(document).ready(function() {
+            const msg = '@TempData["SuccessMessage"]';
+            if (msg) showAlert(msg, true);
+        });
     </script>
 }
-
-<style>
-  .required::after {
-    content: " *";
-    color: #dc3545;
-  }
-</style>

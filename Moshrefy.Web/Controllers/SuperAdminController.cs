@@ -94,7 +94,24 @@ namespace Moshrefy.Web.Controllers
             return View("SearchCenters");
         }
 
-       
+        // get center by email 
+        [HttpGet]
+        public async Task<IActionResult> GetCenterByEmail(string email)
+        {
+            try
+            {
+                var centerDTO = await _centerService.GetByEmailAsync(email);
+                var centerVM = _mapper.Map<CenterVM>(centerDTO);
+                return Json(new { success = true, center = centerVM });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error searching center by email: {email}");
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+        // get center by email 
+
         [HttpGet]
         public async Task<IActionResult> CenterDetails(int centerId)
         {

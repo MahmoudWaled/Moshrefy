@@ -5,7 +5,7 @@
     var status = Context.Request.Query["status"].ToString().ToLower();
 }
 
-<!-- Header -->
+<!-- Page Header -->
 <div class="bg-white p-4 mb-4 shadow-sm border-bottom">
     <div class="container-fluid">
         <div class="row align-items-center">
@@ -35,7 +35,7 @@
                     <a asp-action="AdvancedSearchCenters" class="btn btn-light d-none d-sm-inline-flex align-items-center">
                         <i class="bi bi-search me-1"></i> Advanced Search
                     </a>
-                    <a asp-action="CreateCenter" class="btn btn-action-create d-none d-sm-inline-flex align-items-center">
+                    <a asp-action="CreateCenter" class="btn btn-success d-none d-sm-inline-flex align-items-center">
                         <i class="bi bi-plus-lg me-1"></i> Create New Center
                     </a>
                     <a asp-action="CreateCenter" class="btn btn-action-create d-sm-none">
@@ -179,3 +179,15 @@
 
 
 
+@await Html.PartialAsync("_Toast")
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            var msg = '@TempData["SuccessMessage"]';
+            if (msg) {
+                showAlert(msg, true); // Function from site.js
+            }
+        });
+    </script>
+}

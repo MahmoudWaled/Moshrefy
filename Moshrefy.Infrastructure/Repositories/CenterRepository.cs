@@ -64,11 +64,17 @@ namespace Moshrefy.infrastructure.Repositories
            return (centers, totalCount);
         }
 
-        public async Task<IEnumerable<Center>> GetByName(string centerName)
+        public async Task<IEnumerable<Center>> GetByNameAsync(string centerName)
         {
             return await appDbContext.Set<Center>()
                 .Where(c => c.Name.Contains(centerName))
                 .ToListAsync();
+        }
+        public async Task<Center?> GetByEmailAsync(string email)
+        {
+            return await appDbContext.Set<Center>()
+                .FirstOrDefaultAsync(c => c.Email == email);
+
         }
 
         public async Task<int> GetTotalCountAsync()

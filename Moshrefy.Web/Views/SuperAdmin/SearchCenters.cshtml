@@ -2,362 +2,150 @@
     ViewData["Title"] = "Advanced Center Search";
 }
 
-<!-- Page Header -->
-<div class="page-header-modern">
-    <div class="row g-2 align-items-center">
-        <div class="col">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb-modern">
-                    <li class="breadcrumb-item">
-                        <a asp-controller="SuperAdmin" asp-action="Index"><i class="ti ti-home"></i> Dashboard</a>
-                        <i class="ti ti-chevron-right breadcrumb-separator ms-2"></i>
-                    </li>
-                    <li class="breadcrumb-item">
-                        <a asp-controller="SuperAdmin" asp-action="Centers">Centers</a>
-                        <i class="ti ti-chevron-right breadcrumb-separator ms-2"></i>
-                    </li>
-                    <li class="breadcrumb-item active" aria-current="page">Advanced Search</li>
-                </ol>
-            </nav>
-            <h2 class="page-title"><i class="ti ti-search"></i> Advanced Center Search</h2>
-        </div>
-        <div class="col-auto ms-auto d-print-none">
-            <div class="btn-list">
-                <a asp-action="Centers" class="btn d-none d-sm-inline-block">
-                    <i class="ti ti-arrow-left icon"></i> Back to Centers
+<div class="bg-white p-4 mb-4 shadow-sm border-bottom">
+    <div class="container-fluid">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-2 small" style="--bs-breadcrumb-divider: '›';">
+                        <li class="breadcrumb-item"><a asp-action="Index" asp-controller="SuperAdmin" class="text-decoration-none text-muted">Dashboard</a></li>
+                        <li class="breadcrumb-item active text-primary fw-medium" aria-current="page text-uppercase">Advanced Search</li>
+                    </ol>
+                </nav>
+                <h2 class="h4 fw-bold text-dark mb-0"><i class="bi bi-search me-2"></i>Advanced Center Search</h2>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <a asp-action="Centers" class="btn btn-outline-secondary btn-sm px-3 shadow-sm">
+                    <i class="bi bi-arrow-left me-1"></i> Back
                 </a>
             </div>
         </div>
     </div>
 </div>
 
-@Html.AntiForgeryToken()
-
-<!-- Page body -->
-<div class="page-body">
-    <div class="container-xl">
-        <!-- Search Form Card -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title"><i class="ti ti-filter me-2"></i>Search Filters</h3>
-                        <div class="ms-auto">
-                            <button type="button" class="btn btn-sm" id="clearFilters">
-                                <i class="ti ti-x icon"></i> Clear All
-                            </button>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <form id="searchForm">
-                            <div class="row g-3">
-                                <div class="col-md-6 col-lg-3">
-                                    <label class="form-label">Center Name</label>
-                                    <div class="input-icon">
-                                        <span class="input-icon-addon">
-                                            <i class="ti ti-building"></i>
-                                        </span>
-                                        <input type="text" class="form-control" id="searchCenterName" 
-                                               placeholder="Search by center name...">
-                                    </div>
-                                </div>
-                                <div class="col-md-6 col-lg-3">
-                                    <label class="form-label">Email</label>
-                                    <div class="input-icon">
-                                        <span class="input-icon-addon">
-                                            <i class="ti ti-mail"></i>
-                                        </span>
-                                        <input type="email" class="form-control" id="searchEmail" 
-                                               placeholder="Search by email...">
-                                    </div>
-                                </div>
-                                <div class="col-md-6 col-lg-3">
-                                    <label class="form-label">Created By</label>
-                                    <div class="input-icon">
-                                        <span class="input-icon-addon">
-                                            <i class="ti ti-user"></i>
-                                        </span>
-                                        <input type="text" class="form-control" id="searchCreatedBy" 
-                                               placeholder="Search by creator name...">
-                                    </div>
-                                </div>
-                                <div class="col-md-6 col-lg-3">
-                                    <label class="form-label">Admin Name</label>
-                                    <div class="input-icon">
-                                        <span class="input-icon-addon">
-                                            <i class="ti ti-user-star"></i>
-                                        </span>
-                                        <input type="text" class="form-control" id="searchAdminName" 
-                                               placeholder="Search by admin name...">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row mt-3">
-                                <div class="col-12">
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="ti ti-search icon"></i> Search
-                                    </button>
-                                    <span id="searchAlert" class="text-danger ms-3" style="display: none;">
-                                        <i class="ti ti-alert-circle"></i> Please enter at least one search filter.
-                                    </span>
-                                </div>
-                            </div>
-                        </form>
+<div class="container-xl">
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+            <form id="cleanSearchForm" class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label small fw-bold">Search By Name</label>
+                    <div class="input-group border rounded shadow-sm">
+                        <span class="input-group-text bg-light border-0"><i class="bi bi-building text-primary"></i></span>
+                        <input type="text" id="nameQuery" class="form-control border-0" placeholder="Enter center name...">
                     </div>
                 </div>
-            </div>
+                <div class="col-md-4">
+                    <label class="form-label small fw-bold">Search By Email</label>
+                    <div class="input-group border rounded shadow-sm">
+                        <span class="input-group-text bg-light border-0"><i class="bi bi-envelope text-info"></i></span>
+                        <input type="email" id="emailQuery" class="form-control border-0" placeholder="Enter email address...">
+                    </div>
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100 fw-bold shadow-sm">
+                        <i class="bi bi-search me-1"></i> Start Search
+                    </button>
+                </div>
+            </form>
         </div>
+    </div>
 
-        <!-- Results Card -->
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title"><i class="ti ti-list me-2"></i>Search Results</h3>
-                        <div class="ms-auto">
-                            <span id="resultCount" class="text-muted">Showing all centers</span>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-vcenter table-hover" id="searchResultsTable">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Center Name</th>
-                                        <th>Email</th>
-                                        <th>Phone</th>
-                                        <th>Address</th>
-                                        <th>Created By</th>
-                                        <th>Admin</th>
-                                        <th>Status</th>
-                                        <th class="w-1">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Data loaded via AJAX -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" id="resultsTable">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4">Center Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Status</th>
+                            <th class="text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsBody">
+                        <tr>
+                            <td colspan="5" class="text-center py-5 text-muted">
+                                <i class="bi bi-info-circle me-1"></i> Enter search data to see results.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 </div>
 
+    @await Html.PartialAsync("_Modals")
+    @await Html.PartialAsync("_Toast")
 @section Scripts {
     <script>
-        var token = $('input[name="__RequestVerificationToken"]').val();
-        var hasSearched = false;
+        $(document).ready(function () {
+            $('#cleanSearchForm').on('submit', function (e) {
+                e.preventDefault();
 
-        $(document).ready(function() {
-            var table = $('#searchResultsTable').DataTable({
-                "processing": true,
-                "serverSide": true,
-                "deferLoading": 0, // Don't load data on init
-                "ajax": function(data, callback, settings) {
-                    if (!hasSearched) {
-                        callback({
-                            draw: data.draw,
-                            recordsTotal: 0,
-                            recordsFiltered: 0,
-                            data: []
-                        });
+                const name = $('#nameQuery').val().trim();
+                const email = $('#emailQuery').val().trim();
+                const $body = $('#resultsBody');
+
+                if (!name && !email) {
+                    showAlert("Please enter a name or an email to search.", false);
+                    return;
+                }
+
+                // Show loading state
+                $body.html('<tr><td colspan="5" class="text-center py-5"><div class="spinner-border spinner-border-sm text-primary"></div> Searching...</td></tr>');
+
+                // Determine URL
+                let targetUrl = name ? `@Url.Action("GetCenterByName")?name=${encodeURIComponent(name)}` : `@Url.Action("GetCenterByEmail")?email=${encodeURIComponent(email)}`;
+
+                $.get(targetUrl, function (response) {
+                    $body.empty();
+
+                    // 1. Check if response is empty or null
+                    if (!response) {
+                        $body.append('<tr><td colspan="5" class="text-center py-5 text-danger fw-bold">No center found matching your criteria.</td></tr>');
                         return;
                     }
 
-                    // Add custom params
-                    data.centerName = $('#searchCenterName').val();
-                    data.email = $('#searchEmail').val();
-                    data.createdByName = $('#searchCreatedBy').val();
-                    data.adminName = $('#searchAdminName').val();
+                    // 2. Fix the "forEach" issue: Convert single object to array if needed
+                    let data = Array.isArray(response) ? response : [response];
 
-                    $.ajax({
-                        url: "@Url.Action("SearchCentersData", "SuperAdmin")",
-                        type: "POST",
-                        data: data,
-                        success: function(json) {
-                            callback(json);
-                        },
-                        error: function(xhr, error, code) {
-                            console.error('DataTables error:', error, code);
-                            TablerDialog.fire({
-                                icon: 'error',
-                                title: 'Error Loading Data',
-                                text: 'Please refresh the page and try again.',
-                                timer: 3000
-                            });
-                        }
+                    // 3. Render the rows
+                    data.forEach(item => {
+                        // Ensure item is valid before rendering
+                        if (!item || !item.id) return;
+
+                        const statusBadge = item.isActive
+                            ? '<span class="badge bg-success-subtle text-success border border-success px-2">Active</span>'
+                            : '<span class="badge bg-light text-muted border px-2">Inactive</span>';
+
+                        $body.append(`
+                            <tr>
+                                <td class="ps-4 fw-bold text-dark text-uppercase small">${item.name}</td>
+                                <td><small class="text-muted">${item.email || 'N/A'}</small></td>
+                                <td><i class="bi bi-telephone me-1 small text-primary"></i>${item.phone || 'N/A'}</td>
+                                <td>${statusBadge}</td>
+                                <td class="text-end pe-4">
+                                    <div class="btn-group shadow-sm border rounded bg-white">
+                                        <a href="/SuperAdmin/CenterDetails?centerId=${item.id}" class="btn btn-sm btn-white border-0" title="View"><i class="bi bi-eye text-primary"></i></a>
+                                        <a href="/SuperAdmin/EditCenter?id=${item.id}" class="btn btn-sm btn-white border-0" title="Edit"><i class="bi bi-pencil text-warning"></i></a>
+                                    </div>
+                                </td>
+                            </tr>
+                        `);
                     });
-                },
-                "columns": [
-                    {
-                        "data": null,
-                        "orderable": false,
-                        "searchable": false,
-                        "width": "50px",
-                        "className": "text-center",
-                        "render": function(data, type, row, meta) {
-                            return '<span class="text-muted">' + (meta.row + meta.settings._iDisplayStart + 1) + '</span>';
-                        }
-                    },
-                    { 
-                        "data": "name",
-                        "name": "Name",
-                        "render": function(data, type, row) {
-                            return '<div class="d-flex py-1 align-items-center">' +
-                                   '<i class="ti ti-building text-primary me-2"></i>' +
-                                   '<strong>' + data + '</strong>' +
-                                   '</div>';
-                        }
-                    },
-                    { 
-                        "data": "email",
-                        "name": "Email",
-                        "render": function(data) {
-                            if (data) {
-                                return '<i class="ti ti-mail text-info me-1"></i>' + data;
-                            }
-                            return '<span class="text-muted">N/A</span>';
-                        }
-                    },
-                    { 
-                        "data": "phone",
-                        "name": "Phone",
-                        "render": function(data) {
-                            if (data) {
-                                return '<i class="ti ti-phone text-success me-1"></i>' + data;
-                            }
-                            return '<span class="text-muted">N/A</span>';
-                        }
-                    },
-                    { 
-                        "data": "address",
-                        "name": "Address",
-                        "render": function(data) {
-                            if (data) {
-                                return '<small><i class="ti ti-map-pin text-warning me-1"></i>' + data + '</small>';
-                            }
-                            return '<span class="text-muted">N/A</span>';
-                        }
-                    },
-                    { 
-                        "data": "createdByName",
-                        "name": "CreatedByName",
-                        "render": function(data) {
-                            if (data) {
-                                return '<i class="ti ti-user text-secondary me-1"></i>' + data;
-                            }
-                            return '<span class="text-muted">N/A</span>';
-                        }
-                    },
-                    { 
-                        "data": "adminName",
-                        "name": "AdminName",
-                        "render": function(data) {
-                            if (data) {
-                                return '<i class="ti ti-user-star text-primary me-1"></i><strong>' + data + '</strong>';
-                            }
-                            return '<span class="text-muted">No Admin</span>';
-                        }
-                    },
-                    { 
-                        "data": "isActive",
-                        "name": "IsActive",
-                        "render": function(data, type, row) {
-                            if (row.isDeleted) {
-                                return '<span class="badge bg-danger text-white"><i class="ti ti-trash"></i> Deleted</span>';
-                            }
-                            if (data) {
-                                return '<span class="text-muted">Active</span>';
-                            } else {
-                                return '<span class="badge bg-state-inactive text-white"><i class="ti ti-x"></i> Inactive</span>';
-                            }
-                        }
-                    },
-                    {
-                        "data": null,
-                        "orderable": false,
-                        "render": function(data, type, row) {
-                            var actions = '<div class="btn-group btn-group-sm" role="group">';
-                            
-                            // View button
-                            actions += '<a href="@Url.Action("CenterDetails", "SuperAdmin")?centerId=' + row.id + '" class="btn btn-sm btn-action-icon action-view" title="View">' +
-                                      '<i class="ti ti-eye icon"></i>' +
-                                      '</a>';
-                            
-                            // Edit button
-                            actions += '<a href="@Url.Action("EditCenter", "SuperAdmin")?id=' + row.id + '" class="btn btn-sm btn-action-icon action-edit" title="Edit">' +
-                                      '<i class="ti ti-edit icon"></i>' +
-                                      '</a>';
-                            
-                            actions += '</div>';
-                            return actions;
-                        }
-                    }
-                ],
-                "order": [[1, "asc"]],
-                "pageLength": 25,
-                "language": {
-                    "search": "_INPUT_",
-                    "searchPlaceholder": "Quick search...",
-                    "lengthMenu": "_MENU_ entries",
-                    "info": "Showing _START_ to _END_ of _TOTAL_ centers",
-                    "infoEmpty": "No centers found",
-                    "infoFiltered": "(from _MAX_ total)",
-                    "zeroRecords": "No matching centers found",
-                    "paginate": {
-                        "first": "«",
-                        "last": "»",
-                        "next": "›",
-                        "previous": "‹"
-                    },
-                    "processing": '<div class="spinner-border text-primary" role="status"></div><span class="ms-2">Searching...</span>'
-                },
-                "drawCallback": function(settings) {
-                    var api = this.api();
-                    var info = api.page.info();
-                    if (hasSearched) {
-                        $('#resultCount').text('Found ' + info.recordsTotal + ' centers');
-                    } else {
-                        $('#resultCount').text('Enter search criteria and click Search');
-                    }
-                }
-            });
 
-            // Search form submission
-            $('#searchForm').on('submit', function(e) {
-                e.preventDefault();
-                
-                // Check if at least one filter has a value
-                var centerName = $('#searchCenterName').val().trim();
-                var email = $('#searchEmail').val().trim();
-                var createdByName = $('#searchCreatedBy').val().trim();
-                var adminName = $('#searchAdminName').val().trim();
-                
-                if (!centerName && !email && !createdByName && !adminName) {
-                    $('#searchAlert').show();
-                    return;
-                }
-                
-                $('#searchAlert').hide();
-                
-                hasSearched = true;
-                table.ajax.reload();
-            });
+                    // Final check if nothing was added
+                    if ($body.children().length === 0) {
+                        $body.append('<tr><td colspan="5" class="text-center py-5 text-muted">No centers found.</td></tr>');
+                    }
 
-            // Clear all filters
-            $('#clearFilters').on('click', function() {
-                $('#searchCenterName').val('');
-                $('#searchEmail').val('');
-                $('#searchCreatedBy').val('');
-                $('#searchAdminName').val('');
-                hasSearched = false;
-                table.clear().draw();
-                $('#resultCount').text('Enter search criteria and click Search');
+                }).fail(function() {
+                    showAlert("Search failed. Ensure the center exists.", false);
+                    $body.html('<tr><td colspan="5" class="text-center py-5 text-muted">Enter search criteria and try again.</td></tr>');
+                });
             });
         });
     </script>
 }
-

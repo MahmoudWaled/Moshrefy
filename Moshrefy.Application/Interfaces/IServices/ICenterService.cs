@@ -1,3 +1,4 @@
+
 using Moshrefy.Application.DTOs.Center;
 using Moshrefy.Application.DTOs.Common;
 using Moshrefy.Domain.Paramter;
@@ -8,6 +9,7 @@ namespace Moshrefy.Application.Interfaces.IServices
     {
         Task<CenterResponseDTO> CreateAsync(CreateCenterDTO createCenterDTO);
         Task<CenterResponseDTO?> GetByIdAsync(int id);
+        Task<CenterResponseDTO?> GetByEmailAsync(string email);
         Task<List<CenterResponseDTO>> GetAllAsync(PaginationParameter paginationParamter);
         Task<PaginatedResult<CenterResponseDTO>>  GetNonDeletedAsync(PaginationParameter paginationParamter);
         Task<PaginatedResult<CenterResponseDTO>> GetDeletedAsync(PaginationParameter paginationParamter);
