@@ -8,11 +8,11 @@ namespace Moshrefy.Application.Interfaces.IServices
     {
         Task<CenterResponseDTO> CreateAsync(CreateCenterDTO createCenterDTO);
         Task<CenterResponseDTO?> GetByIdAsync(int id);
-        Task<List<CenterResponseDTO>> GetAllAsync(PaginationParamter paginationParamter);
-        Task<PaginatedResult<CenterResponseDTO>>  GetNonDeletedAsync(PaginationParamter paginationParamter);
-        Task<PaginatedResult<CenterResponseDTO>> GetDeletedAsync(PaginationParamter paginationParamter);
-        Task<PaginatedResult<CenterResponseDTO>> GetActiveAsync(PaginationParamter paginationParamter);
-        Task<PaginatedResult<CenterResponseDTO>> GetInactiveAsync(PaginationParamter paginationParamter);
+        Task<List<CenterResponseDTO>> GetAllAsync(PaginationParameter paginationParamter);
+        Task<PaginatedResult<CenterResponseDTO>>  GetNonDeletedAsync(PaginationParameter paginationParamter);
+        Task<PaginatedResult<CenterResponseDTO>> GetDeletedAsync(PaginationParameter paginationParamter);
+        Task<PaginatedResult<CenterResponseDTO>> GetActiveAsync(PaginationParameter paginationParamter);
+        Task<PaginatedResult<CenterResponseDTO>> GetInactiveAsync(PaginationParameter paginationParamter);
         Task<List<CenterResponseDTO>> GetByNameAsync(string name);
         Task UpdateAsync(int id, UpdateCenterDTO updateCenterDTO);
         Task HardDeleteAsync(int id);

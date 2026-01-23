@@ -11,7 +11,7 @@ namespace Moshrefy.infrastructure.Repositories
     public class AcademicYearRepository(AppDbContext appDbContext) : GenericRepository<AcademicYear, int>(appDbContext), IAcademicYearRepository
     {
         // Predicate overload for proper server-side filtering
-        public new async Task<IEnumerable<AcademicYear>> GetAllAsync(Expression<Func<AcademicYear, bool>> predicate, PaginationParamter paginationParamter)
+        public new async Task<IEnumerable<AcademicYear>> GetAllAsync(Expression<Func<AcademicYear, bool>> predicate, PaginationParameter paginationParamter)
         {
             
             return await appDbContext.Set<AcademicYear>()

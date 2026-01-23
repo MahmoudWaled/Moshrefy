@@ -21,7 +21,7 @@ namespace Moshrefy.Application.Services
             // Check if already exists
             var existing = await unitOfWork.TeacherItems.GetAllAsync(
                 ti => ti.CenterId == currentCenterId && ti.TeacherId == createTeacherItemDTO.TeacherId && ti.ItemId == createTeacherItemDTO.ItemId,
-                new PaginationParamter { PageSize = 1 });
+                new PaginationParameter { PageSize = 1 });
             if (existing.Any())
             {
                 throw new BadRequestException("Teacher is already assigned to this item.");
@@ -44,7 +44,7 @@ namespace Moshrefy.Application.Services
             return mapper.Map<TeacherItemResponseDTO>(teacherItem);
         }
 
-        public async Task<List<TeacherItemResponseDTO>> GetAllAsync(PaginationParamter paginationParamter)
+        public async Task<List<TeacherItemResponseDTO>> GetAllAsync(PaginationParameter paginationParamter)
         {
             var currentCenterId = GetCurrentCenterIdOrThrow();
             var teacherItems = await unitOfWork.TeacherItems.GetAllAsync(
@@ -66,11 +66,11 @@ namespace Moshrefy.Application.Services
             var currentCenterId = GetCurrentCenterIdOrThrow();
             var teacherItems = await unitOfWork.TeacherItems.GetAllAsync(
                 ti => ti.CenterId == currentCenterId && ti.ItemId == itemId && !ti.IsDeleted,
-                new PaginationParamter { PageSize = 1000 });
+                new PaginationParameter { PageSize = 1000 });
             return mapper.Map<List<TeacherItemResponseDTO>>(teacherItems.ToList());
         }
 
-        public async Task<List<TeacherItemResponseDTO>> GetActiveAsync(PaginationParamter paginationParamter)
+        public async Task<List<TeacherItemResponseDTO>> GetActiveAsync(PaginationParameter paginationParamter)
         {
             var currentCenterId = GetCurrentCenterIdOrThrow();
             var teacherItems = await unitOfWork.TeacherItems.GetAllAsync(
@@ -79,7 +79,7 @@ namespace Moshrefy.Application.Services
             return mapper.Map<List<TeacherItemResponseDTO>>(teacherItems.ToList());
         }
 
-        public async Task<List<TeacherItemResponseDTO>> GetInactiveAsync(PaginationParamter paginationParamter)
+        public async Task<List<TeacherItemResponseDTO>> GetInactiveAsync(PaginationParameter paginationParamter)
         {
             var currentCenterId = GetCurrentCenterIdOrThrow();
             var teacherItems = await unitOfWork.TeacherItems.GetAllAsync(
@@ -164,7 +164,7 @@ namespace Moshrefy.Application.Services
             var currentCenterId = GetCurrentCenterIdOrThrow();
             var teacherItems = await unitOfWork.TeacherItems.GetAllAsync(
                 ti => ti.CenterId == currentCenterId && ti.TeacherId == teacherId && ti.ItemId == itemId && !ti.IsDeleted,
-                new PaginationParamter { PageSize = 1 });
+                new PaginationParameter { PageSize = 1 });
             return teacherItems.Any();
         }
     }

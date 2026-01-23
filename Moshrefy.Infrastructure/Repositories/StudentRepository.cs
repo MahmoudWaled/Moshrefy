@@ -25,7 +25,7 @@ namespace Moshrefy.infrastructure.Repositories
                 .FirstOrDefaultAsync();
         }
 
-        public new async Task<IEnumerable<Student>> GetAllAsync(PaginationParamter paginationParamter)
+        public new async Task<IEnumerable<Student>> GetAllAsync(PaginationParameter paginationParamter)
         {
             return await appDbContext.Set<Student>()
                 .Include(s => s.Enrollments)
@@ -36,7 +36,7 @@ namespace Moshrefy.infrastructure.Repositories
         }
 
         // Predicate overload with includes for proper server-side filtering
-        public new async Task<IEnumerable<Student>> GetAllAsync(Expression<Func<Student, bool>> predicate, PaginationParamter paginationParamter)
+        public new async Task<IEnumerable<Student>> GetAllAsync(Expression<Func<Student, bool>> predicate, PaginationParameter paginationParamter)
         {
             return await appDbContext.Set<Student>()
                 .Include(s => s.Enrollments)

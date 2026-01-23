@@ -41,7 +41,7 @@ namespace Moshrefy.Application.Services
             return mapper.Map<TeacherResponseDTO>(teacher);
         }
 
-        public async Task<List<TeacherResponseDTO>> GetAllAsync(PaginationParamter paginationParamter)
+        public async Task<List<TeacherResponseDTO>> GetAllAsync(PaginationParameter paginationParamter)
         {
             var currentCenterId = GetCurrentCenterIdOrThrow();
             
@@ -60,13 +60,13 @@ namespace Moshrefy.Application.Services
             return mapper.Map<List<TeacherResponseDTO>>(teachers);
         }
 
-        public async Task<List<TeacherResponseDTO>> GetActiveAsync(PaginationParamter paginationParamter)
+        public async Task<List<TeacherResponseDTO>> GetActiveAsync(PaginationParameter paginationParamter)
         {
             var teachers = await unitOfWork.Teachers.GetActiveTeachersAsync();
             return mapper.Map<List<TeacherResponseDTO>>(teachers);
         }
 
-        public async Task<List<TeacherResponseDTO>> GetInactiveAsync(PaginationParamter paginationParamter)
+        public async Task<List<TeacherResponseDTO>> GetInactiveAsync(PaginationParameter paginationParamter)
         {
             var teachers = await unitOfWork.Teachers.GetAllAsync(paginationParamter);
             var inactiveTeachers = teachers.Where(t => !t.IsActive).ToList();

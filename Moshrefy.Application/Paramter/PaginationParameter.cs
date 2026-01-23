@@ -1,6 +1,6 @@
 ﻿namespace Moshrefy.Domain.Paramter
 {
-    public class PaginationParamter
+    public class PaginationParameter
     {
         private const int MaxPageSize = 100;
         private const int DefaultPageSize = 30;

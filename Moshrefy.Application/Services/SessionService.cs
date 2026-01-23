@@ -35,7 +35,7 @@ namespace Moshrefy.Application.Services
             return mapper.Map<SessionResponseDTO>(session);
         }
 
-        public async Task<List<SessionResponseDTO>> GetAllAsync(PaginationParamter paginationParamter)
+        public async Task<List<SessionResponseDTO>> GetAllAsync(PaginationParameter paginationParamter)
         {
             var currentCenterId = GetCurrentCenterIdOrThrow();
             var sessions = await unitOfWork.Sessions.GetAllAsync(

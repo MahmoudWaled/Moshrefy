@@ -34,7 +34,7 @@ namespace Moshrefy.Application.Services
             return mapper.Map<InvoiceResponseDTO>(invoice);
         }
 
-        public async Task<List<InvoiceResponseDTO>> GetAllAsync(PaginationParamter paginationParamter)
+        public async Task<List<InvoiceResponseDTO>> GetAllAsync(PaginationParameter paginationParamter)
         {
             var currentCenterId = GetCurrentCenterIdOrThrow();
             var invoices = await unitOfWork.Invoices.GetAllAsync(
@@ -43,7 +43,7 @@ namespace Moshrefy.Application.Services
             return mapper.Map<List<InvoiceResponseDTO>>(invoices.ToList());
         }
 
-        public async Task<List<InvoiceResponseDTO>> GetPaidInvoicesAsync(PaginationParamter paginationParamter)
+        public async Task<List<InvoiceResponseDTO>> GetPaidInvoicesAsync(PaginationParameter paginationParamter)
         {
             var currentCenterId = GetCurrentCenterIdOrThrow();
             var invoices = await unitOfWork.Invoices.GetAllAsync(
@@ -52,7 +52,7 @@ namespace Moshrefy.Application.Services
             return mapper.Map<List<InvoiceResponseDTO>>(invoices.ToList());
         }
 
-        public async Task<List<InvoiceResponseDTO>> GetUnpaidInvoicesAsync(PaginationParamter paginationParamter)
+        public async Task<List<InvoiceResponseDTO>> GetUnpaidInvoicesAsync(PaginationParameter paginationParamter)
         {
             var currentCenterId = GetCurrentCenterIdOrThrow();
             var invoices = await unitOfWork.Invoices.GetAllAsync(

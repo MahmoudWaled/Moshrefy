@@ -11,7 +11,7 @@ namespace Moshrefy.infrastructure.Repositories
     public class ClassroomRepository(AppDbContext appDbContext) : GenericRepository<Classroom, int>(appDbContext), IClassroomRepository
     {
         // Predicate overload for proper server-side filtering
-        public new async Task<IEnumerable<Classroom>> GetAllAsync(Expression<Func<Classroom, bool>> predicate, PaginationParamter paginationParamter)
+        public new async Task<IEnumerable<Classroom>> GetAllAsync(Expression<Func<Classroom, bool>> predicate, PaginationParameter paginationParamter)
         {
             return await appDbContext.Set<Classroom>()
                 .Where(predicate)

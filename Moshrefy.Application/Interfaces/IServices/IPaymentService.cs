@@ -8,7 +8,7 @@ namespace Moshrefy.Application.Interfaces.IServices
     {
         Task<PaymentResponseDTO> CreateAsync(CreatePaymentDTO createPaymentDTO);
         Task<PaymentResponseDTO?> GetByIdAsync(int id);
-        Task<List<PaymentResponseDTO>> GetAllAsync(PaginationParamter paginationParamter);
+        Task<List<PaymentResponseDTO>> GetAllAsync(PaginationParameter paginationParamter);
         Task<List<PaymentResponseDTO>> GetByStudentIdAsync(int studentId);
         Task<List<PaymentResponseDTO>> GetByInvoiceIdAsync(int invoiceId);
         Task<List<PaymentResponseDTO>> GetBySessionIdAsync(int sessionId);

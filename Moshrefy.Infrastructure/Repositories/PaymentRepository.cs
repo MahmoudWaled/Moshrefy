@@ -12,7 +12,7 @@ namespace Moshrefy.infrastructure.Repositories
     public class PaymentRepository(AppDbContext appDbContext) : GenericRepository<Payment, int>(appDbContext), IPaymentRepository
     {
         // Predicate overload for proper server-side filtering
-        public new async Task<IEnumerable<Payment>> GetAllAsync(Expression<Func<Payment, bool>> predicate, PaginationParamter paginationParamter)
+        public new async Task<IEnumerable<Payment>> GetAllAsync(Expression<Func<Payment, bool>> predicate, PaginationParameter paginationParamter)
         {
             return await appDbContext.Set<Payment>()
                 .Include(p => p.Student)

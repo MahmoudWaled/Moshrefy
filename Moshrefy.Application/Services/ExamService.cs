@@ -35,7 +35,7 @@ namespace Moshrefy.Application.Services
             return mapper.Map<ExamResponseDTO>(exam);
         }
 
-        public async Task<List<ExamResponseDTO>> GetAllAsync(PaginationParamter paginationParamter)
+        public async Task<List<ExamResponseDTO>> GetAllAsync(PaginationParameter paginationParamter)
         {
             var currentCenterId = GetCurrentCenterIdOrThrow();
             var exams = await unitOfWork.Exams.GetAllAsync(
@@ -65,7 +65,7 @@ namespace Moshrefy.Application.Services
             var currentCenterId = GetCurrentCenterIdOrThrow();
             var exams = await unitOfWork.Exams.GetAllAsync(
                 e => e.CenterId == currentCenterId && e.CourseId == courseId && !e.IsDeleted,
-                new PaginationParamter { PageSize = 1000 });
+                new PaginationParameter { PageSize = 1000 });
             return mapper.Map<List<ExamResponseDTO>>(exams.ToList());
         }
 
@@ -74,7 +74,7 @@ namespace Moshrefy.Application.Services
             var currentCenterId = GetCurrentCenterIdOrThrow();
             var exams = await unitOfWork.Exams.GetAllAsync(
                 e => e.CenterId == currentCenterId && e.ClassroomId == classroomId && !e.IsDeleted,
-                new PaginationParamter { PageSize = 1000 });
+                new PaginationParameter { PageSize = 1000 });
             return mapper.Map<List<ExamResponseDTO>>(exams.ToList());
         }
 
@@ -83,7 +83,7 @@ namespace Moshrefy.Application.Services
             var currentCenterId = GetCurrentCenterIdOrThrow();
             var exams = await unitOfWork.Exams.GetAllAsync(
                 e => e.CenterId == currentCenterId && e.TeacherCourse != null && e.TeacherCourse.TeacherId == teacherId && !e.IsDeleted,
-                new PaginationParamter { PageSize = 1000 });
+                new PaginationParameter { PageSize = 1000 });
             return mapper.Map<List<ExamResponseDTO>>(exams.ToList());
         }
 
@@ -92,7 +92,7 @@ namespace Moshrefy.Application.Services
             var currentCenterId = GetCurrentCenterIdOrThrow();
             var exams = await unitOfWork.Exams.GetAllAsync(
                 e => e.CenterId == currentCenterId && e.ExamStatus == status && !e.IsDeleted,
-                new PaginationParamter { PageSize = 1000 });
+                new PaginationParameter { PageSize = 1000 });
             return mapper.Map<List<ExamResponseDTO>>(exams.ToList());
         }
 

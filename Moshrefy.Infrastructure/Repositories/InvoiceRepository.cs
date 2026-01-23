@@ -11,7 +11,7 @@ namespace Moshrefy.infrastructure.Repositories
     public class InvoiceRepository(AppDbContext appDbContext) : GenericRepository<Invoice, int>(appDbContext), IInvoiceRepository
     {
         // Predicate overload for proper server-side filtering
-        public new async Task<IEnumerable<Invoice>> GetAllAsync(Expression<Func<Invoice, bool>> predicate, PaginationParamter paginationParamter)
+        public new async Task<IEnumerable<Invoice>> GetAllAsync(Expression<Func<Invoice, bool>> predicate, PaginationParameter paginationParamter)
         {
             return await appDbContext.Set<Invoice>()
                 .Where(predicate)

@@ -5,8 +5,8 @@ namespace Moshrefy.Application.Interfaces.IGenericRepository
 {
     public interface IGenericRepository<TEntity, TKey> where TEntity : class where TKey : IEquatable<TKey>
     {
-        Task<IEnumerable<TEntity>> GetAllAsync(PaginationParamter paginationParamter);
-        Task<IEnumerable<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>> predicate, PaginationParamter paginationParamter);
+        Task<IEnumerable<TEntity>> GetAllAsync(PaginationParameter paginationParamter);
+        Task<IEnumerable<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>> predicate, PaginationParameter paginationParamter);
         Task<TEntity?> GetByIdAsync(TKey id);
         Task AddAsync(TEntity entity);
         void Update(TEntity entity);

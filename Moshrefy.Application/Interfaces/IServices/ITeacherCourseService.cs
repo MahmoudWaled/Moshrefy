@@ -7,11 +7,11 @@ namespace Moshrefy.Application.Interfaces.IServices
     {
         Task<TeacherCourseResponseDTO> CreateAsync(CreateTeacherCourseDTO createTeacherCourseDTO);
         Task<TeacherCourseResponseDTO?> GetByIdAsync(int id);
-        Task<List<TeacherCourseResponseDTO>> GetAllAsync(PaginationParamter paginationParamter);
+        Task<List<TeacherCourseResponseDTO>> GetAllAsync(PaginationParameter paginationParamter);
         Task<List<TeacherCourseResponseDTO>> GetByTeacherIdAsync(int teacherId);
         Task<List<TeacherCourseResponseDTO>> GetByCourseIdAsync(int courseId);
-        Task<List<TeacherCourseResponseDTO>> GetActiveAsync(PaginationParamter paginationParamter);
-        Task<List<TeacherCourseResponseDTO>> GetInactiveAsync(PaginationParamter paginationParamter);
+        Task<List<TeacherCourseResponseDTO>> GetActiveAsync(PaginationParameter paginationParamter);
+        Task<List<TeacherCourseResponseDTO>> GetInactiveAsync(PaginationParameter paginationParamter);
         Task UpdateAsync(int id, UpdateTeacherCourseDTO updateTeacherCourseDTO);
         Task DeleteAsync(int id);
         Task SoftDeleteAsync(int id);

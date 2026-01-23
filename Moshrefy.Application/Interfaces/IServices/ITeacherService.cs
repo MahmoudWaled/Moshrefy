@@ -7,11 +7,11 @@ namespace Moshrefy.Application.Interfaces.IServices
     {
         Task<TeacherResponseDTO> CreateAsync(CreateTeacherDTO createTeacherDTO);
         Task<TeacherResponseDTO?> GetByIdAsync(int id);
-        Task<List<TeacherResponseDTO>> GetAllAsync(PaginationParamter paginationParamter);
+        Task<List<TeacherResponseDTO>> GetAllAsync(PaginationParameter paginationParamter);
         Task<Moshrefy.Application.DTOs.Common.DataTableResponse<TeacherResponseDTO>> GetTeachersDataTableAsync(Moshrefy.Application.DTOs.Common.DataTableRequest request);
         Task<List<TeacherResponseDTO>> GetByNameAsync(string name);
-        Task<List<TeacherResponseDTO>> GetActiveAsync(PaginationParamter paginationParamter);
-        Task<List<TeacherResponseDTO>> GetInactiveAsync(PaginationParamter paginationParamter);
+        Task<List<TeacherResponseDTO>> GetActiveAsync(PaginationParameter paginationParamter);
+        Task<List<TeacherResponseDTO>> GetInactiveAsync(PaginationParameter paginationParamter);
         Task<TeacherResponseDTO?> GetByPhoneNumberAsync(string phoneNumber);
         Task UpdateAsync(int id, UpdateTeacherDTO updateTeacherDTO);
         Task DeleteAsync(int id);

@@ -35,7 +35,7 @@ namespace Moshrefy.Application.Services
             return mapper.Map<PaymentResponseDTO>(payment);
         }
 
-        public async Task<List<PaymentResponseDTO>> GetAllAsync(PaginationParamter paginationParamter)
+        public async Task<List<PaymentResponseDTO>> GetAllAsync(PaginationParameter paginationParamter)
         {
             var currentCenterId = GetCurrentCenterIdOrThrow();
             var payments = await unitOfWork.Payments.GetAllAsync(
@@ -49,7 +49,7 @@ namespace Moshrefy.Application.Services
             var currentCenterId = GetCurrentCenterIdOrThrow();
             var payments = await unitOfWork.Payments.GetAllAsync(
                 p => p.CenterId == currentCenterId && p.StudentId == studentId,
-                new PaginationParamter { PageSize = 1000 });
+                new PaginationParameter { PageSize = 1000 });
             return mapper.Map<List<PaymentResponseDTO>>(payments.ToList());
         }
 
@@ -58,7 +58,7 @@ namespace Moshrefy.Application.Services
             var currentCenterId = GetCurrentCenterIdOrThrow();
             var payments = await unitOfWork.Payments.GetAllAsync(
                 p => p.CenterId == currentCenterId && p.InvoiceId == invoiceId,
-                new PaginationParamter { PageSize = 1000 });
+                new PaginationParameter { PageSize = 1000 });
             return mapper.Map<List<PaymentResponseDTO>>(payments.ToList());
         }
 
@@ -67,7 +67,7 @@ namespace Moshrefy.Application.Services
             var currentCenterId = GetCurrentCenterIdOrThrow();
             var payments = await unitOfWork.Payments.GetAllAsync(
                 p => p.CenterId == currentCenterId && p.SessionId == sessionId,
-                new PaginationParamter { PageSize = 1000 });
+                new PaginationParameter { PageSize = 1000 });
             return mapper.Map<List<PaymentResponseDTO>>(payments.ToList());
         }
 
@@ -76,7 +76,7 @@ namespace Moshrefy.Application.Services
             var currentCenterId = GetCurrentCenterIdOrThrow();
             var payments = await unitOfWork.Payments.GetAllAsync(
                 p => p.CenterId == currentCenterId && p.ExamId == examId,
-                new PaginationParamter { PageSize = 1000 });
+                new PaginationParameter { PageSize = 1000 });
             return mapper.Map<List<PaymentResponseDTO>>(payments.ToList());
         }
 
@@ -85,7 +85,7 @@ namespace Moshrefy.Application.Services
             var currentCenterId = GetCurrentCenterIdOrThrow();
             var payments = await unitOfWork.Payments.GetAllAsync(
                 p => p.CenterId == currentCenterId && p.paymentMethods == paymentMethod,
-                new PaginationParamter { PageSize = 1000 });
+                new PaginationParameter { PageSize = 1000 });
             return mapper.Map<List<PaymentResponseDTO>>(payments.ToList());
         }
 
@@ -94,7 +94,7 @@ namespace Moshrefy.Application.Services
             var currentCenterId = GetCurrentCenterIdOrThrow();
             var payments = await unitOfWork.Payments.GetAllAsync(
                 p => p.CenterId == currentCenterId && p.PaymentStatus == paymentStatus,
-                new PaginationParamter { PageSize = 1000 });
+                new PaginationParameter { PageSize = 1000 });
             return mapper.Map<List<PaymentResponseDTO>>(payments.ToList());
         }
 

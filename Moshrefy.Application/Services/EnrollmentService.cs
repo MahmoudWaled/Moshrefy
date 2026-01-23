@@ -25,7 +25,7 @@ namespace Moshrefy.Application.Services
             
             var existing = await unitOfWork.Enrollments.GetAllAsync(
                 e => e.CenterId == currentCenterId && e.StudentId == createEnrollmentDTO.StudentId && e.CourseId == createEnrollmentDTO.CourseId && !e.IsDeleted,
-                new PaginationParamter { PageSize = 1 });
+                new PaginationParameter { PageSize = 1 });
             if (existing.Any())
             {
                 throw new BadRequestException("Student is already enrolled in this course.");
@@ -52,7 +52,7 @@ namespace Moshrefy.Application.Services
             return mapper.Map<EnrollmentResponseDTO>(enrollment);
         }
 
-        public async Task<List<EnrollmentResponseDTO>> GetAllAsync(PaginationParamter paginationParamter)
+        public async Task<List<EnrollmentResponseDTO>> GetAllAsync(PaginationParameter paginationParamter)
         {
             var currentCenterId = GetCurrentCenterIdOrThrow();
             var enrollments = await unitOfWork.Enrollments.GetAllAsync(
@@ -66,7 +66,7 @@ namespace Moshrefy.Application.Services
             var currentCenterId = GetCurrentCenterIdOrThrow();
             var enrollments = await unitOfWork.Enrollments.GetAllAsync(
                 e => e.CenterId == currentCenterId && e.StudentId == studentId && !e.IsDeleted,
-                new PaginationParamter { PageSize = 1000 });
+                new PaginationParameter { PageSize = 1000 });
             return mapper.Map<List<EnrollmentResponseDTO>>(enrollments.ToList());
         }
 
@@ -75,11 +75,11 @@ namespace Moshrefy.Application.Services
             var currentCenterId = GetCurrentCenterIdOrThrow();
             var enrollments = await unitOfWork.Enrollments.GetAllAsync(
                 e => e.CenterId == currentCenterId && e.CourseId == courseId && !e.IsDeleted,
-                new PaginationParamter { PageSize = 1000 });
+                new PaginationParameter { PageSize = 1000 });
             return mapper.Map<List<EnrollmentResponseDTO>>(enrollments.ToList());
         }
 
-        public async Task<List<EnrollmentResponseDTO>> GetActiveAsync(PaginationParamter paginationParamter)
+        public async Task<List<EnrollmentResponseDTO>> GetActiveAsync(PaginationParameter paginationParamter)
         {
             var currentCenterId = GetCurrentCenterIdOrThrow();
             var enrollments = await unitOfWork.Enrollments.GetAllAsync(
@@ -88,7 +88,7 @@ namespace Moshrefy.Application.Services
             return mapper.Map<List<EnrollmentResponseDTO>>(enrollments.ToList());
         }
 
-        public async Task<List<EnrollmentResponseDTO>> GetInactiveAsync(PaginationParamter paginationParamter)
+        public async Task<List<EnrollmentResponseDTO>> GetInactiveAsync(PaginationParameter paginationParamter)
         {
             var currentCenterId = GetCurrentCenterIdOrThrow();
             var enrollments = await unitOfWork.Enrollments.GetAllAsync(
@@ -181,7 +181,7 @@ namespace Moshrefy.Application.Services
             var currentCenterId = GetCurrentCenterIdOrThrow();
             var enrollments = await unitOfWork.Enrollments.GetAllAsync(
                 e => e.CenterId == currentCenterId && e.StudentId == studentId && e.CourseId == courseId && !e.IsDeleted,
-                new PaginationParamter { PageSize = 1 });
+                new PaginationParameter { PageSize = 1 });
             return enrollments.Any();
         }
 
@@ -199,7 +199,7 @@ namespace Moshrefy.Application.Services
             {
                 var exists = await unitOfWork.Enrollments.GetAllAsync(
                     e => e.CenterId == currentCenterId && e.StudentId == studentId && e.CourseId == courseId && !e.IsDeleted,
-                    new PaginationParamter { PageSize = 1 });
+                    new PaginationParameter { PageSize = 1 });
                     
                 if (exists.Any())
                 {
@@ -244,7 +244,7 @@ namespace Moshrefy.Application.Services
             {
                 var exists = await unitOfWork.Enrollments.GetAllAsync(
                     e => e.CenterId == currentCenterId && e.StudentId == studentId && e.CourseId == courseId && !e.IsDeleted,
-                    new PaginationParamter { PageSize = 1 });
+                    new PaginationParameter { PageSize = 1 });
                     
                 if (exists.Any())
                 {

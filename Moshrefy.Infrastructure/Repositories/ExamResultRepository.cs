@@ -12,7 +12,7 @@ namespace Moshrefy.infrastructure.Repositories
     public class ExamResultRepository(AppDbContext appDbContext) : GenericRepository<ExamResult, int>(appDbContext), IExamResultRepository
     {
         // Predicate overload for proper server-side filtering
-        public new async Task<IEnumerable<ExamResult>> GetAllAsync(Expression<Func<ExamResult, bool>> predicate, PaginationParamter paginationParamter)
+        public new async Task<IEnumerable<ExamResult>> GetAllAsync(Expression<Func<ExamResult, bool>> predicate, PaginationParameter paginationParamter)
         {
             return await appDbContext.Set<ExamResult>()
                 .Include(er => er.Exam)

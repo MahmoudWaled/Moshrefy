@@ -178,7 +178,7 @@ namespace Moshrefy.Application.Services
         // Get users for DataTables
         public async Task<DataTableResponse<UserResponseDTO>> GetUsersDataTableAsync(DataTableRequest request)
         {
-             var paginationParams = new PaginationParamter
+             var paginationParams = new PaginationParameter
             {
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize
@@ -493,7 +493,7 @@ namespace Moshrefy.Application.Services
             return _mapper.Map<UserResponseDTO>(createdUser ?? user);
         }
 
-        public async Task<List<UserResponseDTO>> GetAllUsersAsync(PaginationParamter paginationParamter)
+        public async Task<List<UserResponseDTO>> GetAllUsersAsync(PaginationParameter paginationParamter)
         {
             IQueryable<ApplicationUser> query = _userManager.Users.Include(u => u.Center);
            
@@ -505,7 +505,7 @@ namespace Moshrefy.Application.Services
             return _mapper.Map<List<UserResponseDTO>>(users);
         }
 
-        public async Task<List<UserResponseDTO>> GetUsersByCenterIdAsync(int centerId, PaginationParamter paginationParamter)
+        public async Task<List<UserResponseDTO>> GetUsersByCenterIdAsync(int centerId, PaginationParameter paginationParamter)
         {
             if (centerId <= 0)
                 throw new BadRequestException("Invalid center id.");
@@ -549,7 +549,7 @@ namespace Moshrefy.Application.Services
             return await _userManager.Users.CountAsync(u => u.IsDeleted);
         }
 
-        public async Task<List<UserResponseDTO>> GetUsersByRoleAsync(string roleName, PaginationParamter paginationParamter)
+        public async Task<List<UserResponseDTO>> GetUsersByRoleAsync(string roleName, PaginationParameter paginationParamter)
         {
             if (string.IsNullOrEmpty(roleName))
                 throw new BadRequestException("Role name cannot be null.");
@@ -815,7 +815,7 @@ namespace Moshrefy.Application.Services
             await _userManager.UpdateAsync(user);
         }
 
-        public async Task<List<UserResponseDTO>> GetDeletedUsersAsync(PaginationParamter paginationParamter)
+        public async Task<List<UserResponseDTO>> GetDeletedUsersAsync(PaginationParameter paginationParamter)
         {
             var query = _userManager.Users.Include(u => u.Center).Where(u => u.IsDeleted);
 
@@ -827,7 +827,7 @@ namespace Moshrefy.Application.Services
             return _mapper.Map<List<UserResponseDTO>>(users);
         }
 
-        public async Task<List<UserResponseDTO>> GetInactiveUsersAsync(PaginationParamter paginationParamter)
+        public async Task<List<UserResponseDTO>> GetInactiveUsersAsync(PaginationParameter paginationParamter)
         {
             IQueryable<ApplicationUser> query = _userManager.Users.Include(u => u.Center).Where(u => !u.IsActive && !u.IsDeleted);
 
@@ -839,7 +839,7 @@ namespace Moshrefy.Application.Services
             return _mapper.Map<List<UserResponseDTO>>(users);
         }
 
-        public async Task<List<UserResponseDTO>> GetActiveUsersAsync(PaginationParamter paginationParamter)
+        public async Task<List<UserResponseDTO>> GetActiveUsersAsync(PaginationParameter paginationParamter)
         {
             IQueryable<ApplicationUser> query = _userManager.Users.Include(u => u.Center).Where(u => u.IsActive && !u.IsDeleted);
 
@@ -952,7 +952,7 @@ namespace Moshrefy.Application.Services
             var totalCenters = await _unitOfWork.Centers.GetTotalCountAsync();
             var nonDeletedCenters = await _unitOfWork.Centers.GetNonDeletedCountAsync();
             var nonDeletedCentersList = await _unitOfWork.Centers.GetNonDeletedPagedAsync(
-                new PaginationParamter { PageSize = 200 });
+                new PaginationParameter { PageSize = 200 });
             var activeCenters = nonDeletedCentersList.centers.Count(c => c.IsActive);
 
             // Users
@@ -1011,49 +1011,49 @@ namespace Moshrefy.Application.Services
 
         public async Task<int> GetTotalTeachersCountAsync()
         {
-            var teachers = await _unitOfWork.Teachers.GetAllAsync(new PaginationParamter { PageSize = int.MaxValue, PageNumber = 1 });
+            var teachers = await _unitOfWork.Teachers.GetAllAsync(new PaginationParameter { PageSize = int.MaxValue, PageNumber = 1 });
             return teachers.Count();
         }
 
         public async Task<int> GetTotalStudentsCountAsync()
         {
-            var students = await _unitOfWork.Students.GetAllAsync(new PaginationParamter { PageSize = int.MaxValue, PageNumber = 1 });
+            var students = await _unitOfWork.Students.GetAllAsync(new PaginationParameter { PageSize = int.MaxValue, PageNumber = 1 });
             return students.Count();
         }
 
         public async Task<int> GetTotalCoursesCountAsync()
         {
-            var courses = await _unitOfWork.Courses.GetAllAsync(new PaginationParamter { PageSize = int.MaxValue, PageNumber = 1 });
+            var courses = await _unitOfWork.Courses.GetAllAsync(new PaginationParameter { PageSize = int.MaxValue, PageNumber = 1 });
             return courses.Count();
         }
 
         public async Task<int> GetTotalClassroomsCountAsync()
         {
-            var classrooms = await _unitOfWork.Classrooms.GetAllAsync(new PaginationParamter { PageSize = int.MaxValue, PageNumber = 1 });
+            var classrooms = await _unitOfWork.Classrooms.GetAllAsync(new PaginationParameter { PageSize = int.MaxValue, PageNumber = 1 });
             return classrooms.Count();
         }
 
         public async Task<int> GetDeletedTeachersCountAsync()
         {
-            var teachers = await _unitOfWork.Teachers.GetAllAsync(new PaginationParamter { PageSize = int.MaxValue, PageNumber = 1 });
+            var teachers = await _unitOfWork.Teachers.GetAllAsync(new PaginationParameter { PageSize = int.MaxValue, PageNumber = 1 });
             return teachers.Count(t => t.IsDeleted);
         }
 
         public async Task<int> GetDeletedStudentsCountAsync()
         {
-            var students = await _unitOfWork.Students.GetAllAsync(new PaginationParamter { PageSize = int.MaxValue, PageNumber = 1 });
+            var students = await _unitOfWork.Students.GetAllAsync(new PaginationParameter { PageSize = int.MaxValue, PageNumber = 1 });
             return students.Count(s => s.IsDeleted);
         }
 
         public async Task<int> GetDeletedCoursesCountAsync()
         {
-            var courses = await _unitOfWork.Courses.GetAllAsync(new PaginationParamter { PageSize = int.MaxValue, PageNumber = 1 });
+            var courses = await _unitOfWork.Courses.GetAllAsync(new PaginationParameter { PageSize = int.MaxValue, PageNumber = 1 });
             return courses.Count(c => c.IsDeleted);
         }
 
         public async Task<int> GetDeletedClassroomsCountAsync()
         {
-            var classrooms = await _unitOfWork.Classrooms.GetAllAsync(new PaginationParamter { PageSize = int.MaxValue, PageNumber = 1 });
+            var classrooms = await _unitOfWork.Classrooms.GetAllAsync(new PaginationParameter { PageSize = int.MaxValue, PageNumber = 1 });
             return classrooms.Count(c => c.IsDeleted);
         }
 

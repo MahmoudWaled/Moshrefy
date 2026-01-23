@@ -11,7 +11,7 @@ namespace Moshrefy.infrastructure.Repositories.GenericRepository
     public class GenericRepository<TEntity, TKey>(AppDbContext appDbContext) : IGenericRepository<TEntity, TKey> where TEntity : class where TKey : IEquatable<TKey>
     {
 
-        public async Task<IEnumerable<TEntity>> GetAllAsync(PaginationParamter paginationParamter)
+        public async Task<IEnumerable<TEntity>> GetAllAsync(PaginationParameter paginationParamter)
         {
             return await appDbContext.Set<TEntity>()
                 .Skip((paginationParamter.PageNumber - 1) * paginationParamter.PageSize)
@@ -20,7 +20,7 @@ namespace Moshrefy.infrastructure.Repositories.GenericRepository
         }
 
         // with predicate overload
-        public async Task<IEnumerable<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>> predicate, PaginationParamter paginationParamter)
+        public async Task<IEnumerable<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>> predicate, PaginationParameter paginationParamter)
         {
             return await appDbContext.Set<TEntity>()
                 .Where(predicate)

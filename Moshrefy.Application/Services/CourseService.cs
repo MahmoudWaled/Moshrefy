@@ -50,7 +50,7 @@ namespace Moshrefy.Application.Services
             return _mapper.Map<CourseResponseDTO>(course);
         }
 
-        public async Task<List<CourseResponseDTO>> GetAllAsync(PaginationParamter paginationParamter)
+        public async Task<List<CourseResponseDTO>> GetAllAsync(PaginationParameter paginationParamter)
         {
             if (paginationParamter == null)
                 throw new BadRequestException("Pagination parameters cannot be null.");
@@ -88,7 +88,7 @@ namespace Moshrefy.Application.Services
             return _mapper.Map<List<CourseResponseDTO>>(filteredCourses);
         }
 
-        public async Task<List<CourseResponseDTO>> GetActiveAsync(PaginationParamter paginationParamter)
+        public async Task<List<CourseResponseDTO>> GetActiveAsync(PaginationParameter paginationParamter)
         {
             var currentCenterId = GetCurrentCenterIdOrThrow();
 
@@ -100,7 +100,7 @@ namespace Moshrefy.Application.Services
             return _mapper.Map<List<CourseResponseDTO>>(activeCourses);
         }
 
-        public async Task<List<CourseResponseDTO>> GetInactiveAsync(PaginationParamter paginationParamter)
+        public async Task<List<CourseResponseDTO>> GetInactiveAsync(PaginationParameter paginationParamter)
         {
             var currentCenterId = GetCurrentCenterIdOrThrow();
 
@@ -116,7 +116,7 @@ namespace Moshrefy.Application.Services
         {
             var currentCenterId = GetCurrentCenterIdOrThrow();
 
-            var courses = await _unitOfWork.Courses.GetAllAsync(new PaginationParamter());
+            var courses = await _unitOfWork.Courses.GetAllAsync(new PaginationParameter());
             var coursesByYear = courses
                 .Where(c => c.AcademicYearId == academicYearId && c.CenterId == currentCenterId && !c.IsDeleted)
                 .ToList();

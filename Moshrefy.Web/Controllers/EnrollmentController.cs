@@ -87,7 +87,7 @@ namespace Moshrefy.Web.Controllers
                 try
                 {
                     // Get all enrollments - filtering is done on client side
-                    var paginationParams = new PaginationParamter { PageSize = 1000 };
+                    var paginationParams = new PaginationParameter { PageSize = 1000 };
                     enrollmentsDTO = await _enrollmentService.GetAllAsync(paginationParams);
                 }
                 catch (Exception)
@@ -328,7 +328,7 @@ namespace Moshrefy.Web.Controllers
         {
             try
             {
-                var allCourses = await _courseService.GetAllAsync(new PaginationParamter { PageSize = 1000 });
+                var allCourses = await _courseService.GetAllAsync(new PaginationParameter { PageSize = 1000 });
                 var enrolledCourses = await _enrollmentService.GetByStudentIdAsync(studentId);
                 
                 // Only count non-deleted enrollments with non-deleted courses
@@ -366,7 +366,7 @@ namespace Moshrefy.Web.Controllers
         {
             try
             {
-                var allStudents = await _studentService.GetAllAsync(new PaginationParamter { PageSize = 1000 });
+                var allStudents = await _studentService.GetAllAsync(new PaginationParameter { PageSize = 1000 });
                 var enrolledStudents = await _enrollmentService.GetByCourseIdAsync(courseId);
                 
                 // Only count non-deleted enrollments with non-deleted students
@@ -396,8 +396,8 @@ namespace Moshrefy.Web.Controllers
         {
             try
             {
-                var students = await _studentService.GetAllAsync(new PaginationParamter { PageSize = 1000 });
-                var courses = await _courseService.GetAllAsync(new PaginationParamter { PageSize = 1000 });
+                var students = await _studentService.GetAllAsync(new PaginationParameter { PageSize = 1000 });
+                var courses = await _courseService.GetAllAsync(new PaginationParameter { PageSize = 1000 });
 
                 ViewBag.Students = students
                     .Where(s => !s.IsDeleted)

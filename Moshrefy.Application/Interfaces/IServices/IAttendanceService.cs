@@ -8,7 +8,7 @@ namespace Moshrefy.Application.Interfaces.IServices
     {
         Task<AttendanceResponseDTO> CreateAsync(CreateAttendanceDTO createAttendanceDTO);
         Task<AttendanceResponseDTO?> GetByIdAsync(int id);
-        Task<List<AttendanceResponseDTO>> GetAllAsync(PaginationParamter paginationParamter);
+        Task<List<AttendanceResponseDTO>> GetAllAsync(PaginationParameter paginationParamter);
         Task<List<AttendanceResponseDTO>> GetByStudentIdAsync(int studentId);
         Task<List<AttendanceResponseDTO>> GetBySessionIdAsync(int sessionId);
         Task<List<AttendanceResponseDTO>> GetByExamIdAsync(int examId);

@@ -357,7 +357,7 @@ namespace Moshrefy.Web.Controllers
         {
             try
             {
-                var allCourses = await _courseService.GetActiveAsync(new PaginationParamter { PageSize = 1000 });
+                var allCourses = await _courseService.GetActiveAsync(new PaginationParameter { PageSize = 1000 });
                 var assignedCourses = await _teacherCourseService.GetByTeacherIdAsync(id);
                 var assignedCourseIds = assignedCourses
                     .Where(tc => !tc.IsDeleted)

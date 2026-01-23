@@ -79,7 +79,7 @@ namespace Moshrefy.Application.Services
             return _mapper.Map<UserResponseDTO>(user);
         }
 
-        public async Task<List<UserResponseDTO>> GetAllUsersInMyCenterAsync(PaginationParamter paginationParamter)
+        public async Task<List<UserResponseDTO>> GetAllUsersInMyCenterAsync(PaginationParameter paginationParamter)
         {
             var currentCenterId = _tenantContext.GetCurrentCenterId();
             if (currentCenterId == null)
@@ -98,7 +98,7 @@ namespace Moshrefy.Application.Services
             return _mapper.Map<List<UserResponseDTO>>(users);
         }
 
-        public async Task<List<UserResponseDTO>> GetActiveUsersInMyCenterAsync(PaginationParamter paginationParamter)
+        public async Task<List<UserResponseDTO>> GetActiveUsersInMyCenterAsync(PaginationParameter paginationParamter)
         {
             var currentCenterId = _tenantContext.GetCurrentCenterId();
             if (currentCenterId == null)
@@ -118,7 +118,7 @@ namespace Moshrefy.Application.Services
             return _mapper.Map<List<UserResponseDTO>>(users);
         }
 
-        public async Task<List<UserResponseDTO>> GetInactiveUsersInMyCenterAsync(PaginationParamter paginationParamter)
+        public async Task<List<UserResponseDTO>> GetInactiveUsersInMyCenterAsync(PaginationParameter paginationParamter)
         {
             var currentCenterId = _tenantContext.GetCurrentCenterId();
             if (currentCenterId == null)
@@ -138,7 +138,7 @@ namespace Moshrefy.Application.Services
             return _mapper.Map<List<UserResponseDTO>>(users);
         }
 
-        public async Task<List<UserResponseDTO>> GetUsersByRoleInMyCenterAsync(string roleName, PaginationParamter paginationParamter)
+        public async Task<List<UserResponseDTO>> GetUsersByRoleInMyCenterAsync(string roleName, PaginationParameter paginationParamter)
         {
             if (string.IsNullOrEmpty(roleName))
                 throw new BadRequestException("Role name cannot be null.");

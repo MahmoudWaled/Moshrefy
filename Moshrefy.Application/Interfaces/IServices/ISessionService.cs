@@ -8,7 +8,7 @@ namespace Moshrefy.Application.Interfaces.IServices
     {
         Task<SessionResponseDTO> CreateAsync(CreateSessionDTO createSessionDTO);
         Task<SessionResponseDTO?> GetByIdAsync(int id);
-        Task<List<SessionResponseDTO>> GetAllAsync(PaginationParamter paginationParamter);
+        Task<List<SessionResponseDTO>> GetAllAsync(PaginationParameter paginationParamter);
         Task<List<SessionResponseDTO>> GetByDateRangeAsync(DateTime startDate, DateTime endDate);
         Task<List<SessionResponseDTO>> GetBySpecificDateAsync(DateTime date);
         Task<List<SessionResponseDTO>> GetByCourseNameAsync(string courseName);

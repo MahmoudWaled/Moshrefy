@@ -35,7 +35,7 @@ namespace Moshrefy.Application.Services
             return mapper.Map<AttendanceResponseDTO>(attendance);
         }
 
-        public async Task<List<AttendanceResponseDTO>> GetAllAsync(PaginationParamter paginationParamter)
+        public async Task<List<AttendanceResponseDTO>> GetAllAsync(PaginationParameter paginationParamter)
         {
             var currentCenterId = GetCurrentCenterIdOrThrow();
             var attendances = await unitOfWork.Attendances.GetAllAsync(
@@ -49,7 +49,7 @@ namespace Moshrefy.Application.Services
             var currentCenterId = GetCurrentCenterIdOrThrow();
             var attendances = await unitOfWork.Attendances.GetAllAsync(
                 a => a.CenterId == currentCenterId && a.StudentId == studentId,
-                new PaginationParamter { PageSize = 1000 });
+                new PaginationParameter { PageSize = 1000 });
             return mapper.Map<List<AttendanceResponseDTO>>(attendances.ToList());
         }
 
@@ -58,7 +58,7 @@ namespace Moshrefy.Application.Services
             var currentCenterId = GetCurrentCenterIdOrThrow();
             var attendances = await unitOfWork.Attendances.GetAllAsync(
                 a => a.CenterId == currentCenterId && a.SessionId == sessionId,
-                new PaginationParamter { PageSize = 1000 });
+                new PaginationParameter { PageSize = 1000 });
             return mapper.Map<List<AttendanceResponseDTO>>(attendances.ToList());
         }
 
@@ -67,7 +67,7 @@ namespace Moshrefy.Application.Services
             var currentCenterId = GetCurrentCenterIdOrThrow();
             var attendances = await unitOfWork.Attendances.GetAllAsync(
                 a => a.CenterId == currentCenterId && a.ExamId == examId,
-                new PaginationParamter { PageSize = 1000 });
+                new PaginationParameter { PageSize = 1000 });
             return mapper.Map<List<AttendanceResponseDTO>>(attendances.ToList());
         }
 
@@ -76,7 +76,7 @@ namespace Moshrefy.Application.Services
             var currentCenterId = GetCurrentCenterIdOrThrow();
             var attendances = await unitOfWork.Attendances.GetAllAsync(
                 a => a.CenterId == currentCenterId && a.AttendanceStatus == status,
-                new PaginationParamter { PageSize = 1000 });
+                new PaginationParameter { PageSize = 1000 });
             return mapper.Map<List<AttendanceResponseDTO>>(attendances.ToList());
         }
 

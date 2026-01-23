@@ -9,10 +9,10 @@ namespace Moshrefy.Application.Interfaces.IServices
     public interface IUserManagementService
     {
         Task<UserResponseDTO> CreateUserAsync(CreateUserDTO createUserDTO);
-        Task<List<UserResponseDTO>> GetAllUsersInMyCenterAsync(PaginationParamter paginationParamter);
-        Task<List<UserResponseDTO>> GetActiveUsersInMyCenterAsync(PaginationParamter paginationParamter);
-        Task<List<UserResponseDTO>> GetInactiveUsersInMyCenterAsync(PaginationParamter paginationParamter);
-        Task<List<UserResponseDTO>> GetUsersByRoleInMyCenterAsync(string roleName, PaginationParamter paginationParamter);
+        Task<List<UserResponseDTO>> GetAllUsersInMyCenterAsync(PaginationParameter paginationParamter);
+        Task<List<UserResponseDTO>> GetActiveUsersInMyCenterAsync(PaginationParameter paginationParamter);
+        Task<List<UserResponseDTO>> GetInactiveUsersInMyCenterAsync(PaginationParameter paginationParamter);
+        Task<List<UserResponseDTO>> GetUsersByRoleInMyCenterAsync(string roleName, PaginationParameter paginationParamter);
         Task<UserResponseDTO> GetUserByIdInMyCenterAsync(string userId);
         Task UpdateUserAsync(string userId, UpdateUserDTO updateUserDTO);
         Task UpdateUserRoleAsync(string userId, string newRole);

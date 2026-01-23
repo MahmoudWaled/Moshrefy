@@ -316,7 +316,7 @@ namespace Moshrefy.Web.Controllers
         {
             try
             {
-                var academicYears = await _academicYearService.GetAllAcademicYearsAsync(new PaginationParamter { PageNumber = 1, PageSize = 100 });
+                var academicYears = await _academicYearService.GetAllAcademicYearsAsync(new PaginationParameter { PageNumber = 1, PageSize = 100 });
                 return academicYears
                     .Where(ay => ay.IsActive)
                     .Select(ay => new SelectListItem

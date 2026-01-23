@@ -10,7 +10,7 @@ namespace Moshrefy.infrastructure.Repositories
     public class CenterRepository(AppDbContext appDbContext) : GenericRepository<Center, int>(appDbContext), ICenterRepository
     {
 
-        public async Task<(IEnumerable<Center> centers, int TotalCount)> GetNonDeletedPagedAsync(PaginationParamter paginationParamter)
+        public async Task<(IEnumerable<Center> centers, int TotalCount)> GetNonDeletedPagedAsync(PaginationParameter paginationParamter)
         {
             var query = appDbContext.Set<Center>().Where(c => !c.IsDeleted);
 
@@ -24,7 +24,7 @@ namespace Moshrefy.infrastructure.Repositories
 
             return (centers, totalCount);
         }
-        public async Task<(IEnumerable<Center> centers, int TotalCount)> GetActivePagedAsync(PaginationParamter paginationParamter)
+        public async Task<(IEnumerable<Center> centers, int TotalCount)> GetActivePagedAsync(PaginationParameter paginationParamter)
         {
             var query = appDbContext.Set<Center>().Where(c=> !c.IsDeleted);
                
@@ -38,7 +38,7 @@ namespace Moshrefy.infrastructure.Repositories
             return (centers, totalCount);
         }
 
-        public async Task<(IEnumerable<Center> centers , int TotalCount)> GetInactivePagedAsync(PaginationParamter paginationParamter)
+        public async Task<(IEnumerable<Center> centers , int TotalCount)> GetInactivePagedAsync(PaginationParameter paginationParamter)
         {
             var query = appDbContext.Set<Center>().Where(c => !c.IsDeleted);
             var totalCount = await query.Where(c => !c.IsActive).CountAsync();
@@ -51,7 +51,7 @@ namespace Moshrefy.infrastructure.Repositories
             return (centers, totalCount);
         }
 
-        public async Task<(IEnumerable<Center> centers, int TotalCount)> GetDeletedPagedAsync(PaginationParamter paginationParamter)
+        public async Task<(IEnumerable<Center> centers, int TotalCount)> GetDeletedPagedAsync(PaginationParameter paginationParamter)
         {
             var query = appDbContext.Set<Center>().Where(c => c.IsDeleted);
             var totalCount = await query.CountAsync();

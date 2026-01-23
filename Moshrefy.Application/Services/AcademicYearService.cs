@@ -75,7 +75,7 @@ namespace Moshrefy.Application.Services
         }
 
         // Get all academic years
-        public async Task<List<AcademicYearResponseDTO>> GetAllAcademicYearsAsync(PaginationParamter paginationParamter)
+        public async Task<List<AcademicYearResponseDTO>> GetAllAcademicYearsAsync(PaginationParameter paginationParamter)
         {
             if (paginationParamter == null)
                 throw new BadRequestException("Pagination parameters cannot be null.");

@@ -35,7 +35,7 @@ namespace Moshrefy.Application.Services
             return mapper.Map<ExamResultResponseDTO>(examResult);
         }
 
-        public async Task<List<ExamResultResponseDTO>> GetAllAsync(PaginationParamter paginationParamter)
+        public async Task<List<ExamResultResponseDTO>> GetAllAsync(PaginationParameter paginationParamter)
         {
             var currentCenterId = GetCurrentCenterIdOrThrow();
             var examResults = await unitOfWork.ExamResults.GetAllAsync(
@@ -49,7 +49,7 @@ namespace Moshrefy.Application.Services
             var currentCenterId = GetCurrentCenterIdOrThrow();
             var examResults = await unitOfWork.ExamResults.GetAllAsync(
                 er => er.CenterId == currentCenterId && er.StudentId == studentId && !er.IsDeleted,
-                new PaginationParamter { PageSize = 1000 });
+                new PaginationParameter { PageSize = 1000 });
             return mapper.Map<List<ExamResultResponseDTO>>(examResults.ToList());
         }
 
@@ -58,7 +58,7 @@ namespace Moshrefy.Application.Services
             var currentCenterId = GetCurrentCenterIdOrThrow();
             var examResults = await unitOfWork.ExamResults.GetAllAsync(
                 er => er.CenterId == currentCenterId && er.ExamId == examId && !er.IsDeleted,
-                new PaginationParamter { PageSize = 1000 });
+                new PaginationParameter { PageSize = 1000 });
             return mapper.Map<List<ExamResultResponseDTO>>(examResults.ToList());
         }
 
@@ -67,7 +67,7 @@ namespace Moshrefy.Application.Services
             var currentCenterId = GetCurrentCenterIdOrThrow();
             var examResults = await unitOfWork.ExamResults.GetAllAsync(
                 er => er.CenterId == currentCenterId && er.ExamResultStatus == status && !er.IsDeleted,
-                new PaginationParamter { PageSize = 1000 });
+                new PaginationParameter { PageSize = 1000 });
             return mapper.Map<List<ExamResultResponseDTO>>(examResults.ToList());
         }
 

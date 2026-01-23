@@ -53,7 +53,7 @@ namespace Moshrefy.Application.Services
             return mapper.Map<StudentResponseDTO>(student);
         }
 
-        public async Task<List<StudentResponseDTO>> GetAllAsync(PaginationParamter paginationParamter)
+        public async Task<List<StudentResponseDTO>> GetAllAsync(PaginationParameter paginationParamter)
         {
             var currentCenterId = GetCurrentCenterIdOrThrow();
             
@@ -87,19 +87,19 @@ namespace Moshrefy.Application.Services
             return mapper.Map<List<StudentResponseDTO>>(students);
         }
 
-        public async Task<List<StudentResponseDTO>> GetActiveStudentsAsync(PaginationParamter paginationParamter)
+        public async Task<List<StudentResponseDTO>> GetActiveStudentsAsync(PaginationParameter paginationParamter)
         {
             var students = await unitOfWork.Students.GetByStatusAsync(StudentStatus.Active);
             return mapper.Map<List<StudentResponseDTO>>(students);
         }
 
-        public async Task<List<StudentResponseDTO>> GetInactiveStudentsAsync(PaginationParamter paginationParamter)
+        public async Task<List<StudentResponseDTO>> GetInactiveStudentsAsync(PaginationParameter paginationParamter)
         {
             var students = await unitOfWork.Students.GetByStatusAsync(StudentStatus.Inactive);
             return mapper.Map<List<StudentResponseDTO>>(students);
         }
 
-        public async Task<List<StudentResponseDTO>> GetSuspendedStudentsAsync(PaginationParamter paginationParamter)
+        public async Task<List<StudentResponseDTO>> GetSuspendedStudentsAsync(PaginationParameter paginationParamter)
         {
             var students = await unitOfWork.Students.GetByStatusAsync(StudentStatus.Suspended);
             return mapper.Map<List<StudentResponseDTO>>(students);

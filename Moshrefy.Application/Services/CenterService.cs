@@ -44,13 +44,13 @@ namespace Moshrefy.Application.Services
             return mapper.Map<CenterResponseDTO>(center);
         }
 
-        public async Task<List<CenterResponseDTO>> GetAllAsync(PaginationParamter paginationParamter)
+        public async Task<List<CenterResponseDTO>> GetAllAsync(PaginationParameter paginationParamter)
         {
             var centers = await unitOfWork.Centers.GetAllAsync(paginationParamter);
             return mapper.Map<List<CenterResponseDTO>>(centers);
         }
 
-        public async Task<PaginatedResult<CenterResponseDTO>> GetNonDeletedAsync(PaginationParamter paginationParamter)
+        public async Task<PaginatedResult<CenterResponseDTO>> GetNonDeletedAsync(PaginationParameter paginationParamter)
         {
             var (centers, totalCount) = await unitOfWork.Centers.GetNonDeletedPagedAsync(paginationParamter);
             var centersDTO = mapper.Map<List<CenterResponseDTO>>(centers);
@@ -62,7 +62,7 @@ namespace Moshrefy.Application.Services
             );
         }
 
-        public async Task<PaginatedResult<CenterResponseDTO>> GetDeletedAsync(PaginationParamter paginationParamter)
+        public async Task<PaginatedResult<CenterResponseDTO>> GetDeletedAsync(PaginationParameter paginationParamter)
         {
             var (centers , totalCount) = await unitOfWork.Centers.GetDeletedPagedAsync(paginationParamter);
             var centersDTO = mapper.Map<List<CenterResponseDTO>>(centers);
@@ -80,7 +80,7 @@ namespace Moshrefy.Application.Services
             return mapper.Map<List<CenterResponseDTO>>(centers);
         }
 
-        public async Task<PaginatedResult<CenterResponseDTO>> GetActiveAsync(PaginationParamter paginationParamter)
+        public async Task<PaginatedResult<CenterResponseDTO>> GetActiveAsync(PaginationParameter paginationParamter)
         {   
             var (centers , totalCount) = await unitOfWork.Centers.GetActivePagedAsync(paginationParamter);
             var centersDTO = mapper.Map<List<CenterResponseDTO>>(centers);  
@@ -92,7 +92,7 @@ namespace Moshrefy.Application.Services
             );
         }
 
-        public async Task<PaginatedResult<CenterResponseDTO>> GetInactiveAsync(PaginationParamter paginationParamter)
+        public async Task<PaginatedResult<CenterResponseDTO>> GetInactiveAsync(PaginationParameter paginationParamter)
         {
             var (centers , totalCount) = await unitOfWork.Centers.GetInactivePagedAsync(paginationParamter);
             var centersDTO = mapper.Map<List<CenterResponseDTO>>(centers);

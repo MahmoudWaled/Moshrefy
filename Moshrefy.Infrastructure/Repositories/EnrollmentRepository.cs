@@ -11,7 +11,7 @@ namespace Moshrefy.infrastructure.Repositories
     public class EnrollmentRepository(AppDbContext appDbContext) : GenericRepository<Enrollment, int>(appDbContext), IEnrollmentRepository
     {
         // Predicate overload for proper server-side filtering
-        public new async Task<IEnumerable<Enrollment>> GetAllAsync(Expression<Func<Enrollment, bool>> predicate, PaginationParamter paginationParamter)
+        public new async Task<IEnumerable<Enrollment>> GetAllAsync(Expression<Func<Enrollment, bool>> predicate, PaginationParameter paginationParamter)
         {
             return await appDbContext.Set<Enrollment>()
                 .Include(e => e.Student)

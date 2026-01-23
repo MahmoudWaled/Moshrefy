@@ -23,7 +23,7 @@ namespace Moshrefy.Application.Services
             // Check if already exists (including soft-deleted)
             var existing = await unitOfWork.TeacherCourses.GetAllAsync(
                 tc => tc.CenterId == currentCenterId && tc.TeacherId == createTeacherCourseDTO.TeacherId && tc.CourseId == createTeacherCourseDTO.CourseId,
-                new PaginationParamter { PageSize = 1 });
+                new PaginationParameter { PageSize = 1 });
             var existingAssignment = existing.FirstOrDefault();
             
             if (existingAssignment != null)
@@ -69,7 +69,7 @@ namespace Moshrefy.Application.Services
             return mapper.Map<TeacherCourseResponseDTO>(teacherCourse);
         }
 
-        public async Task<List<TeacherCourseResponseDTO>> GetAllAsync(PaginationParamter paginationParamter)
+        public async Task<List<TeacherCourseResponseDTO>> GetAllAsync(PaginationParameter paginationParamter)
         {
             var currentCenterId = GetCurrentCenterIdOrThrow();
             var teacherCourses = await unitOfWork.TeacherCourses.GetAllAsync(
@@ -90,7 +90,7 @@ namespace Moshrefy.Application.Services
             return mapper.Map<List<TeacherCourseResponseDTO>>(teacherCourses);
         }
 
-        public async Task<List<TeacherCourseResponseDTO>> GetActiveAsync(PaginationParamter paginationParamter)
+        public async Task<List<TeacherCourseResponseDTO>> GetActiveAsync(PaginationParameter paginationParamter)
         {
             var currentCenterId = GetCurrentCenterIdOrThrow();
             var teacherCourses = await unitOfWork.TeacherCourses.GetAllAsync(
@@ -99,7 +99,7 @@ namespace Moshrefy.Application.Services
             return mapper.Map<List<TeacherCourseResponseDTO>>(teacherCourses.ToList());
         }
 
-        public async Task<List<TeacherCourseResponseDTO>> GetInactiveAsync(PaginationParamter paginationParamter)
+        public async Task<List<TeacherCourseResponseDTO>> GetInactiveAsync(PaginationParameter paginationParamter)
         {
             var currentCenterId = GetCurrentCenterIdOrThrow();
             var teacherCourses = await unitOfWork.TeacherCourses.GetAllAsync(
@@ -221,7 +221,7 @@ namespace Moshrefy.Application.Services
             var currentCenterId = GetCurrentCenterIdOrThrow();
             var teacherCourses = await unitOfWork.TeacherCourses.GetAllAsync(
                 tc => tc.CenterId == currentCenterId && tc.TeacherId == teacherId && tc.CourseId == courseId && !tc.IsDeleted,
-                new PaginationParamter { PageSize = 1 });
+                new PaginationParameter { PageSize = 1 });
             return teacherCourses.Any();
         }
     }

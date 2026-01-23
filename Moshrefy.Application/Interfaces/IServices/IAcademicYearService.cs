@@ -9,7 +9,7 @@ namespace Moshrefy.Application.Interfaces.IServices
         Task AddAcademicYearAsync(CreateAcademicYearDTO createAcademicYearDTO);
         Task UpdateAcademicYearAsync(int id, UpdateAcademicYearDTO updateAcademicYearDTO);
         Task DeleteAcademicYearAsync(int id);
-        Task<List<AcademicYearResponseDTO>> GetAllAcademicYearsAsync(PaginationParamter paginationParamter);
+        Task<List<AcademicYearResponseDTO>> GetAllAcademicYearsAsync(PaginationParameter paginationParamter);
         Task<AcademicYearResponseDTO> GetAcademicYearByIdAsync(int id);
         Task<List<AcademicYearResponseDTO>> GetAcademicYearsByNameAsync(string name);
         Task<int> GetTotalCountAsync();

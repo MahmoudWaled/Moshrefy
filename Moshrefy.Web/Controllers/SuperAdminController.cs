@@ -59,7 +59,7 @@ namespace Moshrefy.Web.Controllers
 
         // List centers (NonDeleted,Deleted,Active,Inactive)
         [HttpGet]
-        public async Task<IActionResult> Centers([FromQuery] PaginationParamter pagination , string status = "all")
+        public async Task<IActionResult> Centers([FromQuery] PaginationParameter pagination , string status = "all")
         {
 
             var paginatedCenters = status switch
@@ -81,7 +81,7 @@ namespace Moshrefy.Web.Controllers
 
         // Get active centers 
         [HttpGet]
-        public async Task<IActionResult> ActiveCenters([FromQuery] PaginationParamter pagination )
+        public async Task<IActionResult> ActiveCenters([FromQuery] PaginationParameter pagination )
         {
             var activeCentersDTO = await _centerService.GetActiveAsync(pagination) ;
             var activeCentersVM = _mapper.Map<List<CenterVM>>(activeCentersDTO);
@@ -844,7 +844,7 @@ namespace Moshrefy.Web.Controllers
                 int skip = start != null ? Convert.ToInt32(start) : 0;
                 int pageNumber = (skip / pageSize) + 1;
 
-                var paginationParams = new PaginationParamter
+                var paginationParams = new PaginationParameter
                 {
                     PageNumber = pageNumber,
                     PageSize = pageSize
@@ -1043,7 +1043,7 @@ namespace Moshrefy.Web.Controllers
                 int skip = start != null ? Convert.ToInt32(start) : 0;
                 int pageNumber = (skip / pageSize) + 1;
 
-                var paginationParams = new PaginationParamter
+                var paginationParams = new PaginationParameter
                 {
                     PageNumber = pageNumber,
                     PageSize = pageSize
@@ -1103,7 +1103,7 @@ namespace Moshrefy.Web.Controllers
         {
             try
             {
-                var centers = await _centerService.GetNonDeletedAsync(new PaginationParamter
+                var centers = await _centerService.GetNonDeletedAsync(new PaginationParameter
                 {
                     PageSize = 50,
                     PageNumber = 1
@@ -1131,7 +1131,7 @@ namespace Moshrefy.Web.Controllers
         // Get active centers for dropdown
         private async Task<List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>> GetActiveCentersForDropdown()
         {
-            var centers = await _centerService.GetNonDeletedAsync(new PaginationParamter
+            var centers = await _centerService.GetNonDeletedAsync(new PaginationParameter
             {
                 PageSize = 200,
                 PageNumber = 1

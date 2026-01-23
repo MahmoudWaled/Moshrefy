@@ -12,7 +12,7 @@ namespace Moshrefy.infrastructure.Repositories
     public class SessionRepository(AppDbContext appDbContext) : GenericRepository<Session, int>(appDbContext), ISessionRepository
     {
         // Predicate overload for proper server-side filtering
-        public new async Task<IEnumerable<Session>> GetAllAsync(Expression<Func<Session, bool>> predicate, PaginationParamter paginationParamter)
+        public new async Task<IEnumerable<Session>> GetAllAsync(Expression<Func<Session, bool>> predicate, PaginationParameter paginationParamter)
         {
             return await appDbContext.Set<Session>()
                 .Include(s => s.TeacherCourse)

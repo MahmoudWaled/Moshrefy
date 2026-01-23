@@ -8,7 +8,7 @@ namespace Moshrefy.Application.Interfaces.IServices
     {
         Task<ExamResultResponseDTO> CreateAsync(CreateExamResultDTO createExamResultDTO);
         Task<ExamResultResponseDTO?> GetByIdAsync(int id);
-        Task<List<ExamResultResponseDTO>> GetAllAsync(PaginationParamter paginationParamter);
+        Task<List<ExamResultResponseDTO>> GetAllAsync(PaginationParameter paginationParamter);
         Task<List<ExamResultResponseDTO>> GetByStudentIdAsync(int studentId);
         Task<List<ExamResultResponseDTO>> GetByExamIdAsync(int examId);
         Task<List<ExamResultResponseDTO>> GetByStatusAsync(ExamResultStatus status);

@@ -11,7 +11,7 @@ namespace Moshrefy.infrastructure.Repositories
     public class CourseRepository(AppDbContext appDbContext) : GenericRepository<Course, int>(appDbContext), ICourseRepository
     {
         // Override to include AcademicYear navigation property
-        public new async Task<IEnumerable<Course>> GetAllAsync(PaginationParamter paginationParamter)
+        public new async Task<IEnumerable<Course>> GetAllAsync(PaginationParameter paginationParamter)
         {
             return await appDbContext.Set<Course>()
                 .Include(c => c.AcademicYear)
@@ -21,7 +21,7 @@ namespace Moshrefy.infrastructure.Repositories
         }
 
         // Override to include AcademicYear navigation property with filtering
-        public new async Task<IEnumerable<Course>> GetAllAsync(Expression<Func<Course, bool>> predicate, PaginationParamter paginationParamter)
+        public new async Task<IEnumerable<Course>> GetAllAsync(Expression<Func<Course, bool>> predicate, PaginationParameter paginationParamter)
         {
             return await appDbContext.Set<Course>()
                 .Include(c => c.AcademicYear)

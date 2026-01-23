@@ -35,7 +35,7 @@ namespace Moshrefy.Application.Services
             return mapper.Map<ItemResponseDTO>(item);
         }
 
-        public async Task<List<ItemResponseDTO>> GetAllAsync(PaginationParamter paginationParamter)
+        public async Task<List<ItemResponseDTO>> GetAllAsync(PaginationParameter paginationParamter)
         {
             var currentCenterId = GetCurrentCenterIdOrThrow();
             var items = await unitOfWork.Items.GetAllAsync(
@@ -49,7 +49,7 @@ namespace Moshrefy.Application.Services
             var currentCenterId = GetCurrentCenterIdOrThrow();
             var items = await unitOfWork.Items.GetAllAsync(
                 i => i.CenterId == currentCenterId && i.Name.Contains(name) && !i.IsDeleted,
-                new PaginationParamter { PageSize = 1000 });
+                new PaginationParameter { PageSize = 1000 });
             return mapper.Map<List<ItemResponseDTO>>(items.ToList());
         }
 
@@ -58,11 +58,11 @@ namespace Moshrefy.Application.Services
             var currentCenterId = GetCurrentCenterIdOrThrow();
             var items = await unitOfWork.Items.GetAllAsync(
                 i => i.CenterId == currentCenterId && i.ItemStatus == status && !i.IsDeleted,
-                new PaginationParamter { PageSize = 1000 });
+                new PaginationParameter { PageSize = 1000 });
             return mapper.Map<List<ItemResponseDTO>>(items.ToList());
         }
 
-        public async Task<List<ItemResponseDTO>> GetAvailableItemsAsync(PaginationParamter paginationParamter)
+        public async Task<List<ItemResponseDTO>> GetAvailableItemsAsync(PaginationParameter paginationParamter)
         {
             var currentCenterId = GetCurrentCenterIdOrThrow();
             var items = await unitOfWork.Items.GetAllAsync(
@@ -71,7 +71,7 @@ namespace Moshrefy.Application.Services
             return mapper.Map<List<ItemResponseDTO>>(items.ToList());
         }
 
-        public async Task<List<ItemResponseDTO>> GetReservedItemsAsync(PaginationParamter paginationParamter)
+        public async Task<List<ItemResponseDTO>> GetReservedItemsAsync(PaginationParameter paginationParamter)
         {
             var currentCenterId = GetCurrentCenterIdOrThrow();
             var items = await unitOfWork.Items.GetAllAsync(
