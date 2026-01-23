@@ -57,11 +57,19 @@ namespace Moshrefy.Web.Controllers
 
         #region Center Management
 
-        // List all centers
+        // List centers (NonDeleted,Deleted,Active,Inactive)
         [HttpGet]
-        public async Task<IActionResult> Centers([FromQuery] PaginationParamter pagination)
+        public async Task<IActionResult> Centers([FromQuery] PaginationParamter pagination , string status = "all")
         {
-            var paginatedCenters = await _centerService.GetNonDeletedPagedAsync(pagination);
+
+            var paginatedCenters = status switch
+            {
+                "active" => await _centerService.GetActiveAsync(pagination),
+                "inactive" => await _centerService.GetInactiveAsync(pagination),
+                "deleted" => await _centerService.GetDeletedAsync(pagination),
+                _ => await _centerService.GetNonDeletedAsync(pagination)
+            };
+
             var paginatedVM = new PaginatedResult<CenterVM>(
                 _mapper.Map<List<CenterVM>>(paginatedCenters.Items),
                 paginatedCenters.TotalCount,
@@ -71,7 +79,15 @@ namespace Moshrefy.Web.Controllers
             return View(paginatedVM);
         }
 
-       
+        // Get active centers 
+        [HttpGet]
+        public async Task<IActionResult> ActiveCenters([FromQuery] PaginationParamter pagination )
+        {
+            var activeCentersDTO = await _centerService.GetActiveAsync(pagination) ;
+            var activeCentersVM = _mapper.Map<List<CenterVM>>(activeCentersDTO);
+            return View(activeCentersVM);
+        }
+
         [HttpGet]
         public IActionResult AdvancedSearchCenters()
         {
@@ -1093,7 +1109,7 @@ namespace Moshrefy.Web.Controllers
                     PageNumber = 1
                 });
 
-                var filteredCenters = centers
+                var filteredCenters = centers.Items
                     .Where(c => string.IsNullOrEmpty(term) || 
                                 c.Name.Contains(term, StringComparison.OrdinalIgnoreCase))
                     .Select(c => new
@@ -1121,7 +1137,7 @@ namespace Moshrefy.Web.Controllers
                 PageNumber = 1
             });
 
-            return centers
+            return centers.Items
                 .Where(c => c.IsActive)
                 .Select(c => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem
                 {

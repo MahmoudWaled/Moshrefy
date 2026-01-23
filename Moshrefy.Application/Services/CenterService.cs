@@ -50,16 +50,28 @@ namespace Moshrefy.Application.Services
             return mapper.Map<List<CenterResponseDTO>>(centers);
         }
 
-        public async Task<List<CenterResponseDTO>> GetNonDeletedAsync(PaginationParamter paginationParamter)
+        public async Task<PaginatedResult<CenterResponseDTO>> GetNonDeletedAsync(PaginationParamter paginationParamter)
         {
-            var centers = await unitOfWork.Centers.GetNonDeletedCentersPagedAsync(paginationParamter);
-            return mapper.Map<List<CenterResponseDTO>>(centers);
+            var (centers, totalCount) = await unitOfWork.Centers.GetNonDeletedPagedAsync(paginationParamter);
+            var centersDTO = mapper.Map<List<CenterResponseDTO>>(centers);
+            return new PaginatedResult<CenterResponseDTO>(
+                centersDTO,
+                totalCount,
+                paginationParamter.PageNumber,
+                paginationParamter.PageSize
+            );
         }
 
-        public async Task<List<CenterResponseDTO>> GetDeletedAsync(PaginationParamter paginationParamter)
+        public async Task<PaginatedResult<CenterResponseDTO>> GetDeletedAsync(PaginationParamter paginationParamter)
         {
-            var deletedCenters = await unitOfWork.Centers.GetDeletedCentersAsync(paginationParamter);
-            return mapper.Map<List<CenterResponseDTO>>(deletedCenters);
+            var (centers , totalCount) = await unitOfWork.Centers.GetDeletedPagedAsync(paginationParamter);
+            var centersDTO = mapper.Map<List<CenterResponseDTO>>(centers);
+            return new PaginatedResult<CenterResponseDTO>(
+                centersDTO,
+                totalCount,
+                paginationParamter.PageNumber,
+                paginationParamter.PageSize
+            );
         }
 
         public async Task<List<CenterResponseDTO>> GetByNameAsync(string name)
@@ -68,16 +80,28 @@ namespace Moshrefy.Application.Services
             return mapper.Map<List<CenterResponseDTO>>(centers);
         }
 
-        public async Task<List<CenterResponseDTO>> GetActiveAsync(PaginationParamter paginationParamter)
+        public async Task<PaginatedResult<CenterResponseDTO>> GetActiveAsync(PaginationParamter paginationParamter)
         {   
-            var activeCenters = await unitOfWork.Centers.GetActiveCentersAsync(paginationParamter);
-            return mapper.Map<List<CenterResponseDTO>>(activeCenters);
+            var (centers , totalCount) = await unitOfWork.Centers.GetActivePagedAsync(paginationParamter);
+            var centersDTO = mapper.Map<List<CenterResponseDTO>>(centers);  
+            return new PaginatedResult<CenterResponseDTO>(
+                centersDTO,
+                totalCount,
+                paginationParamter.PageNumber,
+                paginationParamter.PageSize
+            );
         }
 
-        public async Task<List<CenterResponseDTO>> GetInactiveAsync(PaginationParamter paginationParamter)
+        public async Task<PaginatedResult<CenterResponseDTO>> GetInactiveAsync(PaginationParamter paginationParamter)
         {
-            var inactiveCenters = await unitOfWork.Centers.GetInactiveCentersAsync(paginationParamter);
-            return mapper.Map<List<CenterResponseDTO>>(inactiveCenters);
+            var (centers , totalCount) = await unitOfWork.Centers.GetInactivePagedAsync(paginationParamter);
+            var centersDTO = mapper.Map<List<CenterResponseDTO>>(centers);
+            return new PaginatedResult<CenterResponseDTO>(
+                centersDTO,
+                totalCount,
+                paginationParamter.PageNumber,
+                paginationParamter.PageSize
+            );
         }
 
         public async Task UpdateAsync(int id, UpdateCenterDTO updateCenterDTO)
@@ -190,17 +214,6 @@ namespace Moshrefy.Application.Services
             return await unitOfWork.Centers.GetDeletedCountAsync();
         }
 
-        public async Task<PaginatedResult<CenterResponseDTO>> GetNonDeletedPagedAsync(PaginationParamter paginationParamter)
-        {
-            var (centers, totalCount) = await unitOfWork.Centers.GetNonDeletedCentersPagedAsync(paginationParamter);
-            var centersDto = mapper.Map<List<CenterResponseDTO>>(centers);
-
-            return new PaginatedResult<CenterResponseDTO>(
-                centersDto,
-                totalCount,
-                paginationParamter.PageNumber,
-                paginationParamter.PageSize
-            );
-        }
+      
     }
 }

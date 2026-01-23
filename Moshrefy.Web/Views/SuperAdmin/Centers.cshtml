@@ -1,143 +1,177 @@
-@model PaginatedResult<CenterVM>
+﻿@model PaginatedResult<CenterVM>
 
 @{
     ViewData["Title"] = "Centers Management";
+    var status = Context.Request.Query["status"].ToString().ToLower();
 }
 
-<!-- Page Header -->
-<div class="page-header-modern">
-    <div class="row g-2 align-items-center">
-        <div class="col">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb-modern">
-                    <li class="breadcrumb-item">
-                        <a asp-controller="SuperAdmin" asp-action="Index"><i class="ti ti-home"></i> Dashboard</a>
-                        <i class="ti ti-chevron-right breadcrumb-separator ms-2"></i>
-                    </li>
-                    <li class="breadcrumb-item active" aria-current="page">Centers</li>
-                </ol>
-            </nav>
-            <h2 class="page-title"><i class="ti ti-building"></i> Centers Management</h2>
-        </div>
-        <div class="col-auto ms-auto d-print-none">
-            <div class="btn-list">
-                <a asp-action="AdvancedSearchCenters" class="btn d-none d-sm-inline-block">
-                    <i class="ti ti-search icon"></i> Advanced Search
-                </a>
-                <a asp-action="CreateCenter" class="btn btn-action-create d-none d-sm-inline-block">
-                    <i class="ti ti-plus icon"></i> Create New Center
-                </a>
-                <a asp-action="CreateCenter" class="btn btn-action-create d-sm-none btn-icon">
-                    <i class="ti ti-plus icon"></i>
-                </a>
+<!-- Header -->
+<div class="bg-white p-4 mb-4 shadow-sm border-bottom">
+    <div class="container-fluid">
+        <div class="row align-items-center">
+
+            <div class="col-md-8">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-2" style="--bs-breadcrumb-divider: '›';">
+                        <li class="breadcrumb-item">
+                            <a asp-controller="SuperAdmin" asp-action="Index" class="text-decoration-none text-muted small">
+                                <i class="bi bi-house-door me-1"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item active small fw-medium text-primary" aria-current="page">
+                            Centers
+                        </li>
+                    </ol>
+                </nav>
+                <div class="d-flex align-items-center">
+                    <h2 class="h4 fw-bold text-dark mb-0 me-3">
+                        Centers Management
+                    </h2>
+                </div>
             </div>
+
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <div class="d-flex gap-2 justify-content-md-end">
+                    <a asp-action="AdvancedSearchCenters" class="btn btn-light d-none d-sm-inline-flex align-items-center">
+                        <i class="bi bi-search me-1"></i> Advanced Search
+                    </a>
+                    <a asp-action="CreateCenter" class="btn btn-action-create d-none d-sm-inline-flex align-items-center">
+                        <i class="bi bi-plus-lg me-1"></i> Create New Center
+                    </a>
+                    <a asp-action="CreateCenter" class="btn btn-action-create d-sm-none">
+                        <i class="bi bi-plus-lg"></i>
+                    </a>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
 
-
 @Html.AntiForgeryToken()
 
 <!-- Page body -->
-<div class="page-body">
-    <div class="container-xl">
-        <div class="row row-deck row-cards">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title" id="cardTitle">All Centers</h3>
-                        <div class="ms-auto d-flex align-items-center gap-3">
-                            <!-- Page Size Dropdown -->
-                            <div class="d-flex align-items-center gap-2">
-                                <label class="form-label m-0 text-muted">Show</label>
-                                <select class="form-select form-select-sm" style="width: auto;" id="pageSizeSelect"
-                                        onchange="window.location.href='@Url.Action("Centers", "SuperAdmin")?PageNumber=1&PageSize=' + this.value">
-                                    @foreach (var size in new[] { 10, 20, 30, 50, 100 })
-                                    {
-                                        if (Model.PageSize == size)
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3">
+                <h3 class="card-title h5 mb-2 fw-semibold text-secondary-emphasis" id="cardTitle">All Centers</h3>
+                <div class="ms-auto d-flex align-items-center gap-3 justify-content-between ">
+                    <!-- Page Size Dropdown -->
+                    <div class="d-flex align-items-center gap-2">
+                        <label class="form-label m-0 text-muted">Show</label>
+                        <select class="form-select form-select-sm" style="width: auto;" id="pageSizeSelect"
+                                onchange="window.location.href='@Url.Action("Centers", "SuperAdmin")?PageNumber=1&PageSize=' + this.value">
+                            @foreach (var size in new[] { 10, 20, 30, 50, 100 })
+                            {
+                                if (Model.PageSize == size)
+                                {
+                                    <option value="@size" selected>@size</option>
+                                }
+                                else
+                                {
+                                    <option value="@size">@size</option>
+                                }
+                            }
+                        </select>
+                        <label class="form-label m-0 text-muted">entries</label>
+                    </div>
+
+                    <!-- Filter Buttons -->
+                    <div class="btn-group" role="group">
+                        <a asp-action="Centers"
+                           asp-route-status="all"
+                           class="btn btn-sm btn-outline-primary border @(string.IsNullOrEmpty(status) || status == "all" ? "active" : "")"
+                           id="filterAll">
+                            <i class="bi bi-list me-1"></i> All
+                        </a>
+
+                        <a asp-action="Centers"
+                           asp-route-status="active"
+                           class="btn btn-sm btn-outline-primary border @(status == "active" ? "active" : "")"
+                           id="filterActive">
+                            Active
+                        </a>
+
+                        <a asp-action="Centers"
+                           asp-route-status="inactive"
+                           class="btn btn-sm btn-outline-primary border @(status == "inactive" ? "active" : "")"
+                           id="filterInactive">
+                            Inactive
+                        </a>
+
+                        <a asp-action="Centers"
+                           asp-route-status="deleted"
+                           class="btn btn-sm btn-outline-danger border @(status == "deleted" ? "active" : "")"
+                           id="filterDeleted">
+                            <i class="bi bi-trash me-1"></i> Deleted
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-3">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0" id="centersTable">
+                        <thead class="table-primary">
+                            <tr>
+                                <th>#</th>
+                                <th>@Html.DisplayNameFor(Model => Model.Items.First().Name)</th>
+                                <th>@Html.DisplayNameFor(Model => Model.Items.First().Address)</th>
+                                <th>@Html.DisplayNameFor(Model => Model.Items.First().IsActive)</th>
+                                <th>@Html.DisplayNameFor(Model => Model.Items.First().CreatedAt)</th>
+                                <th class="w-1">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                var rowNumber = ((Model.PageNumber - 1) * Model.PageSize) + 1;
+                            }
+                            @foreach (var center in Model.Items)
+                            {
+                                <tr class="@(center.IsDeleted ? "table-danger" : "") ">
+                                    <td class="text-secondary-emphasis">@(rowNumber++)</td>
+                                    <td class="text-secondary-emphasis">@center.Name</td>
+                                    <td class="text-secondary-emphasis">@center.Address</td>
+                                    <td class="text-secondary-emphasis">
+                                        @if (center.IsActive)
                                         {
-                                            <option value="@size" selected>@size</option>
+                                            <span>Active</span>
                                         }
                                         else
                                         {
-                                            <option value="@size">@size</option>
+                                            <span class="badge bg-state-inactive">Inactive</span>
                                         }
-                                    }
-                                </select>
-                                <label class="form-label m-0 text-muted">entries</label>
-                            </div>
+                                    </td>
+                                    <td class="text-secondary-emphasis">@center.CreatedAt.ToString("yyyy-MM-dd")</td>
+                                    <td class="text-secondary-emphasis">
+                                        <a asp-action="CenterDetails" asp-route-centerId="@center.Id" class="btn btn-light btn-sm">
+                                            <i class="bi bi-eye"></i>
+                                            View
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-                            <!-- Filter Buttons -->
-                            <div class="btn-group" role="group">
-                                <button type="button" class="btn btn-sm" id="filterAll">
-                                    <i class="ti ti-list icon"></i> All
-                                </button>
-                                <button type="button" class="btn btn-sm" id="filterActive">
-                                    Active
-                                </button>
-                                <button type="button" class="btn btn-sm" id="filterInactive">
-                                    Inactive
-                                </button>
-                                <button type="button" class="btn btn-sm btn-action-delete" id="filterDeleted">
-                                    <i class="ti ti-trash icon"></i> Deleted
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-vcenter table-hover" id="centersTable">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>@Html.DisplayNameFor(Model => Model.Items.First().Name)</th>
-                                        <th>@Html.DisplayNameFor(Model => Model.Items.First().Address)</th>
-                                        <th>@Html.DisplayNameFor(Model => Model.Items.First().IsActive)</th>
-                                        <th>@Html.DisplayNameFor(Model => Model.Items.First().IsDeleted)</th>
-                                        <th>@Html.DisplayNameFor(Model => Model.Items.First().CreatedAt)</th>
-                                        <th class="w-1">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @{
-                                        var rowNumber = ((Model.PageNumber - 1) * Model.PageSize) + 1;
-                                    }
-                                    @foreach (var center in Model.Items)
-                                    {
-                                        <tr>
-                                            <td>@(rowNumber++)</td>
-                                            <td>@center.Name</td>
-                                            <td>@center.Address</td>
-                                            <td class="@(center.IsActive ? "" : "badge bg-state-inactive")">
-                                                @(center.IsActive ? "Active" : "Inactive")
-                                            </td>
-                                            <td>@(center.IsDeleted ? "Deleted" : "")</td>
-                                            <td>@center.CreatedAt.ToString("yyyy-MM-dd")</td>
-                                            <td>
-                                                <a asp-action="CenterDetails" asp-route-centerId="@center.Id" class="btn btn-sm">View</a>
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- Pagination and PageSize dropdown show option -->
-                    @await Html.PartialAsync("_Pagination", new Moshrefy.Web.Models.Common.PaginationVM
-                    {
-                        PageNumber = Model.PageNumber,
+            <!-- Pagination and PageSize dropdown show option -->
+            @await Html.PartialAsync("_Pagination", new PaginationVM
+            {
+                PageNumber = Model.PageNumber,
                         PageSize = Model.PageSize,
                         TotalCount = Model.TotalCount,
                         ActionName = "Centers",
                         ControllerName = "SuperAdmin",
                         ItemName = "centers",
-                        ShowPageSizeDropdown = false
-                    })
-                </div>
-            </div>
+                        ShowPageSizeDropdown = false,
+                        searchQuery = status
+
+                        })
         </div>
     </div>
 </div>
+
 
 

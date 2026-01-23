@@ -9,46 +9,59 @@ namespace Moshrefy.infrastructure.Repositories
 {
     public class CenterRepository(AppDbContext appDbContext) : GenericRepository<Center, int>(appDbContext), ICenterRepository
     {
-        public async Task<IEnumerable<Center>> GetNonDeletedCentersAsync(PaginationParamter paginationParamter)
+
+        public async Task<(IEnumerable<Center> centers, int TotalCount)> GetNonDeletedPagedAsync(PaginationParamter paginationParamter)
         {
-            return await appDbContext.Set<Center>()
-               .Where(c => !c.IsDeleted)
-               .OrderByDescending(c => c.ModifiedAt)
-               .Skip((paginationParamter.PageNumber - 1) * paginationParamter.PageSize)
-               .Take(paginationParamter.PageSize)
-               .ToListAsync();
-        }
+            var query = appDbContext.Set<Center>().Where(c => !c.IsDeleted);
 
-        public async Task<IEnumerable<Center>> GetActiveCentersAsync(PaginationParamter paginationParamter)
-        {
+            var totalCount = await query.CountAsync();
 
-            return await appDbContext.Set<Center>()
-                .Where(c => c.IsActive && !c.IsDeleted)
-                .OrderByDescending(c => c.CreatedAt)
-                .Skip((paginationParamter.PageNumber - 1) * paginationParamter.PageSize)
-                .Take(paginationParamter.PageSize)
-                .ToListAsync();
-        }
-
-        public async Task<IEnumerable<Center>> GetInactiveCentersAsync(PaginationParamter paginationParamter)
-        {
-            return await appDbContext.Set<Center>()
-                .Where(c => !c.IsActive && !c.IsDeleted)
-                .OrderByDescending(c => c.CreatedAt)
-                .Skip((paginationParamter.PageNumber - 1) * paginationParamter.PageSize)
-                .Take(paginationParamter.PageSize)
-                .ToListAsync();
-        }
-
-        public async Task<IEnumerable<Center>> GetDeletedCentersAsync(PaginationParamter paginationParamter)
-        {
-
-            return await appDbContext.Set<Center>()
-                .Where(c => c.IsDeleted)
+            var centers = await query
                 .OrderByDescending(c => c.ModifiedAt)
                 .Skip((paginationParamter.PageNumber - 1) * paginationParamter.PageSize)
                 .Take(paginationParamter.PageSize)
                 .ToListAsync();
+
+            return (centers, totalCount);
+        }
+        public async Task<(IEnumerable<Center> centers, int TotalCount)> GetActivePagedAsync(PaginationParamter paginationParamter)
+        {
+            var query = appDbContext.Set<Center>().Where(c=> !c.IsDeleted);
+               
+            var totalCount = await query.Where(c => c.IsActive).CountAsync();
+            var centers = await query
+                .Where(c => c.IsActive)
+                .OrderByDescending(c => c.CreatedAt)
+                .Skip((paginationParamter.PageNumber - 1) * paginationParamter.PageSize)
+                .Take(paginationParamter.PageSize)
+                .ToListAsync();
+            return (centers, totalCount);
+        }
+
+        public async Task<(IEnumerable<Center> centers , int TotalCount)> GetInactivePagedAsync(PaginationParamter paginationParamter)
+        {
+            var query = appDbContext.Set<Center>().Where(c => !c.IsDeleted);
+            var totalCount = await query.Where(c => !c.IsActive).CountAsync();
+            var centers = await query
+                .Where(c => !c.IsActive)
+                .OrderByDescending(c => c.CreatedAt)
+                .Skip((paginationParamter.PageNumber - 1) * paginationParamter.PageSize)
+                .Take(paginationParamter.PageSize)
+                .ToListAsync();
+            return (centers, totalCount);
+        }
+
+        public async Task<(IEnumerable<Center> centers, int TotalCount)> GetDeletedPagedAsync(PaginationParamter paginationParamter)
+        {
+            var query = appDbContext.Set<Center>().Where(c => c.IsDeleted);
+            var totalCount = await query.CountAsync();
+            var centers = await query
+                .OrderByDescending(c => c.ModifiedAt)
+                .Skip((paginationParamter.PageNumber - 1) * paginationParamter.PageSize)
+                .Take(paginationParamter.PageSize)
+                .ToListAsync();
+
+           return (centers, totalCount);
         }
 
         public async Task<IEnumerable<Center>> GetByName(string centerName)
@@ -77,19 +90,6 @@ namespace Moshrefy.infrastructure.Repositories
                 .CountAsync();
         }
 
-        public async Task<(IEnumerable<Center> Items, int TotalCount)> GetNonDeletedCentersPagedAsync(PaginationParamter paginationParamter)
-        {
-            var query = appDbContext.Set<Center>().Where(c => !c.IsDeleted);
-
-            var totalCount = await query.CountAsync();
-
-            var items = await query
-                .OrderByDescending(c => c.ModifiedAt)
-                .Skip((paginationParamter.PageNumber - 1) * paginationParamter.PageSize)
-                .Take(paginationParamter.PageSize)
-                .ToListAsync();
-
-            return (items, totalCount);
-        }
+        
     }
 }

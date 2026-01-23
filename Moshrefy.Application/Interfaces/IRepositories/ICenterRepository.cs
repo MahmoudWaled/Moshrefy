@@ -6,13 +6,13 @@ namespace Moshrefy.Application.Interfaces.IRepositories
 {
     public interface ICenterRepository : IGenericRepository<Center, int>
     {
-        Task<(IEnumerable<Center> Items, int TotalCount)> GetNonDeletedCentersPagedAsync(PaginationParamter paginationParamter);
+        Task<(IEnumerable<Center> centers, int TotalCount)> GetNonDeletedPagedAsync(PaginationParamter paginationParamter);
+        Task<(IEnumerable<Center> centers, int TotalCount)> GetActivePagedAsync(PaginationParamter paginationParamter);
+        Task<(IEnumerable<Center> centers, int TotalCount)> GetInactivePagedAsync(PaginationParamter paginationParamter);
+        Task<(IEnumerable<Center> centers, int TotalCount)> GetDeletedPagedAsync(PaginationParamter paginationParamter);
+        Task<IEnumerable<Center>> GetByName(string centerName);
         Task<int> GetTotalCountAsync();
         Task<int> GetNonDeletedCountAsync();
         Task<int> GetDeletedCountAsync();
-        Task<IEnumerable<Center>> GetActiveCentersAsync(PaginationParamter paginationParamter);
-        Task<IEnumerable<Center>> GetInactiveCentersAsync(PaginationParamter paginationParamter);
-        Task<IEnumerable<Center>> GetDeletedCentersAsync(PaginationParamter paginationParamter);
-        Task<IEnumerable<Center>> GetByName(string centerName);
     }
 }
