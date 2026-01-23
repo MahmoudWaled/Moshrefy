@@ -61,7 +61,7 @@
                     <div class="d-flex align-items-center gap-2">
                         <label class="form-label m-0 text-muted">Show</label>
                         <select class="form-select form-select-sm" style="width: auto;" id="pageSizeSelect"
-                                onchange="window.location.href='@Url.Action("Centers", "SuperAdmin")?PageNumber=1&PageSize=' + this.value">
+                                onchange="window.location.href='@Url.Action("Centers", "SuperAdmin")?PageNumber=1&status=@(status)&PageSize=' + this.value">
                             @foreach (var size in new[] { 10, 20, 30, 50, 100 })
                             {
                                 if (Model.PageSize == size)
@@ -81,6 +81,7 @@
                     <div class="btn-group" role="group">
                         <a asp-action="Centers"
                            asp-route-status="all"
+                           asp-route-pageSize="@Model.PageSize"
                            class="btn btn-sm btn-outline-primary border @(string.IsNullOrEmpty(status) || status == "all" ? "active" : "")"
                            id="filterAll">
                             <i class="bi bi-list me-1"></i> All
@@ -88,6 +89,7 @@
 
                         <a asp-action="Centers"
                            asp-route-status="active"
+                           asp-route-pageSize="@Model.PageSize"
                            class="btn btn-sm btn-outline-primary border @(status == "active" ? "active" : "")"
                            id="filterActive">
                             Active
@@ -95,6 +97,7 @@
 
                         <a asp-action="Centers"
                            asp-route-status="inactive"
+                           asp-route-pageSize="@Model.PageSize"
                            class="btn btn-sm btn-outline-primary border @(status == "inactive" ? "active" : "")"
                            id="filterInactive">
                             Inactive
@@ -102,6 +105,7 @@
 
                         <a asp-action="Centers"
                            asp-route-status="deleted"
+                           asp-route-pageSize="@Model.PageSize"
                            class="btn btn-sm btn-outline-danger border @(status == "deleted" ? "active" : "")"
                            id="filterDeleted">
                             <i class="bi bi-trash me-1"></i> Deleted
