@@ -67,7 +67,7 @@ namespace Moshrefy.infrastructure.Repositories
         public async Task<IEnumerable<Center>> GetByNameAsync(string centerName)
         {
             return await appDbContext.Set<Center>()
-                .Where(c => c.Name.Contains(centerName))
+                .Where(c => c.Name.ToLower().Contains(centerName.ToLower()))
                 .ToListAsync();
         }
         public async Task<Center?> GetByEmailAsync(string email)

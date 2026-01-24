@@ -44,14 +44,24 @@ namespace Moshrefy.Application.Services
             return mapper.Map<CenterResponseDTO>(center);
         }
 
-        public Task<CenterResponseDTO?> GetByEmailAsync(string email)
+        public async Task<CenterResponseDTO?> GetByEmailAsync(string email)
         {
             if (string.IsNullOrWhiteSpace(email))
                 throw new BadRequestException("Center name cannot be null or empty.");
-            var center = unitOfWork.Centers.GetByEmailAsync(email);
+            var center = await unitOfWork.Centers.GetByEmailAsync(email.ToLower());
             if (center == null)
-                throw new NotFoundException<string>(nameof(center), "center", email);
-            return mapper.Map<Task<CenterResponseDTO?>>(center);
+                throw new NotFoundException<string>(nameof(center), "email", email);
+            return mapper.Map<CenterResponseDTO?>(center);
+        }
+
+        public async Task<List<CenterResponseDTO>> GetByNameAsync(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                throw new BadRequestException("Center name cannot be null or empty.");
+            var centers = await unitOfWork.Centers.GetByNameAsync(name);
+            if (centers == null || centers.Count() == 0)
+                throw new NotFoundException<string>(nameof(Center), "name", name);
+            return mapper.Map<List<CenterResponseDTO>>(centers);
         }
 
         public async Task<List<CenterResponseDTO>> GetAllAsync(PaginationParameter paginationParamter)
@@ -84,11 +94,7 @@ namespace Moshrefy.Application.Services
             );
         }
 
-        public async Task<List<CenterResponseDTO>> GetByNameAsync(string name)
-        {
-            var centers = await unitOfWork.Centers.GetByNameAsync(name);
-            return mapper.Map<List<CenterResponseDTO>>(centers);
-        }
+  
 
         public async Task<PaginatedResult<CenterResponseDTO>> GetActiveAsync(PaginationParameter paginationParamter)
         {   

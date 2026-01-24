@@ -89,7 +89,7 @@ namespace Moshrefy.Web.Controllers
         }
 
         [HttpGet]
-        public IActionResult AdvancedSearchCenters()
+        public IActionResult SearchCenters()
         {
             return View("SearchCenters");
         }
@@ -110,7 +110,23 @@ namespace Moshrefy.Web.Controllers
                 return Json(new { success = false, message = ex.Message });
             }
         }
-        // get center by email 
+
+        // get center by name
+        [HttpGet]
+        public async Task<IActionResult> GetCenterByName(string name)
+        {
+            try
+            {
+                var centerDTOs = await _centerService.GetByNameAsync(name);
+                var centerVMs = _mapper.Map<List<CenterVM>>(centerDTOs);
+                return Json(new { success = true, centers = centerVMs });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error searching center by name: {name}");
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
 
         [HttpGet]
         public async Task<IActionResult> CenterDetails(int centerId)
@@ -1113,37 +1129,6 @@ namespace Moshrefy.Web.Controllers
         #endregion
 
         #region Helper Methods
-
-        // Search centers for Select2 dropdown
-        [HttpGet]
-        public async Task<IActionResult> SearchCenters(string term)
-        {
-            try
-            {
-                var centers = await _centerService.GetNonDeletedAsync(new PaginationParameter
-                {
-                    PageSize = 50,
-                    PageNumber = 1
-                });
-
-                var filteredCenters = centers.Items
-                    .Where(c => string.IsNullOrEmpty(term) || 
-                                c.Name.Contains(term, StringComparison.OrdinalIgnoreCase))
-                    .Select(c => new
-                    {
-                        id = c.Id,
-                        text = $"{c.Name} - {c.Address}"
-                    })
-                    .ToList();
-
-                return Json(new { results = filteredCenters });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error searching centers");
-                return Json(new { results = new List<object>() });
-            }
-        }
 
         // Get active centers for dropdown
         private async Task<List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>> GetActiveCentersForDropdown()
