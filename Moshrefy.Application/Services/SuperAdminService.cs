@@ -505,20 +505,28 @@ namespace Moshrefy.Application.Services
             return _mapper.Map<List<UserResponseDTO>>(users);
         }
 
-        public async Task<List<UserResponseDTO>> GetUsersByCenterIdAsync(int centerId, PaginationParameter paginationParamter)
+        public async Task<PaginatedResult<UserResponseDTO>> GetUsersByCenterIdAsync(int centerId, PaginationParameter paginationParamter)
         {
             if (centerId <= 0)
                 throw new BadRequestException("Invalid center id.");
 
             IQueryable<ApplicationUser> query = _userManager.Users.Include(u => u.Center).Where(u => u.CenterId == centerId);
 
-                query = query
+            var totalCount = await query.CountAsync();
+
+            query = query
                     .Skip((paginationParamter.PageNumber - 1) * paginationParamter.PageSize)
                     .Take(paginationParamter.PageSize);
-            
-
             var users = await query.ToListAsync();
-            return _mapper.Map<List<UserResponseDTO>>(users);
+            var usersDTO = _mapper.Map<List<UserResponseDTO>>(users);
+            return new PaginatedResult<UserResponseDTO>
+            {
+                Items = usersDTO,
+                PageNumber = paginationParamter.PageNumber,
+                PageSize = paginationParamter.PageSize,
+                TotalCount = totalCount
+            };
+
         }
 
         public async Task<int> GetUsersByCenterIdCountAsync(int centerId)

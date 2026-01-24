@@ -13,6 +13,7 @@ using Moshrefy.Application.DTOs.Common;
 using System;
 using System.Threading.Tasks;
 using Moshrefy.Domain.Entities;
+using Moshrefy.Web.Models.User;
 
 namespace Moshrefy.Web.Controllers
 {
@@ -1026,23 +1027,19 @@ namespace Moshrefy.Web.Controllers
 
         // Center users page
         [HttpGet]
-        public async Task<IActionResult> CenterUsers(int centerId)
+        public async Task<IActionResult> CenterUsers(int centerId , [FromQuery] PaginationParameter paginationParameter )
         {
-            if (centerId <= 0)
-            {
-                return NotFound();
-            }
-
             try
             {
-                var centerDTO = await _centerService.GetByIdAsync(centerId);
-                var centerVM = _mapper.Map<CenterVM>(centerDTO);
-
-                ViewBag.CenterId = centerId;
-                ViewBag.CenterName = centerVM.Name;
-                ViewBag.CenterAddress = centerVM.Address;
-
-                return View();
+                var paginatedUsers = await _superAdminService.GetUsersByCenterIdAsync(centerId,paginationParameter);
+                var paginatedVM = new PaginatedResult<UserVM>(
+                    _mapper.Map<List<UserVM>>(paginatedUsers.Items),
+                    paginatedUsers.TotalCount,
+                    paginatedUsers.PageNumber,
+                    paginatedUsers.PageSize
+                );
+                ViewData["CenterId"] = centerId;
+                return View(paginatedVM);
             }
             catch (Exception ex)
             {
@@ -1053,78 +1050,78 @@ namespace Moshrefy.Web.Controllers
         }
 
         // DataTables - Get center users data
-        [HttpPost]
-        public async Task<IActionResult> GetCenterUsersData(int centerId)
-        {
-            try
-            {
-                if (centerId <= 0)
-                {
-                    return BadRequest(new { error = "Invalid center ID" });
-                }
+        //[HttpPost]
+        //public async Task<IActionResult> GetCenterUsersData(int centerId)
+        //{
+        //    try
+        //    {
+        //        if (centerId <= 0)
+        //        {
+        //            return BadRequest(new { error = "Invalid center ID" });
+        //        }
 
-                // Parse DataTables parameters
-                var draw = Request.Form["draw"].FirstOrDefault();
-                var start = Request.Form["start"].FirstOrDefault();
-                var length = Request.Form["length"].FirstOrDefault();
-                var searchValue = Request.Form["search[value]"].FirstOrDefault();
-                var sortColumnIndex = Request.Form["order[0][column]"].FirstOrDefault();
-                var sortColumnName = Request.Form[$"columns[{sortColumnIndex}][name]"].FirstOrDefault();
-                var sortDirection = Request.Form["order[0][dir]"].FirstOrDefault();
+        //        // Parse DataTables parameters
+        //        var draw = Request.Form["draw"].FirstOrDefault();
+        //        var start = Request.Form["start"].FirstOrDefault();
+        //        var length = Request.Form["length"].FirstOrDefault();
+        //        var searchValue = Request.Form["search[value]"].FirstOrDefault();
+        //        var sortColumnIndex = Request.Form["order[0][column]"].FirstOrDefault();
+        //        var sortColumnName = Request.Form[$"columns[{sortColumnIndex}][name]"].FirstOrDefault();
+        //        var sortDirection = Request.Form["order[0][dir]"].FirstOrDefault();
 
-                int pageSize = length != null ? Convert.ToInt32(length) : 25;
-                int skip = start != null ? Convert.ToInt32(start) : 0;
-                int pageNumber = (skip / pageSize) + 1;
+        //        int pageSize = length != null ? Convert.ToInt32(length) : 25;
+        //        int skip = start != null ? Convert.ToInt32(start) : 0;
+        //        int pageNumber = (skip / pageSize) + 1;
 
-                var paginationParams = new PaginationParameter
-                {
-                    PageNumber = pageNumber,
-                    PageSize = pageSize
-                };
+        //        var paginationParams = new PaginationParameter
+        //        {
+        //            PageNumber = pageNumber,
+        //            PageSize = pageSize
+        //        };
 
-                int totalRecords = await _superAdminService.GetUsersByCenterIdCountAsync(centerId);
-                int filteredRecords = totalRecords;
+        //        int totalRecords = await _superAdminService.GetUsersByCenterIdCountAsync(centerId);
+        //        int filteredRecords = totalRecords;
 
-                var usersDTO = await _superAdminService.GetUsersByCenterIdAsync(centerId, paginationParams);
-                var usersVM = _mapper.Map<List<Models.User.UserVM>>(usersDTO);
+        //        var usersDTO = await _superAdminService.GetUsersByCenterIdAsync(centerId, paginationParams);
+        //        var usersVM = _mapper.Map<List<Models.User.UserVM>>(usersDTO);
 
-                // Apply search filter
-                if (!string.IsNullOrEmpty(searchValue))
-                {
-                    usersVM = usersVM.Where(u =>
-                        u.Name.Contains(searchValue, StringComparison.OrdinalIgnoreCase) ||
-                        u.UserName.Contains(searchValue, StringComparison.OrdinalIgnoreCase) ||
-                        (u.Email != null && u.Email.Contains(searchValue, StringComparison.OrdinalIgnoreCase)) ||
-                        (u.PhoneNumber != null && u.PhoneNumber.Contains(searchValue, StringComparison.OrdinalIgnoreCase)) ||
-                        (u.RoleName != null && u.RoleName.Contains(searchValue, StringComparison.OrdinalIgnoreCase)) ||
-                        u.Id.Contains(searchValue)
-                    ).ToList();
+        //        // Apply search filter
+        //        if (!string.IsNullOrEmpty(searchValue))
+        //        {
+        //            usersVM = usersVM.Where(u =>
+        //                u.Name.Contains(searchValue, StringComparison.OrdinalIgnoreCase) ||
+        //                u.UserName.Contains(searchValue, StringComparison.OrdinalIgnoreCase) ||
+        //                (u.Email != null && u.Email.Contains(searchValue, StringComparison.OrdinalIgnoreCase)) ||
+        //                (u.PhoneNumber != null && u.PhoneNumber.Contains(searchValue, StringComparison.OrdinalIgnoreCase)) ||
+        //                (u.RoleName != null && u.RoleName.Contains(searchValue, StringComparison.OrdinalIgnoreCase)) ||
+        //                u.Id.Contains(searchValue)
+        //            ).ToList();
 
-                    filteredRecords = usersVM.Count;
-                }
+        //            filteredRecords = usersVM.Count;
+        //        }
 
-                // Apply sorting
-                if (!string.IsNullOrEmpty(sortColumnName) && !string.IsNullOrEmpty(sortDirection))
-                {
-                    usersVM = sortDirection.ToLower() == "asc"
-                        ? SortUsersAscending(usersVM, sortColumnName)
-                        : SortUsersDescending(usersVM, sortColumnName);
-                }
+        //        // Apply sorting
+        //        if (!string.IsNullOrEmpty(sortColumnName) && !string.IsNullOrEmpty(sortDirection))
+        //        {
+        //            usersVM = sortDirection.ToLower() == "asc"
+        //                ? SortUsersAscending(usersVM, sortColumnName)
+        //                : SortUsersDescending(usersVM, sortColumnName);
+        //        }
 
-                return Ok(new
-                {
-                    draw = draw,
-                    recordsTotal = totalRecords,
-                    recordsFiltered = filteredRecords,
-                    data = usersVM
-                });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error loading center users data for center ID {centerId}");
-                return StatusCode(500, new { error = "Error loading data. Please try again." });
-            }
-        }
+        //        return Ok(new
+        //        {
+        //            draw = draw,
+        //            recordsTotal = totalRecords,
+        //            recordsFiltered = filteredRecords,
+        //            data = usersVM
+        //        });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, $"Error loading center users data for center ID {centerId}");
+        //        return StatusCode(500, new { error = "Error loading data. Please try again." });
+        //    }
+        //}
 
         #endregion
 

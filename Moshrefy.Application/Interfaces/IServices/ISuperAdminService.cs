@@ -1,8 +1,9 @@
 ﻿using Moshrefy.Application.DTOs.Center;
-using Moshrefy.Application.DTOs.User;
 using Moshrefy.Application.DTOs.Common;
-using Moshrefy.Domain.Paramter;
 using Moshrefy.Application.DTOs.Statistics;
+using Moshrefy.Application.DTOs.User;
+using Moshrefy.Domain.Entities;
+using Moshrefy.Domain.Paramter;
 
 namespace Moshrefy.Application.Interfaces.IServices
 {
@@ -22,12 +23,12 @@ namespace Moshrefy.Application.Interfaces.IServices
         Task<List<UserResponseDTO>> GetActiveUsersAsync(PaginationParameter paginationParamter);
         Task<List<UserResponseDTO>> GetInactiveUsersAsync(PaginationParameter paginationParamter);
         Task<List<UserResponseDTO>> GetDeletedUsersAsync(PaginationParameter paginationParamter);
-        Task<List<UserResponseDTO>> GetUsersByCenterIdAsync(int centerId, PaginationParameter paginationParamter);
         Task<int> GetUsersByCenterIdCountAsync(int centerId);
         Task<int> GetTotalUsersCountAsync();
         Task<int> GetActiveUsersCountAsync();
         Task<int> GetInactiveUsersCountAsync();
         Task<int> GetDeletedUsersCountAsync();
+        Task<PaginatedResult<UserResponseDTO>> GetUsersByCenterIdAsync(int centerId, PaginationParameter paginationParamter);
         Task<List<UserResponseDTO>> GetUsersByRoleAsync(string roleName, PaginationParameter paginationParamter);
         Task<UserResponseDTO> GetUserByIdAsync(string userId);
         Task<UserResponseDTO> GetUserByEmailAsync(string email);
