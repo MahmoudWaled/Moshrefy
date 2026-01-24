@@ -4,149 +4,234 @@
 }
 
 <!-- Page Header -->
-<div class="page-header-modern">
-    <div class="row g-2 align-items-center">
-        <div class="col">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb-modern">
-                    <li class="breadcrumb-item">
-                        <a asp-controller="SuperAdmin" asp-action="Index"><i class="ti ti-home"></i> Dashboard</a>
-                        <i class="ti ti-chevron-right breadcrumb-separator ms-2"></i>
-                    </li>
-                    <li class="breadcrumb-item active" aria-current="page">Search Users</li>
-                </ol>
-            </nav>
-            <h2 class="page-title"><i class="ti ti-search"></i> Search Users</h2>
+<div class="bg-white p-4 mb-4 shadow-sm border-bottom">
+    <div class="container-fluid">
+        <div class="row align-items-center">
+
+            <div class="col-md-8">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-2" style="--bs-breadcrumb-divider: '›';">
+                        <li class="breadcrumb-item">
+                            <a asp-controller="SuperAdmin" asp-action="Index" class="text-decoration-none text-muted small">
+                                <i class="bi bi-house-door me-1"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a asp-controller="SuperAdmin" asp-action="Users" class="text-decoration-none text-muted small">
+                                Users
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item active small fw-medium text-primary" aria-current="page">
+                            Search
+                        </li>
+                    </ol>
+                </nav>
+                <div class="d-flex align-items-center">
+                    <h2 class="h4 fw-bold text-dark mb-0 me-3">
+                        <i class="bi bi-search me-2"></i>Search Users
+                    </h2>
+                </div>
+            </div>
+
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <div class="d-flex gap-2 justify-content-md-end">
+                    <a asp-action="Users" class="btn btn-outline-secondary btn-sm px-3 shadow-sm">
+                        <i class="bi bi-chevron-left me-1"></i> Back to Users
+                    </a>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
+
+@Html.AntiForgeryToken()
 
 <!-- Page body -->
-<div class="page-body">
-  <div class="container-xl">
-    <div class="row row-deck row-cards">
-      <!-- Search by Email -->
-      <div class="col-md-6">
-        <div class="card">
-          <div class="card-header">
-            <h3 class="card-title"><i class="ti ti-mail me-2"></i>Search by Email</h3>
-          </div>
-          <div class="card-body">
-            <form id="searchByEmailForm">
-              <div class="mb-3">
-                <label class="form-label"><i class="ti ti-at me-1"></i>Email Address</label>
-                <div class="input-group">
-                  <span class="input-group-text"><i class="ti ti-mail"></i></span>
-                  <input type="email" class="form-control" id="emailInput" name="email" placeholder="Enter email address..." required>
+<div class="row">
+    <div class="col-lg-6">
+        <!-- Search by Email -->
+        <div class="card shadow-sm border-0 mb-3">
+            <div class="card-header bg-white py-3">
+                <div class="d-flex align-items-center">
+                    <span class="d-flex align-items-center justify-content-center bg-primary opacity-75 text-white rounded me-3" style="width: 40px; height: 40px;">
+                        <i class="bi bi-envelope"></i>
+                    </span>
+                    <h3 class="card-title h5 mb-0 fw-semibold">Search by Email</h3>
                 </div>
-                <small class="form-hint"><i class="ti ti-info-circle me-1"></i>Enter the exact email address</small>
-              </div>
-              <button type="submit" class="btn btn-action-view w-100"><i class="ti ti-search"></i> Search by Email</button>
-            </form>
-          </div>
+            </div>
+            <div class="card-body">
+                <form id="searchByEmailForm">
+                    <div class="mb-3">
+                        <label class="form-label">Email Address</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                            <input type="email" id="emailInput" class="form-control" placeholder="user@example.com" required>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-search"></i> Search
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
-      </div>
 
-      <!-- Search by Username -->
-      <div class="col-md-6">
-        <div class="card">
-          <div class="card-header">
-            <h3 class="card-title"><i class="ti ti-user me-2"></i>Search by Username</h3>
-          </div>
-          <div class="card-body">
-            <form id="searchByUsernameForm">
-              <div class="mb-3">
-                <label class="form-label"><i class="ti ti-tag me-1"></i>Username</label>
-                <div class="input-group">
-                  <span class="input-group-text"><i class="ti ti-user"></i></span>
-                  <input type="text" class="form-control" id="usernameInput" name="username" placeholder="Enter username..." required>
+        <!-- Search by Username -->
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3">
+                <div class="d-flex align-items-center">
+                    <span class="d-flex align-items-center justify-content-center bg-info opacity-75 text-white rounded me-3" style="width: 40px; height: 40px;">
+                        <i class="bi bi-at"></i>
+                    </span>
+                    <h3 class="card-title h5 mb-0 fw-semibold">Search by Username</h3>
                 </div>
-                <small class="form-hint"><i class="ti ti-info-circle me-1"></i>Enter the exact username</small>
-              </div>
-              <button type="submit" class="btn btn-action-view w-100"><i class="ti ti-search"></i> Search by Username</button>
-            </form>
-          </div>
+            </div>
+            <div class="card-body">
+                <form id="searchByUsernameForm">
+                    <div class="mb-3">
+                        <label class="form-label">Username</label>
+                        <div class="input-group">
+                            <span class="input-group-text">@@</span>
+                            <input type="text" id="usernameInput" class="form-control" placeholder="username" required>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-search"></i> Search
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
-      </div>
     </div>
 
-    <!-- Search Results -->
-    <div id="searchResults" style="display:none" class="mt-4">
-      <div class="card">
-        <div class="card-header">
-          <h3 class="card-title"><i class="ti ti-search me-2"></i>Search Result</h3>
-        </div>
-        <div class="card-body">
-          <div class="row">
-            <div class="col-md-8">
-              <div class="datagrid">
-                <div class="datagrid-item"><div class="datagrid-title"><i class="ti ti-user text-primary me-1"></i>Name</div><div class="datagrid-content"><strong id="resultName"></strong></div></div>
-                <div class="datagrid-item"><div class="datagrid-title"><i class="ti ti-at text-info me-1"></i>Username</div><div class="datagrid-content"><code id="resultUsername"></code></div></div>
-                <div class="datagrid-item"><div class="datagrid-title"><i class="ti ti-mail text-info me-1"></i>Email</div><div class="datagrid-content" id="resultEmail"></div></div>
-                <div class="datagrid-item"><div class="datagrid-title"><i class="ti ti-phone text-success me-1"></i>Phone</div><div class="datagrid-content" id="resultPhone"></div></div>
-                <div class="datagrid-item"><div class="datagrid-title"><i class="ti ti-building text-warning me-1"></i>Center</div><div class="datagrid-content" id="resultCenter"></div></div>
-                <div class="datagrid-item"><div class="datagrid-title"><i class="ti ti-tag text-purple me-1"></i>Role</div><div class="datagrid-content" id="resultRole"></div></div>
-                <div class="datagrid-item"><div class="datagrid-title"><i class="ti ti-toggle-right text-success me-1"></i>Status</div><div class="datagrid-content" id="resultStatus"></div></div>
-                <div class="datagrid-item"><div class="datagrid-title"><i class="ti ti-info-circle text-info me-1"></i>State</div><div class="datagrid-content" id="resultState"></div></div>
-              </div>
+    <!-- Results Column -->
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3">
+                <h3 class="card-title h5 mb-0 fw-semibold">
+                    <i class="bi bi-person-check me-2 text-primary"></i>Search Result
+                </h3>
             </div>
-            <div class="col-md-4">
-              <div class="card bg-success-lt">
-                <div class="card-header"><h3 class="card-title"><i class="ti ti-settings me-2"></i>Actions</h3></div>
-                <div class="card-body">
-                  <div class="d-grid gap-2" id="resultActions"></div>
+            <div class="card-body" id="searchResultContainer">
+                <div class="text-center text-muted py-5">
+                    <i class="bi bi-search fs-1 mb-3 d-block opacity-50"></i>
+                    <p>Enter an email or username to search for a user</p>
                 </div>
-              </div>
             </div>
-          </div>
         </div>
-      </div>
     </div>
-  </div>
 </div>
+
+@await Html.PartialAsync("_Toast")
 
 @section Scripts {
     <script>
-        $(document).ready(function () {
-            $('#searchByEmailForm').on('submit', function (e) {
-                e.preventDefault();
-                const email = $('#emailInput').val().trim();
-                if (!email) { TablerDialog.fire('Error', 'Please enter an email address', 'error'); return; }
-                TablerDialog.fire({ title: 'Searching...', html: 'Looking for: <strong>' + email + '</strong>', allowOutsideClick: false, didOpen: () => TablerDialog.showLoading() });
-                $.post('@Url.Action("SearchUserByEmail")', { email: email }).done(function (res) { TablerDialog.close(); if (res.success) { displayUserResult(res.user); } else { TablerDialog.fire({ icon: 'error', title: 'Not Found', html: res.message }); } });
-            });
+        const token = $('input[name="__RequestVerificationToken"]').val();
 
-            $('#searchByUsernameForm').on('submit', function (e) {
-                e.preventDefault();
-                const username = $('#usernameInput').val().trim();
-                if (!username) { TablerDialog.fire('Error', 'Please enter a username', 'error'); return; }
-                TablerDialog.fire({ title: 'Searching...', html: 'Looking for: <strong>' + username + '</strong>', allowOutsideClick: false, didOpen: () => TablerDialog.showLoading() });
-                $.post('@Url.Action("SearchUserByUsername")', { username: username }).done(function (res) { TablerDialog.close(); if (res.success) { displayUserResult(res.user); } else { TablerDialog.fire({ icon: 'error', title: 'Not Found', html: res.message }); } });
-            });
+        // Search by Email
+        $('#searchByEmailForm').on('submit', function(e) {
+            e.preventDefault();
+            const email = $('#emailInput').val().trim();
+            if (!email) return;
 
-            function displayUserResult(user) {
-                $('#searchResults').fadeIn();
-                $('#resultName').text(user.name);
-                $('#resultUsername').text(user.userName);
-                $('#resultEmail').html(user.email ? '<a href="mailto:' + user.email + '">' + user.email + '</a>' : '<span class="text-muted">N/A</span>');
-                $('#resultPhone').html(user.phoneNumber ? '<a href="tel:' + user.phoneNumber + '">' + user.phoneNumber + '</a>' : '<span class="text-muted">N/A</span>');
-                $('#resultCenter').html(user.centerName && user.centerId ? '<a href="@Url.Action("CenterDetails")/' + user.centerId + '" class="badge bg-info"><i class="ti ti-building me-1"></i>' + user.centerName + '</a>' : '<span class="text-muted">No center</span>');
-                
-                var roleIcon = user.roleName === 'SuperAdmin' ? 'ti-shield' : user.roleName === 'Admin' ? 'ti-tie' : user.roleName === 'Manager' ? 'ti-settings' : 'ti-user';
-                var roleBg = user.roleName === 'SuperAdmin' ? 'bg-role-superadmin' : user.roleName === 'Admin' ? 'bg-role-admin' : user.roleName === 'Manager' ? 'bg-role-manager' : 'bg-role-employee';
-                $('#resultRole').html(user.roleName ? '<span class="badge ' + roleBg + '"><i class="ti ' + roleIcon + ' me-1"></i>' + user.roleName + '</span>' : '<span class="text-muted">N/A</span>');
-                $('#resultStatus').html(user.isActive ? '<span class="badge bg-state-active"><i class="ti ti-check"></i> Active</span>' : '<span class="badge bg-state-inactive"><i class="ti ti-x"></i> Inactive</span>');
-                $('#resultState').html(user.isDeleted ? '<span class="badge bg-action-delete"><i class="ti ti-trash"></i> Deleted</span>' : '<span class="badge bg-state-active"><i class="ti ti-check"></i> Normal</span>');
-                
-                var actions = '<a href="@Url.Action("UserDetails")/' + user.id + '" class="btn btn-action-view"><i class="ti ti-eye"></i> View Details</a>';
-                if (!user.isDeleted) {
-                    actions += '<a href="@Url.Action("EditUser")/' + user.id + '" class="btn btn-action-edit"><i class="ti ti-edit"></i> Edit User</a>';
-                    actions += '<a href="@Url.Action("UpdateUserRole")/' + user.id + '" class="btn btn-purple"><i class="ti ti-tag"></i> Update Role</a>';
-                }
-                $('#resultActions').html(actions);
-                $('html, body').animate({ scrollTop: $('#searchResults').offset().top - 100 }, 500);
-            }
+            showLoading();
+            $.post('@Url.Action("SearchUserByEmail")', { email: email, __RequestVerificationToken: token })
+                .done(function(res) {
+                    if (res.success) {
+                        displayUser(res.user);
+                    } else {
+                        displayError(res.message || 'User not found');
+                    }
+                })
+                .fail(function() {
+                    displayError('Server connection error');
+                });
         });
+
+        // Search by Username
+        $('#searchByUsernameForm').on('submit', function(e) {
+            e.preventDefault();
+            const username = $('#usernameInput').val().trim();
+            if (!username) return;
+
+            showLoading();
+            $.post('@Url.Action("SearchUserByUsername")', { username: username, __RequestVerificationToken: token })
+                .done(function(res) {
+                    if (res.success) {
+                        displayUser(res.user);
+                    } else {
+                        displayError(res.message || 'User not found');
+                    }
+                })
+                .fail(function() {
+                    displayError('Server connection error');
+                });
+        });
+
+        function showLoading() {
+            $('#searchResultContainer').html(`
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="mt-3 text-muted">Searching...</p>
+                </div>
+            `);
+        }
+
+        function displayError(message) {
+            $('#searchResultContainer').html(`
+                <div class="alert alert-warning d-flex align-items-center">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    ${message}
+                </div>
+            `);
+        }
+
+        function displayUser(user) {
+            const statusBadge = user.isDeleted 
+                ? '<span class="badge bg-danger">Deleted</span>'
+                : user.isActive 
+                    ? '<span class="badge bg-success">Active</span>' 
+                    : '<span class="badge bg-secondary">Inactive</span>';
+
+            $('#searchResultContainer').html(`
+                <div class="d-flex align-items-center mb-4">
+                    <span class="d-flex align-items-center justify-content-center bg-primary-subtle text-primary rounded-circle me-3" style="width: 64px; height: 64px;">
+                        <i class="bi bi-person fs-3"></i>
+                    </span>
+                    <div>
+                        <h4 class="mb-1">${user.name || 'N/A'}</h4>
+                        <span class="text-muted">@@${user.userName}</span>
+                        <div class="mt-1">${statusBadge}</div>
+                    </div>
+                </div>
+                <hr>
+                <div class="row g-3">
+                    <div class="col-6">
+                        <label class="text-muted small">Email</label>
+                        <div>${user.email || 'N/A'}</div>
+                    </div>
+                    <div class="col-6">
+                        <label class="text-muted small">Phone</label>
+                        <div>${user.phoneNumber || 'N/A'}</div>
+                    </div>
+                    <div class="col-6">
+                        <label class="text-muted small">Center</label>
+                        <div>${user.centerName || 'N/A'}</div>
+                    </div>
+                    <div class="col-6">
+                        <label class="text-muted small">Role</label>
+                        <div>${user.roleName || 'N/A'}</div>
+                    </div>
+                </div>
+                <hr>
+                <div class="d-grid gap-2">
+                    <a href="@Url.Action("UserDetails")/${user.id}" class="btn btn-primary">
+                        <i class="bi bi-eye me-1"></i> View Details
+                    </a>
+                    <a href="@Url.Action("EditUser")/${user.id}" class="btn btn-outline-secondary">
+                        <i class="bi bi-pencil me-1"></i> Edit User
+                    </a>
+                </div>
+            `);
+        }
     </script>
-    <style>.bg-purple,.btn-purple{background-color:#6f42c1!important;color:white;}.btn-purple:hover{background-color:#5a32a3!important;}</style>
 }

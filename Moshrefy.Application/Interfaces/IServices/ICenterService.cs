@@ -15,6 +15,7 @@ namespace Moshrefy.Application.Interfaces.IServices
         Task<PaginatedResult<CenterResponseDTO>> GetDeletedAsync(PaginationParameter paginationParamter);
         Task<PaginatedResult<CenterResponseDTO>> GetActiveAsync(PaginationParameter paginationParamter);
         Task<PaginatedResult<CenterResponseDTO>> GetInactiveAsync(PaginationParameter paginationParamter);
+        Task<PaginatedResult<CenterResponseDTO>> GetCentersPagedAsync(PaginationParameter paginationParameter, string status);
         Task<List<CenterResponseDTO>> GetByNameAsync(string name);
         Task UpdateAsync(int id, UpdateCenterDTO updateCenterDTO);
         Task HardDeleteAsync(int id);

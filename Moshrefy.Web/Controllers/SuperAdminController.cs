@@ -62,14 +62,7 @@ namespace Moshrefy.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Centers([FromQuery] PaginationParameter pagination , string status = "all")
         {
-
-            var paginatedCenters = status switch
-            {
-                "active" => await _centerService.GetActiveAsync(pagination),
-                "inactive" => await _centerService.GetInactiveAsync(pagination),
-                "deleted" => await _centerService.GetDeletedAsync(pagination),
-                _ => await _centerService.GetNonDeletedAsync(pagination)
-            };
+            var paginatedCenters = await _centerService.GetCentersPagedAsync(pagination, status);
 
             var paginatedVM = new PaginatedResult<CenterVM>(
                 _mapper.Map<List<CenterVM>>(paginatedCenters.Items),
@@ -394,9 +387,17 @@ namespace Moshrefy.Web.Controllers
 
         // List all users
         [HttpGet]
-        public IActionResult Users()
+        public async Task<IActionResult> Users([FromQuery] PaginationParameter pagination, string status = "all")
         {
-            return View();
+            var paginatedUsers = await _superAdminService.GetUsersPagedAsync(pagination, status);
+
+            var paginatedVM = new PaginatedResult<Models.User.UserVM>(
+                _mapper.Map<List<Models.User.UserVM>>(paginatedUsers.Items),
+                paginatedUsers.TotalCount,
+                paginatedUsers.PageNumber,
+                paginatedUsers.PageSize
+            );
+            return View(paginatedVM);
         }
 
         // DataTables - Get users data

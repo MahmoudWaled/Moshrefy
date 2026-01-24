@@ -7,233 +7,252 @@
 }
 
 <!-- Page Header -->
-<div class="page-header-modern">
-    <div class="row g-2 align-items-center">
-        <div class="col">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb-modern">
-                    <li class="breadcrumb-item">
-                        <a asp-controller="SuperAdmin" asp-action="Index"><i class="ti ti-home"></i> Dashboard</a>
-                        <i class="ti ti-chevron-right breadcrumb-separator ms-2"></i>
-                    </li>
-                    <li class="breadcrumb-item">
-                        <a asp-controller="SuperAdmin" asp-action="Centers">Centers</a>
-                        <i class="ti ti-chevron-right breadcrumb-separator ms-2"></i>
-                    </li>
-                    <li class="breadcrumb-item active" aria-current="page">Create User</li>
-                </ol>
-            </nav>
-            <h2 class="page-title"><i class="ti ti-user-plus"></i> Create User for Center</h2>
-        </div>
-        <div class="col-auto ms-auto">
-            <button type="button" onclick="goBack()" class="btn">
-                <i class="ti ti-arrow-left"></i> Back
-            </button>
+<div class="bg-white p-4 mb-4 shadow-sm border-bottom">
+    <div class="container-fluid">
+        <div class="row align-items-center">
+
+            <div class="col-md-8">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-2" style="--bs-breadcrumb-divider: '›';">
+                        <li class="breadcrumb-item">
+                            <a asp-controller="SuperAdmin" asp-action="Index" class="text-decoration-none text-muted small">
+                                <i class="bi bi-house-door me-1"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a asp-controller="SuperAdmin" asp-action="Users" class="text-decoration-none text-muted small">
+                                Users
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item active small fw-medium text-primary" aria-current="page">
+                            Create User
+                        </li>
+                    </ol>
+                </nav>
+                <div class="d-flex align-items-center">
+                    <h2 class="h4 fw-bold text-dark mb-0 me-3">
+                        <i class="bi bi-person-plus me-2"></i>Create User for Center
+                    </h2>
+                </div>
+            </div>
+
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <div class="d-flex gap-2 justify-content-md-end">
+                    <button type="button" onclick="goBack()" class="btn btn-outline-secondary btn-sm px-3 shadow-sm">
+                        <i class="bi bi-chevron-left me-1"></i> Back
+                    </button>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
 
 <!-- Page body -->
-<div class="page-body">
-  <div class="container-xl">
-    @if (preSelectedCenter && !string.IsNullOrEmpty(centerName))
-    {
-      <div class="row mb-3">
-        <div class="col-12">
-          <div class="alert alert-info">
-            <div class="d-flex align-items-center">
-              <i class="ti ti-building icon me-2" style="font-size: 1.5rem;"></i>
-              <div>
-                <strong>Creating user for:</strong> @centerName
-                <div class="text-muted small">The center has been pre-selected</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    }
-
-    <form asp-action="CreateUserForCenter" method="post">
-      <div class="row">
-        <!-- Main Form Column -->
-        <div class="col-lg-8">
-          <!-- Center & Role Selection Card -->
-          <div class="card mb-3">
-            <div class="card-header">
-              <div class="d-flex align-items-center">
-                <span class="avatar bg-primary text-white me-3">
-                  <i class="ti ti-building"></i>
-                </span>
+<div class="row">
+    <div class="col-12">
+        @if (preSelectedCenter && !string.IsNullOrEmpty(centerName))
+        {
+            <div class="alert alert-info d-flex align-items-center mb-3">
+                <i class="bi bi-building fs-4 me-2"></i>
                 <div>
-                  <h3 class="card-title mb-0">Center & Role</h3>
-                  <small class="text-muted">Assign user to center with role</small>
+                    <strong>Creating user for:</strong> @centerName
+                    <div class="text-muted small">The center has been pre-selected</div>
                 </div>
-              </div>
             </div>
-            <div class="card-body">
-              <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-              <div class="row">
-                <div class="col-md-6 mb-3">
-                  <label class="form-label required" asp-for="CenterId">Select Center</label>
-                  <div class="input-group">
-                    <span class="input-group-text"><i class="ti ti-building"></i></span>
-                    <select asp-for="CenterId" asp-items="Model.Centers" class="form-select">
-                      <option value="">-- Select a Center --</option>
-                    </select>
-                  </div>
-                  <span asp-validation-for="CenterId" class="text-danger small"></span>
-                  <small class="form-hint">@(preSelectedCenter ? "Center is pre-selected. You can change if needed." : "Select the center this user will belong to")</small>
-                </div>
-                <div class="col-md-6 mb-3">
-                  <label class="form-label required" asp-for="RoleName">User Role</label>
-                  <div class="input-group">
-                    <span class="input-group-text"><i class="ti ti-tag"></i></span>
-                    <select asp-for="RoleName" class="form-select">
-                      <option value="">-- Select a Role --</option>
-                      <option value="Manager">Manager</option>
-                      <option value="Employee">Employee</option>
-                    </select>
-                  </div>
-                  <span asp-validation-for="RoleName" class="text-danger small"></span>
-                </div>
-              </div>
-            </div>
-          </div>
+        }
 
-          <!-- Personal Information Card -->
-          <div class="card mb-3">
-            <div class="card-header">
-              <div class="d-flex align-items-center">
-                <span class="avatar bg-info text-white me-3">
-                  <i class="ti ti-user"></i>
-                </span>
-                <div>
-                  <h3 class="card-title mb-0">Personal Information</h3>
-                  <small class="text-muted">User account details</small>
-                </div>
-              </div>
-            </div>
-            <div class="card-body">
-              <div class="row">
-                <div class="col-md-6 mb-3">
-                  <label class="form-label required" asp-for="Name">Full Name</label>
-                  <div class="input-group">
-                    <span class="input-group-text"><i class="ti ti-user"></i></span>
-                    <input asp-for="Name" class="form-control" placeholder="Enter full name" />
-                  </div>
-                  <span asp-validation-for="Name" class="text-danger small"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                  <label class="form-label required" asp-for="UserName">Username</label>
-                  <div class="input-group">
-                    <span class="input-group-text">@@</span>
-                    <input asp-for="UserName" class="form-control" placeholder="Enter username" />
-                  </div>
-                  <span asp-validation-for="UserName" class="text-danger small"></span>
-                  <small class="form-hint">Used for login. Must be unique.</small>
-                </div>
-                <div class="col-md-6 mb-3">
-                  <label class="form-label" asp-for="Email">Email Address</label>
-                  <div class="input-group">
-                    <span class="input-group-text"><i class="ti ti-mail"></i></span>
-                    <input asp-for="Email" type="email" class="form-control" placeholder="user@example.com" />
-                  </div>
-                  <span asp-validation-for="Email" class="text-danger small"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                  <label class="form-label" asp-for="PhoneNumber">Phone Number</label>
-                  <div class="input-group">
-                    <span class="input-group-text"><i class="ti ti-phone"></i></span>
-                    <input asp-for="PhoneNumber" class="form-control" placeholder="+1234567890" />
-                  </div>
-                  <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
-                </div>
-              </div>
-            </div>
-          </div>
+        <form asp-action="CreateUserForCenter" method="post">
+            <div class="row">
+                <!-- Main Form Column -->
+                <div class="col-lg-8">
+                    <!-- Center & Role Selection Card -->
+                    <div class="card mb-3 shadow-sm border-0">
+                        <div class="card-header bg-white py-3">
+                            <div class="d-flex align-items-center">
+                                <span class="d-flex align-items-center justify-content-center bg-primary opacity-75 text-white rounded me-3" style="width: 40px; height: 40px;">
+                                    <i class="bi bi-building"></i>
+                                </span>
+                                <div>
+                                    <h3 class="card-title h5 mb-0 fw-semibold">Center & Role</h3>
+                                    <small class="text-muted">Assign user to center with role</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label" asp-for="CenterId">Select Center <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-building"></i></span>
+                                        <select asp-for="CenterId" asp-items="Model.Centers" class="form-select">
+                                            <option value="">-- Select a Center --</option>
+                                        </select>
+                                    </div>
+                                    <span asp-validation-for="CenterId" class="text-danger small"></span>
+                                    <small class="form-text text-muted">@(preSelectedCenter ? "Center is pre-selected. You can change if needed." : "Select the center this user will belong to")</small>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label" asp-for="RoleName">User Role <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-shield"></i></span>
+                                        <select asp-for="RoleName" class="form-select">
+                                            <option value="">-- Select a Role --</option>
+                                            <option value="Manager">Manager</option>
+                                            <option value="Employee">Employee</option>
+                                        </select>
+                                    </div>
+                                    <span asp-validation-for="RoleName" class="text-danger small"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-          <!-- Security Card -->
-          <div class="card mb-3">
-            <div class="card-header">
-              <div class="d-flex align-items-center">
-                <span class="avatar bg-warning text-white me-3">
-                  <i class="ti ti-lock"></i>
-                </span>
-                <div>
-                  <h3 class="card-title mb-0">Security</h3>
-                  <small class="text-muted">Login credentials</small>
-                </div>
-              </div>
-            </div>
-            <div class="card-body">
-              <div class="mb-3">
-                <label class="form-label required" asp-for="Password">Password</label>
-                <div class="input-group">
-                  <span class="input-group-text"><i class="ti ti-lock"></i></span>
-                  <input asp-for="Password" type="password" class="form-control" placeholder="Enter password" />
-                </div>
-                <span asp-validation-for="Password" class="text-danger small"></span>
-                <small class="form-hint">Minimum 6 characters. The user can change this later.</small>
-              </div>
-            </div>
-          </div>
-        </div>
+                    <!-- Personal Information Card -->
+                    <div class="card mb-3 shadow-sm border-0">
+                        <div class="card-header bg-white py-3">
+                            <div class="d-flex align-items-center">
+                                <span class="d-flex align-items-center justify-content-center bg-info opacity-75 text-white rounded me-3" style="width: 40px; height: 40px;">
+                                    <i class="bi bi-person"></i>
+                                </span>
+                                <div>
+                                    <h3 class="card-title h5 mb-0 fw-semibold">Personal Information</h3>
+                                    <small class="text-muted">User account details</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label" asp-for="Name">Full Name <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                        <input asp-for="Name" class="form-control" placeholder="Enter full name" />
+                                    </div>
+                                    <span asp-validation-for="Name" class="text-danger small"></span>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label" asp-for="UserName">Username <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">@@</span>
+                                        <input asp-for="UserName" class="form-control" placeholder="Enter username" />
+                                    </div>
+                                    <span asp-validation-for="UserName" class="text-danger small"></span>
+                                    <small class="form-text text-muted">Used for login. Must be unique.</small>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label" asp-for="Email">Email Address</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                                        <input asp-for="Email" type="email" class="form-control" placeholder="user@example.com" />
+                                    </div>
+                                    <span asp-validation-for="Email" class="text-danger small"></span>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label" asp-for="PhoneNumber">Phone Number</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                                        <input asp-for="PhoneNumber" class="form-control" placeholder="+1234567890" />
+                                    </div>
+                                    <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-        <!-- Sidebar Column -->
-        <div class="col-lg-4">
-          <!-- Role Description Card -->
-          <div class="card mb-3">
-            <div class="card-header">
-              <h3 class="card-title"><i class="ti ti-info-circle me-2"></i>Role Permissions</h3>
-            </div>
-            <div class="card-body">
-              <div class="mb-3">
-                <h5 class="mb-2"><span class="badge bg-role-manager py-2 px-3"><i class="ti ti-settings me-1"></i>Manager</span></h5>
-                <p class="text-muted small mb-0">Senior team member with additional permissions for managing tasks.</p>
-              </div>
-              <hr>
-              <div>
-                <h5 class="mb-2"><span class="badge bg-role-employee py-2 px-3"><i class="ti ti-user me-1"></i>Employee</span></h5>
-                <p class="text-muted small mb-0">Regular team member for handling day-to-day tasks.</p>
-              </div>
-            </div>
-          </div>
+                    <!-- Security Card -->
+                    <div class="card mb-3 shadow-sm border-0">
+                        <div class="card-header bg-white py-3">
+                            <div class="d-flex align-items-center">
+                                <span class="d-flex align-items-center justify-content-center bg-warning opacity-75 text-white rounded me-3" style="width: 40px; height: 40px;">
+                                    <i class="bi bi-lock"></i>
+                                </span>
+                                <div>
+                                    <h3 class="card-title h5 mb-0 fw-semibold">Security</h3>
+                                    <small class="text-muted">Login credentials</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label" asp-for="Password">Password <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                                    <input asp-for="Password" type="password" class="form-control" placeholder="Enter password" />
+                                </div>
+                                <span asp-validation-for="Password" class="text-danger small"></span>
+                                <small class="form-text text-muted">Minimum 6 characters. The user can change this later.</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-          <!-- Action Buttons -->
-          <div class="card">
-            <div class="card-body">
-              <div class="d-grid gap-2">
-                <button type="button" onclick="goBack()" class="btn btn-outline-secondary">
-                  <i class="ti ti-x"></i> Cancel
-                </button>
-                <button type="submit" class="btn btn-action-create">
-                  <i class="ti ti-user-plus"></i> Create User
-                </button>
-              </div>
+                <!-- Sidebar Column -->
+                <div class="col-lg-4">
+                    <!-- Role Description Card -->
+                    <div class="card mb-3 shadow-sm border-0">
+                        <div class="card-header bg-white py-3">
+                            <h3 class="card-title h5 mb-0 fw-semibold">
+                                <i class="bi bi-info-circle me-2 text-primary"></i>Role Permissions
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <h6 class="mb-2"><span class="badge bg-secondary py-2 px-3"><i class="bi bi-gear me-1"></i>Manager</span></h6>
+                                <p class="text-muted small mb-0">Senior team member with additional permissions for managing tasks.</p>
+                            </div>
+                            <hr>
+                            <div>
+                                <h6 class="mb-2"><span class="badge bg-secondary py-2 px-3"><i class="bi bi-person me-1"></i>Employee</span></h6>
+                                <p class="text-muted small mb-0">Regular team member for handling day-to-day tasks.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body d-grid gap-2">
+                            <button type="button" onclick="goBack()" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-lg me-1"></i> Cancel
+                            </button>
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-person-plus me-1"></i> Create User
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-      </div>
-    </form>
-  </div>
+        </form>
+    </div>
 </div>
+@await Html.PartialAsync("_Modals")
+@await Html.PartialAsync("_Toast")
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script>
-        function goBack() {
+       function goBack() {
             if (window.history.length > 1) {
                 window.history.back();
             } else {
-                window.location.href = '@Url.Action("Users", "SuperAdmin")';
+                window.location.href = '@Url.Action("Centers", "SuperAdmin")';
             }
         }
+        $('form').on('submit', function (e) {
+            e.preventDefault();
+            const form = this;
+            
+            setupModal({
+                title: 'Confirm User Creation',
+                body: 'Are you sure you want to create this user?',
+                btnClass: 'btn-success',
+                btnText: 'Yes, Create User',
+                showInput: false,
+                onConfirm: () => {
+                    form.submit();
+                }
+            });
+        });
     </script>
 }
-
-<style>
-  .required::after {
-    content: " *";
-    color: #dc3545;
-  }
-</style>

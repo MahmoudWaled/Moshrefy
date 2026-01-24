@@ -1,580 +1,237 @@
-﻿@{
+﻿@model PaginatedResult<Moshrefy.Web.Models.User.UserVM>
+
+@{
     ViewData["Title"] = "User Management";
+    var status = Context.Request.Query["status"].ToString().ToLower();
 }
 
 <!-- Page Header -->
-<div class="page-header-modern">
-    <div class="row g-2 align-items-center">
-        <div class="col">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb-modern">
-                    <li class="breadcrumb-item">
-                        <a asp-controller="SuperAdmin" asp-action="Index"><i class="ti ti-home"></i> Dashboard</a>
-                        <i class="ti ti-chevron-right breadcrumb-separator ms-2"></i>
-                    </li>
-                    <li class="breadcrumb-item active" aria-current="page">User Management</li>
-                </ol>
-            </nav>
-            <h2 class="page-title"><i class="ti ti-users"></i> User Management</h2>
-        </div>
-        <div class="col-auto ms-auto d-print-none">
-            <div class="btn-list">
-                <a asp-action="SearchUsers" class="btn d-none d-sm-inline-block" title="Advanced Search">
-                    <i class="ti ti-search icon"></i> Search Users
-                </a>
-                <a asp-action="InactiveUsers" class="btn d-none d-sm-inline-block" title="View Inactive Users">
-                    <i class="ti ti-user-off icon"></i> Inactive Users
-                </a>
-                <a asp-action="CreateCenterAdmin" class="btn d-none d-sm-inline-block">
-                    <i class="ti ti-shield icon"></i> Create Center Admin
-                </a>
-                <a asp-action="CreateUserForCenter" class="btn btn-action-create d-none d-sm-inline-block">
-                    <i class="ti ti-user-plus icon"></i> Create User
-                </a>
+<div class="bg-white p-4 mb-4 shadow-sm border-bottom">
+    <div class="container-fluid">
+        <div class="row align-items-center">
+
+            <div class="col-md-6">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-2" style="--bs-breadcrumb-divider: '›';">
+                        <li class="breadcrumb-item">
+                            <a asp-controller="SuperAdmin" asp-action="Index" class="text-decoration-none text-muted small">
+                                <i class="bi bi-house-door me-1"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item active small fw-medium text-primary" aria-current="page">
+                            Users
+                        </li>
+                    </ol>
+                </nav>
+                <div class="d-flex align-items-center">
+                    <h2 class="h4 fw-bold text-dark mb-0 me-3">
+                        User Management
+                    </h2>
+                </div>
             </div>
+
+            <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                <div class="d-flex gap-2 justify-content-md-end">
+                    <a asp-action="SearchUsers" class="btn btn-light d-none d-sm-inline-flex align-items-center">
+                        <i class="bi bi-search me-1"></i> Search
+                    </a>
+                    <a asp-action="CreateCenterAdmin" class="btn btn-secondary d-none d-sm-inline-flex align-items-center">
+                        <i class="bi bi-shield-check me-1"></i> Create Center Admin
+                    </a>
+                    <a asp-action="CreateUserForCenter" class="btn btn-success d-none d-sm-inline-flex align-items-center">
+                        <i class="bi bi-person-plus me-1"></i> Create User
+                    </a>
+                    <a asp-action="CreateUserForCenter" class="btn btn-success d-sm-none">
+                        <i class="bi bi-plus-lg"></i>
+                    </a>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
 
+@Html.AntiForgeryToken()
+
 <!-- Page body -->
-<div class="page-body">
-  <div class="container-xl">
-    <div class="row row-deck row-cards">
-      <div class="col-12">
-        <div class="card">
-          <div class="card-header">
-            <h3 class="card-title">All Users</h3>
-            <div class="ms-auto">
-              <!-- Filter Controls -->
-              <div class="btn-group" role="group">
-                <button type="button" class="btn btn-sm active" id="showAll">
-                  <i class="ti ti-list icon"></i> All
-                </button>
-                <button type="button" class="btn btn-sm" id="hideDeleted">
-                   Active
-                </button>
-                <button type="button" class="btn btn-sm" id="showInactive">
-                  Inactive
-                </button>
-                <button type="button" class="btn btn-sm btn-action-delete" id="showDeleted">
-                  <i class="ti ti-trash icon"></i> Deleted
-                </button>
-              </div>
-              <select id="roleFilter" class="form-select form-select-sm d-inline-block ms-2" style="width: auto;">
-                <option value="all">All Roles</option>
-                <option value="SuperAdmin">Super Admin</option>
-                <option value="Admin">Admin</option>
-                <option value="Manager">Manager</option>
-                <option value="Employee">Employee</option>
-              </select>
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3">
+                <h3 class="card-title h5 mb-2 fw-semibold text-secondary-emphasis" id="cardTitle">All Users</h3>
+                <div class="ms-auto d-flex align-items-center gap-3 justify-content-between ">
+                    <!-- Page Size Dropdown -->
+                    <div class="d-flex align-items-center gap-2">
+                        <label class="form-label m-0 text-muted">Show</label>
+                        <select class="form-select form-select-sm" style="width: auto;" id="pageSizeSelect"
+                                onchange="window.location.href='@Url.Action("Users", "SuperAdmin")?PageNumber=1&status=@(status)&PageSize=' + this.value">
+                            @foreach (var size in new[] { 10, 20, 30, 50, 100 })
+                            {
+                                if (Model.PageSize == size)
+                                {
+                                    <option value="@size" selected>@size</option>
+                                }
+                                else
+                                {
+                                    <option value="@size">@size</option>
+                                }
+                            }
+                        </select>
+                        <label class="form-label m-0 text-muted">entries</label>
+                    </div>
+
+                    <!-- Filter Buttons -->
+                    <div class="btn-group" role="group">
+                        <a asp-action="Users"
+                           asp-route-status="all"
+                           asp-route-pageSize="@Model.PageSize"
+                           class="btn btn-sm btn-outline-primary border @(string.IsNullOrEmpty(status) || status == "all" ? "active" : "")"
+                           id="filterAll">
+                            <i class="bi bi-list me-1"></i> All
+                        </a>
+
+                        <a asp-action="Users"
+                           asp-route-status="active"
+                           asp-route-pageSize="@Model.PageSize"
+                           class="btn btn-sm btn-outline-primary border @(status == "active" ? "active" : "")"
+                           id="filterActive">
+                            Active
+                        </a>
+
+                        <a asp-action="Users"
+                           asp-route-status="inactive"
+                           asp-route-pageSize="@Model.PageSize"
+                           class="btn btn-sm btn-outline-primary border @(status == "inactive" ? "active" : "")"
+                           id="filterInactive">
+                            Inactive
+                        </a>
+
+                        <a asp-action="Users"
+                           asp-route-status="deleted"
+                           asp-route-pageSize="@Model.PageSize"
+                           class="btn btn-sm btn-outline-danger border @(status == "deleted" ? "active" : "")"
+                           id="filterDeleted">
+                            <i class="bi bi-trash me-1"></i> Deleted
+                        </a>
+                    </div>
+                </div>
             </div>
-          </div>
-          <div class="card-body">
-            <div class="table-responsive">
-              <table id="usersTable" class="table table-vcenter table-hover">
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th data-name="Name">Name</th>
-                    <th data-name="UserName">Username</th>
-                    <th data-name="PhoneNumber">Phone</th>
-                    <th data-name="CenterName">Center</th>
-                    <th data-name="RoleName">Role</th>
-                    <th data-name="IsActive">Status</th>
-                    <th data-name="IsDeleted">State</th>
-                    <th data-name="CreatedAt">Created</th>
-                    <th class="w-1">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <!-- Data loaded via AJAX -->
-                </tbody>
-              </table>
+            <div class="card-body p-3">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0" id="usersTable">
+                        <thead class="table-primary">
+                            <tr>
+                                <th>#</th>
+                                <th>@Html.DisplayNameFor(Model => Model.Items.First().Name)</th>
+                                <th>@Html.DisplayNameFor(Model => Model.Items.First().UserName)</th>
+                                <th>@Html.DisplayNameFor(Model => Model.Items.First().PhoneNumber)</th>
+                                <th>@Html.DisplayNameFor(Model => Model.Items.First().CenterName)</th>
+                                <th>@Html.DisplayNameFor(Model => Model.Items.First().RoleName)</th>
+                                <th>@Html.DisplayNameFor(Model => Model.Items.First().IsActive)</th>
+                                <th>@Html.DisplayNameFor(Model => Model.Items.First().CreatedAt)</th>
+                                <th class="w-1">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                var rowNumber = ((Model.PageNumber - 1) * Model.PageSize) + 1;
+                            }
+                            @foreach (var user in Model.Items)
+                            {
+                                <tr class="@(user.IsDeleted ? "table-danger" : "") ">
+                                    <td class="text-secondary-emphasis">@(rowNumber++)</td>
+                                    <td class="text-secondary-emphasis">
+                                        <i class="bi bi-person text-primary me-1"></i>
+                                        <strong>@user.Name</strong>
+                                    </td>
+                                    <td class="text-secondary-emphasis">
+                                        <code>@user.UserName</code>
+                                    </td>
+                                    <td class="text-secondary-emphasis">
+                                        @if (!string.IsNullOrEmpty(user.PhoneNumber))
+                                        {
+                                            <i class="bi bi-telephone text-success me-1"></i>@user.PhoneNumber
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">N/A</span>
+                                        }
+                                    </td>
+                                    <td class="text-secondary-emphasis">
+                                        @if (!string.IsNullOrEmpty(user.CenterName))
+                                        {
+                                            <small>@user.CenterName</small>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">N/A</span>
+                                        }
+                                    </td>
+                                    <td class="text-secondary-emphasis">
+                                        @if (!string.IsNullOrEmpty(user.RoleName))
+                                        {
+                                            <span class="text-muted">@user.RoleName</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">N/A</span>
+                                        }
+                                    </td>
+                                    <td class="text-secondary-emphasis">
+                                        @if (user.IsDeleted)
+                                        {
+                                            <span class="badge bg-danger">Deleted</span>
+                                        }
+                                        else if (user.IsActive)
+                                        {
+                                            <span>Active</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">Inactive</span>
+                                        }
+                                    </td>
+                                    <td class="text-secondary-emphasis">
+                                        <small>@user.CreatedAt.ToString("MMM dd, yyyy")</small>
+                                    </td>
+                                    <td class="text-secondary-emphasis">
+                                        <a asp-action="UserDetails" asp-route-id="@user.Id" class="btn btn-light btn-sm">
+                                            <i class="bi bi-eye"></i>
+                                            View
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
             </div>
-          </div>
+
+            <!-- Pagination -->
+            @await Html.PartialAsync("_Pagination", new PaginationVM
+            {
+                PageNumber = Model.PageNumber,
+                PageSize = Model.PageSize,
+                TotalCount = Model.TotalCount,
+                ActionName = "Users",
+                ControllerName = "SuperAdmin",
+                ItemName = "users",
+                ShowPageSizeDropdown = false,
+                searchQuery = status
+            })
         </div>
-      </div>
     </div>
-  </div>
 </div>
+
+@await Html.PartialAsync("_Toast")
 
 @section Scripts {
     <script>
         $(document).ready(function () {
-            var currentFilter = 'active'; // Default to non-deleted (active+inactive)
-            var activeFilter = 'all';     // Default to all states within non-deleted
-            var currentRole = 'all';
-            
-            // Initialize DataTable with server-side processing
-            var table = $('#usersTable').DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: {
-                    url: '@Url.Action("GetUsersData", "SuperAdmin")',
-                    type: 'POST',
-                    data: function (d) {
-                        d.filterDeleted = currentFilter;
-                        d.activeFilter = activeFilter;
-                        d.filterRole = currentRole;
-                    },
-                    error: function (xhr, error, code) {
-                        console.error('DataTables error:', error, code);
-                        TablerDialog.fire({
-                            icon: 'error',
-                            title: 'Error Loading Data',
-                            text: 'Please refresh the page and try again.',
-                            timer: 3000
-                        });
-                    }
-                },
-                columns: [
-                    {
-                        data: null,
-                        orderable: false,
-                        searchable: false,
-                        width: '40px',
-                        className: 'text-center align-middle',
-                        render: function (data, type, row, meta) {
-                            return '<span class="text-muted">' + (meta.row + meta.settings._iDisplayStart + 1) + '</span>';
-                        }
-                    },
-                    {
-                        data: 'name',
-                        name: 'Name',
-                        width: '150px',
-                        className: 'align-middle',
-                        render: function (data) {
-                            return '<i class="ti ti-user text-primary me-1"></i> <strong>' + data + '</strong>';
-                        }
-                    },
-                    {
-                        data: 'userName',
-                        name: 'UserName',
-                        width: '120px',
-                        className: 'align-middle',
-                        render: function (data) {
-                            return '<code>' + data + '</code>';
-                        }
-                    },
-                    {
-                        data: 'phoneNumber',
-                        name: 'PhoneNumber',
-                        width: '120px',
-                        className: 'align-middle text-nowrap',
-                        render: function (data) {
-                            if (data && data !== '') {
-                                return '<i class="ti ti-phone text-success me-1"></i> ' + data;
-                            }
-                            return '<span class="text-muted">N/A</span>';
-                        }
-                    },
-                    {
-                        data: 'centerName',
-                        name: 'CenterName',
-                        width: '150px',
-                        className: 'align-middle',
-                        render: function (data) {
-                            if (data && data !== '') {
-                                return '<i class="ti ti-building text-info me-1"></i> <small>' + data + '</small>';
-                            }
-                            return '<span class="text-muted">N/A</span>';
-                        }
-                    },
-                    {
-                        data: 'roleName',
-                        name: 'RoleName',
-                        width: '100px',
-                        className: 'text-center align-middle',
-                        render: function (data) {
-                            if (data) {
-                                return '<span class="text-muted">' + data + '</span>';
-                            }
-                            return '<span class="text-muted">N/A</span>';
-                        }
-                    },
-                    {
-                        data: 'isActive',
-                        name: 'IsActive',
-                        width: '85px',
-                        className: 'text-center align-middle',
-                        render: function (data, type, row) {
-                            if (row.isDeleted) {
-                                return '<span class="text-muted">Inactive</span>';
-                            }
-                            if (data) {
-                                return '<span class="text-muted">Active</span>';
-                            }
-                            return '<span class="badge bg-state-inactive text-white"><i class="ti ti-x"></i> Inactive</span>';
-                        }
-                    },
-                    {
-                        data: 'isDeleted',
-                        name: 'IsDeleted',
-                        visible: false, // Hidden by default
-                        width: '85px',
-                        className: 'text-center align-middle',
-                        render: function (data) {
-                            if (data) {
-                                return '<span class="badge bg-danger text-white"><i class="ti ti-trash"></i> Deleted</span>';
-                            }
-                            return '<span class="text-muted">Normal</span>';
-                        }
-                    },
-                    {
-                        data: 'createdAt',
-                        name: 'CreatedAt',
-                        width: '110px',
-                        className: 'text-center align-middle',
-                        render: function (data) {
-                            var date = new Date(data);
-                            var formatted = date.toLocaleDateString('en-US', {
-                                year: 'numeric',
-                                month: 'short',
-                                day: 'numeric'
-                            });
-                            return '<small class="text-muted"><i class="ti ti-clock me-1"></i>' + formatted + '</small>';
-                        }
-                    },
-                    {
-                        data: null,
-                        orderable: false,
-                        width: '180px',
-                        className: 'text-center align-middle',
-                        render: function (data, type, row) {
-                            var buttons = '<div class="btn-group btn-group-sm" role="group">';
-
-                            // View button (always visible)
-                            buttons += '<a href="@Url.Action("UserDetails", "SuperAdmin")/' + row.id + '" ' +
-                                'class="btn btn-action-icon action-view" title="View Details">' +
-                                '<i class="ti ti-eye"></i></a>';
-
-                            if (!row.isDeleted) {
-                                // Edit button
-                                buttons += '<a href="@Url.Action("EditUser", "SuperAdmin")/' + row.id + '" ' +
-                                    'class="btn btn-action-icon action-edit" title="Edit">' +
-                                    '<i class="ti ti-edit"></i></a>';
-
-                                // Active/Deactivate button
-                                if (row.isActive) {
-                                    buttons += '<button class="btn btn-action-icon action-deactivate" title="Deactivate" ' +
-                                        'onclick="deactivateUser(\'' + row.id + '\', \'' + row.userName.replace(/'/g, "\\'") + '\')">' +
-                                        '<i class="ti ti-ban"></i></button>';
-                                } else {
-                                    buttons += '<button class="btn btn-action-icon action-activate" title="Activate" ' +
-                                        'onclick="activateUser(\'' + row.id + '\', \'' + row.userName.replace(/'/g, "\\'") + '\')">' +
-                                        '<i class="ti ti-check"></i></button>';
-                                }
-
-                                // Delete button
-                                buttons += '<button class="btn btn-action-icon action-delete" title="Delete" ' +
-                                    'onclick="softDeleteUser(\'' + row.id + '\', \'' + row.userName.replace(/'/g, "\\'") + '\')">' +
-                                    '<i class="ti ti-trash"></i></button>';
-                            } else {
-                                // Restore button
-                                buttons += '<button class="btn btn-action-icon action-restore" title="Restore" ' +
-                                    'onclick="restoreUser(\'' + row.id + '\', \'' + row.userName.replace(/'/g, "\\'") + '\')">' +
-                                    '<i class="ti ti-refresh"></i></button>';
-                                
-                                // Permanent Delete button
-                                buttons += '<button class="btn btn-action-icon action-delete" title="Permanent Delete" ' +
-                                    'onclick="permanentDeleteUser(\'' + row.id + '\', \'' + row.userName.replace(/'/g, "\\'") + '\')">' +
-                                    '<i class="ti ti-trash-x"></i></button>';
-                            }
-
-                            buttons += '</div>';
-                            return buttons;
-                        }
-                    }
-
-                ],
-                pageLength: 25,
-                lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
-                order: [[9, 'desc']], // Sort by created date descending
-                autoWidth: false,
-                responsive: true,
-                language: {
-                    search: "_INPUT_",
-                    searchPlaceholder: "Search users...",
-                    lengthMenu: "_MENU_ entries",
-                    info: "Showing _START_ to _END_ of _TOTAL_ users",
-                    infoEmpty: "No users to display",
-                    infoFiltered: "(from _MAX_ total)",
-                    zeroRecords: "No matching users found",
-                    emptyTable: '<div class="p-4 text-center">' +
-                        '<i class="ti ti-users" style="font-size: 4rem;"></i>' +
-                        '<h4 class="text-muted mt-3">No Deleted Users Found.</h4>' +
-                        '</div>',
-                    paginate: { first: '«', last: '»', next: '›', previous: '‹' },
-                    processing: '<div class="spinner-border text-primary" role="status"></div><span class="ms-2">Loading...</span>'
-                },
-                createdRow: function (row, data, dataIndex) {
-                    if (data.isDeleted) {
-                        $(row).addClass('table-danger');
-                    }
-                }
-            });
-
-            // Helper to toggle State column visibility
-            function toggleStateColumn(show) {
-                var stateColumn = table.column('IsDeleted:name');
-                stateColumn.visible(show);
+            var msg = '@TempData["SuccessMessage"]';
+            if (msg) {
+                showAlert(msg, true);
             }
-
-            // Filter: Show All (Non-deleted)
-            $('#showAll').click(function () {
-                currentFilter = 'active'; // 'active' in backend means non-deleted
-                activeFilter = 'all';     // No secondary active/inactive filter
-                toggleStateColumn(false);
-                $('.btn-group .btn').removeClass('active');
-                $(this).addClass('active');
-                table.ajax.reload(null, false);
-            });
-
-            // Filter: Active Only
-            $('#hideDeleted').click(function () {
-                currentFilter = 'active'; // 'active' in backend means non-deleted
-                activeFilter = 'active';  // Secondary filter: only IsActive=true
-                toggleStateColumn(false);
-                $('.btn-group .btn').removeClass('active');
-                $(this).addClass('active');
-                table.ajax.reload(null, false);
-            });
-
-            // Filter: Inactive Only
-            $('#showInactive').click(function () {
-                currentFilter = 'active'; // 'active' in backend means non-deleted
-                activeFilter = 'inactive'; // Secondary filter: only IsActive=false
-                toggleStateColumn(false);
-                $('.btn-group .btn').removeClass('active');
-                $(this).addClass('active');
-                table.ajax.reload(null, false);
-            });
-
-            // Filter: Show Only Deleted
-            $('#showDeleted').click(function () {
-                currentFilter = 'deleted';
-                activeFilter = 'all';     // Secondary filter ignored for deleted
-                toggleStateColumn(true);
-                $('.btn-group .btn').removeClass('active');
-                $(this).addClass('active');
-                table.ajax.reload(null, false);
-            });
-
-            // Role Filter
-            $('#roleFilter').change(function () {
-                currentRole = $(this).val();
-                table.ajax.reload(null, false);
-            });
         });
-
-        // Restore user function
-        function restoreUser(userId, userName) {
-            TablerDialog.fire({
-                title: 'Restore User?',
-                html: 'Are you sure you want to restore<br><strong>' + userName + '</strong>?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#28a745',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: '<i class="ti ti-refresh"></i> Yes, Restore',
-                cancelButtonText: 'Cancel',
-                showLoaderOnConfirm: true,
-                preConfirm: function () {
-                    return $.post('@Url.Action("RestoreUser", "SuperAdmin")', { id: userId })
-                        .then(function (response) {
-                            if (!response.success) {
-                                throw new Error(response.message);
-                            }
-                            return response;
-                        })
-                        .catch(function (error) {
-                            TablerDialog.showValidationMessage('Request failed: ' + error.message);
-                        });
-                },
-                allowOutsideClick: function () { return !TablerDialog.isLoading(); }
-            }).then(function (result) {
-                if (result.isConfirmed) {
-                    TablerDialog.fire({
-                        title: 'Restored!',
-                        text: result.value.message,
-                        icon: 'success',
-                        timer: 2000,
-                        showConfirmButton: false
-                    });
-                    $('#usersTable').DataTable().ajax.reload(null, false);
-                }
-            });
-        }
-
-        // Activate user function
-        function activateUser(userId, userName) {
-            TablerDialog.fire({
-                title: 'Activate User?',
-                html: 'Activate user<br><strong>' + userName + '</strong>?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#28a745',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: '<i class="ti ti-check"></i> Yes, Activate',
-                cancelButtonText: 'Cancel',
-                showLoaderOnConfirm: true,
-                preConfirm: function () {
-                    return $.post('@Url.Action("ActivateUser", "SuperAdmin")', { id: userId })
-                        .then(function (response) {
-                            if (!response.success) {
-                                throw new Error(response.message);
-                            }
-                            return response;
-                        })
-                        .catch(function (error) {
-                            TablerDialog.showValidationMessage('Request failed: ' + error.message);
-                        });
-                },
-                allowOutsideClick: function () { return !TablerDialog.isLoading(); }
-            }).then(function (result) {
-                if (result.isConfirmed) {
-                    TablerDialog.fire({
-                        title: 'Activated!',
-                        text: result.value.message,
-                        icon: 'success',
-                        timer: 2000,
-                        showConfirmButton: false
-                    });
-                    $('#usersTable').DataTable().ajax.reload(null, false);
-                }
-            });
-        }
-
-        // Deactivate user function
-        function deactivateUser(userId, userName) {
-            TablerDialog.fire({
-                title: 'Deactivate User?',
-                html: 'Deactivate user<br><strong>' + userName + '</strong>?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#ffc107',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: '<i class="ti ti-ban"></i> Yes, Deactivate',
-                cancelButtonText: 'Cancel',
-                showLoaderOnConfirm: true,
-                preConfirm: function () {
-                    return $.post('@Url.Action("DeactivateUser", "SuperAdmin")', { id: userId })
-                        .then(function (response) {
-                            if (!response.success) {
-                                throw new Error(response.message);
-                            }
-                            return response;
-                        })
-                        .catch(function (error) {
-                            TablerDialog.showValidationMessage('Request failed: ' + error.message);
-                        });
-                },
-                allowOutsideClick: function () { return !TablerDialog.isLoading(); }
-            }).then(function (result) {
-                if (result.isConfirmed) {
-                    TablerDialog.fire({
-                        title: 'Deactivated!',
-                        text: result.value.message,
-                        icon: 'success',
-                        timer: 2000,
-                        showConfirmButton: false
-                    });
-                    $('#usersTable').DataTable().ajax.reload(null, false);
-                }
-            });
-        }
-
-        // Soft delete user function
-        function softDeleteUser(userId, userName) {
-            TablerDialog.fire({
-                title: 'Delete User?',
-                html: 'Move <strong>' + userName + '</strong> to trash?<br><small class="text-muted">You can restore it later.</small>',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#dc3545',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: '<i class="ti ti-trash"></i> Yes, Delete',
-                cancelButtonText: 'Cancel',
-                showLoaderOnConfirm: true,
-                preConfirm: function () {
-                    return $.post('@Url.Action("SoftDeleteUser", "SuperAdmin")', { id: userId })
-                        .then(function (response) {
-                            if (!response.success) {
-                                throw new Error(response.message);
-                            }
-                            return response;
-                        })
-                        .catch(function (error) {
-                            TablerDialog.showValidationMessage('Request failed: ' + error.message);
-                        });
-                },
-                allowOutsideClick: function () { return !TablerDialog.isLoading(); }
-            }).then(function (result) {
-                if (result.isConfirmed) {
-                    TablerDialog.fire({
-                        title: 'Deleted!',
-                        text: result.value.message,
-                        icon: 'success',
-                        timer: 2000,
-                        showConfirmButton: false
-                    });
-                    $('#usersTable').DataTable().ajax.reload(null, false);
-                }
-            });
-        }
-
-        // Permanent delete user function
-        function permanentDeleteUser(userId, userName) {
-            TablerDialog.fire({
-                title: 'PERMANENT DELETE',
-                html: '<div class="alert alert-danger mb-2"><strong>DANGER!</strong> This cannot be undone!</div>Type <code>DELETE</code> to confirm for <strong>' + userName + '</strong>:',
-                input: 'text',
-                inputPlaceholder: 'Type Delete',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#dc3545',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: '<i class="ti ti-trash-x"></i> PERMANENTLY DELETE',
-                cancelButtonText: 'Cancel',
-                preConfirm: function(value) {
-                    if (value !== 'Delete') {
-                        TablerDialog.showValidationMessage('You must type Delete to confirm');
-                    }
-                }
-            }).then(function(result) {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: '@Url.Action("HardDeleteUser", "SuperAdmin")',
-                        type: 'POST',
-                        data: { id: userId },
-                        success: function(result) {
-                            if (result.success) {
-                                $('#usersTable').DataTable().ajax.reload(null, false);
-                                TablerDialog.fire({
-                                    icon: 'success',
-                                    title: 'Deleted!',
-                                    text: result.message || 'User permanently deleted',
-                                    timer: 2000,
-                                    showConfirmButton: false
-                                });
-                            } else {
-                                TablerDialog.fire({
-                                    icon: 'error',
-                                    title: 'Error',
-                                    text: 'Error deleting user: ' + result.message
-                                });
-                            }
-                        },
-                        error: function() {
-                            TablerDialog.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: 'Error deleting user'
-                            });
-                        }
-                    });
-                }
-            });
-        }
     </script>
 }

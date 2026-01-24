@@ -15,7 +15,7 @@ namespace Moshrefy.Web.Models.User
         public string? PhoneNumber { get; set; }
 
         public int? CenterId { get; set; }
-
+        [Display(Name = "Center")]
         public string? CenterName { get; set; }
         [Display(Name = "Role")]
         public string? RoleName { get; set; }
@@ -27,7 +27,7 @@ namespace Moshrefy.Web.Models.User
         public string? CreatedByName { get; set; }
         [Display(Name = "Status")]
         public bool IsActive { get; set; }
-        [Display(Name = "state")]
+        [Display(Name = "State")]
         public bool IsDeleted { get; set; }
     }
 }

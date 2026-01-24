@@ -2,138 +2,187 @@
 @{
     ViewData["Title"] = "Update User Role";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    var userId = ViewBag.UserId as string;
+    var userName = ViewBag.UserName as string;
+    var currentRole = ViewBag.CurrentRole as string;
 }
 
 <!-- Page Header -->
-<div class="page-header-modern">
-    <div class="row g-2 align-items-center">
-        <div class="col">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb-modern">
-                    <li class="breadcrumb-item">
-                        <a asp-controller="SuperAdmin" asp-action="Index"><i class="ti ti-home"></i> Dashboard</a>
-                        <i class="ti ti-chevron-right breadcrumb-separator ms-2"></i>
-                    </li>
-                    <li class="breadcrumb-item">
-                        <a asp-controller="SuperAdmin" asp-action="Users">Users</a>
-                        <i class="ti ti-chevron-right breadcrumb-separator ms-2"></i>
-                    </li>
-                    <li class="breadcrumb-item active" aria-current="page">Update Role</li>
-                </ol>
-            </nav>
-            <h2 class="page-title"><i class="ti ti-tag"></i> Update User Role</h2>
+<div class="bg-white p-4 mb-4 shadow-sm border-bottom">
+    <div class="container-fluid">
+        <div class="row align-items-center">
+
+            <div class="col-md-8">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-2" style="--bs-breadcrumb-divider: '›';">
+                        <li class="breadcrumb-item">
+                            <a asp-controller="SuperAdmin" asp-action="Index" class="text-decoration-none text-muted small">
+                                <i class="bi bi-house-door me-1"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a asp-controller="SuperAdmin" asp-action="Users" class="text-decoration-none text-muted small">
+                                Users
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item active small fw-medium text-primary" aria-current="page">
+                            Update Role
+                        </li>
+                    </ol>
+                </nav>
+                <div class="d-flex align-items-center">
+                    <h2 class="h4 fw-bold text-dark mb-0 me-3">
+                        <i class="bi bi-shield-check me-2"></i>Update User Role
+                    </h2>
+                </div>
+            </div>
+
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <div class="d-flex gap-2 justify-content-md-end">
+                    <a asp-action="UserDetails" asp-route-id="@userId" class="btn btn-outline-secondary btn-sm px-3 shadow-sm">
+                        <i class="bi bi-chevron-left me-1"></i> Back
+                    </a>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
+
+@Html.AntiForgeryToken()
 
 <!-- Page body -->
-<div class="page-body">
-  <div class="container-xl">
-    <div class="row">
-      <!-- User Info Card -->
-      <div class="col-md-4">
-        <div class="card">
-          <div class="card-header">
-            <h3 class="card-title"><i class="ti ti-user me-2"></i>User Information</h3>
-          </div>
-          <div class="card-body text-center">
-            <span class="avatar avatar-xl bg-primary-lt mb-3"><i class="ti ti-user icon-lg"></i></span>
-            <h3 class="mb-3">@ViewBag.UserName</h3>
-            <div class="mb-3">
-              <strong>Current Role: </strong>
-              @if (!string.IsNullOrEmpty(ViewBag.CurrentRole))
-              {
-                var bgClass = (string)ViewBag.CurrentRole switch { "SuperAdmin" => "bg-role-superadmin", "Admin" => "bg-role-admin", "Manager" => "bg-role-manager", _ => "bg-role-employee" };
-                var icon = (string)ViewBag.CurrentRole switch { "SuperAdmin" => "ti-shield", "Admin" => "ti-tie", "Manager" => "ti-settings", _ => "ti-user" };
-                <span class="badge @bgClass"><i class="ti @icon me-1"></i>@ViewBag.CurrentRole</span>
-              }
-              else
-              {<span class="text-muted">Not assigned</span>}
+<div class="row">
+    <!-- User Info Card -->
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 mb-3">
+            <div class="card-header bg-white py-3">
+                <h3 class="card-title h5 mb-0 fw-semibold">
+                    <i class="bi bi-person me-2 text-primary"></i>User Information
+                </h3>
             </div>
-            <a asp-action="UserDetails" asp-route-id="@ViewBag.UserId" class="btn btn-outline-primary w-100"><i class="ti ti-eye"></i> View Full Profile</a>
-          </div>
-        </div>
-
-        <div class="card mt-3">
-          <div class="card-header">
-            <h3 class="card-title"><i class="ti ti-alert-triangle me-2"></i>Important</h3>
-          </div>
-          <div class="card-body">
-            <ul class="list-unstyled text-muted">
-              <li class="mb-2"><i class="ti ti-info-circle me-1"></i>Role changes apply immediately</li>
-              <li class="mb-2"><i class="ti ti-refresh me-1"></i>User may need to re-login</li>
-              <li><i class="ti ti-shield me-1"></i>Assign appropriate roles only</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <!-- Update Role Form -->
-      <div class="col-md-8">
-        <div class="card">
-          <div class="card-header">
-            <h3 class="card-title"><i class="ti ti-settings me-2"></i>Change User Role</h3>
-          </div>
-          <form asp-action="UpdateUserRole" asp-route-id="@ViewBag.UserId" method="post" id="updateRoleForm">
-            @Html.AntiForgeryToken()
-            <div class="card-body">
-              <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
-
-              <div class="mb-3">
-                <label class="form-label"><i class="ti ti-tag me-1"></i>Select New Role</label>
-                <div class="form-selectgroup form-selectgroup-boxes d-flex flex-column">
-                  <label class="form-selectgroup-item flex-fill">
-                    <input type="radio" name="Role" value="@((int)Moshrefy.Domain.Enums.RolesNames.SuperAdmin)" class="form-selectgroup-input" @(Model.Role == Moshrefy.Domain.Enums.RolesNames.SuperAdmin ? "checked" : "")>
-                    <div class="form-selectgroup-label d-flex align-items-center p-3">
-                      <div class="me-3"><span class="form-selectgroup-check"></span></div>
-                      <div><span class="badge bg-role-superadmin"><i class="ti ti-shield me-1"></i>Super Admin</span><div class="text-muted mt-1">Full system access and control over all centers</div></div>
-                    </div>
-                  </label>
-                  <label class="form-selectgroup-item flex-fill">
-                    <input type="radio" name="Role" value="@((int)Moshrefy.Domain.Enums.RolesNames.Admin)" class="form-selectgroup-input" @(Model.Role == Moshrefy.Domain.Enums.RolesNames.Admin ? "checked" : "")>
-                    <div class="form-selectgroup-label d-flex align-items-center p-3">
-                      <div class="me-3"><span class="form-selectgroup-check"></span></div>
-                      <div><span class="badge bg-role-admin"><i class="ti ti-tie me-1"></i>Admin</span><div class="text-muted mt-1">Full access to manage their assigned center</div></div>
-                    </div>
-                  </label>
-                  <label class="form-selectgroup-item flex-fill">
-                    <input type="radio" name="Role" value="@((int)Moshrefy.Domain.Enums.RolesNames.Manager)" class="form-selectgroup-input" @(Model.Role == Moshrefy.Domain.Enums.RolesNames.Manager ? "checked" : "")>
-                    <div class="form-selectgroup-label d-flex align-items-center p-3">
-                      <div class="me-3"><span class="form-selectgroup-check"></span></div>
-                      <div><span class="badge bg-role-manager"><i class="ti ti-settings me-1"></i>Manager</span><div class="text-muted mt-1">Can manage operations and view reports</div></div>
-                    </div>
-                  </label>
-                  <label class="form-selectgroup-item flex-fill">
-                    <input type="radio" name="Role" value="@((int)Moshrefy.Domain.Enums.RolesNames.Employee)" class="form-selectgroup-input" @(Model.Role == Moshrefy.Domain.Enums.RolesNames.Employee ? "checked" : "")>
-                    <div class="form-selectgroup-label d-flex align-items-center p-3">
-                      <div class="me-3"><span class="form-selectgroup-check"></span></div>
-                      <div><span class="badge bg-role-employee"><i class="ti ti-user me-1"></i>Employee</span><div class="text-muted mt-1">Basic access for daily operations</div></div>
-                    </div>
-                  </label>
+            <div class="card-body text-center">
+                <span class="d-flex align-items-center justify-content-center bg-primary-subtle text-primary rounded-circle mx-auto mb-3" style="width: 64px; height: 64px;">
+                    <i class="bi bi-person fs-3"></i>
+                </span>
+                <h4 class="mb-3">@userName</h4>
+                <div class="mb-3">
+                    <strong>Current Role: </strong>
+                    @if (!string.IsNullOrEmpty(currentRole))
+                    {
+                        <span class="text-muted">@currentRole</span>
+                    }
+                    else
+                    {
+                        <span class="text-muted">Not assigned</span>
+                    }
                 </div>
-                <span asp-validation-for="Role" class="text-danger"></span>
-              </div>
+                <a asp-action="UserDetails" asp-route-id="@userId" class="btn btn-outline-primary w-100">
+                    <i class="bi bi-eye me-1"></i> View Full Profile
+                </a>
             </div>
-            <div class="card-footer text-end">
-              <a asp-action="UserDetails" asp-route-id="@ViewBag.UserId" class="btn btn-secondary me-2"><i class="ti ti-x"></i> Cancel</a>
-              <button type="submit" class="btn btn-purple"><i class="ti ti-device-floppy"></i> Update Role</button>
-            </div>
-          </form>
         </div>
-      </div>
+
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3">
+                <h3 class="card-title h6 mb-0 fw-semibold">
+                    <i class="bi bi-exclamation-triangle text-warning me-2"></i>Important
+                </h3>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled text-muted small mb-0">
+                    <li class="mb-2"><i class="bi bi-info-circle me-1"></i>Role changes apply immediately</li>
+                    <li class="mb-2"><i class="bi bi-arrow-repeat me-1"></i>User may need to re-login</li>
+                    <li><i class="bi bi-shield me-1"></i>Assign appropriate roles only</li>
+                </ul>
+            </div>
+        </div>
     </div>
-  </div>
+
+    <!-- Update Role Form -->
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3">
+                <h3 class="card-title h5 mb-0 fw-semibold">
+                    <i class="bi bi-gear me-2 text-primary"></i>Change User Role
+                </h3>
+            </div>
+            <form asp-action="UpdateUserRole" asp-route-id="@userId" method="post" id="updateRoleForm">
+                @Html.AntiForgeryToken()
+                <div class="card-body">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                    <div class="mb-3">
+                        <label class="form-label"><i class="bi bi-tag me-1"></i>Select New Role</label>
+                        
+                        <div class="d-flex flex-column gap-2">
+                            <label class="border rounded p-3 d-flex align-items-center cursor-pointer @(Model.Role == Moshrefy.Domain.Enums.RolesNames.SuperAdmin ? "border-primary bg-light" : "")">
+                                <input type="radio" name="Role" value="@((int)Moshrefy.Domain.Enums.RolesNames.SuperAdmin)" class="form-check-input me-3" @(Model.Role == Moshrefy.Domain.Enums.RolesNames.SuperAdmin ? "checked" : "")>
+                                <div>
+                                    <strong>Super Admin</strong>
+                                    <div class="text-muted small mt-1">Full system access and control over all centers</div>
+                                </div>
+                            </label>
+                            <label class="border rounded p-3 d-flex align-items-center cursor-pointer @(Model.Role == Moshrefy.Domain.Enums.RolesNames.Admin ? "border-primary bg-light" : "")">
+                                <input type="radio" name="Role" value="@((int)Moshrefy.Domain.Enums.RolesNames.Admin)" class="form-check-input me-3" @(Model.Role == Moshrefy.Domain.Enums.RolesNames.Admin ? "checked" : "")>
+                                <div>
+                                    <strong>Admin</strong>
+                                    <div class="text-muted small mt-1">Full access to manage their assigned center</div>
+                                </div>
+                            </label>
+                            <label class="border rounded p-3 d-flex align-items-center cursor-pointer @(Model.Role == Moshrefy.Domain.Enums.RolesNames.Manager ? "border-primary bg-light" : "")">
+                                <input type="radio" name="Role" value="@((int)Moshrefy.Domain.Enums.RolesNames.Manager)" class="form-check-input me-3" @(Model.Role == Moshrefy.Domain.Enums.RolesNames.Manager ? "checked" : "")>
+                                <div>
+                                    <strong>Manager</strong>
+                                    <div class="text-muted small mt-1">Can manage operations and view reports</div>
+                                </div>
+                            </label>
+                            <label class="border rounded p-3 d-flex align-items-center cursor-pointer @(Model.Role == Moshrefy.Domain.Enums.RolesNames.Employee ? "border-primary bg-light" : "")">
+                                <input type="radio" name="Role" value="@((int)Moshrefy.Domain.Enums.RolesNames.Employee)" class="form-check-input me-3" @(Model.Role == Moshrefy.Domain.Enums.RolesNames.Employee ? "checked" : "")>
+                                <div>
+                                    <strong>Employee</strong>
+                                    <div class="text-muted small mt-1">Basic access for daily operations</div>
+                                </div>
+                            </label>
+                        </div>
+                        <span asp-validation-for="Role" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="card-footer bg-white text-end">
+                    <a asp-action="UserDetails" asp-route-id="@userId" class="btn btn-secondary me-2">
+                        <i class="bi bi-x-lg me-1"></i> Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-lg me-1"></i> Update Role
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
+
+@await Html.PartialAsync("_Modals")
+@await Html.PartialAsync("_Toast")
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script>
+        const token = $('input[name="__RequestVerificationToken"]').val();
+
         $('#updateRoleForm').on('submit', function (e) {
             e.preventDefault();
-            const selectedRole = $('input[name="Role"]:checked').closest('label').find('.badge').text().trim();
-            TablerDialog.fire({ title: 'Confirm Role Update', html: 'Update <strong>@ViewBag.UserName</strong> role to:<br><br><span class="badge bg-purple">' + selectedRole + '</span>', icon: 'question', showCancelButton: true, confirmButtonColor: '#28a745', confirmButtonText: '<i class="ti ti-check"></i> Yes, Update' })
-            .then((r) => { if (r.isConfirmed) { this.submit(); } });
+            const selectedRole = $('input[name="Role"]:checked').closest('label').find('strong').text().trim();
+            
+            setupModal({
+                title: 'Confirm Role Update',
+                body: `Update <strong>@userName</strong> role to: <br><br><strong>${selectedRole}</strong>`,
+                btnClass: 'btn-primary',
+                btnText: 'Yes, Update',
+                showInput: false,
+                onConfirm: () => {
+                    document.getElementById('updateRoleForm').submit();
+                }
+            });
         });
     </script>
-    <style>.bg-purple,.btn-purple{background-color:#6f42c1!important;color:white;}.btn-purple:hover{background-color:#5a32a3!important;}</style>
 }

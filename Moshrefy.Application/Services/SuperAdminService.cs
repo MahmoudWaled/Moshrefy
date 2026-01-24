@@ -859,6 +859,46 @@ namespace Moshrefy.Application.Services
             return _mapper.Map<List<UserResponseDTO>>(users);
         }
 
+        public async Task<PaginatedResult<UserResponseDTO>> GetUsersPagedAsync(PaginationParameter paginationParameter, string status)
+        {
+            IQueryable<ApplicationUser> query = _userManager.Users
+                .Include(u => u.Center)
+                .OrderByDescending(u => u.CreatedAt);
+
+            // Apply status filter
+            query = status?.ToLower() switch
+            {
+                "active" => query.Where(u => u.IsActive && !u.IsDeleted),
+                "inactive" => query.Where(u => !u.IsActive && !u.IsDeleted),
+                "deleted" => query.Where(u => u.IsDeleted),
+                _ => query.Where(u => !u.IsDeleted) // "all" or default = non-deleted
+            };
+
+            var totalCount = await query.CountAsync();
+
+            var users = await query
+                .Skip((paginationParameter.PageNumber - 1) * paginationParameter.PageSize)
+                .Take(paginationParameter.PageSize)
+                .ToListAsync();
+
+            var usersDTO = _mapper.Map<List<UserResponseDTO>>(users);
+
+            // Populate roles for each user
+            foreach (var userDto in usersDTO)
+            {
+                var user = users.First(u => u.Id == userDto.Id);
+                var roles = await _userManager.GetRolesAsync(user);
+                userDto.RoleName = roles.FirstOrDefault();
+            }
+
+            return new PaginatedResult<UserResponseDTO>(
+                usersDTO,
+                totalCount,
+                paginationParameter.PageNumber,
+                paginationParameter.PageSize
+            );
+        }
+
         public async Task DeleteUserAsync(string userId)
         {
             if (string.IsNullOrEmpty(userId))

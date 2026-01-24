@@ -6,183 +6,176 @@
 }
 
 <!-- Page Header -->
-<div class="page-header-modern">
-    <div class="row g-2 align-items-center">
-        <div class="col">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb-modern">
-                    <li class="breadcrumb-item">
-                        <a asp-controller="SuperAdmin" asp-action="Index"><i class="ti ti-home"></i> Dashboard</a>
-                        <i class="ti ti-chevron-right breadcrumb-separator ms-2"></i>
-                    </li>
-                    <li class="breadcrumb-item">
-                        <a asp-controller="SuperAdmin" asp-action="Users">Users</a>
-                        <i class="ti ti-chevron-right breadcrumb-separator ms-2"></i>
-                    </li>
-                    <li class="breadcrumb-item active" aria-current="page">Edit</li>
-                </ol>
-            </nav>
-            <h2 class="page-title"><i class="ti ti-user-edit"></i> Edit User</h2>
-        </div>
-        <div class="col-auto ms-auto">
-            <button type="button" onclick="goBack()" class="btn">
-                <i class="ti ti-arrow-left"></i> Back
-            </button>
+<div class="bg-white p-4 mb-4 shadow-sm border-bottom">
+    <div class="container-fluid">
+        <div class="row align-items-center">
+
+            <div class="col-md-8">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-2" style="--bs-breadcrumb-divider: '›';">
+                        <li class="breadcrumb-item">
+                            <a asp-controller="SuperAdmin" asp-action="Index" class="text-decoration-none text-muted small">
+                                <i class="bi bi-house-door me-1"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a asp-controller="SuperAdmin" asp-action="Users" class="text-decoration-none text-muted small">
+                                Users
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item active small fw-medium text-primary" aria-current="page">
+                            Edit User
+                        </li>
+                    </ol>
+                </nav>
+                <div class="d-flex align-items-center">
+                    <h2 class="h4 fw-bold text-dark mb-0 me-3">
+                        <i class="bi bi-pencil-square me-2"></i>Edit User
+                    </h2>
+                </div>
+            </div>
+
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <div class="d-flex gap-2 justify-content-md-end">
+                    <a asp-action="UserDetails" class="btn btn-outline-secondary btn-sm px-3 shadow-sm">
+                        <i class="bi bi-chevron-left me-1"></i> Back to details
+                    </a>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
 
 <!-- Page body -->
-<div class="page-body">
-  <div class="container-xl">
-    <form asp-action="EditUser" asp-route-id="@userId" method="post">
-      <div class="row">
-        <!-- Main Form Column -->
-        <div class="col-lg-8">
-          <!-- Personal Information Card -->
-          <div class="card mb-3">
-            <div class="card-header">
-              <div class="d-flex align-items-center">
-                <span class="avatar bg-primary text-white me-3">
-                  <i class="ti ti-user"></i>
-                </span>
-                <div>
-                  <h3 class="card-title mb-0">Personal Information</h3>
-                  <small class="text-muted">Basic user details</small>
-                </div>
-              </div>
-            </div>
-            <div class="card-body">
-              <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-              <div class="row">
-                <div class="col-md-6 mb-3">
-                  <label class="form-label required" asp-for="Name">Full Name</label>
-                  <div class="input-group">
-                    <span class="input-group-text"><i class="ti ti-user"></i></span>
-                    <input asp-for="Name" class="form-control" placeholder="Enter full name" />
-                  </div>
-                  <span asp-validation-for="Name" class="text-danger small"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                  <label class="form-label required" asp-for="UserName">Username</label>
-                  <div class="input-group">
-                    <span class="input-group-text">@@</span>
-                    <input asp-for="UserName" class="form-control" placeholder="Enter username" />
-                  </div>
-                  <span asp-validation-for="UserName" class="text-danger small"></span>
-                  <small class="form-hint">Used for login. Must be unique.</small>
-                </div>
-              </div>
-            </div>
-          </div>
+<div class="row">
+    <div class="col-12">
+        <form asp-action="EditUser" asp-route-id="@userId" method="post">
+        <input type="hidden" asp-for="IsActive" />
+            <div class="row">
+                <!-- Main Form Column -->
+                <div class="col-lg-8">
+                    <!-- Personal Information Card -->
+                    <div class="card mb-3 shadow-sm border-0">
+                        <div class="card-header bg-white py-3">
+                            <div class="d-flex align-items-center">
+                                <span class="d-flex align-items-center justify-content-center bg-primary opacity-75 text-white rounded me-3" style="width: 40px; height: 40px;">
+                                    <i class="bi bi-person"></i>
+                                </span>
+                                <div>
+                                    <h3 class="card-title h5 mb-0 fw-semibold">Personal Information</h3>
+                                    <small class="text-muted">Basic user details</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label" asp-for="Name">Full Name <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                        <input asp-for="Name" class="form-control" placeholder="Enter full name" />
+                                    </div>
+                                    <span asp-validation-for="Name" class="text-danger small"></span>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label" asp-for="UserName">Username <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">@@</span>
+                                        <input asp-for="UserName" class="form-control" placeholder="Enter username" />
+                                    </div>
+                                    <span asp-validation-for="UserName" class="text-danger small"></span>
+                                    <small class="form-text text-muted">Used for login. Must be unique.</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-          <!-- Contact Information Card -->
-          <div class="card mb-3">
-            <div class="card-header">
-              <div class="d-flex align-items-center">
-                <span class="avatar bg-info text-white me-3">
-                  <i class="ti ti-address-book"></i>
-                </span>
-                <div>
-                  <h3 class="card-title mb-0">Contact Information</h3>
-                  <small class="text-muted">Contact details</small>
-                </div>
-              </div>
-            </div>
-            <div class="card-body">
-              <div class="row">
-                <div class="col-md-6 mb-3">
-                  <label class="form-label" asp-for="Email">Email Address</label>
-                  <div class="input-group">
-                    <span class="input-group-text"><i class="ti ti-mail"></i></span>
-                    <input asp-for="Email" type="email" class="form-control" placeholder="user@example.com" />
-                  </div>
-                  <span asp-validation-for="Email" class="text-danger small"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                  <label class="form-label" asp-for="PhoneNumber">Phone Number</label>
-                  <div class="input-group">
-                    <span class="input-group-text"><i class="ti ti-phone"></i></span>
-                    <input asp-for="PhoneNumber" class="form-control" placeholder="+1234567890" />
-                  </div>
-                  <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
-                </div>
-              </div>
-            </div>
-          </div>
+                    <!-- Contact Information Card -->
+                    <div class="card mb-3 shadow-sm border-0">
+                        <div class="card-header bg-white py-3">
+                            <div class="d-flex align-items-center">
+                                <span class="d-flex align-items-center justify-content-center bg-info opacity-75 text-white rounded me-3" style="width: 40px; height: 40px;">
+                                    <i class="bi bi-journal-bookmark"></i>
+                                </span>
+                                <div>
+                                    <h3 class="card-title h5 mb-0 fw-semibold">Contact Information</h3>
+                                    <small class="text-muted">Contact details</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label" asp-for="Email">Email Address</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                                        <input asp-for="Email" type="email" class="form-control" placeholder="user@example.com" />
+                                    </div>
+                                    <span asp-validation-for="Email" class="text-danger small"></span>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label" asp-for="PhoneNumber">Phone Number</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                                        <input asp-for="PhoneNumber" class="form-control" placeholder="+1234567890" />
+                                    </div>
+                                    <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-          <!-- Center Assignment Card -->
-          <div class="card mb-3">
-            <div class="card-header">
-              <div class="d-flex align-items-center">
-                <span class="avatar bg-warning text-white me-3">
-                  <i class="ti ti-building"></i>
-                </span>
-                <div>
-                  <h3 class="card-title mb-0">Center Assignment</h3>
-                  <small class="text-muted">Assign user to a center</small>
+                    <!-- Center Assignment Card -->
+                    <div class="card mb-3 shadow-sm border-0">
+                        <div class="card-header bg-white py-3">
+                            <div class="d-flex align-items-center">
+                                <span class="d-flex align-items-center justify-content-center bg-warning opacity-75 text-white rounded me-3" style="width: 40px; height: 40px;">
+                                    <i class="bi bi-building"></i>
+                                </span>
+                                <div>
+                                    <h3 class="card-title h5 mb-0 fw-semibold">Center Assignment</h3>
+                                    <small class="text-muted">Assign user to a center</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label" asp-for="CenterId">Center</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-building"></i></span>
+                                    <select asp-for="CenterId" asp-items="Model.Centers" class="form-select">
+                                        <option value="">-- Select a Center (Optional) --</option>
+                                    </select>
+                                </div>
+                                <span asp-validation-for="CenterId" class="text-danger small"></span>
+                                <small class="form-text text-muted">Assign or change the center for this user</small>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-              </div>
-            </div>
-            <div class="card-body">
-              <div class="mb-3">
-                <label class="form-label" asp-for="CenterId">Center</label>
-                <div class="input-group">
-                  <span class="input-group-text"><i class="ti ti-building"></i></span>
-                  <select asp-for="CenterId" asp-items="Model.Centers" class="form-select">
-                    <option value="">-- Select a Center (Optional) --</option>
-                  </select>
-                </div>
-                <span asp-validation-for="CenterId" class="text-danger small"></span>
-                <small class="form-hint">Assign or change the center for this user</small>
-              </div>
-            </div>
-          </div>
-        </div>
 
-        <!-- Sidebar Column -->
-        <div class="col-lg-4">
-          <!-- Status Card -->
-          <div class="card mb-3">
-            <div class="card-header">
-              <div class="d-flex align-items-center">
-                <span class="avatar bg-success text-white me-3">
-                  <i class="ti ti-toggle-right"></i>
-                </span>
-                <h3 class="card-title mb-0">Status</h3>
-              </div>
-            </div>
-            <div class="card-body">
-              <label class="form-selectgroup-item flex-fill d-block">
-                <div class="form-check form-switch">
-                  <input type="checkbox" asp-for="IsActive" class="form-check-input">
-                  <span class="form-check-label">
-                    <strong>User Active</strong>
-                    <div class="text-muted small">Inactive users cannot login</div>
-                  </span>
+                <!-- Sidebar Column -->
+                <div class="col-lg-4">
+                    <!-- Action Buttons -->
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body d-grid gap-2">
+                            <button type="button" onclick="goBack()" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-lg me-1"></i> Cancel
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-lg me-1"></i> Save Changes
+                            </button>
+                        </div>
+                    </div>
                 </div>
-              </label>
             </div>
-          </div>
-
-          <!-- Action Buttons -->
-          <div class="card">
-            <div class="card-body">
-              <div class="d-grid gap-2">
-                <button type="button" onclick="goBack()" class="btn btn-outline-secondary">
-                  <i class="ti ti-x"></i> Cancel
-                </button>
-                <button type="submit" class="btn btn-action-edit">
-                  <i class="ti ti-device-floppy"></i> Save Changes
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </form>
-  </div>
+        </form>
+    </div>
 </div>
+
+@await Html.PartialAsync("_Toast")
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
@@ -196,10 +189,3 @@
         }
     </script>
 }
-
-<style>
-  .required::after {
-    content: " *";
-    color: #dc3545;
-  }
-</style>

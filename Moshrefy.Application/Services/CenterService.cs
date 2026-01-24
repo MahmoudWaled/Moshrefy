@@ -120,6 +120,17 @@ namespace Moshrefy.Application.Services
             );
         }
 
+        public async Task<PaginatedResult<CenterResponseDTO>> GetCentersPagedAsync(PaginationParameter paginationParameter, string status)
+        {
+            return status?.ToLower() switch
+            {
+                "active" => await GetActiveAsync(paginationParameter),
+                "inactive" => await GetInactiveAsync(paginationParameter),
+                "deleted" => await GetDeletedAsync(paginationParameter),
+                _ => await GetNonDeletedAsync(paginationParameter)
+            };
+        }
+
         public async Task UpdateAsync(int id, UpdateCenterDTO updateCenterDTO)
         {
             if (id <= 0)
