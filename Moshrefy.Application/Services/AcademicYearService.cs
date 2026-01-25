@@ -150,74 +150,25 @@ namespace Moshrefy.Application.Services
 
         #endregion
 
-        #region DataTables
 
-        // Get academic years for DataTables
-        public async Task<Moshrefy.Application.DTOs.Common.DataTableResponse<AcademicYearResponseDTO>> GetAcademicYearsDataTableAsync(Moshrefy.Application.DTOs.Common.DataTableRequest request)
+
+        #region SSR Pagination
+
+        // Get academic years with SSR pagination
+        public async Task<DTOs.Common.PaginatedResult<AcademicYearResponseDTO>> GetAcademicYearsPagedAsync(PaginationParameter paginationParameter)
         {
             var centerId = GetCurrentCenterIdOrThrow();
 
-            // Initial Query
-            var query = _unitOfWork.AcademicYears.GetQueryable()
-                .Where(ay => ay.CenterId == centerId && !ay.IsDeleted);
+            var result = await _unitOfWork.AcademicYears.GetPagedAsync(centerId, paginationParameter.PageNumber, paginationParameter.PageSize);
 
-            // Count Total Records
-            var totalRecords = await _unitOfWork.AcademicYears.CountAsync(ay => ay.CenterId == centerId && !ay.IsDeleted);
+            var dtos = _mapper.Map<List<AcademicYearResponseDTO>>(result.Items);
 
-            // Apply Search Filter
-            if (!string.IsNullOrEmpty(request.SearchValue))
+            return new DTOs.Common.PaginatedResult<AcademicYearResponseDTO>
             {
-                var search = request.SearchValue.ToLower();
-                query = query.Where(ay =>
-                    ay.Name.ToLower().Contains(search) ||
-                    (ay.CreatedByName != null && ay.CreatedByName.ToLower().Contains(search))
-                );
-            }
-
-            // Apply Status Filter
-            if (!string.IsNullOrEmpty(request.FilterStatus) && request.FilterStatus != "all")
-            {
-                bool isActive = request.FilterStatus == "active";
-                query = query.Where(ay => ay.IsActive == isActive);
-            }
-
-            // Count Filtered Records
-            var filteredRecords = await query.CountAsync();
-
-            // Apply Sorting
-            if (!string.IsNullOrEmpty(request.SortColumnName) && !string.IsNullOrEmpty(request.SortDirection))
-            {
-                bool isAsc = request.SortDirection.ToLower() == "asc";
-                query = request.SortColumnName.ToLower() switch
-                {
-                    "name" => isAsc ? query.OrderBy(ay => ay.Name) : query.OrderByDescending(ay => ay.Name),
-                    "createdat" => isAsc ? query.OrderBy(ay => ay.CreatedAt) : query.OrderByDescending(ay => ay.CreatedAt),
-                    "createdbyname" => isAsc ? query.OrderBy(ay => ay.CreatedByName) : query.OrderByDescending(ay => ay.CreatedByName),
-                    "isactive" => isAsc ? query.OrderBy(ay => ay.IsActive) : query.OrderByDescending(ay => ay.IsActive),
-                    _ => query.OrderByDescending(ay => ay.CreatedAt)
-                };
-            }
-            else
-            {
-                query = query.OrderByDescending(ay => ay.CreatedAt);
-            }
-
-            // Apply Pagination
-            if (request.Length > 0)
-            {
-                query = query.Skip(request.Start).Take(request.Length);
-            }
-
-            // Execute Query
-            var academicYears = await query.ToListAsync();
-            var data = _mapper.Map<List<AcademicYearResponseDTO>>(academicYears);
-
-            return new Moshrefy.Application.DTOs.Common.DataTableResponse<AcademicYearResponseDTO>
-            {
-                Draw = request.Draw,
-                RecordsTotal = totalRecords,
-                RecordsFiltered = filteredRecords,
-                Data = data
+                Items = dtos,
+                TotalCount = result.TotalCount,
+                PageNumber = paginationParameter.PageNumber,
+                PageSize = paginationParameter.PageSize
             };
         }
 

@@ -7,6 +7,7 @@ namespace Moshrefy.Application.Interfaces.IRepositories
     {
 
         public Task<IEnumerable<AcademicYear>> GetByName(string academicYearName);
+        Task<(IEnumerable<AcademicYear> Items, int TotalCount)> GetPagedAsync(int centerId, int pageNumber, int pageSize);
 
     }
 }

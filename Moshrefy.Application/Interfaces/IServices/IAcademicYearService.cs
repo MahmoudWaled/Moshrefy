@@ -1,4 +1,5 @@
 using Moshrefy.Application.DTOs.AcademicYear;
+using Moshrefy.Application.DTOs.Common;
 using Moshrefy.Domain.Paramter;
 
 namespace Moshrefy.Application.Interfaces.IServices
@@ -13,6 +14,6 @@ namespace Moshrefy.Application.Interfaces.IServices
         Task<AcademicYearResponseDTO> GetAcademicYearByIdAsync(int id);
         Task<List<AcademicYearResponseDTO>> GetAcademicYearsByNameAsync(string name);
         Task<int> GetTotalCountAsync();
-        Task<Moshrefy.Application.DTOs.Common.DataTableResponse<AcademicYearResponseDTO>> GetAcademicYearsDataTableAsync(Moshrefy.Application.DTOs.Common.DataTableRequest request);
+        Task<PaginatedResult<AcademicYearResponseDTO>> GetAcademicYearsPagedAsync(PaginationParameter paginationParameter);
     }
 }

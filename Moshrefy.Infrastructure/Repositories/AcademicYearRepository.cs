@@ -27,5 +27,21 @@ namespace Moshrefy.infrastructure.Repositories
                 .Where(ay => ay.Name.Contains(academicYearName))
                 .ToListAsync();
         }
+
+        public async Task<(IEnumerable<AcademicYear> Items, int TotalCount)> GetPagedAsync(int centerId, int pageNumber, int pageSize)
+        {
+            var query = appDbContext.Set<AcademicYear>()
+                .Where(ay => ay.CenterId == centerId && !ay.IsDeleted);
+
+            var totalCount = await query.CountAsync();
+
+            var items = await query
+                .OrderByDescending(ay => ay.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (items, totalCount);
+        }
     }
 }

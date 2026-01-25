@@ -38,27 +38,16 @@ namespace Moshrefy.Web.Controllers
 
         // List all academic years
         [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> Index(int page = 1, int pageSize = 10)
         {
-            return View();
+            var paginationParameter = new PaginationParameter { PageNumber = page, PageSize = pageSize };
+            var result = await _academicYearService.GetAcademicYearsPagedAsync(paginationParameter);
+            var mappedResult = _mapper.Map<PaginatedResult<AcademicYearVM>>(result);
+
+            return View(mappedResult);
         }
 
-        // DataTables - Get academic years data
-        [HttpPost]
-        public async Task<IActionResult> GetAcademicYearsData()
-        {
-            try
-            {
-                var request = Request.GetDataTableRequest();
-                var response = await _academicYearService.GetAcademicYearsDataTableAsync(request);
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error loading academic years data");
-                return StatusCode(500, new { error = "Error loading data. Please try again." });
-            }
-        }
+
 
         // View academic year details
         [HttpGet]

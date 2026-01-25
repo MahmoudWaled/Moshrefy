@@ -5,216 +5,236 @@
 }
 
 <!-- Page Header -->
-<div class="page-header-modern">
-    <div class="row g-2 align-items-center">
-        <div class="col">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb-modern">
-                    <li class="breadcrumb-item">
-                        <a asp-controller="AcademicYear" asp-action="Index"><i class="ti ti-calendar"></i> Academic Years</a>
-                        <i class="ti ti-chevron-right breadcrumb-separator ms-2"></i>
-                    </li>
-                    <li class="breadcrumb-item active" aria-current="page">@Model.Name</li>
-                </ol>
-            </nav>
-            <h2 class="page-title"><i class="ti ti-calendar"></i> @Model.Name</h2>
-        </div>
-        <div class="col-auto ms-auto">
-            <button type="button" onclick="goBack()" class="btn">
-                <i class="ti ti-arrow-left"></i> Back
-            </button>
+<div class="bg-white p-4 mb-4 shadow-sm border-bottom">
+    <div class="container-fluid">
+        <div class="row align-items-center">
+
+            <div class="col-md-8">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-2" style="--bs-breadcrumb-divider: '›';">
+                        <li class="breadcrumb-item">
+                            <a asp-controller="Admin" asp-action="Index" class="text-decoration-none text-muted small">
+                                <i class="bi bi-house-door me-1"></i> My Center
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a asp-controller="AcademicYear" asp-action="Index" class="text-decoration-none text-muted small">
+                                Academic Years
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item active small fw-medium text-primary" aria-current="page">
+                            @Model.Name
+                        </li>
+                    </ol>
+                </nav>
+                <div class="d-flex align-items-center">
+                    <h2 class="h4 fw-bold text-dark mb-0 me-3">
+                        <i class="bi bi-calendar3 me-2"></i>@Model.Name
+                    </h2>
+                </div>
+            </div>
+
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <div class="d-flex gap-2 justify-content-md-end">
+                    <a asp-action="Index" class="btn btn-outline-secondary btn-sm px-3 shadow-sm">
+                        <i class="bi bi-chevron-left me-1"></i> Back
+                    </a>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
 
-<!-- Page body -->
-<div class="page-body">
-  <div class="container-xl">
-    <div class="row">
-      <!-- Main Content -->
-      <div class="col-lg-8">
-        <!-- Status Banner -->
-        <div class="card mb-3 @(Model.IsActive ? "border-success" : "border-secondary")">
-          <div class="card-body py-3">
-            <div class="d-flex align-items-center">
-              @if (Model.IsActive)
-              {
-                <span class="avatar bg-state-active text-white me-3">
-                  <i class="ti ti-check"></i>
-                </span>
-                <div>
-                  <h3 class="mb-0 text-success">Active Academic Year</h3>
-                  <small class="text-muted">This academic year is currently in use</small>
-                </div>
-              }
-              else
-              {
-                <span class="avatar bg-state-inactive text-white me-3">
-                  <i class="ti ti-x"></i>
-                </span>
-                <div>
-                  <h3 class="mb-0 text-muted">Inactive Academic Year</h3>
-                  <small class="text-muted">This academic year is not in use</small>
-                </div>
-              }
-            </div>
-          </div>
-        </div>
+@Html.AntiForgeryToken()
 
-        <!-- Details Card -->
-        <div class="card mb-3">
-          <div class="card-header">
-            <div class="d-flex align-items-center">
-              <span class="avatar bg-primary text-white me-3">
-                <i class="ti ti-info-circle"></i>
-              </span>
-              <h3 class="card-title mb-0">Academic Year Information</h3>
-            </div>
-          </div>
-          <div class="card-body">
-            <div class="row g-3">
-              <div class="col-md-6">
-                <div class="mb-3">
-                  <label class="form-label text-muted small mb-1">
-                    <i class="ti ti-calendar me-1"></i> Year Name
-                  </label>
-                  <div class="h4 mb-0">@Model.Name</div>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="mb-3">
-                  <label class="form-label text-muted small mb-1">
-                    <i class="ti ti-toggle-left me-1"></i> Status
-                  </label>
-                  <div>
+<!-- Page body -->
+<div class="row">
+    <!-- Main Content -->
+    <div class="col-lg-8">
+        <!-- Status Banner -->
+        <div class="card mb-3 shadow-sm border-0 @(Model.IsActive ? "border-start border-success border-4" : "border-start border-secondary border-4")">
+            <div class="card-body py-3">
+                <div class="d-flex align-items-center">
                     @if (Model.IsActive)
                     {
-                      <span class="badge bg-state-active py-2 px-3">
-                        <i class="ti ti-check me-1"></i> Active
-                      </span>
+                        <div class="d-flex align-items-center justify-content-center bg-success text-white rounded-circle me-3" style="width: 48px; height: 48px;">
+                            <i class="bi bi-check-lg fs-4"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-0 text-success">Active Academic Year</h5>
+                            <small class="text-muted">This academic year is currently in use</small>
+                        </div>
                     }
                     else
                     {
-                      <span class="badge bg-state-inactive py-2 px-3">
-                        <i class="ti ti-x me-1"></i> Inactive
-                      </span>
+                        <div class="d-flex align-items-center justify-content-center bg-secondary text-white rounded-circle me-3" style="width: 48px; height: 48px;">
+                            <i class="bi bi-x-lg fs-4"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-0 text-muted">Inactive Academic Year</h5>
+                            <small class="text-muted">This academic year is not in use</small>
+                        </div>
                     }
-                  </div>
                 </div>
-              </div>
             </div>
-          </div>
+        </div>
+
+        <!-- Details Card -->
+        <div class="card mb-3 shadow-sm border-0">
+            <div class="card-header bg-white py-3">
+                <div class="d-flex align-items-center">
+                    <span class="d-flex align-items-center justify-content-center bg-primary opacity-75 text-white rounded me-3" style="width: 40px; height: 40px;">
+                        <i class="bi bi-info-circle"></i>
+                    </span>
+                    <h3 class="card-title h5 mb-0 fw-semibold">Academic Year Information</h3>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label text-muted small mb-1">
+                                <i class="bi bi-calendar3 me-1"></i> Year Name
+                            </label>
+                            <div class="h4 mb-0">@Model.Name</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label text-muted small mb-1">
+                                <i class="bi bi-toggle-on me-1"></i> Status
+                            </label>
+                            <div>
+                                @if (Model.IsActive)
+                                {
+                                    <span class="badge bg-success py-2 px-3">
+                                        <i class="bi bi-check me-1"></i> Active
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary py-2 px-3">
+                                        <i class="bi bi-x me-1"></i> Inactive
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Audit Trail Card -->
-        <div class="card">
-          <div class="card-header">
-            <div class="d-flex align-items-center">
-              <span class="avatar bg-secondary text-white me-3">
-                <i class="ti ti-history"></i>
-              </span>
-              <h3 class="card-title mb-0">Audit Trail</h3>
-            </div>
-          </div>
-          <div class="card-body">
-            <div class="row g-3">
-              <div class="col-md-6">
-                <div class="d-flex align-items-start">
-                  <div class="avatar avatar-sm bg-green-lt text-green me-3">
-                    <i class="ti ti-plus"></i>
-                  </div>
-                  <div>
-                    <div class="text-muted small">Created By</div>
-                    <div class="fw-medium">@(Model.CreatedByName ?? "N/A")</div>
-                    <div class="text-muted small">@Model.CreatedAt.ToString("MMM dd, yyyy 'at' hh:mm tt")</div>
-                  </div>
+        <div class="card mb-3 shadow-sm border-0">
+            <div class="card-header bg-white py-3">
+                <div class="d-flex align-items-center">
+                    <span class="d-flex align-items-center justify-content-center bg-secondary opacity-75 text-white rounded me-3" style="width: 40px; height: 40px;">
+                        <i class="bi bi-clock-history"></i>
+                    </span>
+                    <h3 class="card-title h5 mb-0 fw-semibold">Audit Trail</h3>
                 </div>
-              </div>
-              @if (Model.ModifiedAt.HasValue)
-              {
-                <div class="col-md-6">
-                  <div class="d-flex align-items-start">
-                    <div class="avatar avatar-sm bg-yellow-lt text-yellow me-3">
-                      <i class="ti ti-edit"></i>
-                    </div>
-                    <div>
-                      <div class="text-muted small">Last Modified By</div>
-                      <div class="fw-medium">@(Model.ModifiedByName ?? "N/A")</div>
-                      <div class="text-muted small">@Model.ModifiedAt.Value.ToString("MMM dd, yyyy 'at' hh:mm tt")</div>
-                    </div>
-                  </div>
-                </div>
-              }
             </div>
-          </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-start">
+                            <div class="d-flex align-items-center justify-content-center bg-success bg-opacity-10 text-success rounded me-3" style="width: 40px; height: 40px;">
+                                <i class="bi bi-plus"></i>
+                            </div>
+                            <div>
+                                <div class="text-muted small">Created By</div>
+                                <div class="fw-medium">@(Model.CreatedByName ?? "N/A")</div>
+                                <div class="text-muted small">@Model.CreatedAt.ToString("MMM dd, yyyy 'at' hh:mm tt")</div>
+                            </div>
+                        </div>
+                    </div>
+                    @if (Model.ModifiedAt.HasValue)
+                    {
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-start">
+                                <div class="d-flex align-items-center justify-content-center bg-warning bg-opacity-10 text-warning rounded me-3" style="width: 40px; height: 40px;">
+                                    <i class="bi bi-pencil"></i>
+                                </div>
+                                <div>
+                                    <div class="text-muted small">Last Modified By</div>
+                                    <div class="fw-medium">@(Model.ModifiedByName ?? "N/A")</div>
+                                    <div class="text-muted small">@Model.ModifiedAt.Value.ToString("MMM dd, yyyy 'at' hh:mm tt")</div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
         </div>
 
         <!-- Related Courses Card -->
-        <div class="card mb-3">
-          <div class="card-header">
-            <div class="d-flex align-items-center">
-              <span class="avatar bg-info text-white me-3">
-                <i class="ti ti-book"></i>
-              </span>
-              <h3 class="card-title mb-0">Related Courses</h3>
+        <div class="card mb-3 shadow-sm border-0">
+            <div class="card-header bg-white py-3">
+                <div class="d-flex align-items-center">
+                    <span class="d-flex align-items-center justify-content-center bg-info opacity-75 text-white rounded me-3" style="width: 40px; height: 40px;">
+                        <i class="bi bi-book"></i>
+                    </span>
+                    <h3 class="card-title h5 mb-0 fw-semibold">Related Courses</h3>
+                </div>
             </div>
-          </div>
-          <div class="card-body">
-            <div id="relatedCoursesList">
-              <div class="text-center text-muted py-3">
-                <span class="spinner-border spinner-border-sm"></span> Loading...
-              </div>
+            <div class="card-body">
+                <div id="relatedCoursesList">
+                    <div class="text-center text-muted py-3">
+                        <span class="spinner-border spinner-border-sm"></span> Loading...
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
+    </div>
 
-      <!-- Sidebar -->
-      <div class="col-lg-4">
+    <!-- Sidebar -->
+    <div class="col-lg-4">
         @if (User.IsInRole("Admin"))
         {
-          <!-- Actions Card -->
-          <div class="card mb-3">
-            <div class="card-header">
-              <h3 class="card-title"><i class="ti ti-settings me-2"></i>Actions</h3>
+            <!-- Actions Card -->
+            <div class="card mb-3 shadow-sm border-0">
+                <div class="card-header bg-white py-3">
+                    <h3 class="card-title h5 mb-0 fw-semibold"><i class="bi bi-gear me-2 text-primary"></i>Actions</h3>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">
+                            <i class="bi bi-pencil me-2"></i> Edit Academic Year
+                        </a>
+                        <hr class="my-2">
+                        <button onclick="deleteAcademicYear(@Model.Id)" class="btn btn-outline-danger">
+                            <i class="bi bi-trash me-2"></i> Delete Academic Year
+                        </button>
+                    </div>
+                </div>
             </div>
-            <div class="card-body">
-              <div class="d-grid gap-2">
-                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-action-edit">
-                  <i class="ti ti-edit me-2"></i> Edit Academic Year
-                </a>
-                <hr class="my-2">
-                <button onclick="deleteAcademicYear(@Model.Id)" class="btn btn-outline-danger">
-                  <i class="ti ti-trash me-2"></i> Delete Academic Year
-                </button>
-              </div>
-            </div>
-          </div>
 
-          <!-- Warning Card -->
-          <div class="card bg-red-lt">
-            <div class="card-body">
-              <div class="d-flex">
-                <div>
-                  <i class="ti ti-alert-triangle icon text-red me-2" style="font-size: 1.5rem;"></i>
+            <!-- Warning Card -->
+            <div class="card shadow-sm border-0 bg-danger bg-opacity-10">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <i class="bi bi-exclamation-triangle text-danger fs-4 me-3"></i>
+                        <div>
+                            <h6 class="text-danger mb-1">Delete Warning</h6>
+                            <p class="text-muted mb-0 small">
+                                Deleting this academic year will remove all associated data. This action requires confirmation.
+                            </p>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                  <h4 class="text-red mb-1">Delete Warning</h4>
-                  <p class="text-muted mb-0 small">
-                    Deleting this academic year will remove all associated data. This action requires confirmation.
-                  </p>
-                </div>
-              </div>
             </div>
-          </div>
         }
-      </div>
     </div>
-  </div>
 </div>
+
+@await Html.PartialAsync("_Modals")
+@await Html.PartialAsync("_Toast")
 
 @section Scripts {
     <script>
+        const token = $('input[name="__RequestVerificationToken"]').val();
+
         $(document).ready(function() {
             loadRelatedCourses();
         });
@@ -223,13 +243,13 @@
             $.get('@Url.Action("GetCourses")/@Model.Id', function(courses) {
                 var html = '';
                 if (courses.length === 0) {
-                    html = '<div class="text-center text-muted py-2"><i class="ti ti-book-off me-1"></i> No courses in this academic year</div>';
+                    html = '<div class="text-center text-muted py-2"><i class="bi bi-book me-1"></i> No courses in this academic year</div>';
                 } else {
                     html = '<ul class="list-group list-group-flush">';
                     courses.forEach(function(course) {
                         html += '<li class="list-group-item d-flex align-items-center justify-content-between">';
                         html += '<div>';
-                        html += '<i class="ti ti-book text-info me-2"></i>';
+                        html += '<i class="bi bi-book text-info me-2"></i>';
                         html += '<a href="/Course/Details/' + course.id + '" class="text-decoration-none">' + course.name + '</a>';
                         html += '</div>';
                         if (!course.isActive) {
@@ -243,49 +263,30 @@
             });
         }
 
-        function goBack() {
-            if (window.history.length > 1) {
-                window.history.back();
-            } else {
-                window.location.href = '@Url.Action("Index", "AcademicYear")';
-            }
-        }
-        
         function deleteAcademicYear(id) {
-            TablerDialog.fire({
+            setupModal({
                 title: 'Delete Academic Year?',
-                html: 'This will permanently delete this academic year.<br><br>Type <strong>Delete</strong> to confirm:',
-                icon: 'warning',
-                input: 'text',
+                body: 'This will permanently delete this academic year.<br><br>Type <strong>Delete</strong> to confirm:',
+                btnClass: 'btn-danger',
+                btnText: 'Delete',
+                showInput: true,
                 inputPlaceholder: 'Type Delete here',
-                showCancelButton: true,
-                confirmButtonColor: '#dc3545',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: '<i class="ti ti-trash"></i> Delete',
-                cancelButtonText: 'Cancel',
-                inputValidator: (value) => {
-                    if (value !== 'Delete') {
-                        return 'Please type "Delete" to confirm';
+                onConfirm: (inputVal) => {
+                    if (inputVal !== 'Delete') {
+                        showAlert('error', 'Please type "Delete" to confirm');
+                        return;
                     }
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.post('@Url.Action("Delete")', { id: id })
+                    $.post('@Url.Action("Delete")', { id: id, __RequestVerificationToken: token })
                         .done(function(response) {
                             if (response.success) {
-                                TablerDialog.fire({
-                                    icon: 'success',
-                                    title: 'Deleted!',
-                                    text: response.message || 'Academic year deleted successfully.',
-                                    timer: 2000,
-                                    showConfirmButton: false
-                                }).then(() => window.location.href = '@Url.Action("Index")');
+                                showAlert('success', response.message);
+                                setTimeout(() => window.location.href = '@Url.Action("Index")', 1500);
                             } else {
-                                TablerDialog.fire('Error', response.message, 'error');
+                                showAlert('error', response.message);
                             }
                         })
                         .fail(function() {
-                            TablerDialog.fire('Error', 'An error occurred while deleting.', 'error');
+                            showAlert('error', 'An error occurred');
                         });
                 }
             });
