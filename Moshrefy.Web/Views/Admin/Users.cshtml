@@ -1,331 +1,308 @@
+@model Moshrefy.Application.DTOs.Common.PaginatedResult<Moshrefy.Web.Models.User.UserVM>
 @{
     ViewData["Title"] = "My Team";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    var currentRole = ViewBag.CurrentRole as string ?? "all";
+    var currentStatus = ViewBag.CurrentStatus as string ?? "all";
+    var pageSize = Model.PageSize;
 }
 
 <!-- Page Header -->
-<div class="page-header-modern">
-    <div class="row g-2 align-items-center">
-        <div class="col">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb-modern">
-                    <li class="breadcrumb-item">
-                        <a asp-controller="Admin" asp-action="Index"><i class="ti ti-home"></i> My Center</a>
-                        <i class="ti ti-chevron-right breadcrumb-separator ms-2"></i>
-                    </li>
-                    <li class="breadcrumb-item active" aria-current="page">My Team</li>
-                </ol>
-            </nav>
-            <h2 class="page-title"><i class="ti ti-users"></i> My Team</h2>
-        </div>
-        <div class="col-auto ms-auto d-print-none">
-            <div class="btn-list">
-                <a asp-action="CreateUser" class="btn btn-action-create d-none d-sm-inline-block">
-                    <i class="ti ti-user-plus icon"></i> Add New Member
-                </a>
+<div class="bg-white p-4 mb-4 shadow-sm border-bottom">
+    <div class="container-fluid">
+        <div class="row align-items-center">
+
+            <div class="col-md-8">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-2" style="--bs-breadcrumb-divider: '›';">
+                        <li class="breadcrumb-item">
+                            <a asp-controller="Admin" asp-action="Index" class="text-decoration-none text-muted small">
+                                <i class="bi bi-house-door me-1"></i> My Center
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item active small fw-medium text-primary" aria-current="page">
+                            My Team
+                        </li>
+                    </ol>
+                </nav>
+                <div class="d-flex align-items-center">
+                    <h2 class="h4 fw-bold text-secondary-emphasis mb-0 me-3">
+                     <i class="bi bi-people me-2 fs-5"></i>   My Team
+                    </h2>
+                </div>
             </div>
+
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <div class="d-flex gap-2 justify-content-md-end">
+                    <a asp-action="CreateUser" class="btn btn-success btn-sm px-3 shadow-sm">
+                        <i class="bi bi-person-plus me-1"></i> Add New Member
+                    </a>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
 
+@Html.AntiForgeryToken()
+
 <!-- Page body -->
-<div class="page-body">
-  <div class="container-xl">
-    <div class="row row-deck row-cards">
-      <div class="col-12">
-        <div class="card">
-          <div class="card-header">
-            <h3 class="card-title">Team Members</h3>
-            <div class="ms-auto d-flex gap-3 align-items-center">
-              <!-- Role Type Filter Buttons -->
-              <div class="btn-group" role="group" aria-label="Role filter">
-                <button type="button" class="btn btn-outline-secondary btn-sm active" data-filter-role="all"><i class="ti ti-list icon"></i> All</button>
-                <button type="button" class="btn btn-outline-secondary btn-sm" data-filter-role="Employee">
-                  <i class="ti ti-user"></i> Employees
-                </button>
-                <button type="button" class="btn btn-outline-secondary btn-sm" data-filter-role="Manager">
-                  <i class="ti ti-user-cog"></i> Managers
-                </button>
-              </div>
-              <!-- Status Filter -->
-              <div class="btn-group" role="group" aria-label="Status filter">
-                <button type="button" class="btn btn-outline-secondary btn-sm active" data-filter-status="all"><i class="ti ti-list icon"></i> All</button>
-                <button type="button" class="btn btn-outline-secondary btn-sm" data-filter-status="active">
-                  Active
-                </button>
-                <button type="button" class="btn btn-outline-secondary btn-sm" data-filter-status="inactive">
-                  Inactive
-                </button>
-              </div>
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                    <h3 class="card-title h5 mb-0 fw-semibold text-secondary-emphasis">
+                        Team Members 
+                    <span class="badge bg-primary  ">@Model.TotalCount members</span>
+
+                    </h3>
+                    <div class="d-flex gap-3 align-items-center flex-wrap">
+                        <!-- Role Filter Buttons -->
+                        <div class="btn-group" role="group" aria-label="Role filter">
+                            <a asp-action="Users" asp-route-role="all" asp-route-status="@currentStatus" asp-route-pageSize="@pageSize"
+                               class="btn btn-sm btn-outline-secondary border @(currentRole == "all" ? "active" : "")">
+                                <i class="bi bi-list me-1"></i> All
+                            </a>
+                            <a asp-action="Users" asp-route-role="Employee" asp-route-status="@currentStatus" asp-route-pageSize="@pageSize"
+                               class="btn btn-sm btn-outline-secondary border @(currentRole == "Employee" ? "active" : "")">
+                                <i class="bi bi-person me-1"></i> Employees
+                            </a>
+                            <a asp-action="Users" asp-route-role="Manager" asp-route-status="@currentStatus" asp-route-pageSize="@pageSize"
+                               class="btn btn-sm btn-outline-secondary border @(currentRole == "Manager" ? "active" : "")">
+                                <i class="bi bi-person-gear me-1"></i> Managers
+                            </a>
+                        </div>
+                        <!-- Status Filter Buttons -->
+                        <div class="btn-group" role="group" aria-label="Status filter">
+                            <a asp-action="Users" asp-route-role="@currentRole" asp-route-status="all" asp-route-pageSize="@pageSize"
+                               class="btn btn-sm btn-outline-secondary border @(currentStatus == "all" ? "active" : "")">
+                                <i class="bi bi-list me-1"></i> All
+                            </a>
+                            <a asp-action="Users" asp-route-role="@currentRole" asp-route-status="active" asp-route-pageSize="@pageSize"
+                               class="btn btn-sm btn-outline-secondary border @(currentStatus == "active" ? "active" : "")">
+                                Active
+                            </a>
+                            <a asp-action="Users" asp-route-role="@currentRole" asp-route-status="inactive" asp-route-pageSize="@pageSize"
+                               class="btn btn-sm btn-outline-secondary border @(currentStatus == "inactive" ? "active" : "")">
+                                Inactive
+                            </a>
+                        </div>
+                        <!-- Page Size Dropdown -->
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-list-ol me-1"></i> @pageSize per page
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item @(pageSize == 10 ? "active" : "")" asp-action="Users" asp-route-role="@currentRole" asp-route-status="@currentStatus" asp-route-pageSize="10">10 per page</a></li>
+                                <li><a class="dropdown-item @(pageSize == 25 ? "active" : "")" asp-action="Users" asp-route-role="@currentRole" asp-route-status="@currentStatus" asp-route-pageSize="25">25 per page</a></li>
+                                <li><a class="dropdown-item @(pageSize == 50 ? "active" : "")" asp-action="Users" asp-route-role="@currentRole" asp-route-status="@currentStatus" asp-route-pageSize="50">50 per page</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-          <div class="card-body">
-            <div class="table-responsive">
-              <table id="usersTable" class="table table-vcenter table-hover">
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Name</th>
-                    <th>Username</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Type</th>
-                    <th>Status</th>
-                    <th>Created At</th>
-                    <th class="w-1">Actions</th>
-                  </tr>
-                </thead>
-                <tbody></tbody>
-              </table>
+            <div class="card-body p-3">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0" id="usersTable">
+                        <thead class="table-primary">
+                            <tr>
+                                <th>#</th>
+                                <th>@Html.DisplayNameFor(m => m.Items.First().Name)</th>
+                                <th>@Html.DisplayNameFor(m => m.Items.First().UserName)</th>
+                                <th>@Html.DisplayNameFor(m => m.Items.First().Email)</th>
+                                <th>@Html.DisplayNameFor(m => m.Items.First().PhoneNumber)</th>
+                                <th>Type</th>
+                                <th>@Html.DisplayNameFor(m => m.Items.First().IsActive)</th>
+                                <th>Created</th>
+                                <th class="w-1">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.Items.Any())
+                            {
+                                var rowNumber = (Model.PageNumber - 1) * Model.PageSize;
+                                @foreach (var user in Model.Items)
+                                {
+                                    rowNumber++;
+                                    <tr>
+                                        <td class="text-muted">@rowNumber</td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <span class="d-flex align-items-center justify-content-center bg-primary-subtle text-primary rounded-circle me-2" style="width: 32px; height: 32px;">
+                                                    <i class="bi bi-person"></i>
+                                                </span>
+                                                <span class="text-secondary-emphasis">@user.Name</span>
+                                            </div>
+                                        </td>
+                                        <td class="text-muted">@user.UserName</td>
+                                        <td class="text-muted">@(user.Email ?? "N/A")</td>
+                                        <td class="text-muted">@(user.PhoneNumber ?? "N/A")</td>
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(user.RoleName))
+                                            {
+                                                <span class="text-muted">@user.RoleName</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">N/A</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (user.IsActive)
+                                            {
+                                                <span class="text-muted">Active</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">Inactive</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <small class="text-muted">
+                                                <i class="bi bi-clock me-1"></i>@user.CreatedAt.ToString("MMM dd, yyyy")
+                                            </small>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <a asp-action="UserDetails" asp-route-id="@user.Id" class="btn btn-sm btn-light" title="View Details">
+                                                    <i class="bi bi-eye"></i>
+                                                    view
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="9" class="text-center py-5">
+                                        <i class="bi bi-people fs-1 text-muted d-block mb-3"></i>
+                                        <p class="text-muted mb-2">No team members found</p>
+                                        <a asp-action="CreateUser" class="btn btn-success btn-sm">
+                                            <i class="bi bi-person-plus me-1"></i> Add New Member
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
             </div>
-          </div>
+
+            <!-- Pagination Footer -->
+            @if (Model.TotalPages > 1)
+            {
+                <div class="card-footer bg-white">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center mb-0">
+                            <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
+                                <a class="page-link" asp-action="Users" asp-route-page="@(Model.PageNumber - 1)" asp-route-pageSize="@pageSize" asp-route-role="@currentRole" asp-route-status="@currentStatus">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                            </li>
+                            @for (int i = 1; i <= Model.TotalPages; i++)
+                            {
+                                <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                                    <a class="page-link" asp-action="Users" asp-route-page="@i" asp-route-pageSize="@pageSize" asp-route-role="@currentRole" asp-route-status="@currentStatus">@i</a>
+                                </li>
+                            }
+                            <li class="page-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")">
+                                <a class="page-link" asp-action="Users" asp-route-page="@(Model.PageNumber + 1)" asp-route-pageSize="@pageSize" asp-route-role="@currentRole" asp-route-status="@currentStatus">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            }
         </div>
-      </div>
     </div>
-  </div>
 </div>
+
+@await Html.PartialAsync("_Modals")
+@await Html.PartialAsync("_Toast")
 
 @section Scripts {
     <script>
-        $(document).ready(function () {
-            var currentRoleFilter = 'all';
-            var currentStatusFilter = 'all';
-            
-            var table = $('#usersTable').DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: {
-                    url: '@Url.Action("GetUsersData")',
-                    type: 'POST',
-                    data: function (d) {
-                        d.filterStatus = currentStatusFilter;
-                        d.filterRole = currentRoleFilter;
-                    },
-                    error: function (xhr, error, thrown) {
-                        console.error('DataTable Error:', error, thrown);
-                        TablerDialog.fire({
-                            icon: 'error',
-                            title: 'Error Loading Data',
-                            text: error + '. Check console for details.'
-                        });
-                    },
-                    dataSrc: function(json) {
-                        return json.data;
-                    }
-                },
-                columns: [
-                    {
-                        data: null,
-                        orderable: false,
-                        searchable: false,
-                        width: '50px',
-                        className: 'text-center',
-                        render: function(data, type, row, meta) {
-                            return '<span class="text-muted">' + (meta.row + meta.settings._iDisplayStart + 1) + '</span>';
-                        }
-                    },
-                    { data: 'name', name: 'name' },
-                    { data: 'userName', name: 'userName' },
-                    { data: 'email', name: 'email', defaultContent: '<span class="text-muted">N/A</span>' },
-                    { data: 'phoneNumber', name: 'phoneNumber', defaultContent: '<span class="text-muted">N/A</span>' },
-                    {
-                        data: 'roleName',
-                        name: 'roleName',
-                        render: function (data, type, row) {
-                            return '<span class="text-muted">' + (data || 'N/A') + '</span>';
-                        }
-                    },
-                    {
-                        data: 'isActive',
-                        name: 'isActive',
-                        render: function (data, type, row) {
-                            if (data) {
-                                return '<span class="text-muted">Active</span>';
-                            } else {
-                                return '<span class="badge bg-state-inactive text-white"><i class="ti ti-x"></i> Inactive</span>';
-                            }
-                        }
-                    },
-                    {
-                        data: 'createdAt',
-                        name: 'createdAt',
-                        className: 'text-center',
-                        render: function(data) {
-                            if (!data) return '<span class="text-muted">N/A</span>';
-                            var date = new Date(data);
-                            return '<small class="text-muted"><i class="ti ti-clock me-1"></i>' + date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) + '</small>';
-                        }
-                    },
-                    {
-                        data: null,
-                        orderable: false,
-                        render: function (data, type, row) {
-                            var actions = '<div class="btn-group btn-group-sm">';
-                            actions += '<a href="/Admin/UserDetails/' + row.id + '" class="btn btn-action-icon action-view" title="View Details"><i class="ti ti-eye"></i></a>';
-                            actions += '<a href="/Admin/EditUser/' + row.id + '" class="btn btn-action-icon action-edit" title="Edit"><i class="ti ti-edit"></i></a>';
-
-                            if (row.isActive) {
-                                actions += '<button onclick="deactivateUser(\'' + row.id + '\')" class="btn btn-action-icon action-deactivate" title="Disable Access"><i class="ti ti-ban"></i></button>';
-                            } else {
-                                actions += '<button onclick="activateUser(\'' + row.id + '\')" class="btn btn-action-icon action-activate" title="Enable Access"><i class="ti ti-check"></i></button>';
-                            }
-
-                            if (!row.isDeleted) {
-                                actions += '<button onclick="deleteUser(\'' + row.id + '\')" class="btn btn-action-icon action-delete" title="Remove"><i class="ti ti-trash"></i></button>';
-                            }
-
-                            actions += '</div>';
-                            return actions;
-                        }
-                    }
-
-                ],
-                order: [[8, 'desc']],
-                language: {
-                    search: '_INPUT_',
-                    searchPlaceholder: 'Search members...',
-                    lengthMenu: '_MENU_ entries',
-                    info: 'Showing _START_ to _END_ of _TOTAL_ members',
-                    infoEmpty: 'No team members found',
-                    infoFiltered: '(from _MAX_ total)',
-                    zeroRecords: 'No matching members found',
-                    paginate: { first: '«', last: '»', next: '›', previous: '‹' },
-                    processing: '<div class="spinner-border text-primary" role="status"></div><span class="ms-2">Loading...</span>'
-                }
-            });
-
-            // Role filter button click handler
-            $('[data-filter-role]').click(function() {
-                $('[data-filter-role]').removeClass('active');
-                $(this).addClass('active');
-                currentRoleFilter = $(this).data('filter-role');
-                table.ajax.reload();
-            });
-
-            // Status filter button click handler
-            var currentStatusFilter = 'all';
-            $('[data-filter-status]').click(function() {
-                $('[data-filter-status]').removeClass('active');
-                $(this).addClass('active');
-                currentStatusFilter = $(this).data('filter-status');
-                table.ajax.reload();
-            });
-
-            // Update AJAX data function
-            table.on('preXhr.dt', function (e, settings, data) {
-                data.filterStatus = currentStatusFilter;
-                data.filterRole = currentRoleFilter;
-            });
-        });
+        const token = $('input[name="__RequestVerificationToken"]').val();
 
         function activateUser(id) {
-            TablerDialog.fire({
+            setupModal({
                 title: 'Enable Access?',
-                text: 'Enable access for this team member?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#28a745',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: '<i class="ti ti-check"></i> Yes, enable',
-                cancelButtonText: 'Cancel'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.post('@Url.Action("ActivateUser")', { id: id })
-                        .done(function (response) {
-                            if (response.success) {
-                                TablerDialog.fire({
-                                    icon: 'success',
-                                    title: 'Success!',
-                                    text: response.message,
-                                    timer: 2000,
-                                    showConfirmButton: false
-                                });
-                                $('#usersTable').DataTable().ajax.reload();
+                body: 'Enable access for this team member?',
+                btnClass: 'btn-success',
+                btnText: 'Yes, Enable',
+                showInput: false,
+                onConfirm: () => {
+                    $.post('@Url.Action("ActivateUser")', { id: id, __RequestVerificationToken: token })
+                        .done(function (res) {
+                            if (res.success) {
+                                showAlert('success', res.message);
+                                setTimeout(() => location.reload(), 1500);
                             } else {
-                                TablerDialog.fire('Error', response.message, 'error');
+                                showAlert('error', res.message);
                             }
                         })
                         .fail(function () {
-                            TablerDialog.fire('Error', 'An error occurred', 'error');
+                            showAlert('error', 'An error occurred');
                         });
                 }
             });
         }
 
         function deactivateUser(id) {
-            TablerDialog.fire({
+            setupModal({
                 title: 'Disable Access?',
-                text: 'This member will not be able to log in.',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#ffc107',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: '<i class="ti ti-ban"></i> Yes, disable',
-                cancelButtonText: 'Cancel'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.post('@Url.Action("DeactivateUser")', { id: id })
-                        .done(function (response) {
-                            if (response.success) {
-                                TablerDialog.fire({
-                                    icon: 'success',
-                                    title: 'Success!',
-                                    text: response.message,
-                                    timer: 2000,
-                                    showConfirmButton: false
-                                });
-                                $('#usersTable').DataTable().ajax.reload();
+                body: 'This member will not be able to log in.',
+                btnClass: 'btn-warning',
+                btnText: 'Yes, Disable',
+                showInput: false,
+                onConfirm: () => {
+                    $.post('@Url.Action("DeactivateUser")', { id: id, __RequestVerificationToken: token })
+                        .done(function (res) {
+                            if (res.success) {
+                                showAlert('success', res.message);
+                                setTimeout(() => location.reload(), 1500);
                             } else {
-                                TablerDialog.fire('Error', response.message, 'error');
+                                showAlert('error', res.message);
                             }
                         })
                         .fail(function () {
-                            TablerDialog.fire('Error', 'An error occurred', 'error');
+                            showAlert('error', 'An error occurred');
                         });
                 }
             });
         }
 
         function deleteUser(id) {
-            TablerDialog.fire({
+            setupModal({
                 title: 'Remove Team Member?',
-                html: 'This action cannot be undone.<br><br>Type <strong>Delete</strong> to confirm:',
-                icon: 'warning',
-                input: 'text',
+                body: 'This action cannot be undone.<br><br>Type <strong>Delete</strong> to confirm:',
+                btnClass: 'btn-danger',
+                btnText: 'Remove',
+                showInput: true,
                 inputPlaceholder: 'Type Delete here',
-                showCancelButton: true,
-                confirmButtonColor: '#dc3545',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: '<i class="ti ti-trash"></i> Remove',
-                cancelButtonText: 'Cancel',
-                inputValidator: (value) => {
-                    if (value !== 'Delete') {
-                        return 'Please type "Delete" to confirm';
+                onConfirm: (inputVal) => {
+                    if (inputVal !== 'Delete') {
+                        showAlert('error', 'Please type "Delete" to confirm');
+                        return;
                     }
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.post('@Url.Action("SoftDeleteUser")', { id: id })
-                        .done(function (response) {
-                            if (response.success) {
-                                TablerDialog.fire({
-                                    icon: 'success',
-                                    title: 'Removed!',
-                                    text: response.message,
-                                    timer: 2000,
-                                    showConfirmButton: false
-                                });
-                                $('#usersTable').DataTable().ajax.reload();
+                    $.post('@Url.Action("SoftDeleteUser")', { id: id, __RequestVerificationToken: token })
+                        .done(function (res) {
+                            if (res.success) {
+                                showAlert('success', res.message);
+                                setTimeout(() => location.reload(), 1500);
                             } else {
-                                TablerDialog.fire('Error', response.message, 'error');
+                                showAlert('error', res.message);
                             }
                         })
                         .fail(function () {
-                            TablerDialog.fire('Error', 'An error occurred', 'error');
+                            showAlert('error', 'An error occurred');
                         });
                 }
             });
         }
     </script>
 }
-

@@ -32,7 +32,15 @@ function setupModal(options) {
     $('#mInput').val('');
     $('#mBtn').prop('disabled', showInput);
 
-    // 3. Securely show modal using Bootstrap 5 Native JS
+    // 3. Enable button when user types "Delete" (case-sensitive)
+    if (showInput) {
+        $('#mInput').off('input').on('input', function () {
+            const isValid = $(this).val() === 'Delete';
+            $('#mBtn').prop('disabled', !isValid);
+        });
+    }
+
+    // 4. Securely show modal using Bootstrap 5 Native JS
     try {
         const modalInstance = bootstrap.Modal.getOrCreateInstance(modalElement);
         modalInstance.show();
@@ -42,8 +50,14 @@ function setupModal(options) {
         $(modalElement).modal('show');
     }
 
-    // 4. Detach previous clicks to prevent multiple submissions
-    $('#mBtn').off('click').on('click', onConfirm);
+    // 5. Detach previous clicks to prevent multiple submissions
+    $('#mBtn').off('click').on('click', function () {
+        if (showInput) {
+            onConfirm($('#mInput').val());
+        } else {
+            onConfirm();
+        }
+    });
 }
 // Navigation helper
 function goBack(defaultUrl) {

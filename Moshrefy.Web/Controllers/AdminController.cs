@@ -48,9 +48,16 @@ namespace Moshrefy.Web.Controllers
 
         // List all users
         [HttpGet]
-        public IActionResult Users()
+        public async Task<IActionResult> Users(int page = 1, int pageSize = 10, string role = "all", string status = "all")
         {
-            return View();
+            var paginationParameter = new PaginationParameter { PageNumber = page, PageSize = pageSize };
+            var result = await _userManagementService.GetUsersPagedAsync(paginationParameter, role, status);
+            var usersVM = _mapper.Map<PaginatedResult<UserVM>>(result);
+
+            ViewBag.CurrentRole = role;
+            ViewBag.CurrentStatus = status;
+
+            return View(usersVM);
         }
 
         // DataTables - Get users data

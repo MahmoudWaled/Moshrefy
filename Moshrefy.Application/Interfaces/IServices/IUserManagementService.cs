@@ -21,6 +21,7 @@ namespace Moshrefy.Application.Interfaces.IServices
         Task SoftDeleteUserAsync(string userId);
         Task<int> GetTotalCountAsync();
         Task<DataTableResponse<UserResponseDTO>> GetUsersDataTableAsync(DataTableRequest request);
+        Task<PaginatedResult<UserResponseDTO>> GetUsersPagedAsync(PaginationParameter paginationParameter, string role, string status);
     }
 
 }

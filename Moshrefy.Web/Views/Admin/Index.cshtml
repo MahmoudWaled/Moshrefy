@@ -4,192 +4,182 @@
 }
 
 <!-- Page Header -->
-<div class="page-header-modern">
-    <div class="row g-2 align-items-center">
-        <div class="col">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb-modern">
-                    <li class="breadcrumb-item active" aria-current="page"><i class="ti ti-home"></i> My Center</li>
-                </ol>
-            </nav>
-            <h2 class="page-title"><i class="ti ti-home"></i> Center Dashboard</h2>
+<div class="bg-white p-4 mb-4 shadow-sm border-bottom">
+    <div class="container-fluid">
+        <div class="row align-items-center">
+
+            <div class="col-md-8">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-2" style="--bs-breadcrumb-divider: '›';">
+                        <li class="breadcrumb-item active small fw-medium text-primary" aria-current="page">
+                            <i class="bi bi-house-door me-1"></i> My Center
+                        </li>
+                    </ol>
+                </nav>
+                <div class="d-flex align-items-center">
+                    <h2 class="h4 fw-bold text-dark mb-0 me-3">
+                        <i class="bi bi-speedometer2 me-2"></i>Center Dashboard
+                    </h2>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
 
 <!-- Page body -->
-<div class="page-body">
-  <div class="container-xl">
-    @{
-      var hasCenterIdClaim = User.Claims.Any(c => c.Type == "CenterId" && !string.IsNullOrEmpty(c.Value));
-    }
-    @if (!hasCenterIdClaim)
-    {
-      <div class="row mb-3">
-        <div class="col-12">
-          <div class="alert alert-warning">
-            <div class="d-flex">
-              <div><i class="ti ti-alert-triangle icon me-2"></i></div>
-              <div><strong>System Updated!</strong><br>We've made some improvements. Please <strong>log out and log back in</strong> to enjoy better performance.</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    }
-
-    <!-- Quick Actions -->
-    <div class="row mb-4">
-      <div class="col-12">
-        <h3 class="mb-3"><i class="ti ti-rocket me-2"></i>Quick Actions</h3>
-      </div>
-    </div>
-
-    <div class="row row-deck row-cards">
-      <!-- Team Members Card -->
-      <div class="col-sm-6 col-lg-3">
-        <div class="card card-sm">
-          <div class="card-body">
-            <div class="row align-items-center">
-              <div class="col-auto">
-                <span class="avatar bg-role-employee text-white" style="width: 3rem; height: 3rem;">
-                  <i class="ti ti-users" style="font-size: 1.5rem;"></i>
-                </span>
-              </div>
-              <div class="col">
-                <div class="fw-bold">Team Members</div>
-                <div class="text-muted small">Manage employees & managers</div>
-              </div>
-            </div>
-          </div>
-          <div class="card-footer">
-            <a asp-action="Users" class="btn btn-primary w-100">
-              <i class="ti ti-arrow-right"></i> View Team
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Add Team Member Card -->
-      <div class="col-sm-6 col-lg-3">
-        <div class="card card-sm">
-          <div class="card-body">
-            <div class="row align-items-center">
-              <div class="col-auto">
-                <span class="avatar bg-action-create text-white" style="width: 3rem; height: 3rem;">
-                  <i class="ti ti-user-plus" style="font-size: 1.5rem;"></i>
-                </span>
-              </div>
-              <div class="col">
-                <div class="fw-bold">Add Member</div>
-                <div class="text-muted small">Create new team member</div>
-              </div>
-            </div>
-          </div>
-          <div class="card-footer">
-            <a asp-action="CreateUser" class="btn btn-success w-100">
-              <i class="ti ti-plus"></i> Add New
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Academic Years Card -->
-      <div class="col-sm-6 col-lg-3">
-        <div class="card card-sm">
-          <div class="card-body">
-            <div class="row align-items-center">
-              <div class="col-auto">
-                <span class="avatar bg-info text-white" style="width: 3rem; height: 3rem;">
-                  <i class="ti ti-calendar" style="font-size: 1.5rem;"></i>
-                </span>
-              </div>
-              <div class="col">
-                <div class="fw-bold">Academic Years</div>
-                <div class="text-muted small">Manage academic periods</div>
-              </div>
-            </div>
-          </div>
-          <div class="card-footer">
-            <a asp-controller="AcademicYear" asp-action="Index" class="btn btn-info w-100">
-              <i class="ti ti-arrow-right"></i> View Years
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Courses Card -->
-      <div class="col-sm-6 col-lg-3">
-        <div class="card card-sm">
-          <div class="card-body">
-            <div class="row align-items-center">
-              <div class="col-auto">
-                <span class="avatar bg-purple text-white" style="width: 3rem; height: 3rem;">
-                  <i class="ti ti-book" style="font-size: 1.5rem;"></i>
-                </span>
-              </div>
-              <div class="col">
-                <div class="fw-bold">Courses</div>
-                <div class="text-muted small">Manage course catalog</div>
-              </div>
-            </div>
-          </div>
-          <div class="card-footer">
-            <a asp-controller="Course" asp-action="Index" class="btn btn-purple w-100">
-              <i class="ti ti-arrow-right"></i> View Courses
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Help Section -->
-    <div class="row mt-4">
-      <div class="col-12">
-        <div class="card">
-          <div class="card-header">
-            <h3 class="card-title"><i class="ti ti-help me-2"></i>Quick Help</h3>
-          </div>
-          <div class="card-body">
-            <div class="row">
-              <div class="col-md-4 mb-3 mb-md-0">
-                <div class="d-flex">
-                  <span class="avatar bg-azure-lt text-azure me-3"><i class="ti ti-users"></i></span>
-                  <div>
-                    <h4 class="mb-1">Managing Team</h4>
-                    <p class="text-muted small mb-0">Add, edit, or remove team members from your center.</p>
-                  </div>
+<div class="row">
+    <div class="col-12">
+        @{
+            var hasCenterIdClaim = User.Claims.Any(c => c.Type == "CenterId" && !string.IsNullOrEmpty(c.Value));
+        }
+        @if (!hasCenterIdClaim)
+        {
+            <div class="alert alert-warning d-flex align-items-center mb-4">
+                <i class="bi bi-exclamation-triangle fs-4 me-3"></i>
+                <div>
+                    <strong>System Updated!</strong><br>We've made some improvements. Please <strong>log out and log back in</strong> to enjoy better performance.
                 </div>
-              </div>
-              <div class="col-md-4 mb-3 mb-md-0">
-                <div class="d-flex">
-                  <span class="avatar bg-green-lt text-green me-3"><i class="ti ti-calendar"></i></span>
-                  <div>
-                    <h4 class="mb-1">Academic Years</h4>
-                    <p class="text-muted small mb-0">Organize courses by academic periods.</p>
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-4">
-                <div class="d-flex">
-                  <span class="avatar bg-purple-lt text-purple me-3"><i class="ti ti-book"></i></span>
-                  <div>
-                    <h4 class="mb-1">Courses</h4>
-                    <p class="text-muted small mb-0">Create and manage courses for students.</p>
-                  </div>
-                </div>
-              </div>
             </div>
-          </div>
+        }
+
+        <!-- Quick Actions -->
+        <h5 class="mb-3"><i class="bi bi-rocket me-2"></i>Quick Actions</h5>
+
+        <div class="row g-3 mb-4">
+            <!-- Team Members Card -->
+            <div class="col-sm-6 col-lg-3">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <span class="d-flex align-items-center justify-content-center bg-primary opacity-75 text-white rounded me-3" style="width: 48px; height: 48px;">
+                                <i class="bi bi-people fs-4"></i>
+                            </span>
+                            <div>
+                                <div class="fw-bold">Team Members</div>
+                                <div class="text-muted small">Manage employees & managers</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 pt-0">
+                        <a asp-action="Users" class="btn btn-primary w-100">
+                            <i class="bi bi-arrow-right me-1"></i> View Team
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Team Member Card -->
+            <div class="col-sm-6 col-lg-3">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <span class="d-flex align-items-center justify-content-center bg-success opacity-75 text-white rounded me-3" style="width: 48px; height: 48px;">
+                                <i class="bi bi-person-plus fs-4"></i>
+                            </span>
+                            <div>
+                                <div class="fw-bold">Add Member</div>
+                                <div class="text-muted small">Create new team member</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 pt-0">
+                        <a asp-action="CreateUser" class="btn btn-success w-100">
+                            <i class="bi bi-plus-lg me-1"></i> Add New
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Academic Years Card -->
+            <div class="col-sm-6 col-lg-3">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <span class="d-flex align-items-center justify-content-center bg-info opacity-75 text-white rounded me-3" style="width: 48px; height: 48px;">
+                                <i class="bi bi-calendar3 fs-4"></i>
+                            </span>
+                            <div>
+                                <div class="fw-bold">Academic Years</div>
+                                <div class="text-muted small">Manage academic periods</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 pt-0">
+                        <a asp-controller="AcademicYear" asp-action="Index" class="btn btn-info w-100">
+                            <i class="bi bi-arrow-right me-1"></i> View Years
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Courses Card -->
+            <div class="col-sm-6 col-lg-3">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <span class="d-flex align-items-center justify-content-center bg-secondary opacity-75 text-white rounded me-3" style="width: 48px; height: 48px;">
+                                <i class="bi bi-book fs-4"></i>
+                            </span>
+                            <div>
+                                <div class="fw-bold">Courses</div>
+                                <div class="text-muted small">Manage course catalog</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 pt-0">
+                        <a asp-controller="Course" asp-action="Index" class="btn btn-secondary w-100">
+                            <i class="bi bi-arrow-right me-1"></i> View Courses
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
+
+        <!-- Help Section -->
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3">
+                <h3 class="card-title h5 mb-0 fw-semibold">
+                    <i class="bi bi-question-circle me-2 text-primary"></i>Quick Help
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-start">
+                            <span class="d-flex align-items-center justify-content-center bg-primary-subtle text-primary rounded me-3" style="width: 40px; height: 40px;">
+                                <i class="bi bi-people"></i>
+                            </span>
+                            <div>
+                                <h6 class="mb-1">Managing Team</h6>
+                                <p class="text-muted small mb-0">Add, edit, or remove team members from your center.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-start">
+                            <span class="d-flex align-items-center justify-content-center bg-success-subtle text-success rounded me-3" style="width: 40px; height: 40px;">
+                                <i class="bi bi-calendar3"></i>
+                            </span>
+                            <div>
+                                <h6 class="mb-1">Academic Years</h6>
+                                <p class="text-muted small mb-0">Organize courses by academic periods.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-start">
+                            <span class="d-flex align-items-center justify-content-center bg-secondary-subtle text-secondary rounded me-3" style="width: 40px; height: 40px;">
+                                <i class="bi bi-book"></i>
+                            </span>
+                            <div>
+                                <h6 class="mb-1">Courses</h6>
+                                <p class="text-muted small mb-0">Create and manage courses for students.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
-
-<style>
-  .btn-purple { background-color: #6f42c1 !important; border-color: #6f42c1 !important; color: white; }
-  .btn-purple:hover { background-color: #5a32a3 !important; border-color: #5a32a3 !important; color: white; }
-  .bg-purple { background-color: #6f42c1 !important; }
-  .card { transition: transform 0.2s, box-shadow 0.2s; }
-  .card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-</style>

@@ -5,226 +5,238 @@
 }
 
 <!-- Page Header -->
-<div class="page-header-modern">
-    <div class="row g-2 align-items-center">
-        <div class="col">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb-modern">
-                    <li class="breadcrumb-item">
-                        <a asp-controller="Admin" asp-action="Index"><i class="ti ti-home"></i> My Center</a>
-                        <i class="ti ti-chevron-right breadcrumb-separator ms-2"></i>
-                    </li>
-                    <li class="breadcrumb-item">
-                        <a asp-controller="Admin" asp-action="Users">My Team</a>
-                        <i class="ti ti-chevron-right breadcrumb-separator ms-2"></i>
-                    </li>
-                    <li class="breadcrumb-item active" aria-current="page">@Model.Name</li>
-                </ol>
-            </nav>
-            <h2 class="page-title"><i class="ti ti-user"></i> Team Member Details</h2>
-        </div>
-        <div class="col-auto ms-auto">
-            <button type="button" onclick="goBack()" class="btn">
-                <i class="ti ti-arrow-left"></i> Back
-            </button>
+<div class="bg-white p-4 mb-4 shadow-sm border-bottom">
+    <div class="container-fluid">
+        <div class="row align-items-center">
+
+            <div class="col-md-8">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-2" style="--bs-breadcrumb-divider: '›';">
+                        <li class="breadcrumb-item">
+                            <a asp-controller="Admin" asp-action="Index" class="text-decoration-none text-muted small">
+                                <i class="bi bi-house-door me-1"></i> My Center
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a asp-controller="Admin" asp-action="Users" class="text-decoration-none text-muted small">
+                                My Team
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item active small fw-medium text-primary" aria-current="page">
+                            @Model.Name
+                        </li>
+                    </ol>
+                </nav>
+                <div class="d-flex align-items-center">
+                    <h2 class="h4 fw-bold text-dark mb-0 me-3">
+                        <i class="bi bi-person me-2"></i>Team Member Details
+                    </h2>
+                </div>
+            </div>
+
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <div class="d-flex gap-2 justify-content-md-end">
+                    <a asp-action="Users" class="btn btn-outline-secondary btn-sm px-3 shadow-sm">
+                        <i class="bi bi-chevron-left me-1"></i> Back to Team
+                    </a>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
 
+@Html.AntiForgeryToken()
+
 <!-- Page body -->
-<div class="page-body">
-  <div class="container-xl">
-    <div class="row">
-      <!-- Member Info Card -->
-      <div class="col-md-4">
-        <div class="card">
-          <div class="card-body text-center">
-            <div class="avatar avatar-xl mb-3" style="background-color: var(--tblr-primary); color: white; font-size: 2rem;">
-              @Model.Name.Substring(0, 1).ToUpper()
-            </div>
-            <h3 class="card-title mb-1">@Model.Name</h3>
-            <p class="text-muted">@@@Model.UserName</p>
-
-            <div class="mb-3">
-              @if (Model.IsActive)
-              {
-                <span class="badge bg-state-active">Active Member</span>
-              }
-              else
-              {
-                <span class="badge bg-secondary">Inactive</span>
-              }
-              <br />
-              @if (!string.IsNullOrEmpty(Model.RoleName))
-              {
-                <span class="badge mt-2 @(Model.RoleName == "Employee" ? "bg-role-employee" : Model.RoleName == "Manager" ? "bg-role-manager" : "bg-secondary")">
-                  <i class="ti @(Model.RoleName == "Employee" ? "ti-user" : "ti-user-cog")"></i>
-                  @Model.RoleName
-                </span>
-              }
-            </div>
-
-            <div class="list-group list-group-flush text-start">
-              @if (!string.IsNullOrEmpty(Model.Email))
-              {
-                <div class="list-group-item">
-                  <i class="ti ti-mail me-2 text-muted"></i><strong>Email:</strong> @Model.Email
+<div class="row">
+    <!-- Member Info Card -->
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-body text-center">
+                <div class="d-flex align-items-center justify-content-center bg-primary-subtle text-primary rounded-circle mx-auto mb-3" style="width: 80px; height: 80px; font-size: 2rem;">
+                    @Model.Name.Substring(0, 1).ToUpper()
                 </div>
-              }
-              @if (!string.IsNullOrEmpty(Model.PhoneNumber))
-              {
-                <div class="list-group-item">
-                  <i class="ti ti-phone me-2 text-muted"></i><strong>Phone:</strong> @Model.PhoneNumber
-                </div>
-              }
-            </div>
+                <h4 class="mb-1">@Model.Name</h4>
+                <p class="text-muted">@@@Model.UserName</p>
 
-            <div class="mt-3">
-              <a asp-action="EditUser" asp-route-id="@Model.Id" class="btn btn-action-edit w-100">
-                <i class="ti ti-edit"></i> Edit Info
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Actions Card -->
-      <div class="col-md-8">
-        <div class="card">
-          <div class="card-header">
-            <h3 class="card-title">Member Actions</h3>
-          </div>
-          <div class="card-body">
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <div class="card bg-light">
-                  <div class="card-body">
-                    <div class="d-flex align-items-center mb-2">
-                      <span class="avatar bg-purple text-white me-3"><i class="ti ti-tag"></i></span>
-                      <div>
-                        <strong>Member Type</strong>
-                        <div class="text-muted small">Current: <strong>@Model.RoleName</strong></div>
-                      </div>
-                    </div>
-                    <button class="btn btn-sm btn-purple" type="button" data-bs-toggle="modal" data-bs-target="#changeRoleModal">
-                      <i class="ti ti-arrows-exchange"></i> Change Type
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-md-6 mb-3">
-                <div class="card bg-light">
-                  <div class="card-body">
-                    <div class="d-flex align-items-center mb-2">
-                      <span class="avatar bg-action-view text-white me-3"><i class="ti ti-key"></i></span>
-                      <div>
-                        <strong>Access Control</strong>
-                        <div class="text-muted small">@(Model.IsActive ? "Currently has access" : "Access disabled")</div>
-                      </div>
-                    </div>
+                <div class="mb-3">
                     @if (Model.IsActive)
                     {
-                      <button class="btn btn-sm btn-state-deactive" onclick="deactivateMember()">
-                        <i class="ti ti-ban"></i> Disable Access
-                      </button>
+                        <span class="badge bg-success">Active Member</span>
                     }
                     else
                     {
-                      <button class="btn btn-sm btn-state-active" onclick="activateMember()">
-                        <i class="ti ti-check"></i> Enable Access
-                      </button>
+                        <span class="badge bg-secondary">Inactive</span>
                     }
-                  </div>
+                    <br />
+                    @if (!string.IsNullOrEmpty(Model.RoleName))
+                    {
+                        <span class="text-muted mt-2 d-inline-block">@Model.RoleName</span>
+                    }
                 </div>
-              </div>
-            </div>
 
-            <div class="row">
-              <div class="col-12 mb-3">
-                <div class="card bg-light">
-                  <div class="card-body">
-                    <div class="d-flex align-items-center mb-2">
-                      <span class="avatar bg-action-delete text-white me-3"><i class="ti ti-user-off"></i></span>
-                      <div>
-                        <strong>Remove Member</strong>
-                        <div class="text-muted small">This can be undone later</div>
-                      </div>
-                    </div>
-                    <button class="btn btn-sm btn-action-delete" onclick="removeMember()">
-                      <i class="ti ti-trash"></i> Remove from Team
-                    </button>
-                  </div>
+                <div class="list-group list-group-flush text-start mb-3">
+                    @if (!string.IsNullOrEmpty(Model.Email))
+                    {
+                        <div class="list-group-item border-0 px-0">
+                            <i class="bi bi-envelope me-2 text-muted"></i><strong>Email:</strong> @Model.Email
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.PhoneNumber))
+                    {
+                        <div class="list-group-item border-0 px-0">
+                            <i class="bi bi-telephone me-2 text-muted"></i><strong>Phone:</strong> @Model.PhoneNumber
+                        </div>
+                    }
                 </div>
-              </div>
-            </div>
 
-            <!-- Member Activity -->
-            <div class="card">
-              <div class="card-header">
-                <h4 class="card-title"><i class="ti ti-clock me-2"></i>Member Since</h4>
-              </div>
-              <div class="card-body">
-                <p><strong>Joined:</strong> @Model.CreatedAt.ToString("MMMM dd, yyyy")</p>
-                @if (!string.IsNullOrEmpty(Model.CreatedByName))
-                {
-                  <p><strong>Added by:</strong> @Model.CreatedByName</p>
-                }
-              </div>
+                <a asp-action="EditUser" asp-route-id="@Model.Id" class="btn btn-primary w-100">
+                    <i class="bi bi-pencil me-1"></i> Edit Info
+                </a>
             </div>
-          </div>
         </div>
-      </div>
     </div>
-  </div>
+
+    <!-- Actions Card -->
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3">
+                <h3 class="card-title h5 mb-0 fw-semibold">
+                    <i class="bi bi-gear me-2 text-primary"></i>Member Actions
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="card bg-light border-0">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-2">
+                                    <span class="d-flex align-items-center justify-content-center bg-secondary text-white rounded me-3" style="width: 40px; height: 40px;">
+                                        <i class="bi bi-tag"></i>
+                                    </span>
+                                    <div>
+                                        <strong>Member Type</strong>
+                                        <div class="text-muted small">Current: <strong>@Model.RoleName</strong></div>
+                                    </div>
+                                </div>
+                                <button class="btn btn-sm btn-secondary" type="button" data-bs-toggle="modal" data-bs-target="#changeRoleModal">
+                                    <i class="bi bi-arrow-left-right me-1"></i> Change Type
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card bg-light border-0">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-2">
+                                    <span class="d-flex align-items-center justify-content-center bg-info text-white rounded me-3" style="width: 40px; height: 40px;">
+                                        <i class="bi bi-key"></i>
+                                    </span>
+                                    <div>
+                                        <strong>Access Control</strong>
+                                        <div class="text-muted small">@(Model.IsActive ? "Currently has access" : "Access disabled")</div>
+                                    </div>
+                                </div>
+                                @if (Model.IsActive)
+                                {
+                                    <button class="btn btn-sm btn-warning" onclick="deactivateMember()">
+                                        <i class="bi bi-pause-circle me-1"></i> Disable Access
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-sm btn-success" onclick="activateMember()">
+                                        <i class="bi bi-check-circle me-1"></i> Enable Access
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3 mt-2">
+                    <div class="col-12">
+                        <div class="card bg-light border-0">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-2">
+                                    <span class="d-flex align-items-center justify-content-center bg-danger text-white rounded me-3" style="width: 40px; height: 40px;">
+                                        <i class="bi bi-person-x"></i>
+                                    </span>
+                                    <div>
+                                        <strong>Remove Member</strong>
+                                        <div class="text-muted small">This can be undone later</div>
+                                    </div>
+                                </div>
+                                <button class="btn btn-sm btn-danger" onclick="removeMember()">
+                                    <i class="bi bi-trash me-1"></i> Remove from Team
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Member Activity -->
+                <div class="card mt-3 border-0">
+                    <div class="card-header bg-white">
+                        <h5 class="card-title mb-0"><i class="bi bi-clock me-2"></i>Member Since</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-1"><strong>Joined:</strong> @Model.CreatedAt.ToString("MMMM dd, yyyy")</p>
+                        @if (!string.IsNullOrEmpty(Model.CreatedByName))
+                        {
+                            <p class="mb-0"><strong>Added by:</strong> @Model.CreatedByName</p>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Change Role Modal -->
 <div class="modal fade" id="changeRoleModal" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Change Member Type</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <p>Select the new type for <strong>@Model.Name</strong>:</p>
-        <div class="mb-3">
-          <label class="form-label">Member Type</label>
-          <select id="newRoleSelect" class="form-select">
-            <option value="">-- Select Type --</option>
-            <option value="Employee">Employee</option>
-            <option value="Manager">Manager</option>
-          </select>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Change Member Type</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Select the new type for <strong>@Model.Name</strong>:</p>
+                <div class="mb-3">
+                    <label class="form-label">Member Type</label>
+                    <select id="newRoleSelect" class="form-select">
+                        <option value="">-- Select Type --</option>
+                        <option value="Employee">Employee</option>
+                        <option value="Manager">Manager</option>
+                    </select>
+                </div>
+                <div class="alert alert-info" id="roleDescriptionModal" style="display: none;">
+                    <i class="bi bi-info-circle me-2"></i><span id="roleDescriptionTextModal"></span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="changeRole()">Change Type</button>
+            </div>
         </div>
-        <div class="alert alert-info" id="roleDescriptionModal" style="display: none;">
-          <i class="ti ti-info-circle me-2"></i><span id="roleDescriptionTextModal"></span>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-action-edit" onclick="changeRole()">Change Type</button>
-      </div>
     </div>
-  </div>
 </div>
+
+@await Html.PartialAsync("_Modals")
+@await Html.PartialAsync("_Toast")
 
 @section Scripts {
     <script>
-        function goBack() {
-            if (window.history.length > 1) {
-                window.history.back();
-            } else {
-                window.location.href = '@Url.Action("Users", "Admin")';
-            }
-        }
+        const token = $('input[name="__RequestVerificationToken"]').val();
         
         const roleDescriptions = {
             'Employee': 'Regular team member who can handle day-to-day tasks.',
             'Manager': 'Senior team member with additional permissions.'
         };
 
-        // Initialize modal when document is ready
         var changeRoleModal;
         $(document).ready(function() {
             var changeRoleModalEl = document.getElementById('changeRoleModal');
@@ -232,14 +244,6 @@
                 changeRoleModal = new bootstrap.Modal(changeRoleModalEl);
             }
         });
-
-        function showChangeRoleModal() { 
-            if (changeRoleModal) {
-                changeRoleModal.show(); 
-            } else {
-                TablerDialog.fire('Error', 'Could not open modal. Please refresh the page.', 'error');
-            }
-        }
 
         $('#newRoleSelect').change(function() {
             var r = $(this).val();
@@ -255,90 +259,99 @@
         function changeRole() {
             var newRole = $('#newRoleSelect').val();
             if (!newRole) { 
-                TablerDialog.fire('Error', 'Please select a member type', 'error'); 
+                showAlert('error', 'Please select a member type'); 
                 return; 
             }
-            TablerDialog.fire({ 
-                title: 'Change Type?', 
-                text: 'Change to ' + newRole + '?', 
-                icon: 'question', 
-                showCancelButton: true, 
-                confirmButtonColor: '#6f42c1', 
-                confirmButtonText: 'Yes, change' 
-            })
-            .then((r) => { 
-                if (r.isConfirmed) { 
-                    $.post('@Url.Action("ChangeUserRole")', { id: '@Model.Id', newRole: newRole })
-                    .done((res) => { 
-                        if (res.success) { 
-                            if (changeRoleModal) changeRoleModal.hide(); 
-                            TablerDialog.fire({ 
-                                icon: 'success', 
-                                title: 'Success!', 
-                                text: res.message,
-                                timer: 2000, 
-                                showConfirmButton: false 
-                            }).then(() => location.reload()); 
-                        } else { 
-                            TablerDialog.fire('Error', res.message, 'error'); 
-                        } 
-                    })
-                    .fail(function() {
-                        TablerDialog.fire('Error', 'An error occurred while changing type.', 'error');
-                    }); 
-                } 
+            
+            setupModal({
+                title: 'Change Type?',
+                body: 'Change to <strong>' + newRole + '</strong>?',
+                btnClass: 'btn-primary',
+                btnText: 'Yes, Change',
+                showInput: false,
+                onConfirm: () => {
+                    $.post('@Url.Action("ChangeUserRole")', { id: '@Model.Id', newRole: newRole, __RequestVerificationToken: token })
+                        .done((res) => { 
+                            if (res.success) { 
+                                if (changeRoleModal) changeRoleModal.hide(); 
+                                showAlert('success', res.message);
+                                setTimeout(() => location.reload(), 1500);
+                            } else { 
+                                showAlert('error', res.message); 
+                            } 
+                        })
+                        .fail(function() {
+                            showAlert('error', 'An error occurred while changing type.');
+                        }); 
+                }
             });
         }
 
         function activateMember() {
-            TablerDialog.fire({ title: 'Enable Access?', icon: 'question', showCancelButton: true, confirmButtonColor: '#28a745', confirmButtonText: '<i class="ti ti-check"></i> Yes, enable' })
-            .then((r) => { if (r.isConfirmed) { $.post('@Url.Action("ActivateUser")', { id: '@Model.Id' }).done((res) => { if (res.success) { TablerDialog.fire({ icon: 'success', title: 'Enabled!', timer: 2000, showConfirmButton: false }).then(() => location.reload()); } }); } });
+            setupModal({
+                title: 'Enable Access?',
+                body: 'Enable access for this team member?',
+                btnClass: 'btn-success',
+                btnText: 'Yes, Enable',
+                showInput: false,
+                onConfirm: () => {
+                    $.post('@Url.Action("ActivateUser")', { id: '@Model.Id', __RequestVerificationToken: token })
+                        .done((res) => { 
+                            if (res.success) { 
+                                showAlert('success', 'Access enabled!');
+                                setTimeout(() => location.reload(), 1500);
+                            } 
+                        });
+                }
+            });
         }
 
         function deactivateMember() {
-            TablerDialog.fire({ title: 'Disable Access?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ffc107', confirmButtonText: '<i class="ti ti-ban"></i> Yes, disable' })
-            .then((r) => { if (r.isConfirmed) { $.post('@Url.Action("DeactivateUser")', { id: '@Model.Id' }).done((res) => { if (res.success) { TablerDialog.fire({ icon: 'success', title: 'Disabled!', timer: 2000, showConfirmButton: false }).then(() => location.reload()); } }); } });
+            setupModal({
+                title: 'Disable Access?',
+                body: 'This member will not be able to log in.',
+                btnClass: 'btn-warning',
+                btnText: 'Yes, Disable',
+                showInput: false,
+                onConfirm: () => {
+                    $.post('@Url.Action("DeactivateUser")', { id: '@Model.Id', __RequestVerificationToken: token })
+                        .done((res) => { 
+                            if (res.success) { 
+                                showAlert('success', 'Access disabled!');
+                                setTimeout(() => location.reload(), 1500);
+                            } 
+                        });
+                }
+            });
         }
 
         function removeMember() {
-            TablerDialog.fire({
+            setupModal({
                 title: 'Remove Team Member?',
-                html: 'This action cannot be undone.<br><br>Type <strong>Delete</strong> to confirm:',
-                icon: 'warning',
-                input: 'text',
+                body: 'This action cannot be undone.<br><br>Type <strong>Delete</strong> to confirm:',
+                btnClass: 'btn-danger',
+                btnText: 'Remove',
+                showInput: true,
                 inputPlaceholder: 'Type Delete here',
-                showCancelButton: true,
-                confirmButtonColor: '#dc3545',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: '<i class="ti ti-trash"></i> Remove',
-                cancelButtonText: 'Cancel',
-                inputValidator: (value) => {
-                    if (value !== 'Delete') {
-                        return 'Please type "Delete" to confirm';
+                onConfirm: (inputVal) => {
+                    if (inputVal !== 'Delete') {
+                        showAlert('error', 'Please type "Delete" to confirm');
+                        return;
                     }
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.post('@Url.Action("SoftDeleteUser")', { id: '@Model.Id' })
+                    $.post('@Url.Action("SoftDeleteUser")', { id: '@Model.Id', __RequestVerificationToken: token })
                         .done(function(response) {
                             if (response.success) {
-                                TablerDialog.fire({
-                                    icon: 'success',
-                                    title: 'Removed!',
-                                    text: response.message,
-                                    timer: 2000,
-                                    showConfirmButton: false
-                                }).then(() => window.location.href = '@Url.Action("Users")');
+                                showAlert('success', response.message);
+                                setTimeout(() => window.location.href = '@Url.Action("Users")', 1500);
                             } else {
-                                TablerDialog.fire('Error', response.message, 'error');
+                                showAlert('error', response.message);
                             }
                         })
                         .fail(function() {
-                            TablerDialog.fire('Error', 'An error occurred', 'error');
+                            showAlert('error', 'An error occurred');
                         });
                 }
             });
         }
     </script>
-    <style>.bg-purple,.btn-purple{background-color:#6f42c1!important;color:white;}.btn-purple:hover{background-color:#5a32a3!important;}</style>
 }

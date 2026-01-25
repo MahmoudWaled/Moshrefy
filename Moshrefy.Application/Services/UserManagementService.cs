@@ -485,6 +485,71 @@ namespace Moshrefy.Application.Services
         }
 
         #endregion
+
+        #region SSR Pagination
+
+        public async Task<PaginatedResult<UserResponseDTO>> GetUsersPagedAsync(PaginationParameter paginationParameter, string role, string status)
+        {
+            var currentCenterId = _tenantContext.GetCurrentCenterId();
+            if (currentCenterId == null)
+                throw new BadRequestException("Admin must be assigned to a center.");
+
+            // Base query: users in this center (exclude soft-deleted by default unless status is "deleted")
+            var query = _userManager.Users.Where(u => u.CenterId == currentCenterId && !u.IsDeleted);
+
+            // Role filter
+            if (!string.IsNullOrEmpty(role) && role.ToLower() != "all")
+            {
+                var usersInRole = await _userManager.GetUsersInRoleAsync(role);
+                var userIdsInRole = usersInRole.Select(u => u.Id).ToList();
+                query = query.Where(u => userIdsInRole.Contains(u.Id));
+            }
+
+            // Status filter
+            if (!string.IsNullOrEmpty(status))
+            {
+                switch (status.ToLower())
+                {
+                    case "active":
+                        query = query.Where(u => u.IsActive);
+                        break;
+                    case "inactive":
+                        query = query.Where(u => !u.IsActive);
+                        break;
+                }
+            }
+
+            var totalCount = await query.CountAsync();
+
+            var users = await query
+                .OrderByDescending(u => u.CreatedAt)
+                .Skip((paginationParameter.PageNumber - 1) * paginationParameter.PageSize)
+                .Take(paginationParameter.PageSize)
+                .ToListAsync();
+
+            var mappedUsers = _mapper.Map<List<UserResponseDTO>>(users);
+
+            // Get roles for each user
+            foreach (var user in mappedUsers)
+            {
+                var appUser = await _userManager.FindByIdAsync(user.Id);
+                if (appUser != null)
+                {
+                    var roles = await _userManager.GetRolesAsync(appUser);
+                    user.RoleName = roles.FirstOrDefault();
+                }
+            }
+
+            return new PaginatedResult<UserResponseDTO>
+            {
+                Items = mappedUsers,
+                TotalCount = totalCount,
+                PageNumber = paginationParameter.PageNumber,
+                PageSize = paginationParameter.PageSize
+            };
+        }
+
+        #endregion
     }
 }
 

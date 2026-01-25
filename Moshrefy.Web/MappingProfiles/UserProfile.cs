@@ -1,4 +1,5 @@
 using AutoMapper;
+using Moshrefy.Application.DTOs.Common;
 using Moshrefy.Application.DTOs.User;
 using Moshrefy.Web.Models.User;
 
@@ -13,6 +14,8 @@ namespace Moshrefy.Web.MappingProfiles
             CreateMap<UpdateUserProfileVM, UpdateUserProfileDTO>().ReverseMap();
             CreateMap<UpdateUserRoleVM, UpdateUserRoleDTO>().ReverseMap();
             CreateMap<UserVM, UserResponseDTO>().ReverseMap();
+            CreateMap<PaginatedResult<UserResponseDTO>, PaginatedResult<UserVM>>()
+                .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items));
         }
     }
 }
